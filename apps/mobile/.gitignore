@@ -42,3 +42,4 @@ expo-env.d.ts
 
 # eas development build
 build-*.tar.gz
+build-*.apk
