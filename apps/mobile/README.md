@@ -1,16 +1,17 @@
-# Starter base
+# tkhwang-pico
 
-A starting point to help you set up your project quickly and use the common components provided by `react-native-reusables`. The idea is to make it easier for you to get started.
+## EAS Build/Submit/Update
 
-## Features
+### EAS Build
 
-- NativeWind v4
-- Dark and light mode
-  - Android Navigation Bar matches mode
-  - Persistent mode
-- Common components
-  - ThemeToggle, Avatar, Button, Card, Progress, Text, Tooltip
+#### iOS
 
-<img src="https://github.com/mrzachnugent/react-native-reusables/assets/63797719/42c94108-38a7-498b-9c70-18640420f1bc"
-     alt="starter-base-template"
-     style="width:270px;" />
+```bash
+eas build --platform ios --profile production
+```
+
+#### Android
+
+```bash
+eas build --platform android --profile preview
+```
