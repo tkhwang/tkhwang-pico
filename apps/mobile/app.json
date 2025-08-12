@@ -27,7 +27,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "app.tkbetter.pico.dev"
     },
     "web": {
       "bundler": "metro",
@@ -45,6 +46,12 @@
       "eas": {
         "projectId": "0b4ed5dd-8139-4fce-96c3-5977720a896f"
       }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/0b4ed5dd-8139-4fce-96c3-5977720a896f"
     }
   }
 }
