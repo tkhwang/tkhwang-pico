@@ -12,6 +12,7 @@
     "build:ios": "eas build --profile production --platform ios",
     "build:ios:local": "eas build --profile development-simulator --platform ios --local",
     "build:android": "eas build --profile preview --platform android",
+    "build:android:local": "eas build --profile development --platform android --local",
     "clean": "rm -rf .expo node_modules",
     "postinstall": "npx tailwindcss -i ./global.css -o ./node_modules/.cache/nativewind/global.css"
   },
