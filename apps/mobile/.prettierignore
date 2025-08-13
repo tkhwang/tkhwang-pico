@@ -1,0 +1,13 @@
+node_modules/
+dist/
+web-build/
+.expo/
+*.min.*
+*.lock
+*.log
+coverage/
+build/
+*.d.ts
+*.tsbuildinfo
+
+
