@@ -9,9 +9,9 @@ import { StatusBar } from 'expo-status-bar';
 
 import { ThemeToggle } from '~/components/ThemeToggle';
 import { setAndroidNavigationBar } from '~/lib/android-navigation-bar';
+import '~/global.css';
 import { NAV_THEME } from '~/lib/constants';
 import { useColorScheme } from '~/lib/useColorScheme';
-import '~/global.css';
 
 const LIGHT_THEME: Theme = {
   ...DefaultTheme,
