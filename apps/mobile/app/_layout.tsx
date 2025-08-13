@@ -2,11 +2,10 @@ import * as React from 'react';
 
 import { Appearance, Platform } from 'react-native';
 
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-
 import { DarkTheme, DefaultTheme, Theme, ThemeProvider } from '@react-navigation/native';
 import { PortalHost } from '@rn-primitives/portal';
+import { Stack } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 
 import { ThemeToggle } from '~/components/ThemeToggle';
 import { setAndroidNavigationBar } from '~/lib/android-navigation-bar';

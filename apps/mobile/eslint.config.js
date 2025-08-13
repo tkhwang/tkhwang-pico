@@ -37,9 +37,9 @@ module.exports = defineConfig([
           pathGroups: [
             { pattern: 'react', group: 'external', position: 'before' },
             { pattern: 'react-native', group: 'external', position: 'before' },
-            { pattern: 'expo-*', group: 'external', position: 'before' },
             { pattern: '~/**', group: 'internal' },
           ],
+          // Keep these as plain externals without creating subgroups/newlines
           pathGroupsExcludedImportTypes: ['react', 'react-native'],
         },
       ],
