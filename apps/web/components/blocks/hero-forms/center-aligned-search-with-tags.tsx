@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,8 +10,14 @@ import {
   SearchIcon,
   UserIcon,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function HeroFormCenterAlignedSearchWithTags() {
+  const router = useRouter();
+
+  const handleInputClick = () => {
+    router.push("/login");
+  };
   return (
     <>
       {/* Hero */}
@@ -35,6 +43,7 @@ export default function HeroFormCenterAlignedSearchWithTags() {
                       className="h-full"
                       id="article"
                       placeholder="Search whatever you want"
+                      onClick={handleInputClick}
                     />
                   </div>
                   <div className="flex-[0_0_auto]">
