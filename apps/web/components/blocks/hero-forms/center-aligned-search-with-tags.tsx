@@ -2,13 +2,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  BriefcaseIcon,
-  FlowerIcon,
-  HeartIcon,
-  LightbulbIcon,
-  MountainSnow,
+  CalendarIcon,
+  CloudSunIcon,
+  FileTextIcon,
   SearchIcon,
-  SettingsIcon,
+  UserIcon,
 } from "lucide-react";
 
 export default function HeroFormCenterAlignedSearchWithTags() {
@@ -100,28 +98,20 @@ export default function HeroFormCenterAlignedSearchWithTags() {
             </div>
             <div className="mt-10 flex flex-wrap justify-center gap-2 sm:mt-20">
               <Button variant={"outline"}>
-                <BriefcaseIcon className="mr-2 h-auto w-3 flex-shrink-0" />
-                Business
+                <CloudSunIcon className="mr-2 h-auto w-3 flex-shrink-0" />
+                Weather
               </Button>
               <Button variant={"outline"}>
-                <SettingsIcon className="mr-2 h-auto w-3 flex-shrink-0" />
-                Strategy
+                <CalendarIcon className="mr-2 h-auto w-3 flex-shrink-0" />
+                Calendar
               </Button>
               <Button variant={"outline"}>
-                <HeartIcon className="mr-2 h-auto w-3 flex-shrink-0" />
-                Health
+                <FileTextIcon className="mr-2 h-auto w-3 flex-shrink-0" />
+                Content
               </Button>
               <Button variant={"outline"}>
-                <LightbulbIcon className="mr-2 h-auto w-3 flex-shrink-0" />
-                Creative
-              </Button>
-              <Button variant={"outline"}>
-                <FlowerIcon className="mr-2 h-auto w-3 flex-shrink-0" />
-                Environment
-              </Button>
-              <Button variant={"outline"}>
-                <MountainSnow className="mr-2 h-auto w-3 flex-shrink-0" />
-                Adventure
+                <UserIcon className="mr-2 h-auto w-3 flex-shrink-0" />
+                Secretary
               </Button>
             </div>
           </div>
