@@ -1,12 +1,12 @@
-import type { FC } from "react";
 import {
   ThreadListItemPrimitive,
   ThreadListPrimitive,
 } from "@assistant-ui/react";
 import { ArchiveIcon, PlusIcon } from "lucide-react";
+import type { FC } from "react";
 
-import { Button } from "@/components/ui/button";
 import { TooltipIconButton } from "@/components/assistant-ui/tooltip-icon-button";
+import { Button } from "@/components/ui/button";
 
 export const ThreadList: FC = () => {
   return (
