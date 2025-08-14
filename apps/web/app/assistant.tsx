@@ -2,14 +2,9 @@
 
 import { AssistantRuntimeProvider } from "@assistant-ui/react";
 import { useChatRuntime } from "@assistant-ui/react-ai-sdk";
-import { Thread } from "@/components/assistant-ui/thread";
-import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
+
 import { AppSidebar } from "@/components/app-sidebar";
-import { Separator } from "@/components/ui/separator";
+import { Thread } from "@/components/assistant-ui/thread";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -18,6 +13,12 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { Separator } from "@/components/ui/separator";
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
 
 export const Assistant = () => {
   const runtime = useChatRuntime();
@@ -34,7 +35,11 @@ export const Assistant = () => {
               <Breadcrumb>
                 <BreadcrumbList>
                   <BreadcrumbItem className="hidden md:block">
-                    <BreadcrumbLink href="https://www.assistant-ui.com/docs/getting-started" target="_blank" rel="noopener noreferrer">
+                    <BreadcrumbLink
+                      href="https://www.assistant-ui.com/docs/getting-started"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
                       Build Your Own ChatGPT UX
                     </BreadcrumbLink>
                   </BreadcrumbItem>

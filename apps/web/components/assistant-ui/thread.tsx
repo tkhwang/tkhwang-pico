@@ -1,29 +1,30 @@
 import {
-  ThreadPrimitive,
-  ComposerPrimitive,
-  MessagePrimitive,
   ActionBarPrimitive,
   BranchPickerPrimitive,
+  ComposerPrimitive,
   ErrorPrimitive,
+  MessagePrimitive,
+  ThreadPrimitive,
 } from "@assistant-ui/react";
-import type { FC } from "react";
+import { motion } from "framer-motion";
 import {
   ArrowDownIcon,
   ArrowUpIcon,
-  PlusIcon,
-  CopyIcon,
   CheckIcon,
-  PencilIcon,
-  RefreshCwIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
+  CopyIcon,
+  PencilIcon,
+  PlusIcon,
+  RefreshCwIcon,
   Square,
 } from "lucide-react";
+import type { FC } from "react";
 
 import { TooltipIconButton } from "@/components/assistant-ui/tooltip-icon-button";
-import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+
 import { MarkdownText } from "./markdown-text";
 import { ToolFallback } from "./tool-fallback";
 
@@ -401,7 +402,7 @@ const BranchPicker: FC<BranchPickerPrimitive.Root.Props> = ({
       // aui-branch-picker-root
       className={cn(
         "text-muted-foreground inline-flex items-center text-xs",
-        className,
+        className
       )}
       {...rest}
     >
