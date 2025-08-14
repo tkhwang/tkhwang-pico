@@ -3,8 +3,8 @@
   "editor.formatOnSaveMode": "file",
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.codeActionsOnSave": {
-    "source.fixAll": true,
-    "source.fixAll.eslint": true
+    "source.fixAll": "explicit",
+    "source.fixAll.eslint": "explicit"
   },
   "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
@@ -31,5 +31,5 @@
     "typescript",
     "typescriptreact"
   ],
-  "eslint.workingDirectories": ["apps/web", "apps/mobile"]
+  "eslint.workingDirectories": [{ "mode": "auto" }]
 }
