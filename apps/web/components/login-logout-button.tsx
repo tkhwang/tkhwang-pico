@@ -29,7 +29,7 @@ export const LoginLogoutButton = () => {
     <Button
       variant="outline"
       onClick={() => {
-        router.push("/login");
+        router.push("/auth/login");
       }}
     >
       Login

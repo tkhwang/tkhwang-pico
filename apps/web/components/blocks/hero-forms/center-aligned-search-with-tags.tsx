@@ -17,7 +17,7 @@ export default function HeroFormCenterAlignedSearchWithTags() {
   const router = useRouter();
 
   const handleInputClick = () => {
-    router.push("/login");
+    router.push("/auth/login");
   };
   return (
     <>
