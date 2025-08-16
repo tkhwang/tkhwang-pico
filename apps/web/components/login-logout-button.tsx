@@ -12,8 +12,12 @@ export const LoginLogoutButton = () => {
   if (user) {
     return (
       <Button
-        onClick={() => {
-          signOut();
+        type="button"
+        onClick={async () => {
+          await signOut();
+          // Align with the rest of the app's flow
+          // (or router.refresh() if you rely on middleware/session refresh)
+          router.push("/auth/login");
         }}
       >
         Log out
