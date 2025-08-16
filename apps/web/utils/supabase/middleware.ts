@@ -34,21 +34,19 @@ export async function updateSession(request: NextRequest) {
           });
         },
         remove(name: string, options: CookieOptions) {
-          request.cookies.set({
+          // Expire the cookie on both the request and response
+          const expired = {
             name,
             value: "",
             ...options,
-          });
+            maxAge: 0,
+            expires: new Date(0),
+          };
+          request.cookies.set(expired);
           response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
+            request: { headers: request.headers },
           });
-          response.cookies.set({
-            name,
-            value: "",
-            ...options,
-          });
+          response.cookies.set(expired);
         },
       },
     }
