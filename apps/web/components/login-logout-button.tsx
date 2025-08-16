@@ -1,31 +1,19 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Button } from "./ui/button";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/utils/supabase/client";
-import { signout } from "@/lib/auth-actions";
+import { useAuth } from "@/providers/auth-provider";
 
 const LoginButton = () => {
-  const [user, setUser] = useState<any>(null);
+  const { user, signOut } = useAuth();
   const router = useRouter();
-  const supabase = createClient();
-  useEffect(() => {
-    const fetchUser = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      setUser(user);
-    };
-    fetchUser();
-  }, [supabase.auth]);
 
   if (user) {
     return (
       <Button
         onClick={() => {
-          signout();
-          setUser(null);
+          signOut();
         }}
       >
         Log out
