@@ -17,13 +17,13 @@ export default function HeroFormCenterAlignedSearchWithTags() {
   const router = useRouter();
 
   const handleInputClick = () => {
-    router.push("/login");
+    router.push("/auth/login");
   };
   return (
     <>
       {/* Hero */}
-      <div className="relative overflow-hidden">
-        <div className="container mx-auto px-4 py-24 md:px-6 lg:py-32 2xl:max-w-[1400px]">
+      <div className="relative overflow-hidden min-h-screen flex items-center justify-center">
+        <div className="container mx-auto px-4 py-8 md:px-6 2xl:max-w-[1400px]">
           <div className="text-center">
             <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
               PICO
