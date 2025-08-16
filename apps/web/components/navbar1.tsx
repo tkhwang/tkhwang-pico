@@ -1,4 +1,4 @@
-import { Book, Menu, Sunset, Trees, Zap } from "lucide-react";
+import { Menu } from "lucide-react";
 
 import {
   Accordion,
@@ -22,7 +22,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import LoginLogoutButton from "@/components/login-logout-button";
+import { LoginLogoutButton } from "@/components/login-logout-button";
 
 interface MenuItem {
   title: string;
