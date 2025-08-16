@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { LoginLogoutButton } from "@/components/login-logout-button";
 import { PicoLogo } from "@/components/pico-logo";
+import { ThemeSwitcher } from "@/components/theme-switcher";
 
 const Navbar05Page = () => {
   return (
@@ -26,6 +27,7 @@ const Navbar05Page = () => {
           >
             <Search className="!h-5 !w-5" />
           </Button>
+          <ThemeSwitcher />
           <LoginLogoutButton />
         </div>
       </div>
