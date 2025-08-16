@@ -7,10 +7,19 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const token_hash = searchParams.get("token_hash");
   const type = searchParams.get("type") as EmailOtpType | null;
-  const next = searchParams.get("next") ?? "/";
 
-  const redirectTo = request.nextUrl.clone();
-  redirectTo.pathname = next;
+  const nextParam = searchParams.get("next") ?? "/";
+  // Build a safe same-origin URL for redirection
+  let redirectTo: URL;
+  try {
+    const candidate = new URL(nextParam, request.url);
+    redirectTo =
+      candidate.origin === new URL(request.url).origin
+        ? candidate
+        : new URL("/", request.url);
+  } catch {
+    redirectTo = new URL("/", request.url);
+  }
   redirectTo.searchParams.delete("token_hash");
   redirectTo.searchParams.delete("type");
 
