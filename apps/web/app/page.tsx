@@ -1,7 +1,6 @@
 "use client";
 
 import HeroFormCenterAlignedSearchWithTags from "@/components/blocks/hero-forms/center-aligned-search-with-tags";
-import { Navbar1 } from "@/components/navbar1";
 import { useAuth } from "@/providers/auth-provider";
 
 export default function Home() {
@@ -9,8 +8,6 @@ export default function Home() {
 
   return (
     <>
-      <Navbar1 />
-      {/* {user ? <Assistant /> : <HeroFormCenterAlignedSearchWithTags />} */}
       <HeroFormCenterAlignedSearchWithTags />
     </>
   );
