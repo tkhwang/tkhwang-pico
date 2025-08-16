@@ -5,7 +5,7 @@ import { Button } from "./ui/button";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/providers/auth-provider";
 
-const LoginButton = () => {
+export const LoginLogoutButton = () => {
   const { user, signOut } = useAuth();
   const router = useRouter();
 
@@ -32,5 +32,3 @@ const LoginButton = () => {
     </Button>
   );
 };
-
-export default LoginButton;
