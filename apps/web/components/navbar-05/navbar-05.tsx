@@ -1,16 +1,15 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Logo } from "./logo";
 import { Search } from "lucide-react";
 import { LoginLogoutButton } from "@/components/login-logout-button";
+import { PicoLogo } from "@/components/pico-logo";
 
 const Navbar05Page = () => {
   return (
     <nav className="fixed top-6 inset-x-4 h-16 bg-background border dark:border-slate-700/70 max-w-screen-xl mx-auto rounded-full z-50">
       <div className="h-full flex items-center justify-between mx-auto px-4">
         <div className="flex items-center gap-2 md:gap-6">
-          <Logo className="shrink-0" />
-
+          <PicoLogo />
           <div className="relative hidden md:block">
             <Search className="h-5 w-5 absolute inset-y-0 my-auto left-2.5" />
             <Input
