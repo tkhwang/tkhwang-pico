@@ -5,11 +5,6 @@ import { weatherWorkflow } from "./workflows/weather-workflow";
 import { weatherAgent } from "./agents/weather-agent";
 import { registerCopilotKit } from "@ag-ui/mastra";
 
-type WeatherRuntimeContext = {
-  "user-id": string;
-  "temperature-scale": "celsius" | "fahrenheit";
-};
-
 export const mastra = new Mastra({
   workflows: { weatherWorkflow },
   agents: { weatherAgent },
@@ -28,7 +23,7 @@ export const mastra = new Mastra({
       allowHeaders: ["*"],
     },
     apiRoutes: [
-      registerCopilotKit<WeatherRuntimeContext>({
+      registerCopilotKit({
         path: "/copilotkit",
         resourceId: "weatherAgent",
         setContext: (c, runtimeContext) => {
