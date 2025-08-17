@@ -1,3 +1,5 @@
+"use client";
+
 import { CopilotChat } from "@copilotkit/react-ui";
 import { CopilotKit } from "@copilotkit/react-core";
 
