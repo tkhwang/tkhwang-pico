@@ -1,6 +1,5 @@
 import { CopilotChat } from "@copilotkit/react-ui";
 import { CopilotKit } from "@copilotkit/react-core";
-import "@copilotkit/react-ui/styles.css";
 
 interface CopilotKitComponentProps {
   runtimeUrl: string;
