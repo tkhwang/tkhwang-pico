@@ -7,17 +7,18 @@ import {
 import { MastraAgent } from "@ag-ui/mastra";
 import { MastraClient } from "@mastra/client-js";
 import { NextRequest } from "next/server";
-import { getMastraConfig } from "@/lib/config";
+import { getConfig } from "@/lib/config";
 
-const { baseUrl } = getMastraConfig();
+const config = getConfig();
 
 const serviceAdapter = new ExperimentalEmptyAdapter();
 
 // 3. Create the CopilotRuntime instance and utilize the Mastra AG-UI
 //    integration to get the remote agents.
 const runtime = new CopilotRuntime({
+  // @ts-expect-error - TODO: fix this
   agents: await MastraAgent.getRemoteAgents({
-    mastraClient: new MastraClient({ baseUrl }),
+    mastraClient: new MastraClient({ baseUrl: config.mastra.mastraUrl }),
   }),
 });
 

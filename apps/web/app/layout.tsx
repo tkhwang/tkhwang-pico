@@ -7,10 +7,12 @@ import { AuthProvider } from "@/providers/auth-provider";
 import "./globals.css";
 import Navbar05Page from "@/components/navbar-05/navbar-05";
 import { CopilotKit } from "@copilotkit/react-core";
-import { getCommonConfig } from "@/lib/config";
+import { getConfig } from "@/lib/config";
+
+const config = getConfig();
 
 export const metadata: Metadata = {
-  metadataBase: new URL(getCommonConfig().webUrl),
+  metadataBase: new URL(config.common.webUrl),
   title: "PICO | Personal Intelligence Companion Operator",
   description: "PICO is a personal intelligence companion operator",
 };
@@ -29,7 +31,11 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.className} antialiased`}>
-        <CopilotKit runtimeUrl="/api/copilotkit" agent="weatherAgent">
+        <CopilotKit
+          publicLicenseKey={config.copilotKit.publicLicenseKey}
+          runtimeUrl="/api/copilotkit"
+          agent="weatherAgent"
+        >
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
