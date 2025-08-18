@@ -5,7 +5,6 @@ import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "@/providers/auth-provider";
-import Navbar05Page from "@/components/navbar-05/navbar-05";
 import { CopilotKit } from "@copilotkit/react-core";
 import { getConfig } from "@/lib/config";
 
@@ -42,10 +41,7 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <AuthProvider>
-              <Navbar05Page />
-              {children}
-            </AuthProvider>
+            <AuthProvider>{children}</AuthProvider>
           </ThemeProvider>
         </CopilotKit>
       </body>
