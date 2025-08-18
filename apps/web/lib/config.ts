@@ -4,7 +4,7 @@ const config = {
   },
   mastra: {
     mastraUrl: process.env.NEXT_PUBLIC_MASTRA_URL,
-    copilotKitUrl: `${process.env.NEXT_PUBLIC_MASTRA_URL}/copilotkit`,
+    copilotKitUrl: "/api/copilotkit",
   },
   supabase: {
     supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,

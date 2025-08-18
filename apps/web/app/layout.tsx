@@ -1,10 +1,10 @@
 import "@copilotkit/react-ui/styles.css";
+import "./globals.css";
 
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "@/providers/auth-provider";
-import "./globals.css";
 import Navbar05Page from "@/components/navbar-05/navbar-05";
 import { CopilotKit } from "@copilotkit/react-core";
 import { getConfig } from "@/lib/config";
@@ -33,7 +33,7 @@ export default function RootLayout({
       <body className={`${geistSans.className} antialiased`}>
         <CopilotKit
           publicLicenseKey={config.copilotKit.publicLicenseKey}
-          runtimeUrl="/api/copilotkit"
+          runtimeUrl={config.mastra.copilotKitUrl}
           agent="weatherAgent"
         >
           <ThemeProvider
