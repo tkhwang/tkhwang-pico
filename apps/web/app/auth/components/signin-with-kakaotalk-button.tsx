@@ -1,16 +1,12 @@
-"use client";
-
 import { Button } from "@/components/ui/button";
 import { signInWithKakao } from "@/lib/auth-actions";
 
 export const SignInWithKakaotalkButton = () => {
   return (
     <Button
-      type="button"
+      type="submit"
+      formAction={signInWithKakao}
       className="w-full bg-[#FEE500] hover:bg-[#FEE500]/95 text-black/85 border-0 rounded-xl font-medium"
-      onClick={() => {
-        signInWithKakao();
-      }}
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"

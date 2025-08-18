@@ -1,17 +1,13 @@
-"use client";
-
 import { Button } from "@/components/ui/button";
 import { signInWithGoogle } from "@/lib/auth-actions";
 
 export const SignInWithGoogleButton = () => {
   return (
     <Button
-      type="button"
+      type="submit"
+      formAction={signInWithGoogle}
       variant="outline"
       className="w-full"
-      onClick={() => {
-        signInWithGoogle();
-      }}
     >
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
         <path
