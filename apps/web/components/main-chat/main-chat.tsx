@@ -42,9 +42,7 @@ export function MainChat() {
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="/">
-                    PICO
-                  </BreadcrumbLink>
+                  PICO
                 </BreadcrumbItem>
                 <BreadcrumbSeparator className="hidden md:block" />
                 <BreadcrumbItem>
@@ -58,6 +56,10 @@ export function MainChat() {
           <CopilotChat
             instructions="You are assisting the user as PICO, a personal intelligent companion operator."
             className="h-full w-full"
+            labels={{
+              title: "Your Assistant",
+              initial: "Hi! 👋 How can I assist you today?",
+            }}
           />
         </div>
       </SidebarInset>
