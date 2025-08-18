@@ -7,12 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CloudSunIcon } from "lucide-react";
 import { MainChatToolWeather } from "./tool/main-chat-tool-weather";
 
-interface CopilotKitComponentProps {
-  runtimeUrl: string;
-  agent?: string;
-}
-
-export function CopilotKitComponent({ runtimeUrl }: CopilotKitComponentProps) {
+export function CopilotKitComponent() {
   useCopilotAction({
     name: "weatherTool",
     available: "disabled",
@@ -20,19 +15,6 @@ export function CopilotKitComponent({ runtimeUrl }: CopilotKitComponentProps) {
       return <MainChatToolWeather status={status} args={args} />;
     },
   });
-
-  if (!runtimeUrl) {
-    return (
-      <div className="pt-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center text-red-500">
-            Error: Mastra runtime URL is not configured. Please check your
-            environment variables.
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="pt-24 px-4 sm:px-6 lg:px-8">
