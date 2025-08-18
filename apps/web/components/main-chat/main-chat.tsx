@@ -2,12 +2,24 @@
 
 import { CopilotChat } from "@copilotkit/react-ui";
 import { useCopilotAction } from "@copilotkit/react-core";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CloudSunIcon } from "lucide-react";
 import { MainChatToolWeather } from "./tool/main-chat-tool-weather";
+import { AppSidebar } from "@/components/app-sidebar";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import { Separator } from "@/components/ui/separator";
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
+import { ThemeSwitcher } from "@/components/theme-switcher";
 
-export function CopilotKitComponent() {
+export function MainChat() {
   useCopilotAction({
     name: "weatherTool",
     available: "disabled",
@@ -17,41 +29,45 @@ export function CopilotKitComponent() {
   });
 
   return (
-    <div className="pt-24 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto mt-4 space-y-6">
-        <div className="mb-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Currently Available Agents</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                <Button
-                  variant={"outline"}
-                  onClick={() => {
-                    // 사용자에게 날씨 질문을 입력하도록 안내
-                    alert(
-                      "Please ask about the weather in the chat below! Example: 'What's the weather in Seoul?'"
-                    );
-                  }}
-                >
-                  <CloudSunIcon className="mr-2 h-auto w-3 flex-shrink-0" />
-                  Weather
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="-mx-4 sm:-mx-6 lg:-mx-8">
+    <SidebarProvider className="min-h-screen">
+      <AppSidebar />
+      <SidebarInset className="flex flex-col">
+        <header className="flex h-16 shrink-0 items-center transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 border-b">
+          <div className="flex w-full items-center justify-between px-4">
+            <div className="flex items-center gap-2">
+              <SidebarTrigger className="-ml-1" />
+              <Separator
+                orientation="vertical"
+                className="mr-2 data-[orientation=vertical]:h-4"
+              />
+              <Breadcrumb>
+                <BreadcrumbList>
+                  <BreadcrumbItem className="hidden md:block">
+                    PICO
+                  </BreadcrumbItem>
+                  <BreadcrumbSeparator className="hidden md:block" />
+                  <BreadcrumbItem>
+                    <BreadcrumbPage>Chat</BreadcrumbPage>
+                  </BreadcrumbItem>
+                </BreadcrumbList>
+              </Breadcrumb>
+            </div>
+            <div className="flex items-center gap-2">
+              <ThemeSwitcher />
+            </div>
+          </div>
+        </header>
+        <div className="flex-1 p-4 min-h-0">
           <CopilotChat
+            instructions="You are assisting the user as PICO, a personal intelligent companion operator."
+            className="h-full w-full"
             labels={{
               title: "Your Assistant",
               initial: "Hi! 👋 How can I assist you today?",
             }}
           />
         </div>
-      </div>
-    </div>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }

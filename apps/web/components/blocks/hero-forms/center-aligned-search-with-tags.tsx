@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import Navbar02Page from "@/components/navbar-02/navbar-02";
 
 export default function HeroFormCenterAlignedSearchWithTags() {
   const router = useRouter();
@@ -15,6 +16,7 @@ export default function HeroFormCenterAlignedSearchWithTags() {
   };
   return (
     <>
+      <Navbar02Page />
       {/* Hero */}
       <div className="relative overflow-hidden min-h-screen flex items-center justify-center">
         <div className="container mx-auto px-4 py-8 md:px-6 2xl:max-w-[1400px]">
