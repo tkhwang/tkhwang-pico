@@ -1,3 +1,5 @@
+"use client";
+
 import { NavMenu } from "./nav-menu";
 import { NavigationSheet } from "./navigation-sheet";
 import { ThemeSwitcher } from "@/components/theme-switcher";
