@@ -24,7 +24,7 @@ export function LoginForm({
         </CardHeader>
         <CardContent>
           <form>
-            <div className="grid gap-6">
+            <div className="grid gap-3">
               <div className="flex flex-col gap-4">
                 <SignInWithGoogleButton />
               </div>
