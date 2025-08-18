@@ -17,7 +17,6 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { LoginLogoutButton } from "@/components/login-logout-button";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 
 export function MainChat() {
