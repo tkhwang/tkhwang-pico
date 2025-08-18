@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CloudSunIcon } from "lucide-react";
 import { MainChatToolWeather } from "./tool/main-chat-tool-weather";
 
-export function CopilotKitComponent() {
+export function MainChat() {
   useCopilotAction({
     name: "weatherTool",
     available: "disabled",
