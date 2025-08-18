@@ -1,15 +1,29 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { signInWithGoogle } from "@/lib/auth-actions";
+import { getCommonConfig } from "@/lib/config";
+import { createClient } from "@/lib/supabase/client";
 
 export const SignInWithKakaotalkButton = () => {
+  async function signInWithKakao() {
+    const supabase = await createClient();
+
+    const { webUrl } = getCommonConfig();
+
+    await supabase.auth.signInWithOAuth({
+      provider: "kakao",
+      options: {
+        redirectTo: `${webUrl}/auth/callback`,
+      },
+    });
+  }
+
   return (
     <Button
       type="button"
       className="w-full bg-[#FEE500] hover:bg-[#FEE500]/95 text-black/85 border-0 rounded-xl font-medium"
       onClick={() => {
-        signInWithGoogle();
+        signInWithKakao();
       }}
     >
       <svg
