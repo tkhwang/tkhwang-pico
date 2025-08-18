@@ -6,7 +6,11 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export const hasEnvVars = () => {
-  const config = getConfig();
-  return config.supabase.supabaseUrl && config.supabase.publishableKey;
+export const hasEnvVars = (): boolean => {
+  try {
+    const { supabase } = getConfig();
+    return Boolean(supabase.supabaseUrl && supabase.publishableKey);
+  } catch {
+    return false;
+  }
 };
