@@ -3,7 +3,21 @@
 import { CopilotChat } from "@copilotkit/react-ui";
 import { useCopilotAction } from "@copilotkit/react-core";
 import { MainChatToolWeather } from "./tool/main-chat-tool-weather";
-import Navbar02Page from "@/components/navbar-02/navbar-02";
+import { AppSidebar } from "@/components/app-sidebar";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import { Separator } from "@/components/ui/separator";
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
 
 export function MainChat() {
   useCopilotAction({
@@ -15,20 +29,38 @@ export function MainChat() {
   });
 
   return (
-    <>
-      <Navbar02Page />
-      <div className="px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto mt-4 space-y-6">
-          <div className="">
-            <CopilotChat
-              labels={{
-                title: "Your Assistant",
-                initial: "Hi! 👋 How can I assist you today?",
-              }}
+    <SidebarProvider className="min-h-screen">
+      <AppSidebar />
+      <SidebarInset className="flex flex-col">
+        <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 border-b">
+          <div className="flex items-center gap-2 px-4">
+            <SidebarTrigger className="-ml-1" />
+            <Separator
+              orientation="vertical"
+              className="mr-2 data-[orientation=vertical]:h-4"
             />
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem className="hidden md:block">
+                  <BreadcrumbLink href="/">
+                    PICO
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator className="hidden md:block" />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>Chat</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
           </div>
+        </header>
+        <div className="flex-1 p-4 min-h-0">
+          <CopilotChat
+            instructions="You are assisting the user as PICO, a personal intelligent companion operator."
+            className="h-full w-full"
+          />
         </div>
-      </div>
-    </>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }
