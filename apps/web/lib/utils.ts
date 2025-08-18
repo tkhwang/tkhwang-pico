@@ -7,4 +7,4 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export const hasEnvVars =
-  config.supabase.url && config.supabase.publishableKey;
+  config.supabase.supabaseUrl && config.supabase.publishableKey;

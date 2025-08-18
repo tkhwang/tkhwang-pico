@@ -3,11 +3,11 @@ export const config = {
     webUrl: process.env.NEXT_PUBLIC_WEB_URL,
   },
   mastra: {
-    baseUrl: process.env.NEXT_PUBLIC_MASTRA_URL,
+    mastraUrl: process.env.NEXT_PUBLIC_MASTRA_URL,
     copilotKitUrl: `${process.env.NEXT_PUBLIC_MASTRA_URL}/copilotkit`,
   },
   supabase: {
-    url: process.env.NEXT_PUBLIC_SUPABASE_URL,
+    supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
     publishableKey: process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY,
   },
 } as const;
@@ -25,7 +25,7 @@ export const getCommonConfig = () => {
 };
 
 export const getMastraConfig = () => {
-  const baseUrl = config.mastra.baseUrl;
+  const baseUrl = config.mastra.mastraUrl;
 
   if (!baseUrl) {
     throw new Error(
@@ -40,11 +40,11 @@ export const getMastraConfig = () => {
 };
 
 export const getSupabaseConfig = () => {
-  const { url, publishableKey } = config.supabase;
+  const { supabaseUrl, publishableKey } = config.supabase;
 
-  if (!url || !publishableKey) {
+  if (!supabaseUrl || !publishableKey) {
     throw new Error("Supabase environment variables are not configured");
   }
 
-  return { url, publishableKey };
+  return { supabaseUrl, publishableKey };
 };
