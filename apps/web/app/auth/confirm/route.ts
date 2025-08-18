@@ -9,7 +9,6 @@ export async function GET(request: NextRequest) {
   const type = searchParams.get("type") as EmailOtpType | null;
 
   const nextParam = searchParams.get("next") ?? "/";
-  // Build a safe same-origin URL for redirection
   let redirectTo: URL;
   try {
     const candidate = new URL(nextParam, request.url);
@@ -36,7 +35,6 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  // return the user to an error page with some instructions
-  redirectTo.pathname = "/error";
+  redirectTo.pathname = "/auth/error";
   return NextResponse.redirect(redirectTo);
 }

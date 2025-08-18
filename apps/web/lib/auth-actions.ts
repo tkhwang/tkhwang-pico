@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { createClient } from "@/utils/supabase/server";
+import { getCommonConfig } from "@/lib/config";
 
 export async function login(formData: FormData) {
   const supabase = await createClient();
@@ -61,18 +62,40 @@ export async function signout() {
     redirect("/error");
   }
 
-  redirect("/logout");
+  redirect("/auth/login");
 }
 
 export async function signInWithGoogle() {
   const supabase = await createClient();
+
+  const { webUrl } = getCommonConfig();
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",
     options: {
+      redirectTo: `${webUrl}/auth/callback`,
       queryParams: {
         access_type: "offline",
         prompt: "consent",
       },
+    },
+  });
+
+  if (error) {
+    console.log(error);
+    redirect("/error");
+  }
+
+  redirect(data.url);
+}
+
+export async function signInWithKakao() {
+  const supabase = await createClient();
+
+  const { webUrl } = getCommonConfig();
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: "kakao",
+    options: {
+      redirectTo: `${webUrl}/auth/callback`,
     },
   });
 

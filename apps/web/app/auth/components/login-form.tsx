@@ -1,4 +1,5 @@
-import { SignInWithGoogleButton } from "@/app/(auth)/auth/components/signin-with-google-button";
+import { SignInWithGoogleButton } from "./signin-with-google-button";
+import { SignInWithKakaotalkButton } from "./signin-with-kakaotalk-button";
 import {
   Card,
   CardContent,
@@ -18,14 +19,17 @@ export function LoginForm({
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Welcome back</CardTitle>
           <CardDescription>
-            Login with your Apple or Google account
+            Login with your Google or KakaoTalk account
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form>
-            <div className="grid gap-6">
+            <div className="grid gap-3">
               <div className="flex flex-col gap-4">
                 <SignInWithGoogleButton />
+              </div>
+              <div className="flex flex-col gap-4">
+                <SignInWithKakaotalkButton />
               </div>
             </div>
           </form>

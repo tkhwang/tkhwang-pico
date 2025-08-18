@@ -1,4 +1,7 @@
 export const config = {
+  common: {
+    webUrl: process.env.NEXT_PUBLIC_WEB_URL,
+  },
   mastra: {
     baseUrl: process.env.NEXT_PUBLIC_MASTRA_URL,
     copilotKitUrl: `${process.env.NEXT_PUBLIC_MASTRA_URL}/copilotkit`,
@@ -8,6 +11,18 @@ export const config = {
     publishableKey: process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY,
   },
 } as const;
+
+export const getCommonConfig = () => {
+  const webUrl = config.common.webUrl;
+
+  if (!webUrl) {
+    throw new Error(
+      "NEXT_PUBLIC_WEB_URL environment variable is not configured"
+    );
+  }
+
+  return { webUrl };
+};
 
 export const getMastraConfig = () => {
   const baseUrl = config.mastra.baseUrl;
