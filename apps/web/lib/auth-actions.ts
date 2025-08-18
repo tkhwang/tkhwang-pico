@@ -71,7 +71,7 @@ export async function signInWithGoogle() {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",
     options: {
-      redirectTo: `${getConfig().common}/auth/callback`,
+      redirectTo: `${getConfig().common.webUrl}/auth/callback`,
       queryParams: {
         access_type: "offline",
         prompt: "consent",
@@ -93,7 +93,7 @@ export async function signInWithKakao() {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "kakao",
     options: {
-      redirectTo: `${getConfig().common}/auth/callback`,
+      redirectTo: `${getConfig().common.webUrl}/auth/callback`,
     },
   });
 
