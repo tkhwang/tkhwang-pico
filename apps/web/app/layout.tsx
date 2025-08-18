@@ -1,18 +1,18 @@
 import "@copilotkit/react-ui/styles.css";
+import "./globals.css";
 
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "@/providers/auth-provider";
-import "./globals.css";
 import Navbar05Page from "@/components/navbar-05/navbar-05";
+import { CopilotKit } from "@copilotkit/react-core";
+import { getConfig } from "@/lib/config";
 
-const defaultUrl = process.env.VERCEL_URL
-  ? `https://${process.env.VERCEL_URL}`
-  : "http://localhost:3000";
+const config = getConfig();
 
 export const metadata: Metadata = {
-  metadataBase: new URL(defaultUrl),
+  metadataBase: new URL(config.common.webUrl),
   title: "PICO | Personal Intelligence Companion Operator",
   description: "PICO is a personal intelligence companion operator",
 };
@@ -31,17 +31,23 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.className} antialiased`}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
+        <CopilotKit
+          publicLicenseKey={config.copilotKit.publicLicenseKey}
+          runtimeUrl={config.mastra.copilotKitUrl}
+          agent="weatherAgent"
         >
-          <AuthProvider>
-            <Navbar05Page />
-            {children}
-          </AuthProvider>
-        </ThemeProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <AuthProvider>
+              <Navbar05Page />
+              {children}
+            </AuthProvider>
+          </ThemeProvider>
+        </CopilotKit>
       </body>
     </html>
   );
