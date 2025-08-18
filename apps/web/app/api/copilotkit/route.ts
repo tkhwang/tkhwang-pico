@@ -24,7 +24,11 @@ async function initRuntime(): Promise<CopilotRuntime> {
 
 function getRuntime(): Promise<CopilotRuntime> {
   if (!runtimePromise) {
-    runtimePromise = initRuntime();
+    runtimePromise = initRuntime().catch((err) => {
+      // Reset so subsequent requests can retry initialization
+      runtimePromise = null;
+      throw err;
+    });
   }
   return runtimePromise;
 }
