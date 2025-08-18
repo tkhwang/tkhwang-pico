@@ -55,7 +55,6 @@ export function MainChat() {
             </div>
             <div className="flex items-center gap-2">
               <ThemeSwitcher />
-              <LoginLogoutButton />
             </div>
           </div>
         </header>
