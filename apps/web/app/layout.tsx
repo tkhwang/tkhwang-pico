@@ -6,13 +6,11 @@ import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "@/providers/auth-provider";
 import "./globals.css";
 import Navbar05Page from "@/components/navbar-05/navbar-05";
-
-const defaultUrl = process.env.VERCEL_URL
-  ? `https://${process.env.VERCEL_URL}`
-  : "http://localhost:3000";
+import { CopilotKit } from "@copilotkit/react-core";
+import { getCommonConfig } from "@/lib/config";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(defaultUrl),
+  metadataBase: new URL(getCommonConfig().webUrl),
   title: "PICO | Personal Intelligence Companion Operator",
   description: "PICO is a personal intelligence companion operator",
 };
@@ -31,17 +29,19 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.className} antialiased`}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <AuthProvider>
-            <Navbar05Page />
-            {children}
-          </AuthProvider>
-        </ThemeProvider>
+        <CopilotKit runtimeUrl="/api/copilotkit" agent="weatherAgent">
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <AuthProvider>
+              <Navbar05Page />
+              {children}
+            </AuthProvider>
+          </ThemeProvider>
+        </CopilotKit>
       </body>
     </html>
   );

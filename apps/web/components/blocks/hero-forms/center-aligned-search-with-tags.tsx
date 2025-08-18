@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  CalendarIcon,
-  CloudSunIcon,
-  FileTextIcon,
-  SearchIcon,
-  UserIcon,
-} from "lucide-react";
+import { CloudSunIcon, SearchIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
@@ -110,18 +104,6 @@ export default function HeroFormCenterAlignedSearchWithTags() {
               <Button variant={"outline"}>
                 <CloudSunIcon className="mr-2 h-auto w-3 flex-shrink-0" />
                 Weather
-              </Button>
-              <Button variant={"outline"}>
-                <CalendarIcon className="mr-2 h-auto w-3 flex-shrink-0" />
-                Calendar
-              </Button>
-              <Button variant={"outline"}>
-                <FileTextIcon className="mr-2 h-auto w-3 flex-shrink-0" />
-                Content
-              </Button>
-              <Button variant={"outline"}>
-                <UserIcon className="mr-2 h-auto w-3 flex-shrink-0" />
-                Secretary
               </Button>
             </div>
           </div>
