@@ -1,23 +1,9 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { getCommonConfig } from "@/lib/config";
-import { createClient } from "@/lib/supabase/client";
+import { signInWithKakao } from "@/lib/auth-actions";
 
 export const SignInWithKakaotalkButton = () => {
-  async function signInWithKakao() {
-    const supabase = await createClient();
-
-    const { webUrl } = getCommonConfig();
-
-    await supabase.auth.signInWithOAuth({
-      provider: "kakao",
-      options: {
-        redirectTo: `${webUrl}/auth/callback`,
-      },
-    });
-  }
-
   return (
     <Button
       type="button"
