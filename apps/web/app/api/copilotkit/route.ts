@@ -9,26 +9,40 @@ import { MastraClient } from "@mastra/client-js";
 import { NextRequest } from "next/server";
 import { getConfig } from "@/lib/config";
 
-const config = getConfig();
-
 const serviceAdapter = new ExperimentalEmptyAdapter();
 
-// 3. Create the CopilotRuntime instance and utilize the Mastra AG-UI
-//    integration to get the remote agents.
-const runtime = new CopilotRuntime({
+let runtimePromise: Promise<CopilotRuntime> | null = null;
+
+async function initRuntime(): Promise<CopilotRuntime> {
+  const { mastra } = getConfig();
+  const agents = await MastraAgent.getRemoteAgents({
+    mastraClient: new MastraClient({ baseUrl: mastra.mastraUrl }),
+  });
   // @ts-expect-error - TODO: fix this
-  agents: await MastraAgent.getRemoteAgents({
-    mastraClient: new MastraClient({ baseUrl: config.mastra.mastraUrl }),
-  }),
-});
+  return new CopilotRuntime({ agents });
+}
+
+function getRuntime(): Promise<CopilotRuntime> {
+  if (!runtimePromise) {
+    runtimePromise = initRuntime();
+  }
+  return runtimePromise;
+}
 
 // 4. Build a Next.js API route that handles the CopilotKit runtime requests.
 export const POST = async (req: NextRequest) => {
-  const { handleRequest } = copilotRuntimeNextJSAppRouterEndpoint({
-    runtime,
-    serviceAdapter,
-    endpoint: "/api/copilotkit",
-  });
-
-  return handleRequest(req);
+  try {
+    const runtime = await getRuntime();
+    const { handleRequest } = copilotRuntimeNextJSAppRouterEndpoint({
+      runtime,
+      serviceAdapter,
+      endpoint: "/api/copilotkit",
+    });
+    return handleRequest(req);
+  } catch (err) {
+    console.error("Failed to initialize CopilotRuntime:", err);
+    return new Response("Copilot runtime initialization failed", {
+      status: 500,
+    });
+  }
 };
