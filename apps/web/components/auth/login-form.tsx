@@ -1,5 +1,5 @@
-import { SignInWithGoogleButton } from "@/components/signin-with-google-button";
-import { SignInWithKakaotalkButton } from "@/components/signin-with-kakaotalk-button";
+import { SignInWithGoogleButton } from "@/components/auth/signin-with-google-button";
+import { SignInWithKakaotalkButton } from "@/components/auth/signin-with-kakaotalk-button";
 import {
   Card,
   CardContent,
