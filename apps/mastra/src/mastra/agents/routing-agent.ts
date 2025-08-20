@@ -50,7 +50,9 @@ export const routingAgent = new Agent({
                 content: context.message,
               },
             ],
-            {}
+            {
+              runtimeContext: context,
+            }
           );
 
           return {
