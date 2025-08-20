@@ -2878,7 +2878,7 @@
   dependencies:
     "@lukeed/csprng" "^1.1.0"
 
-"@mastra/client-js@^0.10.18":
+"@mastra/client-js@^0.10.18", "@mastra/client-js@^0.10.21":
   version "0.10.21"
   resolved "https://registry.yarnpkg.com/@mastra/client-js/-/client-js-0.10.21.tgz#d1e5c70380bb9ea196f926b7a5fdfa7ee21acad3"
   integrity sha512-qryU5m0pnW+bcayB8ad//EFFaNWOpLxkWZLASIU3hxxQc3D5Aun4GrQOKHstVcD0yIwZTwgnpJ9ZqZsjfYzTxw==
