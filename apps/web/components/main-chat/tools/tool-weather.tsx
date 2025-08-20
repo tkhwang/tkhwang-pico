@@ -1,4 +1,4 @@
-// Simplified to render plain gray text only
+import { generateToolMessage } from "@/utils/tool-message";
 
 interface WeatherToolRenderProps {
   status: string;
@@ -6,9 +6,6 @@ interface WeatherToolRenderProps {
 }
 
 export function MainChatToolWeather({ status, args }: WeatherToolRenderProps) {
-  const message =
-    status !== "complete"
-      ? "Calling weather API..."
-      : `Called the weather API for ${args.location ?? "the location"}.`;
+  const message = generateToolMessage(status, "🌤️", "날씨 정보 조회");
   return <p className="text-sm text-gray-500">{message}</p>;
 }

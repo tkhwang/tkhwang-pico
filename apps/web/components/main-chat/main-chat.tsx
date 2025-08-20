@@ -2,11 +2,11 @@
 
 import { CopilotChat } from "@copilotkit/react-ui";
 import { useCopilotAction } from "@copilotkit/react-core";
-import { MainChatToolWeather } from "./tool/tool-weather";
-import { MainChatToolCheckIntent } from "./tool/tool-check-intent";
-import { MainChatToolDetectLanguage } from "./tool/tool-detect-language";
-import { MainChatToolGenerateFallback } from "./tool/tool-generate-fallback";
-import { MainChatToolHandleRequest } from "./tool/tool-handle-request";
+import { MainChatToolWeather } from "./tools/tool-weather";
+import { MainChatToolCheckIntent } from "./tools/tool-check-intent";
+import { MainChatToolDetectLanguage } from "./tools/tool-detect-language";
+import { MainChatToolGenerateFallback } from "./tools/tool-generate-fallback";
+import { MainChatToolHandleRequest } from "./tools/tool-handle-request";
 import { AppSidebar } from "@/components/app-sidebar";
 import {
   Breadcrumb,
