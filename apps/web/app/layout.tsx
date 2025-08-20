@@ -33,7 +33,7 @@ export default function RootLayout({
         <CopilotKit
           publicLicenseKey={config.copilotKit.publicLicenseKey}
           runtimeUrl={config.mastra.copilotKitUrl}
-          agent="weatherAgent"
+          agent="routingAgent"
           showDevConsole={false}
         >
           <ThemeProvider
