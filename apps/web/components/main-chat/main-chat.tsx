@@ -2,7 +2,11 @@
 
 import { CopilotChat } from "@copilotkit/react-ui";
 import { useCopilotAction } from "@copilotkit/react-core";
-import { MainChatToolWeather } from "./tool/main-chat-tool-weather";
+import { MainChatToolWeather } from "./tool/tool-weather";
+import { MainChatToolCheckIntent } from "./tool/tool-check-intent";
+import { MainChatToolDetectLanguage } from "./tool/tool-detect-language";
+import { MainChatToolGenerateFallback } from "./tool/tool-generate-fallback";
+import { MainChatToolHandleRequest } from "./tool/tool-handle-request";
 import { AppSidebar } from "@/components/app-sidebar";
 import {
   Breadcrumb,
@@ -31,52 +35,32 @@ export function MainChat() {
   useCopilotAction({
     name: "detectLanguage",
     available: "disabled",
-    render: () => {
-      return (
-        <div className="flex items-center gap-2 p-2 bg-blue-50 rounded">
-          <span className="text-blue-600">🔍</span>
-          <span className="text-sm">언어 감지 중...</span>
-        </div>
-      );
+    render: ({ status, args }) => {
+      return <MainChatToolDetectLanguage status={status} args={args} />;
     },
   });
 
   useCopilotAction({
     name: "generateFallbackMessage",
     available: "disabled",
-    render: () => {
-      return (
-        <div className="flex items-center gap-2 p-2 bg-gray-50 rounded">
-          <span className="text-gray-600">💬</span>
-          <span className="text-sm">응답 메시지 생성 중...</span>
-        </div>
-      );
+    render: ({ status, args }) => {
+      return <MainChatToolGenerateFallback status={status} args={args} />;
     },
   });
 
   useCopilotAction({
     name: "checkRequestIntent",
     available: "disabled",
-    render: () => {
-      return (
-        <div className="flex items-center gap-2 p-2 bg-purple-50 rounded">
-          <span className="text-purple-600">🎯</span>
-          <span className="text-sm">요청 의도 분석 중...</span>
-        </div>
-      );
+    render: ({ status, args }) => {
+      return <MainChatToolCheckIntent status={status} args={args} />;
     },
   });
 
   useCopilotAction({
     name: "handleUserRequest",
     available: "disabled",
-    render: () => {
-      return (
-        <div className="flex items-center gap-2 p-2 bg-green-50 rounded">
-          <span className="text-green-600">⚙️</span>
-          <span className="text-sm">라우팅 네트워크 처리 중...</span>
-        </div>
-      );
+    render: ({ status, args }) => {
+      return <MainChatToolHandleRequest status={status} args={args} />;
     },
   });
 
