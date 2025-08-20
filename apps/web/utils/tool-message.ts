@@ -3,5 +3,5 @@ export function generateToolMessage(
   icon: string,
   action: string
 ): string {
-  return `${icon} ${action} ${status !== "complete" ? "중..." : ""}`;
+  return `${icon} ${action} ${status !== "complete" ? "..." : ""}`;
 }

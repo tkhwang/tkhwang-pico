@@ -8,7 +8,7 @@ interface CheckIntentToolRenderProps {
 export function MainChatToolCheckIntent({
   status,
 }: CheckIntentToolRenderProps) {
-  const message = generateToolMessage(status, "🎯", "요청 의도 분석");
+  const message = generateToolMessage(status, "🎯", "Analyzing request intent");
   return <p className="text-sm text-gray-500">{message}</p>;
 }
 
@@ -25,11 +25,11 @@ export function MainChatToolDetectLanguage({
   if (status === "complete" && result?.language) {
     const languageText = result.language === "korean" ? "한국어" : "English";
     return (
-      <p className="text-sm text-gray-500">🔍 언어 감지: {languageText}</p>
+      <p className="text-sm text-gray-500">🔍 Language detected: {languageText}</p>
     );
   }
 
-  const message = generateToolMessage(status, "🔍", "언어 감지");
+  const message = generateToolMessage(status, "🔍", "Detecting language");
   return <p className="text-sm text-gray-500">{message}</p>;
 }
 
@@ -41,7 +41,7 @@ interface GenerateFallbackToolRenderProps {
 export function MainChatToolGenerateFallback({
   status,
 }: GenerateFallbackToolRenderProps) {
-  const message = generateToolMessage(status, "💬", "응답 메시지 생성");
+  const message = generateToolMessage(status, "💬", "Generating response");
   return <p className="text-sm text-gray-500">{message}</p>;
 }
 
@@ -53,7 +53,7 @@ interface HandleRequestToolRenderProps {
 export function MainChatToolHandleRequest({
   status,
 }: HandleRequestToolRenderProps) {
-  const message = generateToolMessage(status, "⚙️", "유저 요청 처리");
+  const message = generateToolMessage(status, "⚙️", "Processing request");
   return <p className="text-sm text-gray-500">{message}</p>;
 }
 
@@ -63,6 +63,6 @@ interface WeatherToolRenderProps {
 }
 
 export function MainChatToolWeather({ status }: WeatherToolRenderProps) {
-  const message = generateToolMessage(status, "🌤️", "날씨 정보 조회");
+  const message = generateToolMessage(status, "🌤️", "Fetching weather");
   return <p className="text-sm text-gray-500">{message}</p>;
 }
