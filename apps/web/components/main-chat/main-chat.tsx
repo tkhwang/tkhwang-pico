@@ -28,6 +28,58 @@ export function MainChat() {
     },
   });
 
+  useCopilotAction({
+    name: "detectLanguage",
+    available: "disabled",
+    render: () => {
+      return (
+        <div className="flex items-center gap-2 p-2 bg-blue-50 rounded">
+          <span className="text-blue-600">🔍</span>
+          <span className="text-sm">언어 감지 중...</span>
+        </div>
+      );
+    },
+  });
+
+  useCopilotAction({
+    name: "generateFallbackMessage",
+    available: "disabled",
+    render: () => {
+      return (
+        <div className="flex items-center gap-2 p-2 bg-gray-50 rounded">
+          <span className="text-gray-600">💬</span>
+          <span className="text-sm">응답 메시지 생성 중...</span>
+        </div>
+      );
+    },
+  });
+
+  useCopilotAction({
+    name: "checkRequestIntent",
+    available: "disabled",
+    render: () => {
+      return (
+        <div className="flex items-center gap-2 p-2 bg-purple-50 rounded">
+          <span className="text-purple-600">🎯</span>
+          <span className="text-sm">요청 의도 분석 중...</span>
+        </div>
+      );
+    },
+  });
+
+  useCopilotAction({
+    name: "handleUserRequest",
+    available: "disabled",
+    render: () => {
+      return (
+        <div className="flex items-center gap-2 p-2 bg-green-50 rounded">
+          <span className="text-green-600">⚙️</span>
+          <span className="text-sm">라우팅 네트워크 처리 중...</span>
+        </div>
+      );
+    },
+  });
+
   return (
     <SidebarProvider className="min-h-screen">
       <AppSidebar />

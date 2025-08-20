@@ -1,6 +1,52 @@
 import { createTool } from "@mastra/core/tools";
 import { z } from "zod";
 import { routingNetwork } from "../network/routing-network";
+import { detectLanguage, generateFallbackMessage } from "./fallback-tools";
+
+export const checkRequestIntent = createTool({
+  id: "checkRequestIntent",
+  description: "Analyze user request intent for routing",
+  inputSchema: z.object({
+    message: z.string().describe("User message to analyze"),
+  }),
+  outputSchema: z.object({
+    isWeatherRelated: z
+      .boolean()
+      .describe("Whether request is weather-related"),
+    needsFallback: z
+      .boolean()
+      .describe("Whether request needs fallback response"),
+  }),
+  execute: async ({ context }) => {
+    const message = context.message.toLowerCase();
+    const weatherKeywords = [
+      "날씨",
+      "weather",
+      "forecast",
+      "temperature",
+      "기온",
+      "비",
+      "rain",
+      "눈",
+      "snow",
+      "활동",
+      "activity",
+      "계획",
+      "plan",
+      "outdoor",
+      "야외",
+    ];
+
+    const isWeatherRelated = weatherKeywords.some((keyword) =>
+      message.includes(keyword)
+    );
+
+    return {
+      isWeatherRelated,
+      needsFallback: !isWeatherRelated,
+    };
+  },
+});
 
 export const handleUserRequest = createTool({
   id: "handleUserRequest",
@@ -46,3 +92,5 @@ export const handleUserRequest = createTool({
     }
   },
 });
+
+export { detectLanguage, generateFallbackMessage };
