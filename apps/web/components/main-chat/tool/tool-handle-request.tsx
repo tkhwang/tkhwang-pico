@@ -1,12 +1,13 @@
+import { generateToolMessage } from "@/utils/tool-message";
+
 interface HandleRequestToolRenderProps {
   status: string;
   args: { message?: string };
 }
 
-export function MainChatToolHandleRequest({ status }: HandleRequestToolRenderProps) {
-  const message =
-    status !== "complete"
-      ? "⚙️ 라우팅 네트워크 처리 중..."
-      : "라우팅 네트워크 처리 완료";
+export function MainChatToolHandleRequest({
+  status,
+}: HandleRequestToolRenderProps) {
+  const message = generateToolMessage(status, "⚙️", "유저 요청 처리");
   return <p className="text-sm text-gray-500">{message}</p>;
 }

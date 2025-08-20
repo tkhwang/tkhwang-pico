@@ -33,6 +33,14 @@ export function MainChat() {
   });
 
   useCopilotAction({
+    name: "checkRequestIntent",
+    available: "disabled",
+    render: ({ status, args }) => {
+      return <MainChatToolCheckIntent status={status} args={args} />;
+    },
+  });
+
+  useCopilotAction({
     name: "detectLanguage",
     available: "disabled",
     render: ({ status, args }) => {
@@ -45,14 +53,6 @@ export function MainChat() {
     available: "disabled",
     render: ({ status, args }) => {
       return <MainChatToolGenerateFallback status={status} args={args} />;
-    },
-  });
-
-  useCopilotAction({
-    name: "checkRequestIntent",
-    available: "disabled",
-    render: ({ status, args }) => {
-      return <MainChatToolCheckIntent status={status} args={args} />;
     },
   });
 
