@@ -21,29 +21,36 @@ export const checkRequestIntent = createTool({
     const message = context.message.toLowerCase();
     const weatherKeywords = [
       "날씨",
-      "weather",
-      "forecast",
-      "temperature",
       "기온",
+      "예보",
       "비",
-      "rain",
       "눈",
+      "weather",
+      "temperature",
+      "forecast",
+      "rain",
       "snow",
+    ];
+    const activityKeywords = [
       "활동",
-      "activity",
       "계획",
+      "야외",
+      "activity",
       "plan",
       "outdoor",
-      "야외",
     ];
 
-    const isWeatherRelated = weatherKeywords.some((keyword) =>
+    const hasWeather = weatherKeywords.some((keyword) =>
+      message.includes(keyword)
+    );
+    const hasActivity = activityKeywords.some((keyword) =>
       message.includes(keyword)
     );
 
     return {
-      isWeatherRelated,
-      needsFallback: !isWeatherRelated,
+      isWeatherRelated: hasWeather,
+      // Only fallback when neither weather nor activity context is present.
+      needsFallback: !hasWeather && !hasActivity,
     };
   },
 });
