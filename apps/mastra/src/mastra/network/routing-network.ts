@@ -12,7 +12,6 @@ export const routingNetwork = new NewAgentNetwork({
     NETWORK CAPABILITIES:
     - weatherAgent: Provides weather information and forecasts for any location
     - weatherWorkflow: Offers activity planning and suggestions based on weather conditions
-    - generalAgent: Handles general knowledge questions, technology info, and educational content
 
     ROUTING STRATEGY:
     1. Analyze user message to detect intent and language (Korean/English)
@@ -21,7 +20,6 @@ export const routingNetwork = new NewAgentNetwork({
        - Weather queries → weatherAgent
        - Activity planning + weather → weatherWorkflow
        - General weather + activities → weatherWorkflow
-       - Technology, education, general knowledge → generalAgent
     4. Execute the selected handler and return results
     5. If no suitable handler found, provide helpful fallback with available options
 
@@ -49,9 +47,8 @@ export const routingNetwork = new NewAgentNetwork({
 현재 사용 가능한 기능:
 • 날씨 정보 및 예보 (weatherAgent)
 • 날씨 기반 활동 계획 (weatherWorkflow)
-• 일반 지식 및 기술 정보 (generalAgent)
 
-날씨, 활동 계획, 또는 일반적인 질문을 해주시면 도움을 드릴 수 있습니다."
+날씨나 활동 계획에 대해 질문해주시면 도움을 드릴 수 있습니다."
 
     English:
     "I'm sorry, but I couldn't find an appropriate function to handle your request.
@@ -59,9 +56,8 @@ export const routingNetwork = new NewAgentNetwork({
 Currently available capabilities:
 • Weather information and forecasts (weatherAgent)
 • Weather-based activity planning (weatherWorkflow)
-• General knowledge and technology information (generalAgent)
 
-Please ask about weather, activity planning, or general questions, and I'll be happy to help."
+Please ask about weather or activity planning, and I'll be happy to help."
   `,
   model: openai("gpt-4o-mini"),
   agents: {
