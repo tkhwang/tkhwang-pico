@@ -1,6 +1,7 @@
 import { openai } from "@ai-sdk/openai";
 import { NewAgentNetwork } from "@mastra/core/network/vNext";
 import { weatherAgent } from "../agents/weather-agent";
+import { fallbackAgent } from "../agents/fallback-agent";
 import { weatherWorkflow } from "../workflows/weather-workflow";
 
 export const routingNetwork = new NewAgentNetwork({
@@ -15,13 +16,15 @@ export const routingNetwork = new NewAgentNetwork({
 
     ROUTING STRATEGY:
     1. Analyze user message to detect intent and language (Korean/English)
-    2. Match user intent with available network capabilities
-    3. Route to the most appropriate handler:
-       - Weather queries → weatherAgent
-       - Activity planning + weather → weatherWorkflow
+    2. STRICT FILTERING: ONLY route to specialized agents for their specific domains
+    3. Route based on clear keyword matching:
+       - Weather queries (날씨, weather, forecast, temperature, 기온, 비, rain, 눈, snow) → weatherAgent
+       - Activity planning + weather (활동, activity, 계획, plan, outdoor, 야외) → weatherWorkflow
        - General weather + activities → weatherWorkflow
-    4. Execute the selected handler and return results
-    5. If no suitable handler found, provide helpful fallback with available options
+    4. For ALL other requests (technology, products, general questions, unrelated topics) → fallbackAgent
+    5. Execute the selected handler and return results
+
+    IMPORTANT: When in doubt, route to fallbackAgent rather than forcing inappropriate matches.
 
     LANGUAGE HANDLING:
     - Detect user language (Korean characters → Korean, otherwise English)
@@ -39,29 +42,15 @@ export const routingNetwork = new NewAgentNetwork({
     - Example: "I'll provide you with weather information."
 
     FALLBACK STRATEGY:
-    When no suitable handler is found, respond with this EXACT format:
-
-    Korean:
-    "죄송하지만, 해당 요청을 처리할 수 있는 적절한 기능을 찾을 수 없습니다.
-
-현재 사용 가능한 기능:
-• 날씨 정보 및 예보 (weatherAgent)
-• 날씨 기반 활동 계획 (weatherWorkflow)
-
-날씨나 활동 계획에 대해 질문해주시면 도움을 드릴 수 있습니다."
-
-    English:
-    "I'm sorry, but I couldn't find an appropriate function to handle your request.
-
-Currently available capabilities:
-• Weather information and forecasts (weatherAgent)
-• Weather-based activity planning (weatherWorkflow)
-
-Please ask about weather or activity planning, and I'll be happy to help."
+    When no suitable handler is found, route to fallbackAgent which will:
+    1. Detect the user's language
+    2. Generate appropriate fallback message with current capabilities
+    3. Provide helpful guidance about available services
   `,
   model: openai("gpt-4o-mini"),
   agents: {
     weatherAgent,
+    fallbackAgent,
   },
   workflows: {
     weatherWorkflow,
