@@ -2,11 +2,6 @@
 
 import { CopilotChat } from "@copilotkit/react-ui";
 import { useCopilotAction } from "@copilotkit/react-core";
-import { MainChatToolWeather } from "./tools/tool-weather";
-import { MainChatToolCheckIntent } from "./tools/tool-check-intent";
-import { MainChatToolDetectLanguage } from "./tools/tool-detect-language";
-import { MainChatToolGenerateFallback } from "./tools/tool-generate-fallback";
-import { MainChatToolHandleRequest } from "./tools/tool-handle-request";
 import { AppSidebar } from "@/components/app-sidebar";
 import {
   Breadcrumb,
@@ -22,6 +17,13 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { ThemeSwitcher } from "@/components/theme-switcher";
+import {
+  MainChatToolCheckIntent,
+  MainChatToolDetectLanguage,
+  MainChatToolGenerateFallback,
+  MainChatToolHandleRequest,
+  MainChatToolWeather,
+} from "@/components/main-chat/main-chat-render-tools";
 
 export function MainChat() {
   useCopilotAction({
