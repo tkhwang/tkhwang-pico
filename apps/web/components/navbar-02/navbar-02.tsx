@@ -3,7 +3,7 @@
 import { NavMenu } from "./nav-menu";
 import { NavigationSheet } from "./navigation-sheet";
 import { ThemeSwitcher } from "@/components/theme-switcher";
-import { LoginLogoutButton } from "@/components/login-logout-button";
+import { LoginLogoutButton } from "@/components/auth/login-logout-button";
 import { PicoLogo } from "@/components/pico-logo";
 
 const Navbar02Page = () => {

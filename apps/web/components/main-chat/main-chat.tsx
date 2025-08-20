@@ -2,7 +2,6 @@
 
 import { CopilotChat } from "@copilotkit/react-ui";
 import { useCopilotAction } from "@copilotkit/react-core";
-import { MainChatToolWeather } from "./tool/main-chat-tool-weather";
 import { AppSidebar } from "@/components/app-sidebar";
 import {
   Breadcrumb,
@@ -18,6 +17,13 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { ThemeSwitcher } from "@/components/theme-switcher";
+import {
+  MainChatToolCheckIntent,
+  MainChatToolDetectLanguage,
+  MainChatToolGenerateFallback,
+  MainChatToolHandleRequest,
+  MainChatToolWeather,
+} from "@/components/main-chat/main-chat-render-tools";
 
 export function MainChat() {
   useCopilotAction({
@@ -25,6 +31,38 @@ export function MainChat() {
     available: "disabled",
     render: ({ status, args }) => {
       return <MainChatToolWeather status={status} args={args} />;
+    },
+  });
+
+  useCopilotAction({
+    name: "checkRequestIntent",
+    available: "disabled",
+    render: ({ status, args }) => {
+      return <MainChatToolCheckIntent status={status} args={args} />;
+    },
+  });
+
+  useCopilotAction({
+    name: "detectLanguage",
+    available: "disabled",
+    render: ({ status, args }) => {
+      return <MainChatToolDetectLanguage status={status} args={args} />;
+    },
+  });
+
+  useCopilotAction({
+    name: "generateFallbackMessage",
+    available: "disabled",
+    render: ({ status, args }) => {
+      return <MainChatToolGenerateFallback status={status} args={args} />;
+    },
+  });
+
+  useCopilotAction({
+    name: "handleUserRequest",
+    available: "disabled",
+    render: ({ status, args }) => {
+      return <MainChatToolHandleRequest status={status} args={args} />;
     },
   });
 
