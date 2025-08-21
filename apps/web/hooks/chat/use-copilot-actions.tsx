@@ -24,8 +24,8 @@ export function useCopilotActions() {
   useCopilotAction({
     name: "detectLanguage",
     available: "disabled",
-    render: ({ status, result }) => {
-      return <ChatToolDetectLanguage status={status} result={result} />;
+    render: ({ status }) => {
+      return <ChatToolDetectLanguage status={status} />;
     },
   });
 

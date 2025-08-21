@@ -16,17 +16,7 @@ interface DetectLanguageToolRenderProps {
 
 export function ChatToolDetectLanguage({
   status,
-  result,
 }: DetectLanguageToolRenderProps) {
-  if (status === "complete" && result?.language) {
-    const languageText = result.language === "korean" ? "한국어" : "English";
-    return (
-      <p className="text-sm text-gray-500">
-        🔍 Language detected: {languageText}
-      </p>
-    );
-  }
-
   const message = generateToolMessage(status, "🔍", "Detecting language");
   return <p className="text-sm text-gray-500">{message}</p>;
 }

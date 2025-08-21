@@ -1,7 +1,8 @@
 export function generateToolMessage(
   status: string,
   icon: string,
-  action: string
+  action: string,
+  showIcon = false
 ): string {
-  return `${icon} ${action} ${status !== "complete" ? "..." : ""}`;
+  return `${showIcon ? icon : ""} ${action} ${status !== "complete" ? "..." : ""}`;
 }
