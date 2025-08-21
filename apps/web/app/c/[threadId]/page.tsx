@@ -127,13 +127,22 @@ function ThreadChatInner({ threadId }: { threadId: string }) {
         role: gqlRole.User,
         content: initial.trim(),
       });
+      try {
+        if (typeof window !== "undefined") {
+          // Inform persistence to skip saving this runtime message id
+          sessionStorage.setItem(`pico:skip-saves:${threadId}`, message.id);
+        }
+      } catch {}
       void appendMessage(message);
     }
   }, [appendMessage, searchParams, threadId, thread, isPersistenceLoading]);
 
   // Show error if persistence fails
   if (persistenceError) {
-    console.error("Chat persistence error:", persistenceError);
+    console.error(
+      "[-][ThreadChatInner] Chat persistence error:",
+      persistenceError
+    );
   }
 
   return (

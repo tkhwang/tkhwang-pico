@@ -74,7 +74,7 @@ export function useChatPersistence({
 
         // Mark all loaded messages as saved to prevent re-saving
         const messageKeys = threadMessages.map(
-          (msg) => `${threadId}-${msg.content}`
+          (msg) => `${threadId}-${msg.id}`
         );
         setSavedMessageIds(new Set(messageKeys));
       } catch (err) {
@@ -116,7 +116,7 @@ export function useChatPersistence({
       for (const message of messages) {
         if (!(message instanceof TextMessage)) continue;
 
-        const messageKey = `${currentThread.id}-${message.content}`;
+        const messageKey = `${currentThread.id}-${message.id}`;
         if (savedMessageIds.has(messageKey)) continue;
 
         const role = message.role === gqlRole.User ? "user" : "assistant";
@@ -128,8 +128,12 @@ export function useChatPersistence({
           metadata: { saved: true },
         });
 
-        // Mark as saved
-        setSavedMessageIds((prev) => new Set(prev).add(messageKey));
+        // Mark as saved (after success)
+        setSavedMessageIds((prev) => {
+          const next = new Set(prev);
+          next.add(messageKey);
+          return next;
+        });
       }
 
       return currentThread;
@@ -174,26 +178,47 @@ export function useChatPersistence({
         const unsavedMessages = messages.filter((msg): msg is TextMessage => {
           if (!(msg instanceof TextMessage)) return false;
 
-          // Skip if we've already saved this content for this thread
-          const messageKey = `${thread.id}-${msg.content}`;
+          // Skip if we've already saved this message id for this thread
+          const messageKey = `${thread.id}-${msg.id}`;
+          try {
+            if (typeof window !== "undefined") {
+              const skipId = sessionStorage.getItem(
+                `pico:skip-saves:${thread.id}`
+              );
+              if (skipId && skipId === msg.id) {
+                return false;
+              }
+            }
+          } catch {}
           return !savedMessageIds.has(messageKey);
         });
 
         for (const message of unsavedMessages) {
           const role = message.role === gqlRole.User ? "user" : "assistant";
-          const messageKey = `${thread.id}-${message.content}`;
-
-          // Skip if already processing this message
+          const messageKey = `${thread.id}-${message.id}`;
           if (savedMessageIds.has(messageKey)) continue;
-
-          // Mark as being saved
-          setSavedMessageIds((prev) => new Set(prev).add(messageKey));
 
           await saveMessage({
             threadId: thread.id,
             role,
             content: message.content,
             metadata: { saved: true },
+          });
+
+          try {
+            if (typeof window !== "undefined") {
+              const skipKey = `pico:skip-saves:${thread.id}`;
+              const skipId = sessionStorage.getItem(skipKey);
+              if (skipId && skipId === message.id) {
+                sessionStorage.removeItem(skipKey);
+              }
+            }
+          } catch {}
+
+          setSavedMessageIds((prev) => {
+            const next = new Set(prev);
+            next.add(messageKey);
+            return next;
           });
         }
 
