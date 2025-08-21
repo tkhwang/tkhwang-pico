@@ -102,7 +102,7 @@ export function NavChatHistory() {
         Chats
       </SidebarGroupLabel>
       <SidebarMenu>
-        {true ? (
+        {isLoading ? (
           <NavChatHistorySkeleton />
         ) : (
           threads.map((thread) => (
