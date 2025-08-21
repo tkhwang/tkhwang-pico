@@ -21,15 +21,21 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useThreads } from "@/lib/hooks/use-threads";
+import { Input } from "@/components/ui/input";
+import { updateThreadTitle } from "@/lib/supabase/chat";
 
 export function NavChatHistory() {
   const { isMobile } = useSidebar();
-  const { threads, isLoading, error, deleteThreadById } = useThreads();
+  const { threads, isLoading, error, deleteThreadById, refetch } = useThreads();
   const [deletingThreadId, setDeletingThreadId] = useState<string | null>(null);
+  const [editingThreadId, setEditingThreadId] = useState<string | null>(null);
+  const [editingTitle, setEditingTitle] = useState("");
+  const [isRenaming, setIsRenaming] = useState(false);
 
   const handleEditChat = (threadId: string) => {
-    // TODO: Implement chat title editing
-    console.log("Edit chat:", threadId);
+    const currentTitle = threads.find((t) => t.id === threadId)?.title || "";
+    setEditingThreadId(threadId);
+    setEditingTitle(currentTitle);
   };
 
   const handleDeleteChat = async (threadId: string) => {
@@ -46,6 +52,36 @@ export function NavChatHistory() {
     } finally {
       setDeletingThreadId(null);
     }
+  };
+
+  const submitRename = async () => {
+    if (!editingThreadId) return;
+    const newTitle = editingTitle.trim();
+    const original = threads.find((t) => t.id === editingThreadId)?.title || "";
+    if (newTitle === original.trim()) {
+      setEditingThreadId(null);
+      setEditingTitle("");
+      return;
+    }
+    try {
+      setIsRenaming(true);
+      await updateThreadTitle(editingThreadId, newTitle || "");
+      await refetch();
+    } catch (err) {
+      console.error(
+        "[-][NavChatHistory] submitRename: Failed to rename thread:",
+        err
+      );
+    } finally {
+      setIsRenaming(false);
+      setEditingThreadId(null);
+      setEditingTitle("");
+    }
+  };
+
+  const cancelRename = () => {
+    setEditingThreadId(null);
+    setEditingTitle("");
   };
 
   if (error) {
@@ -67,16 +103,34 @@ export function NavChatHistory() {
       <SidebarMenu>
         {threads.map((thread) => (
           <SidebarMenuItem key={thread.id}>
-            <SidebarMenuButton asChild className="w-full justify-start">
-              <Link
-                href={`/c/${thread.id}`}
-                aria-label={`Open chat: ${thread.title || "New Chat"}`}
-              >
-                <span className="sidebar-text-truncate">
-                  {thread.title || "New Chat"}
-                </span>
-              </Link>
-            </SidebarMenuButton>
+            {editingThreadId === thread.id ? (
+              <div className="w-full px-2 py-1.5">
+                <Input
+                  value={editingTitle}
+                  onChange={(e) => setEditingTitle(e.target.value)}
+                  autoFocus
+                  disabled={isRenaming}
+                  onBlur={submitRename}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") submitRename();
+                    if (e.key === "Escape") cancelRename();
+                  }}
+                  className="h-8 border-border/40 focus-visible:ring-0 focus-visible:border-border/60 shadow-none"
+                  aria-label="Edit chat title"
+                />
+              </div>
+            ) : (
+              <SidebarMenuButton asChild className="w-full justify-start">
+                <Link
+                  href={`/c/${thread.id}`}
+                  aria-label={`Open chat: ${thread.title || "New Chat"}`}
+                >
+                  <span className="sidebar-text-truncate">
+                    {thread.title || "New Chat"}
+                  </span>
+                </Link>
+              </SidebarMenuButton>
+            )}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuAction showOnHover>
@@ -91,7 +145,7 @@ export function NavChatHistory() {
               >
                 <DropdownMenuItem onClick={() => handleEditChat(thread.id)}>
                   <Edit3 className="text-muted-foreground" />
-                  <span>Edit Chat</span>
+                  <span>Rename</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
@@ -101,9 +155,7 @@ export function NavChatHistory() {
                 >
                   <Trash2 className="text-muted-foreground" />
                   <span>
-                    {deletingThreadId === thread.id
-                      ? "Deleting..."
-                      : "Delete Chat"}
+                    {deletingThreadId === thread.id ? "Deleting..." : "Delete"}
                   </span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
