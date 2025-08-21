@@ -114,7 +114,7 @@ function ThreadChatInner({ threadId }: { threadId: string }) {
   return (
     <CopilotChat
       instructions="You are assisting the user as PICO, a personal intelligent companion operator."
-      className="h-full w-full"
+      className="h-full w-full max-w-3xl mx-auto"
       labels={{
         title: "Your Assistant",
       }}
