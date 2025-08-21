@@ -13,7 +13,6 @@ import {
   updateThreadTitle,
   generateThreadTitle,
   type Thread,
-  type Message,
 } from "../../lib/supabase/chat";
 
 // Build a stable key for message de-duplication within a thread
