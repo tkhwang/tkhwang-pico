@@ -5,6 +5,7 @@ import {
   Role as copilotKitRole,
 } from "@copilotkit/runtime-client-gql";
 import { copilotRoleToString } from "@/utils/copilotkit";
+import { isBrowser } from "@/utils/browser";
 import { useAuth } from "@/providers/auth-provider";
 import { convertToCopilotMessages } from "@/utils/copilotkit";
 import {
@@ -183,10 +184,9 @@ export function useChatPersistence({
               // Skip if we've already saved this message id for this thread
               const messageKey = buildMessageKey(thread.id, message.id);
               try {
-                if (typeof window !== "undefined") {
-                  const skipId = sessionStorage.getItem(
-                    `pico:skip-saves:${thread.id}`
-                  );
+                if (isBrowser()) {
+                  const skipKey = `pico:skip-saves:${thread.id}`;
+                  const skipId = sessionStorage.getItem(skipKey);
                   if (skipId && skipId === message.id) {
                     return false;
                   }
@@ -209,7 +209,7 @@ export function useChatPersistence({
             });
 
             try {
-              if (typeof window !== "undefined") {
+              if (isBrowser()) {
                 const skipKey = `pico:skip-saves:${thread.id}`;
                 const skipId = sessionStorage.getItem(skipKey);
                 if (skipId && skipId === message.id) {
