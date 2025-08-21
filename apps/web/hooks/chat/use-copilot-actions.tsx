@@ -14,14 +14,6 @@ import {
  */
 export function useCopilotActions() {
   useCopilotAction({
-    name: "weatherTool",
-    available: "disabled",
-    render: ({ status }) => {
-      return <ChatToolWeather status={status} />;
-    },
-  });
-
-  useCopilotAction({
     name: "checkRequestIntent",
     available: "disabled",
     render: ({ status }) => {
@@ -50,6 +42,14 @@ export function useCopilotActions() {
     available: "disabled",
     render: ({ status }) => {
       return <ChatToolHandleRequest status={status} />;
+    },
+  });
+
+  useCopilotAction({
+    name: "weatherTool",
+    available: "disabled",
+    render: ({ status }) => {
+      return <ChatToolWeather status={status} />;
     },
   });
 }
