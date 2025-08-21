@@ -2,7 +2,6 @@ import { generateToolMessage } from "@/utils/tool-message";
 
 interface CheckIntentToolRenderProps {
   status: string;
-  args: { message?: string };
 }
 
 export function ChatToolCheckIntent({ status }: CheckIntentToolRenderProps) {
@@ -12,7 +11,6 @@ export function ChatToolCheckIntent({ status }: CheckIntentToolRenderProps) {
 
 interface DetectLanguageToolRenderProps {
   status: string;
-  args: { message?: string };
   result?: { language?: "korean" | "english"; hasKorean?: boolean };
 }
 
@@ -35,7 +33,6 @@ export function ChatToolDetectLanguage({
 
 interface GenerateFallbackToolRenderProps {
   status: string;
-  args: { language?: string };
 }
 
 export function ChatToolGenerateFallback({
@@ -47,7 +44,6 @@ export function ChatToolGenerateFallback({
 
 interface HandleRequestToolRenderProps {
   status: string;
-  args: { message?: string };
 }
 
 export function ChatToolHandleRequest({
@@ -59,7 +55,6 @@ export function ChatToolHandleRequest({
 
 interface WeatherToolRenderProps {
   status: string;
-  args: { location?: string };
 }
 
 export function ChatToolWeather({ status }: WeatherToolRenderProps) {

@@ -16,40 +16,40 @@ export function useCopilotActions() {
   useCopilotAction({
     name: "weatherTool",
     available: "disabled",
-    render: ({ status, args }) => {
-      return <ChatToolWeather status={status} args={args} />;
+    render: ({ status }) => {
+      return <ChatToolWeather status={status} />;
     },
   });
 
   useCopilotAction({
     name: "checkRequestIntent",
     available: "disabled",
-    render: ({ status, args }) => {
-      return <ChatToolCheckIntent status={status} args={args} />;
+    render: ({ status }) => {
+      return <ChatToolCheckIntent status={status} />;
     },
   });
 
   useCopilotAction({
     name: "detectLanguage",
     available: "disabled",
-    render: ({ status, args }) => {
-      return <ChatToolDetectLanguage status={status} args={args} />;
+    render: ({ status, result }) => {
+      return <ChatToolDetectLanguage status={status} result={result} />;
     },
   });
 
   useCopilotAction({
     name: "generateFallbackMessage",
     available: "disabled",
-    render: ({ status, args }) => {
-      return <ChatToolGenerateFallback status={status} args={args} />;
+    render: ({ status }) => {
+      return <ChatToolGenerateFallback status={status} />;
     },
   });
 
   useCopilotAction({
     name: "handleUserRequest",
     available: "disabled",
-    render: ({ status, args }) => {
-      return <ChatToolHandleRequest status={status} args={args} />;
+    render: ({ status }) => {
+      return <ChatToolHandleRequest status={status} />;
     },
   });
 }
