@@ -12,6 +12,10 @@ import {
   type Message,
 } from "../supabase/chat";
 
+// Build a stable key for message de-duplication within a thread
+const buildMessageKey = (threadId: string, messageId: string) =>
+  `${threadId}-${messageId}`;
+
 interface UseChatPersistenceOptions {
   threadId?: string;
   autoSave?: boolean;
@@ -73,8 +77,8 @@ export function useChatPersistence({
         setThread(thread);
 
         // Mark all loaded messages as saved to prevent re-saving
-        const messageKeys = threadMessages.map(
-          (msg) => `${threadId}-${msg.id}`
+        const messageKeys = threadMessages.map((msg) =>
+          buildMessageKey(threadId, msg.id)
         );
         setSavedMessageIds(new Set(messageKeys));
       } catch (err) {
@@ -116,7 +120,7 @@ export function useChatPersistence({
       for (const message of messages) {
         if (!(message instanceof TextMessage)) continue;
 
-        const messageKey = `${currentThread.id}-${message.id}`;
+        const messageKey = buildMessageKey(currentThread.id, message.id);
         if (savedMessageIds.has(messageKey)) continue;
 
         const role = message.role === gqlRole.User ? "user" : "assistant";
@@ -179,7 +183,7 @@ export function useChatPersistence({
           if (!(msg instanceof TextMessage)) return false;
 
           // Skip if we've already saved this message id for this thread
-          const messageKey = `${thread.id}-${msg.id}`;
+          const messageKey = buildMessageKey(thread.id, msg.id);
           try {
             if (typeof window !== "undefined") {
               const skipId = sessionStorage.getItem(
@@ -195,7 +199,7 @@ export function useChatPersistence({
 
         for (const message of unsavedMessages) {
           const role = message.role === gqlRole.User ? "user" : "assistant";
-          const messageKey = `${thread.id}-${message.id}`;
+          const messageKey = buildMessageKey(thread.id, message.id);
           if (savedMessageIds.has(messageKey)) continue;
 
           await saveMessage({
