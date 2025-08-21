@@ -11,6 +11,7 @@ interface PicoInputProps {
   onSubmit?: (value: string) => void;
   value?: string;
   onChange?: (value: string) => void;
+  disabled?: boolean;
 }
 
 export default function PicoInput({
@@ -18,26 +19,27 @@ export default function PicoInput({
   onSubmit,
   value,
   onChange,
+  disabled = false,
 }: PicoInputProps) {
   return (
     <div className="relative overflow-hidden min-h-screen flex items-center justify-center">
       <div className="container mx-auto px-4 py-8 md:px-6 2xl:max-w-[1400px]">
         <div className="text-center">
-          <div className="flex items-start justify-center gap-2">
+          <div className="flex items-center justify-center">
             <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
               PICO
             </h1>
-            <sup className="text-muted-foreground text-xs lg:text-sm">
-              Personal Intelligent Companion Operator
-            </sup>
           </div>
+          <p className="mt-3 text-sm text-muted-foreground sm:text-base">
+            Your everyday AI to search, plan, and get things done.
+          </p>
           <div className="relative mx-auto mt-7 max-w-xl sm:mt-12">
             {/* Form */}
             <form
               autoComplete="off"
               onSubmit={(e) => {
                 e.preventDefault();
-                if (onSubmit && value?.trim()) {
+                if (onSubmit && value?.trim() && !disabled) {
                   onSubmit(value.trim());
                 }
               }}
@@ -45,13 +47,15 @@ export default function PicoInput({
               <div className="bg-background relative z-10 flex space-x-3 rounded-lg border p-3 shadow-lg">
                 <div className="flex-[1_0_0%]">
                   <Label htmlFor="article" className="sr-only">
-                    Search whatever you want
+                    Ask PICO anything
                   </Label>
                   <Input
                     name="article"
                     className="h-full"
                     id="article"
-                    placeholder="Search whatever you want"
+                    placeholder={
+                      disabled ? "Creating thread..." : "Ask PICO anything"
+                    }
                     autoComplete="off"
                     autoCorrect="off"
                     autoCapitalize="off"
@@ -59,11 +63,13 @@ export default function PicoInput({
                     onClick={onInputClick}
                     value={value || ""}
                     onChange={(e) => onChange?.(e.target.value)}
+                    disabled={disabled}
                   />
                 </div>
                 <div className="flex-[0_0_auto]">
-                  <Button type="submit" size={"icon"}>
-                    <SearchIcon />
+                  <Button type="submit" disabled={disabled}>
+                    <SearchIcon className="mr-2 h-4 w-4" />
+                    Ask PICO
                   </Button>
                 </div>
               </div>

@@ -29,6 +29,7 @@ import { useEffect, useRef, use } from "react";
 import { useCopilotChat } from "@copilotkit/react-core";
 import { TextMessage, Role as gqlRole } from "@copilotkit/runtime-client-gql";
 import { getConfig } from "@/lib/config";
+import { useChatPersistence } from "@/lib/hooks/use-chat-persistence";
 
 interface ChatThreadPageProps {
   params: Promise<{
@@ -40,6 +41,16 @@ function ThreadChatInner({ threadId }: { threadId: string }) {
   const searchParams = useSearchParams();
   const { appendMessage } = useCopilotChat();
   const hasSentInitialRef = useRef(false);
+
+  // Initialize chat persistence
+  const {
+    thread,
+    isLoading: isPersistenceLoading,
+    error: persistenceError,
+  } = useChatPersistence({
+    threadId,
+    autoSave: true,
+  });
 
   useCopilotAction({
     name: "weatherTool",
@@ -83,7 +94,13 @@ function ThreadChatInner({ threadId }: { threadId: string }) {
 
   // Send the initial user message exactly once per thread
   useEffect(() => {
-    if (hasSentInitialRef.current) return;
+    if (hasSentInitialRef.current || isPersistenceLoading) return;
+
+    // If we have existing messages (loaded from DB), don't send initial message
+    if (thread && thread.id === threadId) {
+      hasSentInitialRef.current = true;
+      return;
+    }
 
     // Prefer sessionStorage (no URL leak), fallback to ?q for backward-compat
     let initial = "";
@@ -105,20 +122,44 @@ function ThreadChatInner({ threadId }: { threadId: string }) {
 
     if (initial.trim().length > 0) {
       hasSentInitialRef.current = true;
-      void appendMessage(
-        new TextMessage({ role: gqlRole.User, content: initial.trim() })
-      );
+      // Send the message that was already saved
+      const message = new TextMessage({
+        role: gqlRole.User,
+        content: initial.trim(),
+      });
+      try {
+        if (typeof window !== "undefined") {
+          // Inform persistence to skip saving this runtime message id
+          sessionStorage.setItem(`pico:skip-saves:${threadId}`, message.id);
+        }
+      } catch {}
+      void appendMessage(message);
     }
-  }, [appendMessage, searchParams, threadId]);
+  }, [appendMessage, searchParams, threadId, thread, isPersistenceLoading]);
+
+  // Show error if persistence fails
+  if (persistenceError) {
+    console.error(
+      "[-][ThreadChatInner] Chat persistence error:",
+      persistenceError
+    );
+  }
 
   return (
-    <CopilotChat
-      instructions="You are assisting the user as PICO, a personal intelligent companion operator."
-      className="h-full w-full max-w-3xl mx-auto"
-      labels={{
-        title: "Your Assistant",
-      }}
-    />
+    <div className="h-full w-full max-w-3xl mx-auto">
+      {isPersistenceLoading && (
+        <div className="text-sm text-muted-foreground p-2">
+          Loading chat history...
+        </div>
+      )}
+      <CopilotChat
+        instructions="You are assisting the user as PICO, a personal intelligent companion operator."
+        className="h-full w-full"
+        labels={{
+          title: thread?.title || "Your Assistant",
+        }}
+      />
+    </div>
   );
 }
 
