@@ -24,6 +24,7 @@ import {
   createThread,
   saveMessage,
   generateThreadTitle,
+  deleteThread,
 } from "@/lib/supabase/chat";
 
 export function ChatAfterLogin() {
@@ -37,6 +38,7 @@ export function ChatAfterLogin() {
   const handleSubmit = async (value: string) => {
     if (!user || creatingRef.current) return;
 
+    let newThreadId: string | null = null;
     try {
       creatingRef.current = true;
       setIsCreating(true);
@@ -52,6 +54,7 @@ export function ChatAfterLogin() {
         userId: user.id,
         title,
       });
+      newThreadId = thread.id;
 
       // Save the first message
       await saveMessage({
@@ -78,6 +81,19 @@ export function ChatAfterLogin() {
         "[-][ChatAfterLogin] Failed to create thread and save message:",
         error
       );
+
+      // Best-effort cleanup to prevent orphan threads when message save fails
+      try {
+        if (newThreadId) {
+          await deleteThread(newThreadId);
+          newThreadId = null;
+        }
+      } catch (cleanupErr) {
+        console.warn(
+          "[-][ChatAfterLogin] Orphan-thread cleanup failed:",
+          cleanupErr
+        );
+      }
 
       // Show error message to user
       toast.error("Unable to create new chat", {
