@@ -1,11 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { Frame, Settings2 } from "lucide-react";
 
-import { NavMain } from "@/components/nav-main";
-import { NavProjects } from "@/components/nav-projects";
-import { NavUser } from "@/components/nav-user";
+import { NavUser } from "@/components/sidebar-nav/nav-user";
 import { PicoLogo } from "@/components/pico-logo";
 import {
   Sidebar,
@@ -15,30 +12,8 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { useAuth } from "@/providers/auth-provider";
-
-// This is sample data.
-const data = {
-  navMain: [
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings2,
-      items: [
-        {
-          title: "General",
-          url: "#",
-        },
-      ],
-    },
-  ],
-  projects: [
-    {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
-    },
-  ],
-};
+import { NavChats } from "@/components/sidebar-nav/nav-chats";
+import { NavChatHistory } from "@/components/sidebar-nav/nav-chat-history";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user } = useAuth();
@@ -55,8 +30,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <PicoLogo />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
+        <NavChats />
+        <NavChatHistory />
       </SidebarContent>
       <SidebarFooter className="mt-auto">
         <NavUser user={userData} />
