@@ -18,6 +18,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import Link from "next/link";
 
 export interface ChatItem {
   id: string;
@@ -65,11 +66,14 @@ export function NavChatHistory({
       <SidebarMenu>
         {chatHistory.map((item) => (
           <SidebarMenuItem key={item.id}>
-            <SidebarMenuButton
-              onClick={() => handleChatClick(item)}
-              className="w-full justify-start"
-            >
-              <span className="sidebar-text-truncate">{item.title}</span>
+            <SidebarMenuButton asChild className="w-full justify-start">
+              <Link
+                href={item.url ?? `/c/${item.id}`}
+                onClick={() => handleChatClick(item)}
+                aria-label={`Open chat: ${item.title}`}
+              >
+                <span className="sidebar-text-truncate">{item.title}</span>
+              </Link>
             </SidebarMenuButton>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
