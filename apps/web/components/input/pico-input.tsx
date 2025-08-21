@@ -23,12 +23,14 @@ export default function PicoInput({
     <div className="relative overflow-hidden min-h-screen flex items-center justify-center">
       <div className="container mx-auto px-4 py-8 md:px-6 2xl:max-w-[1400px]">
         <div className="text-center">
-          <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
-            PICO
-          </h1>
-          <p className="text-muted-foreground mt-3 text-xl">
-            Personal Intelligent Companion Operator
-          </p>
+          <div className="flex items-start justify-center gap-2">
+            <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
+              PICO
+            </h1>
+            <sup className="text-muted-foreground text-xs lg:text-sm">
+              Personal Intelligent Companion Operator
+            </sup>
+          </div>
           <div className="relative mx-auto mt-7 max-w-xl sm:mt-12">
             {/* Form */}
             <form
