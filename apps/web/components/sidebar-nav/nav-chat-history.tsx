@@ -1,6 +1,8 @@
 "use client";
 
 import { MoreHorizontal, Edit3, Trash2 } from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
 
 import {
   DropdownMenu,
@@ -18,62 +20,62 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { useThreads } from "@/lib/hooks/use-threads";
 
-export interface ChatItem {
-  id: string;
-  title: string;
-  timestamp?: Date;
-  url?: string;
-}
-
-// Mock data based on the image
-const mockChatHistory: ChatItem[] = [
-  { id: "1", title: "RoutingAgent vNext 활용법" },
-  { id: "2", title: "Routing agent 설계 방법" },
-  { id: "3", title: "CopilotChat 채널 agent 호출" },
-  { id: "4", title: "Mastra vNext의 CopilotKit 통합" },
-  { id: "5", title: "Mastra vNext 예제" },
-];
-
-export function NavChatHistory({
-  chatHistory = mockChatHistory,
-}: {
-  chatHistory?: ChatItem[];
-}) {
+export function NavChatHistory() {
   const { isMobile } = useSidebar();
+  const { threads, isLoading, error, deleteThreadById } = useThreads();
+  const [deletingThreadId, setDeletingThreadId] = useState<string | null>(null);
 
-  // const handleChatClick = (chatItem: ChatItem) => {
-  //   // TODO: Implement chat navigation
-  //   console.log("Chat clicked:", chatItem.title);
-  // };
-
-  const handleEditChat = (chatItem: ChatItem) => {
+  const handleEditChat = (threadId: string) => {
     // TODO: Implement chat title editing
-    console.log("Edit chat:", chatItem.title);
+    console.log("Edit chat:", threadId);
   };
 
-  const handleDeleteChat = (chatItem: ChatItem) => {
-    // TODO: Implement chat deletion
-    console.log("Delete chat:", chatItem.title);
+  const handleDeleteChat = async (threadId: string) => {
+    if (deletingThreadId) return; // Prevent multiple deletions
+
+    try {
+      setDeletingThreadId(threadId);
+      await deleteThreadById(threadId);
+    } catch (err) {
+      console.error(
+        "[-][NavChatHistory] handleDeleteChat: Failed to delete chat:",
+        err
+      );
+    } finally {
+      setDeletingThreadId(null);
+    }
   };
+
+  if (error) {
+    return (
+      <SidebarGroup className="group-data-[collapsible=icon]:hidden">
+        <SidebarGroupLabel className="text-sm text-gray-500">
+          Chats
+        </SidebarGroupLabel>
+        <div className="text-sm text-red-500 p-2">Failed to load chats</div>
+      </SidebarGroup>
+    );
+  }
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <SidebarGroupLabel className="text-sm text-gray-500">
-        Chats
+        Chats {isLoading && "(Loading...)"}
       </SidebarGroupLabel>
       <SidebarMenu>
-        {chatHistory.map((item) => (
-          <SidebarMenuItem key={item.id}>
+        {threads.map((thread) => (
+          <SidebarMenuItem key={thread.id}>
             <SidebarMenuButton asChild className="w-full justify-start">
-              {/* <Link
-                href={item.url ?? `/c/${item.id}`}
-                onClick={() => handleChatClick(item)}
-                aria-label={`Open chat: ${item.title}`}
+              <Link
+                href={`/c/${thread.id}`}
+                aria-label={`Open chat: ${thread.title || "New Chat"}`}
               >
-                <span className="sidebar-text-truncate">{item.title}</span>
-              </Link> */}
-              <span className="sidebar-text-truncate">{item.title}</span>
+                <span className="sidebar-text-truncate">
+                  {thread.title || "New Chat"}
+                </span>
+              </Link>
             </SidebarMenuButton>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -87,22 +89,30 @@ export function NavChatHistory({
                 side={isMobile ? "bottom" : "right"}
                 align={isMobile ? "end" : "start"}
               >
-                <DropdownMenuItem onClick={() => handleEditChat(item)}>
+                <DropdownMenuItem onClick={() => handleEditChat(thread.id)}>
                   <Edit3 className="text-muted-foreground" />
                   <span>Edit Chat</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
-                  onClick={() => handleDeleteChat(item)}
+                  onClick={() => handleDeleteChat(thread.id)}
                   className="text-destructive"
+                  disabled={deletingThreadId === thread.id}
                 >
                   <Trash2 className="text-muted-foreground" />
-                  <span>Delete Chat</span>
+                  <span>
+                    {deletingThreadId === thread.id
+                      ? "Deleting..."
+                      : "Delete Chat"}
+                  </span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </SidebarMenuItem>
         ))}
+        {threads.length === 0 && !isLoading && (
+          <div className="text-sm text-muted-foreground p-2">No chats yet</div>
+        )}
       </SidebarMenu>
     </SidebarGroup>
   );
