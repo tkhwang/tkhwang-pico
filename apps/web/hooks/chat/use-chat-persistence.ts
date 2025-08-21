@@ -180,18 +180,7 @@ export function useChatPersistence({
           const unsavedMessages = messages.filter(
             (message): message is TextMessage => {
               if (!(message instanceof TextMessage)) return false;
-
-              // Skip if we've already saved this message id for this thread
               const messageKey = buildMessageKey(thread.id, message.id);
-              try {
-                if (isBrowser()) {
-                  const skipKey = `pico:skip-saves:${thread.id}`;
-                  const skipId = sessionStorage.getItem(skipKey);
-                  if (skipId && skipId === message.id) {
-                    return false;
-                  }
-                }
-              } catch {}
               return !savedMessageIds.has(messageKey);
             }
           );
@@ -199,24 +188,28 @@ export function useChatPersistence({
           for (const message of unsavedMessages) {
             const role = copilotRoleToString(message.role);
             const messageKey = buildMessageKey(thread.id, message.id);
-            if (savedMessageIds.has(messageKey)) continue;
 
-            await saveMessage({
-              threadId: thread.id,
-              role,
-              content: message.content,
-              metadata: { saved: true },
-            });
-
+            // Consume skip flag: do not persist, but mark as saved to avoid future attempts
+            let shouldSkip = false;
             try {
               if (isBrowser()) {
                 const skipKey = `pico:skip-saves:${thread.id}`;
                 const skipId = sessionStorage.getItem(skipKey);
                 if (skipId && skipId === message.id) {
                   sessionStorage.removeItem(skipKey);
+                  shouldSkip = true;
                 }
               }
             } catch {}
+
+            if (!shouldSkip) {
+              await saveMessage({
+                threadId: thread.id,
+                role,
+                content: message.content,
+                metadata: { saved: true },
+              });
+            }
 
             setSavedMessageIds((prev) => {
               const next = new Set(prev);
