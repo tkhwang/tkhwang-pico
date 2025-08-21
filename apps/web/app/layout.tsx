@@ -12,8 +12,8 @@ const config = getConfig();
 
 export const metadata: Metadata = {
   metadataBase: new URL(config.common.webUrl),
-  title: "PICO | Personal Intelligence Companion Operator",
-  description: "PICO is a personal intelligence companion operator",
+  title: "PICO | Personal Intelligence Copilot",
+  description: "Your everyday AI to search, plan, and get things done.",
 };
 
 const geistSans = Geist({
