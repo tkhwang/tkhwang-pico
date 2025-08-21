@@ -1,8 +1,8 @@
 "use client";
 
 import { CopilotChat } from "@copilotkit/react-ui";
-import { CopilotKit, useCopilotAction } from "@copilotkit/react-core";
-import { AppSidebar } from "@/components/sidebar-nav/app-sidebar";
+import { CopilotKit } from "@copilotkit/react-core";
+import { AppSidebar } from "@/components/sidebar/app-sidebar";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -17,19 +17,14 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { ThemeSwitcher } from "@/components/theme-switcher";
-import {
-  ChatToolCheckIntent,
-  ChatToolDetectLanguage,
-  ChatToolGenerateFallback,
-  ChatToolHandleRequest,
-  ChatToolWeather,
-} from "@/components/chat/chat-render-tools";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, use } from "react";
 import { useCopilotChat } from "@copilotkit/react-core";
 import { TextMessage, Role as gqlRole } from "@copilotkit/runtime-client-gql";
 import { getConfig } from "@/lib/config";
-import { useChatPersistence } from "@/lib/hooks/use-chat-persistence";
+import { useChatPersistence } from "@/hooks/chat/use-chat-persistence";
+import { useCopilotActions } from "@/hooks/chat/use-copilot-actions";
+import { ChatPageSkeleton } from "@/components/chat/chat-page-skeleton";
 
 interface ChatThreadPageProps {
   params: Promise<{
@@ -52,45 +47,8 @@ function ThreadChatInner({ threadId }: { threadId: string }) {
     autoSave: true,
   });
 
-  useCopilotAction({
-    name: "weatherTool",
-    available: "disabled",
-    render: ({ status, args }) => {
-      return <ChatToolWeather status={status} args={args} />;
-    },
-  });
-
-  useCopilotAction({
-    name: "checkRequestIntent",
-    available: "disabled",
-    render: ({ status, args }) => {
-      return <ChatToolCheckIntent status={status} args={args} />;
-    },
-  });
-
-  useCopilotAction({
-    name: "detectLanguage",
-    available: "disabled",
-    render: ({ status, args }) => {
-      return <ChatToolDetectLanguage status={status} args={args} />;
-    },
-  });
-
-  useCopilotAction({
-    name: "generateFallbackMessage",
-    available: "disabled",
-    render: ({ status, args }) => {
-      return <ChatToolGenerateFallback status={status} args={args} />;
-    },
-  });
-
-  useCopilotAction({
-    name: "handleUserRequest",
-    available: "disabled",
-    render: ({ status, args }) => {
-      return <ChatToolHandleRequest status={status} args={args} />;
-    },
-  });
+  // Register copilot actions
+  useCopilotActions();
 
   // Send the initial user message exactly once per thread
   useEffect(() => {
@@ -147,11 +105,7 @@ function ThreadChatInner({ threadId }: { threadId: string }) {
 
   return (
     <div className="h-full w-full max-w-3xl mx-auto">
-      {isPersistenceLoading && (
-        <div className="text-sm text-muted-foreground p-2">
-          Loading chat history...
-        </div>
-      )}
+      {isPersistenceLoading && <ChatPageSkeleton />}
       <CopilotChat
         instructions="You are assisting the user as PICO, a personal intelligent companion operator."
         className="h-full w-full"

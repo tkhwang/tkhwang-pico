@@ -1,7 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 import { useCopilotMessagesContext } from "@copilotkit/react-core";
-import { TextMessage, Role as gqlRole } from "@copilotkit/runtime-client-gql";
+import {
+  TextMessage,
+  Role as copilotKitRole,
+} from "@copilotkit/runtime-client-gql";
 import { useAuth } from "@/providers/auth-provider";
+import { convertToCopilotMessages } from "@/utils/copilotkit";
 import {
   createThread,
   saveMessage,
@@ -9,8 +13,7 @@ import {
   updateThreadTitle,
   generateThreadTitle,
   type Thread,
-  type Message,
-} from "../supabase/chat";
+} from "../../lib/supabase/chat";
 
 // Build a stable key for message de-duplication within a thread
 const buildMessageKey = (threadId: string, messageId: string) =>
@@ -61,19 +64,9 @@ export function useChatPersistence({
 
         const { thread, messages: threadMessages } = result;
 
-        // Convert to CopilotKit message format and restore them
-        const copilotMessages = threadMessages.map((msg: Message) => {
-          const role = msg.role === "user" ? gqlRole.User : gqlRole.Assistant;
-          return new TextMessage({
-            id: msg.id,
-            role,
-            content: msg.content,
-            createdAt: msg.created_at,
-          });
-        });
-
-        // Restore messages in CopilotKit
+        const copilotMessages = convertToCopilotMessages(threadMessages);
         setMessages(copilotMessages);
+
         setThread(thread);
 
         // Mark all loaded messages as saved to prevent re-saving
@@ -102,7 +95,7 @@ export function useChatPersistence({
       let currentThread = thread;
       if (!currentThread) {
         const firstUserMessage = messages.find(
-          (m) => m instanceof TextMessage && m.role === gqlRole.User
+          (m) => m instanceof TextMessage && m.role === copilotKitRole.User
         ) as TextMessage | undefined;
 
         const title = firstUserMessage
@@ -123,7 +116,8 @@ export function useChatPersistence({
         const messageKey = buildMessageKey(currentThread.id, message.id);
         if (savedMessageIds.has(messageKey)) continue;
 
-        const role = message.role === gqlRole.User ? "user" : "assistant";
+        const role =
+          message.role === copilotKitRole.User ? "user" : "assistant";
 
         await saveMessage({
           threadId: currentThread.id,
@@ -179,26 +173,29 @@ export function useChatPersistence({
     const saveMessages = async () => {
       try {
         // Find all unsaved messages
-        const unsavedMessages = messages.filter((msg): msg is TextMessage => {
-          if (!(msg instanceof TextMessage)) return false;
+        const unsavedMessages = messages.filter(
+          (message): message is TextMessage => {
+            if (!(message instanceof TextMessage)) return false;
 
-          // Skip if we've already saved this message id for this thread
-          const messageKey = buildMessageKey(thread.id, msg.id);
-          try {
-            if (typeof window !== "undefined") {
-              const skipId = sessionStorage.getItem(
-                `pico:skip-saves:${thread.id}`
-              );
-              if (skipId && skipId === msg.id) {
-                return false;
+            // Skip if we've already saved this message id for this thread
+            const messageKey = buildMessageKey(thread.id, message.id);
+            try {
+              if (typeof window !== "undefined") {
+                const skipId = sessionStorage.getItem(
+                  `pico:skip-saves:${thread.id}`
+                );
+                if (skipId && skipId === message.id) {
+                  return false;
+                }
               }
-            }
-          } catch {}
-          return !savedMessageIds.has(messageKey);
-        });
+            } catch {}
+            return !savedMessageIds.has(messageKey);
+          }
+        );
 
         for (const message of unsavedMessages) {
-          const role = message.role === gqlRole.User ? "user" : "assistant";
+          const role =
+            message.role === copilotKitRole.User ? "user" : "assistant";
           const messageKey = buildMessageKey(thread.id, message.id);
           if (savedMessageIds.has(messageKey)) continue;
 
@@ -228,7 +225,7 @@ export function useChatPersistence({
 
         // Update thread title if needed (only for user messages)
         const userMessages = messages.filter(
-          (m) => m instanceof TextMessage && m.role === gqlRole.User
+          (m) => m instanceof TextMessage && m.role === copilotKitRole.User
         );
         if (userMessages.length === 1 && !thread.title) {
           const firstUserMessage = userMessages[0] as TextMessage;
