@@ -139,18 +139,22 @@ export function NavChatHistory() {
                 </SidebarMenuAction>
               </DropdownMenuTrigger>
               <DropdownMenuContent
-                className="w-48 rounded-lg"
+                className="w-48 rounded-xl p-2"
                 side={isMobile ? "bottom" : "right"}
                 align={isMobile ? "end" : "start"}
               >
-                <DropdownMenuItem onClick={() => handleEditChat(thread.id)}>
+                <DropdownMenuItem
+                  onClick={() => handleEditChat(thread.id)}
+                  className="h-9 px-3"
+                >
                   <Edit3 className="text-muted-foreground" />
                   <span>Rename</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onClick={() => handleDeleteChat(thread.id)}
-                  className="text-destructive"
+                  variant="destructive"
+                  className="h-9 px-3"
                   disabled={deletingThreadId === thread.id}
                 >
                   <Trash2 className="text-muted-foreground" />
