@@ -5,7 +5,6 @@ import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "@/providers/auth-provider";
-import { CopilotKit } from "@copilotkit/react-core";
 import { getConfig } from "@/lib/config";
 
 const config = getConfig();
@@ -30,21 +29,14 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.className} antialiased`}>
-        <CopilotKit
-          publicLicenseKey={config.copilotKit.publicLicenseKey}
-          runtimeUrl={config.mastra.copilotKitUrl}
-          agent="routingAgent"
-          showDevConsole={false}
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
         >
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <AuthProvider>{children}</AuthProvider>
-          </ThemeProvider>
-        </CopilotKit>
+          <AuthProvider>{children}</AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
