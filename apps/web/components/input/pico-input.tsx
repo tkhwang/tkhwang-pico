@@ -32,6 +32,7 @@ export default function PicoInput({
           <div className="relative mx-auto mt-7 max-w-xl sm:mt-12">
             {/* Form */}
             <form
+              autoComplete="off"
               onSubmit={(e) => {
                 e.preventDefault();
                 if (onSubmit && value?.trim()) {
@@ -49,6 +50,10 @@ export default function PicoInput({
                     className="h-full"
                     id="article"
                     placeholder="Search whatever you want"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck={false}
                     onClick={onInputClick}
                     value={value || ""}
                     onChange={(e) => onChange?.(e.target.value)}
