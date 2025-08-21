@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { AppSidebar } from "@/components/sidebar-nav/app-sidebar";
@@ -29,13 +29,16 @@ import {
 export function ChatAfterLogin() {
   const [inputValue, setInputValue] = useState("");
   const [isCreating, setIsCreating] = useState(false);
+  const creatingRef = useRef(false);
+
   const router = useRouter();
   const { user } = useAuth();
 
   const handleSubmit = async (value: string) => {
-    if (!user || isCreating) return;
+    if (!user || creatingRef.current) return;
 
     try {
+      creatingRef.current = true;
       setIsCreating(true);
 
       const valueTrimmed = value.trim();
@@ -85,6 +88,7 @@ export function ChatAfterLogin() {
         },
       });
     } finally {
+      creatingRef.current = false;
       setIsCreating(false);
     }
   };
