@@ -25,15 +25,15 @@ import {
   ChatToolWeather,
 } from "@/components/chat/chat-render-tools";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, use } from "react";
 import { useCopilotChat } from "@copilotkit/react-core";
 import { TextMessage, Role as gqlRole } from "@copilotkit/runtime-client-gql";
 import { getConfig } from "@/lib/config";
 
 interface ChatThreadPageProps {
-  params: {
+  params: Promise<{
     threadId: string;
-  };
+  }>;
 }
 
 function ThreadChatInner({ threadId }: { threadId: string }) {
@@ -123,7 +123,7 @@ function ThreadChatInner({ threadId }: { threadId: string }) {
 }
 
 export default function ChatThreadPage({ params }: ChatThreadPageProps) {
-  const { threadId } = params;
+  const { threadId } = use(params);
 
   const config = getConfig();
 
