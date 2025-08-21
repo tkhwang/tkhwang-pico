@@ -1,9 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Frame } from "lucide-react";
 
-import { NavProjects } from "@/components/sidebar-nav/nav-projects";
 import { NavUser } from "@/components/sidebar-nav/nav-user";
 import { PicoLogo } from "@/components/pico-logo";
 import {
