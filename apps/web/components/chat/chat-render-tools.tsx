@@ -1,3 +1,5 @@
+"use client";
+
 import { useToolMessage } from "@/hooks/use-tool-message";
 
 interface ChatGenericToolRenderProps {
