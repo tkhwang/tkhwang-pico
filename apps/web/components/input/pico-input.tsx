@@ -11,6 +11,7 @@ interface PicoInputProps {
   onSubmit?: (value: string) => void;
   value?: string;
   onChange?: (value: string) => void;
+  disabled?: boolean;
 }
 
 export default function PicoInput({
@@ -18,6 +19,7 @@ export default function PicoInput({
   onSubmit,
   value,
   onChange,
+  disabled = false,
 }: PicoInputProps) {
   return (
     <div className="relative overflow-hidden min-h-screen flex items-center justify-center">
@@ -37,7 +39,7 @@ export default function PicoInput({
               autoComplete="off"
               onSubmit={(e) => {
                 e.preventDefault();
-                if (onSubmit && value?.trim()) {
+                if (onSubmit && value?.trim() && !disabled) {
                   onSubmit(value.trim());
                 }
               }}
@@ -51,7 +53,11 @@ export default function PicoInput({
                     name="article"
                     className="h-full"
                     id="article"
-                    placeholder="Search whatever you want"
+                    placeholder={
+                      disabled
+                        ? "Creating thread..."
+                        : "Search whatever you want"
+                    }
                     autoComplete="off"
                     autoCorrect="off"
                     autoCapitalize="off"
@@ -59,10 +65,11 @@ export default function PicoInput({
                     onClick={onInputClick}
                     value={value || ""}
                     onChange={(e) => onChange?.(e.target.value)}
+                    disabled={disabled}
                   />
                 </div>
                 <div className="flex-[0_0_auto]">
-                  <Button type="submit" size={"icon"}>
+                  <Button type="submit" size={"icon"} disabled={disabled}>
                     <SearchIcon />
                   </Button>
                 </div>
