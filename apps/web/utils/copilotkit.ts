@@ -3,7 +3,9 @@ import {
   Role as copilotKitRole,
 } from "@copilotkit/runtime-client-gql";
 import type { Message } from "../lib/supabase/chat";
-import { CopilotKitRole, DatabaseRole } from "@/types/role";
+import type { DatabaseRole } from "@/types/role";
+
+type CopilotKitRole = (typeof copilotKitRole)[keyof typeof copilotKitRole];
 
 /**
  *   Converts CopilotKit role to database role string
