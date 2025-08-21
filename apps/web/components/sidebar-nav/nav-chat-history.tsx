@@ -18,7 +18,6 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import Link from "next/link";
 
 export interface ChatItem {
   id: string;
@@ -43,10 +42,10 @@ export function NavChatHistory({
 }) {
   const { isMobile } = useSidebar();
 
-  const handleChatClick = (chatItem: ChatItem) => {
-    // TODO: Implement chat navigation
-    console.log("Chat clicked:", chatItem.title);
-  };
+  // const handleChatClick = (chatItem: ChatItem) => {
+  //   // TODO: Implement chat navigation
+  //   console.log("Chat clicked:", chatItem.title);
+  // };
 
   const handleEditChat = (chatItem: ChatItem) => {
     // TODO: Implement chat title editing
