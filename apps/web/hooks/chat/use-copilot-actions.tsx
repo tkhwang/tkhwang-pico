@@ -1,39 +1,27 @@
 "use client";
 
 import { useCopilotAction } from "@copilotkit/react-core";
-import {
-  ChatToolCheckIntent,
-  ChatToolDetectLanguage,
-  ChatToolGenerateFallback,
-  ChatToolHandleRequest,
-  ChatToolWeather,
-} from "@/components/chat/chat-render-tools";
+import { ChatGenericToolRender } from "@/components/chat/chat-render-tools";
 
 /**
  * Custom hook that registers all copilot actions for chat tools
  */
 export function useCopilotActions() {
   useCopilotAction({
-    name: "weatherTool",
-    available: "disabled",
-    render: ({ status }) => {
-      return <ChatToolWeather status={status} />;
-    },
-  });
-
-  useCopilotAction({
     name: "checkRequestIntent",
     available: "disabled",
     render: ({ status }) => {
-      return <ChatToolCheckIntent status={status} />;
+      return (
+        <ChatGenericToolRender name="checkRequestIntent" status={status} />
+      );
     },
   });
 
   useCopilotAction({
     name: "detectLanguage",
     available: "disabled",
-    render: ({ status, result }) => {
-      return <ChatToolDetectLanguage status={status} result={result} />;
+    render: ({ status }) => {
+      return <ChatGenericToolRender name="detectLanguage" status={status} />;
     },
   });
 
@@ -41,7 +29,9 @@ export function useCopilotActions() {
     name: "generateFallbackMessage",
     available: "disabled",
     render: ({ status }) => {
-      return <ChatToolGenerateFallback status={status} />;
+      return (
+        <ChatGenericToolRender name="generateFallbackMessage" status={status} />
+      );
     },
   });
 
@@ -49,7 +39,15 @@ export function useCopilotActions() {
     name: "handleUserRequest",
     available: "disabled",
     render: ({ status }) => {
-      return <ChatToolHandleRequest status={status} />;
+      return <ChatGenericToolRender name="handleUserRequest" status={status} />;
+    },
+  });
+
+  useCopilotAction({
+    name: "weatherTool",
+    available: "disabled",
+    render: ({ status }) => {
+      return <ChatGenericToolRender name="weatherTool" status={status} showElapsedSec={true} />;
     },
   });
 }

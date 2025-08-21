@@ -4,6 +4,8 @@ import {
   TextMessage,
   Role as copilotKitRole,
 } from "@copilotkit/runtime-client-gql";
+import { copilotRoleToString } from "@/utils/copilotkit";
+import { isBrowser } from "@/utils/browser";
 import { useAuth } from "@/providers/auth-provider";
 import { convertToCopilotMessages } from "@/utils/copilotkit";
 import {
@@ -116,8 +118,7 @@ export function useChatPersistence({
         const messageKey = buildMessageKey(currentThread.id, message.id);
         if (savedMessageIds.has(messageKey)) continue;
 
-        const role =
-          message.role === copilotKitRole.User ? "user" : "assistant";
+        const role = copilotRoleToString(message.role);
 
         await saveMessage({
           threadId: currentThread.id,
@@ -159,91 +160,87 @@ export function useChatPersistence({
     [thread]
   );
 
-  // Load thread and its messages on mount
-  useEffect(() => {
-    if (threadId && user) {
-      loadThread(threadId);
-    }
-  }, [loadThread, threadId, user]);
+  useEffect(
+    function onMountLoadThread() {
+      if (threadId && user) {
+        loadThread(threadId);
+      }
+    },
+    [loadThread, threadId, user]
+  );
 
   // Auto-save messages when they change
-  useEffect(() => {
-    if (!autoSave || !user || !thread || messages.length === 0) return;
+  useEffect(
+    function onMessagesAutoSave() {
+      if (!autoSave || !user || !thread || messages.length === 0) return;
 
-    const saveMessages = async () => {
-      try {
-        // Find all unsaved messages
-        const unsavedMessages = messages.filter(
-          (message): message is TextMessage => {
-            if (!(message instanceof TextMessage)) return false;
+      const saveMessages = async () => {
+        try {
+          // Find all unsaved messages
+          const unsavedMessages = messages.filter(
+            (message): message is TextMessage => {
+              if (!(message instanceof TextMessage)) return false;
+              const messageKey = buildMessageKey(thread.id, message.id);
+              return !savedMessageIds.has(messageKey);
+            }
+          );
 
-            // Skip if we've already saved this message id for this thread
+          for (const message of unsavedMessages) {
+            const role = copilotRoleToString(message.role);
             const messageKey = buildMessageKey(thread.id, message.id);
+
+            // Consume skip flag: do not persist, but mark as saved to avoid future attempts
+            let shouldSkip = false;
             try {
-              if (typeof window !== "undefined") {
-                const skipId = sessionStorage.getItem(
-                  `pico:skip-saves:${thread.id}`
-                );
+              if (isBrowser()) {
+                const skipKey = `pico:skip-saves:${thread.id}`;
+                const skipId = sessionStorage.getItem(skipKey);
                 if (skipId && skipId === message.id) {
-                  return false;
+                  sessionStorage.removeItem(skipKey);
+                  shouldSkip = true;
                 }
               }
             } catch {}
-            return !savedMessageIds.has(messageKey);
-          }
-        );
 
-        for (const message of unsavedMessages) {
-          const role =
-            message.role === copilotKitRole.User ? "user" : "assistant";
-          const messageKey = buildMessageKey(thread.id, message.id);
-          if (savedMessageIds.has(messageKey)) continue;
-
-          await saveMessage({
-            threadId: thread.id,
-            role,
-            content: message.content,
-            metadata: { saved: true },
-          });
-
-          try {
-            if (typeof window !== "undefined") {
-              const skipKey = `pico:skip-saves:${thread.id}`;
-              const skipId = sessionStorage.getItem(skipKey);
-              if (skipId && skipId === message.id) {
-                sessionStorage.removeItem(skipKey);
-              }
+            if (!shouldSkip) {
+              await saveMessage({
+                threadId: thread.id,
+                role,
+                content: message.content,
+                metadata: { saved: true },
+              });
             }
-          } catch {}
 
-          setSavedMessageIds((prev) => {
-            const next = new Set(prev);
-            next.add(messageKey);
-            return next;
-          });
+            setSavedMessageIds((prev) => {
+              const next = new Set(prev);
+              next.add(messageKey);
+              return next;
+            });
+          }
+
+          // Update thread title if needed (only for user messages)
+          const userMessages = messages.filter(
+            (m) => m instanceof TextMessage && m.role === copilotKitRole.User
+          );
+          if (userMessages.length === 1 && !thread.title) {
+            const firstUserMessage = userMessages[0] as TextMessage;
+            const title = generateThreadTitle(firstUserMessage.content);
+            await updateTitle(title);
+          }
+        } catch (err) {
+          console.error("Failed to auto-save messages:", err);
+          setError(
+            err instanceof Error ? err.message : "Failed to save messages"
+          );
         }
+      };
 
-        // Update thread title if needed (only for user messages)
-        const userMessages = messages.filter(
-          (m) => m instanceof TextMessage && m.role === copilotKitRole.User
-        );
-        if (userMessages.length === 1 && !thread.title) {
-          const firstUserMessage = userMessages[0] as TextMessage;
-          const title = generateThreadTitle(firstUserMessage.content);
-          await updateTitle(title);
-        }
-      } catch (err) {
-        console.error("Failed to auto-save messages:", err);
-        setError(
-          err instanceof Error ? err.message : "Failed to save messages"
-        );
-      }
-    };
-
-    // Debounce to avoid too frequent saves
-    const timeoutId = setTimeout(saveMessages, 500);
-    return () => clearTimeout(timeoutId);
-  }, [messages, thread, user, autoSave, savedMessageIds, updateTitle]);
+      // Debounce to avoid too frequent saves
+      const timeoutId = setTimeout(saveMessages, 500);
+      return () => clearTimeout(timeoutId);
+    },
+    [messages, thread, user, autoSave, savedMessageIds, updateTitle]
+  );
 
   return {
     thread,

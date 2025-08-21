@@ -1,5 +1,10 @@
 import { createClient } from "./client";
-import type { Tables, TablesInsert, TablesUpdate, Json } from "../../types_db";
+import type {
+  Tables,
+  TablesInsert,
+  TablesUpdate,
+  Json,
+} from "../../types/types_db";
 
 export type Thread = Tables<"threads">;
 export type Message = Tables<"messages">;

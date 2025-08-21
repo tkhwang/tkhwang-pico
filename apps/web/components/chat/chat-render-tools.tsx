@@ -1,63 +1,18 @@
-import { generateToolMessage } from "@/utils/tool-message";
+"use client";
 
-interface CheckIntentToolRenderProps {
+import { useToolMessage } from "@/hooks/use-tool-message";
+
+interface ChatGenericToolRenderProps {
+  name: string;
   status: string;
+  showElapsedSec?: boolean;
 }
 
-export function ChatToolCheckIntent({ status }: CheckIntentToolRenderProps) {
-  const message = generateToolMessage(status, "🎯", "Analyzing request intent");
-  return <p className="text-sm text-gray-500">{message}</p>;
-}
-
-interface DetectLanguageToolRenderProps {
-  status: string;
-  result?: { language?: "korean" | "english"; hasKorean?: boolean };
-}
-
-export function ChatToolDetectLanguage({
+export function ChatGenericToolRender({
+  name,
   status,
-  result,
-}: DetectLanguageToolRenderProps) {
-  if (status === "complete" && result?.language) {
-    const languageText = result.language === "korean" ? "한국어" : "English";
-    return (
-      <p className="text-sm text-gray-500">
-        🔍 Language detected: {languageText}
-      </p>
-    );
-  }
-
-  const message = generateToolMessage(status, "🔍", "Detecting language");
-  return <p className="text-sm text-gray-500">{message}</p>;
-}
-
-interface GenerateFallbackToolRenderProps {
-  status: string;
-}
-
-export function ChatToolGenerateFallback({
-  status,
-}: GenerateFallbackToolRenderProps) {
-  const message = generateToolMessage(status, "💬", "Generating response");
-  return <p className="text-sm text-gray-500">{message}</p>;
-}
-
-interface HandleRequestToolRenderProps {
-  status: string;
-}
-
-export function ChatToolHandleRequest({
-  status,
-}: HandleRequestToolRenderProps) {
-  const message = generateToolMessage(status, "⚙️", "Processing request");
-  return <p className="text-sm text-gray-500">{message}</p>;
-}
-
-interface WeatherToolRenderProps {
-  status: string;
-}
-
-export function ChatToolWeather({ status }: WeatherToolRenderProps) {
-  const message = generateToolMessage(status, "🌤️", "Fetching weather");
+  showElapsedSec = false,
+}: ChatGenericToolRenderProps) {
+  const message = useToolMessage(name, status, showElapsedSec);
   return <p className="text-sm text-gray-500">{message}</p>;
 }
