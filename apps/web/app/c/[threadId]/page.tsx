@@ -1,7 +1,7 @@
 "use client";
 
 import { CopilotChat } from "@copilotkit/react-ui";
-import { useCopilotAction, useCopilotContext } from "@copilotkit/react-core";
+import { CopilotKit, useCopilotAction } from "@copilotkit/react-core";
 import { AppSidebar } from "@/components/sidebar-nav/app-sidebar";
 import {
   Breadcrumb,
@@ -36,10 +36,8 @@ interface ChatThreadPageProps {
   };
 }
 
-export default function ChatThreadPage({ params }: ChatThreadPageProps) {
+function ThreadChatInner({ threadId }: { threadId: string }) {
   const searchParams = useSearchParams();
-  const { threadId } = params;
-  const { setThreadId } = useCopilotContext();
   const { appendMessage } = useCopilotChat();
   const hasSentInitialRef = useRef(false);
 
@@ -83,11 +81,6 @@ export default function ChatThreadPage({ params }: ChatThreadPageProps) {
     },
   });
 
-  // Bind route threadId to Copilot context
-  useEffect(() => {
-    setThreadId(threadId);
-  }, [setThreadId, threadId]);
-
   // Send the initial user message exactly once per thread
   useEffect(() => {
     if (hasSentInitialRef.current) return;
@@ -118,47 +111,64 @@ export default function ChatThreadPage({ params }: ChatThreadPageProps) {
     }
   }, [appendMessage, searchParams, threadId]);
 
-  getConfig(); // keep env validation; throws early if misconfigured
+  return (
+    <CopilotChat
+      instructions="You are assisting the user as PICO, a personal intelligent companion operator."
+      className="h-full w-full"
+      labels={{
+        title: "Your Assistant",
+      }}
+    />
+  );
+}
+
+export default function ChatThreadPage({ params }: ChatThreadPageProps) {
+  const { threadId } = params;
+
+  const config = getConfig();
 
   return (
-    <SidebarProvider className="min-h-screen">
-      <AppSidebar />
-      <SidebarInset className="flex flex-col">
-        <header className="flex h-16 shrink-0 items-center transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 border-b">
-          <div className="flex w-full items-center justify-between px-4">
-            <div className="flex items-center gap-2">
-              <SidebarTrigger className="-ml-1" />
-              <Separator
-                orientation="vertical"
-                className="mr-2 data-[orientation=vertical]:h-4"
-              />
-              <Breadcrumb>
-                <BreadcrumbList>
-                  <BreadcrumbItem className="hidden md:block">
-                    PICO
-                  </BreadcrumbItem>
-                  <BreadcrumbSeparator className="hidden md:block" />
-                  <BreadcrumbItem>
-                    <BreadcrumbPage>Chat</BreadcrumbPage>
-                  </BreadcrumbItem>
-                </BreadcrumbList>
-              </Breadcrumb>
+    <CopilotKit
+      key={threadId}
+      publicLicenseKey={config.copilotKit.publicLicenseKey}
+      runtimeUrl={config.mastra.copilotKitUrl}
+      agent="routingAgent"
+      showDevConsole={false}
+      threadId={threadId}
+    >
+      <SidebarProvider className="min-h-screen">
+        <AppSidebar />
+        <SidebarInset className="flex flex-col">
+          <header className="flex h-16 shrink-0 items-center transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 border-b">
+            <div className="flex w-full items-center justify-between px-4">
+              <div className="flex items-center gap-2">
+                <SidebarTrigger className="-ml-1" />
+                <Separator
+                  orientation="vertical"
+                  className="mr-2 data-[orientation=vertical]:h-4"
+                />
+                <Breadcrumb>
+                  <BreadcrumbList>
+                    <BreadcrumbItem className="hidden md:block">
+                      PICO
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator className="hidden md:block" />
+                    <BreadcrumbItem>
+                      <BreadcrumbPage>Chat</BreadcrumbPage>
+                    </BreadcrumbItem>
+                  </BreadcrumbList>
+                </Breadcrumb>
+              </div>
+              <div className="flex items-center gap-2">
+                <ThemeSwitcher />
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <ThemeSwitcher />
-            </div>
+          </header>
+          <div className="flex-1 p-4 min-h-0">
+            <ThreadChatInner key={threadId} threadId={threadId} />
           </div>
-        </header>
-        <div className="flex-1 p-4 min-h-0">
-          <CopilotChat
-            instructions="You are assisting the user as PICO, a personal intelligent companion operator."
-            className="h-full w-full"
-            labels={{
-              title: "Your Assistant",
-            }}
-          />
-        </div>
-      </SidebarInset>
-    </SidebarProvider>
+        </SidebarInset>
+      </SidebarProvider>
+    </CopilotKit>
   );
 }
