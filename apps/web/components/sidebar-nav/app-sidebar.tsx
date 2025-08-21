@@ -15,17 +15,7 @@ import {
 } from "@/components/ui/sidebar";
 import { useAuth } from "@/providers/auth-provider";
 import { NavChats } from "@/components/sidebar-nav/nav-chats";
-
-// This is sample data.
-const data = {
-  projects: [
-    {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
-    },
-  ],
-};
+import { NavChatHistory } from "@/components/sidebar-nav/nav-chat-history";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user } = useAuth();
@@ -43,7 +33,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavChats />
-        <NavProjects projects={data.projects} />
+        <NavChatHistory />
       </SidebarContent>
       <SidebarFooter className="mt-auto">
         <NavUser user={userData} />
