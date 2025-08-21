@@ -47,7 +47,7 @@ export function useCopilotActions() {
     name: "weatherTool",
     available: "disabled",
     render: ({ status }) => {
-      return <ChatGenericToolRender name="weatherTool" status={status} />;
+      return <ChatGenericToolRender name="weatherTool" status={status} showElapsedSec={true} />;
     },
   });
 }
