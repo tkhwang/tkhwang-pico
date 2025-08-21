@@ -1,11 +1,10 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-
 import Navbar02Page from "@/components/navbar-02/navbar-02";
-import PicoInput from "@/components/pico-input";
+import PicoInput from "@/components/input/pico-input";
 
-export default function HeroFormCenterAlignedSearchWithTags() {
+export function ChatBeforeLogin() {
   const router = useRouter();
 
   const handleInputClick = () => {

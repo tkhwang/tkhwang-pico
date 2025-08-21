@@ -8,9 +8,17 @@ import { Label } from "@/components/ui/label";
 
 interface PicoInputProps {
   onInputClick?: () => void;
+  onSubmit?: (value: string) => void;
+  value?: string;
+  onChange?: (value: string) => void;
 }
 
-export default function PicoInput({ onInputClick }: PicoInputProps) {
+export default function PicoInput({
+  onInputClick,
+  onSubmit,
+  value,
+  onChange,
+}: PicoInputProps) {
   return (
     <div className="relative overflow-hidden min-h-screen flex items-center justify-center">
       <div className="container mx-auto px-4 py-8 md:px-6 2xl:max-w-[1400px]">
@@ -23,7 +31,14 @@ export default function PicoInput({ onInputClick }: PicoInputProps) {
           </p>
           <div className="relative mx-auto mt-7 max-w-xl sm:mt-12">
             {/* Form */}
-            <form>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (onSubmit && value?.trim()) {
+                  onSubmit(value.trim());
+                }
+              }}
+            >
               <div className="bg-background relative z-10 flex space-x-3 rounded-lg border p-3 shadow-lg">
                 <div className="flex-[1_0_0%]">
                   <Label htmlFor="article" className="sr-only">
@@ -35,10 +50,12 @@ export default function PicoInput({ onInputClick }: PicoInputProps) {
                     id="article"
                     placeholder="Search whatever you want"
                     onClick={onInputClick}
+                    value={value || ""}
+                    onChange={(e) => onChange?.(e.target.value)}
                   />
                 </div>
                 <div className="flex-[0_0_auto]">
-                  <Button size={"icon"}>
+                  <Button type="submit" size={"icon"}>
                     <SearchIcon />
                   </Button>
                 </div>

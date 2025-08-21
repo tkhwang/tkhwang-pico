@@ -5,9 +5,7 @@ interface CheckIntentToolRenderProps {
   args: { message?: string };
 }
 
-export function MainChatToolCheckIntent({
-  status,
-}: CheckIntentToolRenderProps) {
+export function ChatToolCheckIntent({ status }: CheckIntentToolRenderProps) {
   const message = generateToolMessage(status, "🎯", "Analyzing request intent");
   return <p className="text-sm text-gray-500">{message}</p>;
 }
@@ -18,14 +16,16 @@ interface DetectLanguageToolRenderProps {
   result?: { language?: "korean" | "english"; hasKorean?: boolean };
 }
 
-export function MainChatToolDetectLanguage({
+export function ChatToolDetectLanguage({
   status,
   result,
 }: DetectLanguageToolRenderProps) {
   if (status === "complete" && result?.language) {
     const languageText = result.language === "korean" ? "한국어" : "English";
     return (
-      <p className="text-sm text-gray-500">🔍 Language detected: {languageText}</p>
+      <p className="text-sm text-gray-500">
+        🔍 Language detected: {languageText}
+      </p>
     );
   }
 
@@ -38,7 +38,7 @@ interface GenerateFallbackToolRenderProps {
   args: { language?: string };
 }
 
-export function MainChatToolGenerateFallback({
+export function ChatToolGenerateFallback({
   status,
 }: GenerateFallbackToolRenderProps) {
   const message = generateToolMessage(status, "💬", "Generating response");
@@ -50,7 +50,7 @@ interface HandleRequestToolRenderProps {
   args: { message?: string };
 }
 
-export function MainChatToolHandleRequest({
+export function ChatToolHandleRequest({
   status,
 }: HandleRequestToolRenderProps) {
   const message = generateToolMessage(status, "⚙️", "Processing request");
@@ -62,7 +62,7 @@ interface WeatherToolRenderProps {
   args: { location?: string };
 }
 
-export function MainChatToolWeather({ status }: WeatherToolRenderProps) {
+export function ChatToolWeather({ status }: WeatherToolRenderProps) {
   const message = generateToolMessage(status, "🌤️", "Fetching weather");
   return <p className="text-sm text-gray-500">{message}</p>;
 }

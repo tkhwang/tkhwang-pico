@@ -1,7 +1,7 @@
 "use client";
 
 import { CopilotChat } from "@copilotkit/react-ui";
-import { useCopilotAction } from "@copilotkit/react-core";
+import { useCopilotAction, useCopilotContext } from "@copilotkit/react-core";
 import { AppSidebar } from "@/components/sidebar-nav/app-sidebar";
 import {
   Breadcrumb,
@@ -18,19 +18,36 @@ import {
 } from "@/components/ui/sidebar";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import {
-  MainChatToolCheckIntent,
-  MainChatToolDetectLanguage,
-  MainChatToolGenerateFallback,
-  MainChatToolHandleRequest,
-  MainChatToolWeather,
-} from "@/components/main-chat/main-chat-render-tools";
+  ChatToolCheckIntent,
+  ChatToolDetectLanguage,
+  ChatToolGenerateFallback,
+  ChatToolHandleRequest,
+  ChatToolWeather,
+} from "@/components/chat/chat-render-tools";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useRef } from "react";
+import { useCopilotChat } from "@copilotkit/react-core";
+import { TextMessage, Role as gqlRole } from "@copilotkit/runtime-client-gql";
+import { getConfig } from "@/lib/config";
 
-export function MainChat() {
+interface ChatThreadPageProps {
+  params: {
+    threadId: string;
+  };
+}
+
+export default function ChatThreadPage({ params }: ChatThreadPageProps) {
+  const searchParams = useSearchParams();
+  const { threadId } = params;
+  const { setThreadId } = useCopilotContext();
+  const { appendMessage } = useCopilotChat();
+  const hasSentInitialRef = useRef(false);
+
   useCopilotAction({
     name: "weatherTool",
     available: "disabled",
     render: ({ status, args }) => {
-      return <MainChatToolWeather status={status} args={args} />;
+      return <ChatToolWeather status={status} args={args} />;
     },
   });
 
@@ -38,7 +55,7 @@ export function MainChat() {
     name: "checkRequestIntent",
     available: "disabled",
     render: ({ status, args }) => {
-      return <MainChatToolCheckIntent status={status} args={args} />;
+      return <ChatToolCheckIntent status={status} args={args} />;
     },
   });
 
@@ -46,7 +63,7 @@ export function MainChat() {
     name: "detectLanguage",
     available: "disabled",
     render: ({ status, args }) => {
-      return <MainChatToolDetectLanguage status={status} args={args} />;
+      return <ChatToolDetectLanguage status={status} args={args} />;
     },
   });
 
@@ -54,7 +71,7 @@ export function MainChat() {
     name: "generateFallbackMessage",
     available: "disabled",
     render: ({ status, args }) => {
-      return <MainChatToolGenerateFallback status={status} args={args} />;
+      return <ChatToolGenerateFallback status={status} args={args} />;
     },
   });
 
@@ -62,9 +79,46 @@ export function MainChat() {
     name: "handleUserRequest",
     available: "disabled",
     render: ({ status, args }) => {
-      return <MainChatToolHandleRequest status={status} args={args} />;
+      return <ChatToolHandleRequest status={status} args={args} />;
     },
   });
+
+  // Bind route threadId to Copilot context
+  useEffect(() => {
+    setThreadId(threadId);
+  }, [setThreadId, threadId]);
+
+  // Send the initial user message exactly once per thread
+  useEffect(() => {
+    if (hasSentInitialRef.current) return;
+
+    // Prefer sessionStorage (no URL leak), fallback to ?q for backward-compat
+    let initial = "";
+    try {
+      if (typeof window !== "undefined") {
+        const key = `pico:init:${threadId}`;
+        const stored = sessionStorage.getItem(key);
+        if (stored) {
+          initial = stored;
+          sessionStorage.removeItem(key);
+        }
+      }
+    } catch {}
+
+    if (!initial) {
+      const q = searchParams.get("q");
+      if (q) initial = q;
+    }
+
+    if (initial.trim().length > 0) {
+      hasSentInitialRef.current = true;
+      void appendMessage(
+        new TextMessage({ role: gqlRole.User, content: initial.trim() })
+      );
+    }
+  }, [appendMessage, searchParams, threadId]);
+
+  getConfig(); // keep env validation; throws early if misconfigured
 
   return (
     <SidebarProvider className="min-h-screen">
@@ -101,7 +155,6 @@ export function MainChat() {
             className="h-full w-full"
             labels={{
               title: "Your Assistant",
-              initial: "Hi! 👋 How can I assist you today?",
             }}
           />
         </div>

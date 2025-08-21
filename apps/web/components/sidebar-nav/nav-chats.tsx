@@ -1,6 +1,7 @@
 "use client";
 
 import { MessageSquarePlus, Search } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 import {
   SidebarGroup,
@@ -10,9 +11,11 @@ import {
 } from "@/components/ui/sidebar";
 
 export function NavChats() {
+  const router = useRouter();
+
   const handleNewChat = () => {
-    // TODO: Implement new chat functionality
-    console.log("New chat clicked");
+    // Navigate back to home page for new chat
+    router.push("/");
   };
 
   const handleSearchChats = () => {
