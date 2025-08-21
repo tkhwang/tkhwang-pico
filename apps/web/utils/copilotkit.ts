@@ -12,17 +12,13 @@ import { CopilotKitRole, DatabaseRole } from "@/types/role";
  * @param {CopilotKitRole} role
  * @return {*}  {DatabaseRole}
  */
+const toDbRoleMap: Partial<Record<CopilotKitRole, DatabaseRole>> = {
+  [copilotKitRole.User]: "user",
+  [copilotKitRole.Assistant]: "assistant",
+  [copilotKitRole.System]: "system",
+};
 export function copilotRoleToString(role: CopilotKitRole): DatabaseRole {
-  switch (role) {
-    case copilotKitRole.User:
-      return "user";
-    case copilotKitRole.Assistant:
-      return "assistant";
-    case copilotKitRole.System:
-      return "system";
-    default:
-      return "assistant";
-  }
+  return toDbRoleMap[role] ?? "assistant";
 }
 
 /**
@@ -32,17 +28,13 @@ export function copilotRoleToString(role: CopilotKitRole): DatabaseRole {
  * @param {DatabaseRole} role
  * @return {*}  {CopilotKitRole}
  */
+const toGqlRoleMap: Record<DatabaseRole, CopilotKitRole> = {
+  user: copilotKitRole.User,
+  assistant: copilotKitRole.Assistant,
+  system: copilotKitRole.System,
+};
 export function stringToCopilotRole(role: DatabaseRole): CopilotKitRole {
-  switch (role) {
-    case "user":
-      return copilotKitRole.User;
-    case "assistant":
-      return copilotKitRole.Assistant;
-    case "system":
-      return copilotKitRole.System;
-    default:
-      return copilotKitRole.Assistant;
-  }
+  return toGqlRoleMap[role];
 }
 
 /**
