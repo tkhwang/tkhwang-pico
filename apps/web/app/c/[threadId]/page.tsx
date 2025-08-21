@@ -24,6 +24,7 @@ import { TextMessage, Role as gqlRole } from "@copilotkit/runtime-client-gql";
 import { getConfig } from "@/lib/config";
 import { useChatPersistence } from "@/hooks/chat/use-chat-persistence";
 import { useCopilotActions } from "@/hooks/chat/use-copilot-actions";
+import { ChatPageSkeleton } from "@/components/chat/chat-page-skeleton";
 
 interface ChatThreadPageProps {
   params: Promise<{
@@ -104,11 +105,7 @@ function ThreadChatInner({ threadId }: { threadId: string }) {
 
   return (
     <div className="h-full w-full max-w-3xl mx-auto">
-      {isPersistenceLoading && (
-        <div className="text-sm text-muted-foreground p-2">
-          Loading chat history...
-        </div>
-      )}
+      {isPersistenceLoading && <ChatPageSkeleton />}
       <CopilotChat
         instructions="You are assisting the user as PICO, a personal intelligent companion operator."
         className="h-full w-full"
