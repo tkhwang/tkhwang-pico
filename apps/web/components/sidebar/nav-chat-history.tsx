@@ -28,6 +28,7 @@ import { NavChatHistorySkeleton } from "@/components/sidebar/nav-chat-history-sk
 export function NavChatHistory() {
   const { isMobile } = useSidebar();
   const { threads, isLoading, error, deleteThreadById, refetch } = useThreads();
+
   const [deletingThreadId, setDeletingThreadId] = useState<string | null>(null);
   const [editingThreadId, setEditingThreadId] = useState<string | null>(null);
   const [editingTitle, setEditingTitle] = useState("");

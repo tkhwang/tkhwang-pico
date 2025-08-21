@@ -1,10 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useAuth } from "@/providers/auth-provider";
-import {
-  getUserThreads,
-  deleteThread,
-  type ThreadWithLastMessage,
-} from "../lib/supabase/chat";
+import { deleteThread, type ThreadWithLastMessage } from "../lib/supabase/chat";
+import { useThreadsQuery } from "@/hooks/queries/use-threads-query";
 
 interface UseThreadsReturn {
   threads: ThreadWithLastMessage[];
@@ -16,29 +13,21 @@ interface UseThreadsReturn {
 
 export function useThreads(): UseThreadsReturn {
   const { user } = useAuth();
+  const {
+    data,
+    isPending,
+    error: queryError,
+    refetch: refetchQuery,
+  } = useThreadsQuery(user?.id);
+
   const [threads, setThreads] = useState<ThreadWithLastMessage[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [localError, setLocalError] = useState<string | null>(null);
+  const isLoading = Boolean(user) && isPending;
 
-  const fetchThreads = useCallback(async () => {
-    if (!user) {
-      setThreads([]);
-      return;
-    }
-
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const userThreads = await getUserThreads(user.id);
-      setThreads(userThreads);
-    } catch (err) {
-      console.error("Failed to fetch threads:", err);
-      setError(err instanceof Error ? err.message : "Failed to fetch threads");
-    } finally {
-      setIsLoading(false);
-    }
-  }, [user]);
+  useEffect(() => {
+    if (data) setThreads(data);
+    if (!user) setThreads([]);
+  }, [data, user]);
 
   const deleteThreadById = useCallback(async (threadId: string) => {
     try {
@@ -47,19 +36,21 @@ export function useThreads(): UseThreadsReturn {
       setThreads((prev) => prev.filter((thread) => thread.id !== threadId));
     } catch (err) {
       console.error("Failed to delete thread:", err);
-      setError(err instanceof Error ? err.message : "Failed to delete thread");
+      setLocalError(
+        err instanceof Error ? err.message : "Failed to delete thread"
+      );
       throw err; // Re-throw so the component can handle it
     }
   }, []);
 
   const refetch = useCallback(async () => {
-    await fetchThreads();
-  }, [fetchThreads]);
+    setLocalError(null);
+    await refetchQuery();
+  }, [refetchQuery]);
 
-  // Fetch threads on mount and when user changes
-  useEffect(() => {
-    fetchThreads();
-  }, [fetchThreads]);
+  const error = localError ?? (queryError ? queryError.message : null);
+
+  // refetch comes from react-query; no manual fetch-on-mount needed
 
   return {
     threads,

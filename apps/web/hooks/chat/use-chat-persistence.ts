@@ -11,11 +11,11 @@ import { convertToCopilotMessages } from "@/utils/copilotkit";
 import {
   createThread,
   saveMessage,
-  getThreadWithMessages,
   updateThreadTitle,
   generateThreadTitle,
   type Thread,
 } from "../../lib/supabase/chat";
+import { useThreadWithMessagesQuery } from "@/hooks/queries/use-thread-with-messages-query";
 
 // Build a stable key for message de-duplication within a thread
 const buildMessageKey = (threadId: string, messageId: string) =>
@@ -48,6 +48,12 @@ export function useChatPersistence({
     new Set()
   );
 
+  const {
+    data: queryData,
+    isPending: isQueryPending,
+    error: queryError,
+  } = useThreadWithMessagesQuery(threadId);
+
   const loadThread = useCallback(
     async (threadId: string) => {
       if (!user) return;
@@ -56,9 +62,8 @@ export function useChatPersistence({
       setError(null);
 
       try {
-        // Load thread with messages
-        const result = await getThreadWithMessages(threadId);
-
+        // Use cached query result for the provided threadId
+        const result = queryData;
         if (!result) {
           setError("Thread not found");
           return;
@@ -83,7 +88,7 @@ export function useChatPersistence({
         setIsLoading(false);
       }
     },
-    [user, setMessages]
+    [user, setMessages, queryData]
   );
 
   const saveCurrentThread = useCallback(async (): Promise<Thread | null> => {
@@ -162,11 +167,25 @@ export function useChatPersistence({
 
   useEffect(
     function onMountLoadThread() {
-      if (threadId && user) {
-        loadThread(threadId);
+      if (!threadId || !user) return;
+
+      // Reflect query loading state
+      setIsLoading(isQueryPending);
+
+      if (queryError) {
+        setError(
+          queryError instanceof Error
+            ? queryError.message
+            : "Failed to load thread"
+        );
+        return;
+      }
+
+      if (queryData) {
+        void loadThread(threadId);
       }
     },
-    [loadThread, threadId, user]
+    [loadThread, threadId, user, isQueryPending, queryError, queryData]
   );
 
   // Auto-save messages when they change
