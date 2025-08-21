@@ -22,8 +22,8 @@ import { useEffect, useRef, use } from "react";
 import { useCopilotChat } from "@copilotkit/react-core";
 import { TextMessage, Role as gqlRole } from "@copilotkit/runtime-client-gql";
 import { getConfig } from "@/lib/config";
-import { useChatPersistence } from "@/hooks/use-chat-persistence";
-import { useCopilotActions } from "@/hooks/use-copilot-actions";
+import { useChatPersistence } from "@/hooks/chat/use-chat-persistence";
+import { useCopilotActions } from "@/hooks/chat/use-copilot-actions";
 
 interface ChatThreadPageProps {
   params: Promise<{
