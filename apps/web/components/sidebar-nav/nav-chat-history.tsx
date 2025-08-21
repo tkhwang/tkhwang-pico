@@ -20,7 +20,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { useThreads } from "@/lib/hooks/use-threads";
+import { useThreads } from "@/hooks/use-threads";
 import { Input } from "@/components/ui/input";
 import { updateThreadTitle } from "@/lib/supabase/chat";
 

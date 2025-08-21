@@ -29,7 +29,7 @@ import { useEffect, useRef, use } from "react";
 import { useCopilotChat } from "@copilotkit/react-core";
 import { TextMessage, Role as gqlRole } from "@copilotkit/runtime-client-gql";
 import { getConfig } from "@/lib/config";
-import { useChatPersistence } from "@/lib/hooks/use-chat-persistence";
+import { useChatPersistence } from "@/hooks/use-chat-persistence";
 
 interface ChatThreadPageProps {
   params: Promise<{

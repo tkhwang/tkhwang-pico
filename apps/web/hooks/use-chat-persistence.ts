@@ -10,7 +10,7 @@ import {
   generateThreadTitle,
   type Thread,
   type Message,
-} from "../supabase/chat";
+} from "../lib/supabase/chat";
 
 // Build a stable key for message de-duplication within a thread
 const buildMessageKey = (threadId: string, messageId: string) =>

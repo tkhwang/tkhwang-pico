@@ -4,7 +4,7 @@ import {
   getUserThreads,
   deleteThread,
   type ThreadWithLastMessage,
-} from "../supabase/chat";
+} from "../lib/supabase/chat";
 
 interface UseThreadsReturn {
   threads: ThreadWithLastMessage[];
