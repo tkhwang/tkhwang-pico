@@ -1,8 +1,9 @@
-export function generateToolMessage(
-  status: string,
-  icon: string,
-  action: string,
-  showIcon = false
+export function generateGenericToolMessage(
+  name: string,
+  status: string
 ): string {
-  return `${showIcon ? icon : ""} ${action} ${status !== "complete" ? "..." : ""}`;
+  if (status === "complete") {
+    return `Used ${name}`;
+  }
+  return `Using ${name}...`;
 }
