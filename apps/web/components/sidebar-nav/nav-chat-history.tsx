@@ -67,13 +67,14 @@ export function NavChatHistory({
         {chatHistory.map((item) => (
           <SidebarMenuItem key={item.id}>
             <SidebarMenuButton asChild className="w-full justify-start">
-              <Link
+              {/* <Link
                 href={item.url ?? `/c/${item.id}`}
                 onClick={() => handleChatClick(item)}
                 aria-label={`Open chat: ${item.title}`}
               >
                 <span className="sidebar-text-truncate">{item.title}</span>
-              </Link>
+              </Link> */}
+              <span className="sidebar-text-truncate">{item.title}</span>
             </SidebarMenuButton>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
