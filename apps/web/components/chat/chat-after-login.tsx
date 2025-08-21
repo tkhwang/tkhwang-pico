@@ -38,8 +38,11 @@ export function ChatAfterLogin() {
     try {
       setIsCreating(true);
 
-      // Generate title from the message
-      const title = generateThreadTitle(value);
+      const valueTrimmed = value.trim();
+      if (valueTrimmed.length === 0) {
+        return;
+      }
+      const title = generateThreadTitle(valueTrimmed);
 
       // Create thread in Supabase
       const thread = await createThread({
@@ -51,7 +54,7 @@ export function ChatAfterLogin() {
       await saveMessage({
         threadId: thread.id,
         role: "user",
-        content: value,
+        content: valueTrimmed,
         metadata: {
           saved: true,
           isFirstMessage: true,
@@ -61,7 +64,7 @@ export function ChatAfterLogin() {
       // Store initial message in sessionStorage for CopilotChat initialization
       try {
         if (typeof window !== "undefined") {
-          sessionStorage.setItem(`pico:init:${thread.id}`, value);
+          sessionStorage.setItem(`pico:init:${thread.id}`, valueTrimmed);
         }
       } catch {}
 
