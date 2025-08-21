@@ -14,7 +14,7 @@ export function NavChats() {
   const router = useRouter();
 
   const handleNewChat = () => {
-    // Navigate back to home page for new chat
+    // Simply navigate to home page for new chat
     router.push("/");
   };
 
