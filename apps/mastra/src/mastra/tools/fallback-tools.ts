@@ -8,7 +8,6 @@ function generateMessage(locale: "ko" | "en", capabilityList: string): string {
 
 현재 사용 가능한 특화 기능:
 ${capabilityList}
-
 위 특화 기능들과 관련된 질문을 해주시면 도움을 드릴 수 있습니다.`;
   }
 
@@ -16,7 +15,6 @@ ${capabilityList}
 
 Currently available specialized capabilities:
 ${capabilityList}
-
 Please ask about the above specialized capabilities, and I'll be happy to help.`;
 }
 
