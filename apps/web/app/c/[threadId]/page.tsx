@@ -63,13 +63,11 @@ function ThreadChatInner({ threadId }: { threadId: string }) {
     // Prefer sessionStorage (no URL leak), fallback to ?q for backward-compat
     let initial = "";
     try {
-      if (typeof window !== "undefined") {
-        const key = `pico:init:${threadId}`;
-        const stored = sessionStorage.getItem(key);
-        if (stored) {
-          initial = stored;
-          sessionStorage.removeItem(key);
-        }
+      const key = `pico:init:${threadId}`;
+      const stored = sessionStorage.getItem(key);
+      if (stored) {
+        initial = stored;
+        sessionStorage.removeItem(key);
       }
     } catch {}
 
@@ -86,10 +84,8 @@ function ThreadChatInner({ threadId }: { threadId: string }) {
         content: initial.trim(),
       });
       try {
-        if (typeof window !== "undefined") {
-          // Inform persistence to skip saving this runtime message id
-          sessionStorage.setItem(`pico:skip-saves:${threadId}`, message.id);
-        }
+        // Inform persistence to skip saving this runtime message id
+        sessionStorage.setItem(`pico:skip-saves:${threadId}`, message.id);
       } catch {}
       void appendMessage(message);
     }
