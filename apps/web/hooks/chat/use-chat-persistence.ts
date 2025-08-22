@@ -1,24 +1,16 @@
-import { useCallback, useEffect, useState } from "react";
-import { useCopilotMessagesContext } from "@copilotkit/react-core";
+import { useEffect, useRef, useState } from "react";
 import {
-  TextMessage,
-  Role as copilotKitRole,
-} from "@copilotkit/runtime-client-gql";
+  useCopilotChat,
+  useCopilotMessagesContext,
+} from "@copilotkit/react-core";
+import { TextMessage } from "@copilotkit/runtime-client-gql";
 import { copilotRoleToString } from "@/utils/copilotkit";
-import { isBrowser } from "@/utils/browser";
 import { useAuth } from "@/providers/auth-provider";
 import { convertToCopilotMessages } from "@/utils/copilotkit";
 import { useMessagesByThreadId } from "@/hooks/queries/use-message-by-thread-id";
-import {
-  saveMessage,
-  updateThreadTitle,
-  generateThreadTitle,
-  type Thread,
-} from "../../lib/supabase/chat";
+import { saveMessage, type Thread } from "../../lib/supabase/chat";
 
-// Build a stable key for message de-duplication within a thread
-const buildMessageKey = (threadId: string, messageId: string) =>
-  `${threadId}-${messageId}`;
+// Minimal de-duplication by CopilotKit message id
 
 interface UseChatPersistenceOptions {
   threadId?: string;
@@ -36,13 +28,12 @@ export function useChatPersistence({
   autoSave = true,
 }: UseChatPersistenceOptions = {}): UseChatPersistenceReturn {
   const { user } = useAuth();
-  const { messages, setMessages } = useCopilotMessagesContext();
+  const { visibleMessages } = useCopilotChat();
+  const { setMessages } = useCopilotMessagesContext();
 
   const [thread, setThread] = useState<Thread | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [savedMessageIds, setSavedMessageIds] = useState<Set<string>>(
-    new Set()
-  );
+  const syncedIdsRef = useRef<Set<string>>(new Set());
 
   const {
     data,
@@ -52,19 +43,15 @@ export function useChatPersistence({
 
   // Sync query data into CopilotKit context and local state
   useEffect(
-    function syncThreadFromQuery() {
+    function restoreFromDbOnMount() {
       if (!data || !threadId) return;
-
       const { thread: loadedThread, messages: threadMessages } = data;
-
-      const copilotMessages = convertToCopilotMessages(threadMessages);
-      setMessages(copilotMessages);
       setThread(loadedThread);
-
-      const messageKeys = threadMessages.map((msg) =>
-        buildMessageKey(threadId, msg.id)
-      );
-      setSavedMessageIds(new Set(messageKeys));
+      // Seed CopilotKit with DB messages
+      setMessages(convertToCopilotMessages(threadMessages));
+      // Seed dedupe set with existing DB message ids
+      const seeded = new Set<string>(threadMessages.map((m) => m.id));
+      syncedIdsRef.current = seeded;
     },
     [data, setMessages, threadId]
   );
@@ -80,80 +67,29 @@ export function useChatPersistence({
     [queryError]
   );
 
-  const updateTitle = useCallback(
-    async (title: string) => {
-      if (!thread) return;
-
-      try {
-        const updatedThread = await updateThreadTitle(thread.id, title);
-        setThread(updatedThread);
-      } catch (err) {
-        console.error("Failed to update title:", err);
-        setError(err instanceof Error ? err.message : "Failed to update title");
-      }
-    },
-    [thread]
-  );
+  // Minimal version: no title auto-generation/update logic
 
   /*
    * Auto-save messages when they change
    */
   useEffect(
-    function onMessagesAutoSave() {
-      if (!autoSave || !user || !thread || messages.length === 0) return;
+    function autoSaveVisibleMessages() {
+      if (!autoSave || !user || !thread || visibleMessages.length === 0) return;
 
-      const saveMessages = async () => {
+      const run = async () => {
         try {
-          // Find all unsaved messages
-          const unsavedMessages = messages.filter(
-            (message): message is TextMessage => {
-              if (!(message instanceof TextMessage)) return false;
-              const messageKey = buildMessageKey(thread.id, message.id);
-              return !savedMessageIds.has(messageKey);
-            }
+          const unsynced = visibleMessages.filter(
+            (m): m is TextMessage =>
+              m instanceof TextMessage && !syncedIdsRef.current.has(m.id)
           );
-
-          for (const message of unsavedMessages) {
-            const role = copilotRoleToString(message.role);
-            const messageKey = buildMessageKey(thread.id, message.id);
-
-            // Consume skip flag: do not persist, but mark as saved to avoid future attempts
-            let shouldSkip = false;
-            try {
-              if (isBrowser()) {
-                const skipKey = `pico:skip-saves:${thread.id}`;
-                const skipId = sessionStorage.getItem(skipKey);
-                if (skipId && skipId === message.id) {
-                  sessionStorage.removeItem(skipKey);
-                  shouldSkip = true;
-                }
-              }
-            } catch {}
-
-            if (!shouldSkip) {
-              await saveMessage({
-                threadId: thread.id,
-                role,
-                content: message.content,
-                metadata: { saved: true },
-              });
-            }
-
-            setSavedMessageIds((prev) => {
-              const next = new Set(prev);
-              next.add(messageKey);
-              return next;
+          for (const m of unsynced) {
+            await saveMessage({
+              threadId: thread.id,
+              role: copilotRoleToString(m.role),
+              content: m.content,
+              metadata: { saved: true },
             });
-          }
-
-          // Update thread title if needed (only for user messages)
-          const userMessages = messages.filter(
-            (m) => m instanceof TextMessage && m.role === copilotKitRole.User
-          );
-          if (userMessages.length === 1 && !thread.title) {
-            const firstUserMessage = userMessages[0] as TextMessage;
-            const title = generateThreadTitle(firstUserMessage.content);
-            await updateTitle(title);
+            syncedIdsRef.current.add(m.id);
           }
         } catch (err) {
           console.error("Failed to auto-save messages:", err);
@@ -163,11 +99,10 @@ export function useChatPersistence({
         }
       };
 
-      // Debounce to avoid too frequent saves
-      const timeoutId = setTimeout(saveMessages, 500);
-      return () => clearTimeout(timeoutId);
+      const id = setTimeout(run, 400);
+      return () => clearTimeout(id);
     },
-    [messages, thread, user, autoSave, savedMessageIds, updateTitle]
+    [autoSave, user, thread, visibleMessages]
   );
 
   return {

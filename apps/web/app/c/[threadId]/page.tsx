@@ -34,7 +34,7 @@ interface ChatThreadPageProps {
 
 function ThreadChatInner({ threadId }: { threadId: string }) {
   const searchParams = useSearchParams();
-  const { appendMessage } = useCopilotChat();
+  const { appendMessage, visibleMessages } = useCopilotChat();
   const hasSentInitialRef = useRef(false);
 
   // Initialize chat persistence
@@ -54,8 +54,8 @@ function ThreadChatInner({ threadId }: { threadId: string }) {
   useEffect(() => {
     if (hasSentInitialRef.current || isPersistenceLoading) return;
 
-    // If we have existing messages (loaded from DB), don't send initial message
-    if (thread && thread.id === threadId) {
+    // If DB restore already produced visible messages, don't send initial message
+    if (visibleMessages.length > 0) {
       hasSentInitialRef.current = true;
       return;
     }
@@ -85,15 +85,16 @@ function ThreadChatInner({ threadId }: { threadId: string }) {
         role: gqlRole.User,
         content: initial.trim(),
       });
-      try {
-        if (typeof window !== "undefined") {
-          // Inform persistence to skip saving this runtime message id
-          sessionStorage.setItem(`pico:skip-saves:${threadId}`, message.id);
-        }
-      } catch {}
       void appendMessage(message);
     }
-  }, [appendMessage, searchParams, threadId, thread, isPersistenceLoading]);
+  }, [
+    appendMessage,
+    searchParams,
+    threadId,
+    thread,
+    isPersistenceLoading,
+    visibleMessages,
+  ]);
 
   // Show error if persistence fails
   if (persistenceError) {
