@@ -11,6 +11,16 @@ import { useMessagesByThreadId } from "@/hooks/queries/use-message-by-thread-id"
 import { saveMessage, type Thread } from "../lib/supabase/chat";
 
 // Minimal de-duplication by CopilotKit message id
+interface MessageStatusLike {
+  status?: { code?: string };
+}
+
+function hasSubstantiveContent(content: string): boolean {
+  const trimmed = content.trim();
+  if (trimmed.length === 0) return false;
+  if (trimmed.toUpperCase() === "EMPTY") return false;
+  return true;
+}
 
 interface UseChatPersistenceOptions {
   threadId?: string;
@@ -43,7 +53,9 @@ export function useChatPersistence({
   useEffect(
     function restoreFromDbOnMount() {
       if (!data || !threadId) return;
+
       const { thread: loadedThread, messages: threadMessages } = data;
+
       setThread(loadedThread);
       // Seed CopilotKit with DB messages
       setMessages(convertToCopilotMessages(threadMessages));
@@ -78,7 +90,10 @@ export function useChatPersistence({
         try {
           const unsynced = visibleMessages.filter(
             (m): m is TextMessage =>
-              m instanceof TextMessage && !syncedIdsRef.current.has(m.id)
+              m instanceof TextMessage &&
+              (m as unknown as MessageStatusLike).status?.code === "Success" &&
+              hasSubstantiveContent(m.content) &&
+              !syncedIdsRef.current.has(m.id)
           );
           for (const m of unsynced) {
             await saveMessage({
