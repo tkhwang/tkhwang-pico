@@ -9,7 +9,6 @@ import { isBrowser } from "@/utils/browser";
 import { useAuth } from "@/providers/auth-provider";
 import { convertToCopilotMessages } from "@/utils/copilotkit";
 import {
-  createThread,
   saveMessage,
   getThreadWithMessages,
   updateThreadTitle,
@@ -30,9 +29,6 @@ interface UseChatPersistenceReturn {
   thread: Thread | null;
   isLoading: boolean;
   error: string | null;
-  saveCurrentThread: () => Promise<Thread | null>;
-  loadThread: (threadId: string) => Promise<void>;
-  updateTitle: (title: string) => Promise<void>;
 }
 
 export function useChatPersistence({
@@ -41,6 +37,7 @@ export function useChatPersistence({
 }: UseChatPersistenceOptions = {}): UseChatPersistenceReturn {
   const { user } = useAuth();
   const { messages, setMessages } = useCopilotMessagesContext();
+
   const [thread, setThread] = useState<Thread | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -86,65 +83,6 @@ export function useChatPersistence({
     [user, setMessages]
   );
 
-  const saveCurrentThread = useCallback(async (): Promise<Thread | null> => {
-    if (!user || messages.length === 0) return null;
-
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      // Create new thread if none exists
-      let currentThread = thread;
-      if (!currentThread) {
-        const firstUserMessage = messages.find(
-          (m) => m instanceof TextMessage && m.role === copilotKitRole.User
-        ) as TextMessage | undefined;
-
-        const title = firstUserMessage
-          ? generateThreadTitle(firstUserMessage.content)
-          : "New Chat";
-
-        currentThread = await createThread({
-          userId: user.id,
-          title,
-        });
-        setThread(currentThread);
-      }
-
-      // Save all unsaved messages
-      for (const message of messages) {
-        if (!(message instanceof TextMessage)) continue;
-
-        const messageKey = buildMessageKey(currentThread.id, message.id);
-        if (savedMessageIds.has(messageKey)) continue;
-
-        const role = copilotRoleToString(message.role);
-
-        await saveMessage({
-          threadId: currentThread.id,
-          role,
-          content: message.content,
-          metadata: { saved: true },
-        });
-
-        // Mark as saved (after success)
-        setSavedMessageIds((prev) => {
-          const next = new Set(prev);
-          next.add(messageKey);
-          return next;
-        });
-      }
-
-      return currentThread;
-    } catch (err) {
-      console.error("Failed to save thread:", err);
-      setError(err instanceof Error ? err.message : "Failed to save thread");
-      return null;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [user, messages, thread, savedMessageIds]);
-
   const updateTitle = useCallback(
     async (title: string) => {
       if (!thread) return;
@@ -169,7 +107,9 @@ export function useChatPersistence({
     [loadThread, threadId, user]
   );
 
-  // Auto-save messages when they change
+  /*
+   * Auto-save messages when they change
+   */
   useEffect(
     function onMessagesAutoSave() {
       if (!autoSave || !user || !thread || messages.length === 0) return;
@@ -246,8 +186,5 @@ export function useChatPersistence({
     thread,
     isLoading,
     error,
-    saveCurrentThread,
-    loadThread,
-    updateTitle,
   };
 }
