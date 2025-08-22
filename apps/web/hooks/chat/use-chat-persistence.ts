@@ -128,6 +128,14 @@ export function useChatPersistence({
       for (const message of messages) {
         if (!(message instanceof TextMessage)) continue;
 
+        // Skip saving assistant messages with empty content (tool usage intermediates)
+        if (
+          message.role === copilotKitRole.Assistant &&
+          !message.content.trim()
+        ) {
+          continue;
+        }
+
         const messageKey = buildMessageKey(currentThread.id, message.id);
         if (savedMessageIds.has(messageKey)) continue;
 
