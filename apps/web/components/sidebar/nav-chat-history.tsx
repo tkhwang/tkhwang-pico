@@ -2,6 +2,7 @@
 
 import { MoreHorizontal, Edit3, Trash2 } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 import {
@@ -26,11 +27,16 @@ import { NavChatHistorySkeleton } from "@/components/sidebar/nav-chat-history-sk
 import { useDeleteThreadMutation } from "@/hooks/mutations/use-delete-thread-mutation";
 import { useUpdateThreadTitleMutation } from "@/hooks/mutations/use-update-thread-title-mutation";
 import { useAuth } from "@/providers/auth-provider";
+import { cn } from "@/lib/utils";
 
 export function NavChatHistory() {
   const { isMobile } = useSidebar();
   const { user } = useAuth();
   const { threads, isLoading, error } = useThreads();
+  const pathname = usePathname();
+
+  // Extract current threadId from pathname (/c/threadId)
+  const currentThreadId = pathname?.split("/c/")[1];
 
   const [editingTitle, setEditingTitle] = useState("");
   const [editingThreadId, setEditingThreadId] = useState<string | null>(null);
@@ -129,7 +135,14 @@ export function NavChatHistory() {
                   />
                 </div>
               ) : (
-                <SidebarMenuButton asChild className="w-full justify-start">
+                <SidebarMenuButton
+                  asChild
+                  className={cn(
+                    "w-full justify-start",
+                    currentThreadId === thread.id &&
+                      "font-bold bg-accent text-accent-foreground"
+                  )}
+                >
                   <Link
                     href={`/c/${thread.id}`}
                     aria-label={`Open chat: ${thread.title || "New Chat"}`}
