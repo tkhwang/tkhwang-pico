@@ -2,6 +2,7 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateThreadTitle, type Thread } from "@/lib/supabase/chat";
+import { useAuth } from "@/providers/auth-provider";
 
 interface UpdateThreadTitleParams {
   threadId: string;
@@ -10,6 +11,7 @@ interface UpdateThreadTitleParams {
 
 export function useUpdateThreadTitleMutation() {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   return useMutation<Thread, Error, UpdateThreadTitleParams>({
     mutationFn: async ({ threadId, title }) => {
@@ -31,13 +33,12 @@ export function useUpdateThreadTitleMutation() {
 
       // Update the specific thread data if it exists
       queryClient.setQueryData(
-        ["thread", variables.threadId],
-        (oldData: { thread: { title: string }; messages: unknown[] }) => {
+        ["threads", user?.id],
+        (oldData: { id: string; title: string }[] | undefined) => {
           if (!oldData) return oldData;
-          return {
-            ...oldData,
-            thread: { ...oldData.thread, title: data.title },
-          };
+          return oldData.map((t) =>
+            t.id === variables.threadId ? { ...t, title: data.title } : t
+          );
         }
       );
     },
