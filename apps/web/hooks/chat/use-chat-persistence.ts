@@ -10,12 +10,12 @@ import { useAuth } from "@/providers/auth-provider";
 import { convertToCopilotMessages } from "@/utils/copilotkit";
 import {
   createThread,
-  saveMessage,
-  updateThreadTitle,
   generateThreadTitle,
   type Thread,
 } from "../../lib/supabase/chat";
 import { useThreadWithMessagesQuery } from "@/hooks/queries/use-thread-with-messages-query";
+import { useSaveMessageMutation } from "@/hooks/mutations/use-save-message-mutation";
+import { useUpdateThreadTitleMutation } from "@/hooks/mutations/use-update-thread-title-mutation";
 
 // Build a stable key for message de-duplication within a thread
 const buildMessageKey = (threadId: string, messageId: string) =>
@@ -41,18 +41,26 @@ export function useChatPersistence({
 }: UseChatPersistenceOptions = {}): UseChatPersistenceReturn {
   const { user } = useAuth();
   const { messages, setMessages } = useCopilotMessagesContext();
+
   const [thread, setThread] = useState<Thread | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [savedMessageIds, setSavedMessageIds] = useState<Set<string>>(
-    new Set()
-  );
 
   const {
     data: queryData,
     isPending: isQueryPending,
     error: queryError,
   } = useThreadWithMessagesQuery(threadId);
+
+  const [savedMessageIds, setSavedMessageIds] = useState<Set<string>>(
+    new Set()
+  );
+  const [savingMessageIds, setSavingMessageIds] = useState<Set<string>>(
+    new Set()
+  );
+
+  const saveMessageMutation = useSaveMessageMutation();
+  const updateTitleMutation = useUpdateThreadTitleMutation();
 
   const loadThread = useCallback(
     async (threadId: string) => {
@@ -125,7 +133,7 @@ export function useChatPersistence({
 
         const role = copilotRoleToString(message.role);
 
-        await saveMessage({
+        await saveMessageMutation.mutateAsync({
           threadId: currentThread.id,
           role,
           content: message.content,
@@ -148,21 +156,24 @@ export function useChatPersistence({
     } finally {
       setIsLoading(false);
     }
-  }, [user, messages, thread, savedMessageIds]);
+  }, [user, messages, thread, savedMessageIds, saveMessageMutation]);
 
   const updateTitle = useCallback(
     async (title: string) => {
       if (!thread) return;
 
       try {
-        const updatedThread = await updateThreadTitle(thread.id, title);
+        const updatedThread = await updateTitleMutation.mutateAsync({
+          threadId: thread.id,
+          title,
+        });
         setThread(updatedThread);
       } catch (err) {
         console.error("Failed to update title:", err);
         setError(err instanceof Error ? err.message : "Failed to update title");
       }
     },
-    [thread]
+    [thread, updateTitleMutation]
   );
 
   useEffect(
@@ -195,18 +206,28 @@ export function useChatPersistence({
 
       const saveMessages = async () => {
         try {
-          // Find all unsaved messages
+          // Find all unsaved messages (not saved and not currently saving)
           const unsavedMessages = messages.filter(
             (message): message is TextMessage => {
               if (!(message instanceof TextMessage)) return false;
               const messageKey = buildMessageKey(thread.id, message.id);
-              return !savedMessageIds.has(messageKey);
+              return (
+                !savedMessageIds.has(messageKey) &&
+                !savingMessageIds.has(messageKey)
+              );
             }
           );
 
           for (const message of unsavedMessages) {
             const role = copilotRoleToString(message.role);
             const messageKey = buildMessageKey(thread.id, message.id);
+
+            // Mark as saving to prevent duplicate saves
+            setSavingMessageIds((prev) => {
+              const next = new Set(prev);
+              next.add(messageKey);
+              return next;
+            });
 
             // Consume skip flag: do not persist, but mark as saved to avoid future attempts
             let shouldSkip = false;
@@ -221,20 +242,32 @@ export function useChatPersistence({
               }
             } catch {}
 
-            if (!shouldSkip) {
-              await saveMessage({
-                threadId: thread.id,
-                role,
-                content: message.content,
-                metadata: { saved: true },
+            try {
+              if (!shouldSkip) {
+                await saveMessageMutation.mutateAsync({
+                  threadId: thread.id,
+                  role,
+                  content: message.content,
+                  metadata: { saved: true },
+                });
+              }
+
+              // Mark as saved and remove from saving set
+              setSavedMessageIds((prev) => {
+                const next = new Set(prev);
+                next.add(messageKey);
+                return next;
+              });
+            } catch (err) {
+              console.error(`Failed to save message ${message.id}:`, err);
+            } finally {
+              // Remove from saving set regardless of success/failure
+              setSavingMessageIds((prev) => {
+                const next = new Set(prev);
+                next.delete(messageKey);
+                return next;
               });
             }
-
-            setSavedMessageIds((prev) => {
-              const next = new Set(prev);
-              next.add(messageKey);
-              return next;
-            });
           }
 
           // Update thread title if needed (only for user messages)
@@ -258,7 +291,16 @@ export function useChatPersistence({
       const timeoutId = setTimeout(saveMessages, 500);
       return () => clearTimeout(timeoutId);
     },
-    [messages, thread, user, autoSave, savedMessageIds, updateTitle]
+    [
+      messages,
+      thread,
+      user,
+      autoSave,
+      savedMessageIds,
+      updateTitle,
+      saveMessageMutation,
+      savingMessageIds,
+    ]
   );
 
   return {
