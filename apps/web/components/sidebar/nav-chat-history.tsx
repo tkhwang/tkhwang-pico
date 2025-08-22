@@ -22,17 +22,21 @@ import {
 } from "@/components/ui/sidebar";
 import { useThreads } from "@/hooks/use-threads";
 import { Input } from "@/components/ui/input";
-import { updateThreadTitle } from "@/lib/supabase/chat";
 import { NavChatHistorySkeleton } from "@/components/sidebar/nav-chat-history-skeleton";
+import { useDeleteThreadMutation } from "@/hooks/mutations/use-delete-thread-mutation";
+import { useUpdateThreadTitleMutation } from "@/hooks/mutations/use-update-thread-title-mutation";
+import { useAuth } from "@/providers/auth-provider";
 
 export function NavChatHistory() {
   const { isMobile } = useSidebar();
-  const { threads, isLoading, error, deleteThreadById, refetch } = useThreads();
+  const { user } = useAuth();
+  const { threads, isLoading, error } = useThreads();
 
-  const [deletingThreadId, setDeletingThreadId] = useState<string | null>(null);
-  const [editingThreadId, setEditingThreadId] = useState<string | null>(null);
   const [editingTitle, setEditingTitle] = useState("");
-  const [isRenaming, setIsRenaming] = useState(false);
+  const [editingThreadId, setEditingThreadId] = useState<string | null>(null);
+
+  const updateTitleMutation = useUpdateThreadTitleMutation();
+  const deleteThreadMutation = useDeleteThreadMutation();
 
   const handleEditChat = (threadId: string) => {
     const currentTitle = threads.find((t) => t.id === threadId)?.title || "";
@@ -41,18 +45,18 @@ export function NavChatHistory() {
   };
 
   const handleDeleteChat = async (threadId: string) => {
-    if (deletingThreadId) return; // Prevent multiple deletions
+    if (deleteThreadMutation.isPending) return; // Prevent multiple deletions
 
     try {
-      setDeletingThreadId(threadId);
-      await deleteThreadById(threadId);
+      await deleteThreadMutation.mutateAsync({
+        threadId,
+        userId: user?.id,
+      });
     } catch (err) {
       console.error(
         "[-][NavChatHistory] handleDeleteChat: Failed to delete chat:",
         err
       );
-    } finally {
-      setDeletingThreadId(null);
     }
   };
 
@@ -66,16 +70,16 @@ export function NavChatHistory() {
       return;
     }
     try {
-      setIsRenaming(true);
-      await updateThreadTitle(editingThreadId, newTitle || "");
-      await refetch();
+      await updateTitleMutation.mutateAsync({
+        threadId: editingThreadId,
+        title: newTitle || "",
+      });
     } catch (err) {
       console.error(
         "[-][NavChatHistory] submitRename: Failed to rename thread:",
         err
       );
     } finally {
-      setIsRenaming(false);
       setEditingThreadId(null);
       setEditingTitle("");
     }
@@ -114,7 +118,7 @@ export function NavChatHistory() {
                     value={editingTitle}
                     onChange={(e) => setEditingTitle(e.target.value)}
                     autoFocus
-                    disabled={isRenaming}
+                    disabled={updateTitleMutation.isPending}
                     onBlur={submitRename}
                     onKeyDown={(e) => {
                       if (e.key === "Enter") submitRename();
@@ -160,11 +164,11 @@ export function NavChatHistory() {
                     onClick={() => handleDeleteChat(thread.id)}
                     variant="destructive"
                     className="h-9 px-3"
-                    disabled={deletingThreadId === thread.id}
+                    disabled={deleteThreadMutation.isPending}
                   >
                     <Trash2 className="text-muted-foreground" />
                     <span>
-                      {deletingThreadId === thread.id
+                      {deleteThreadMutation.isPending
                         ? "Deleting..."
                         : "Delete"}
                     </span>
