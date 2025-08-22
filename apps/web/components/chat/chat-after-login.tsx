@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { AppSidebar } from "@/components/sidebar/app-sidebar";
@@ -20,80 +20,42 @@ import {
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import PicoInput from "@/components/input/pico-input";
 import { useAuth } from "@/providers/auth-provider";
-import {
-  createThread,
-  saveMessage,
-  generateThreadTitle,
-  deleteThread,
-} from "@/lib/supabase/chat";
+import { useCreateThreadMutation } from "@/hooks/mutations/use-create-thread-mutation";
 
 export function ChatAfterLogin() {
-  const [inputValue, setInputValue] = useState("");
-  const [isCreating, setIsCreating] = useState(false);
-  const creatingRef = useRef(false);
-
   const router = useRouter();
   const { user } = useAuth();
 
+  const [inputValue, setInputValue] = useState("");
+
+  const createThreadMutation = useCreateThreadMutation();
+
   const handleSubmit = async (value: string) => {
-    if (!user || creatingRef.current) return;
+    if (!user || createThreadMutation.isPending) return;
 
-    let newThreadId: string | null = null;
+    const valueTrimmed = value.trim();
+    if (valueTrimmed.length === 0) {
+      return;
+    }
+
     try {
-      creatingRef.current = true;
-      setIsCreating(true);
-
-      const valueTrimmed = value.trim();
-      if (valueTrimmed.length === 0) {
-        return;
-      }
-      const title = generateThreadTitle(valueTrimmed);
-
-      // Create thread in Supabase
-      const thread = await createThread({
+      const result = await createThreadMutation.mutateAsync({
         userId: user.id,
-        title,
-      });
-      newThreadId = thread.id;
-
-      // Save the first message
-      await saveMessage({
-        threadId: thread.id,
-        role: "user",
         content: valueTrimmed,
-        metadata: {
-          saved: true,
-          isFirstMessage: true,
-        },
       });
 
       // Store initial message in sessionStorage for CopilotChat initialization
       try {
-        if (typeof window !== "undefined") {
-          sessionStorage.setItem(`pico:init:${thread.id}`, valueTrimmed);
-        }
+        sessionStorage.setItem(`pico:init:${result.thread.id}`, valueTrimmed);
       } catch {}
 
       // Navigate to the chat thread page with real thread ID
-      router.push(`/c/${thread.id}`);
+      router.push(`/c/${result.thread.id}`);
     } catch (error) {
       console.error(
         "[-][ChatAfterLogin] Failed to create thread and save message:",
         error
       );
-
-      // Best-effort cleanup to prevent orphan threads when message save fails
-      try {
-        if (newThreadId) {
-          await deleteThread(newThreadId);
-          newThreadId = null;
-        }
-      } catch (cleanupErr) {
-        console.warn(
-          "[-][ChatAfterLogin] Orphan-thread cleanup failed:",
-          cleanupErr
-        );
-      }
 
       // Show error message to user
       toast.error("Unable to create new chat", {
@@ -103,9 +65,6 @@ export function ChatAfterLogin() {
           onClick: () => handleSubmit(value),
         },
       });
-    } finally {
-      creatingRef.current = false;
-      setIsCreating(false);
     }
   };
 
@@ -143,7 +102,7 @@ export function ChatAfterLogin() {
             value={inputValue}
             onChange={setInputValue}
             onSubmit={handleSubmit}
-            disabled={isCreating}
+            disabled={createThreadMutation.isPending}
           />
         </div>
       </SidebarInset>
