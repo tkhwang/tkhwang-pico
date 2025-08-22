@@ -35,8 +35,8 @@ export function NavChatHistory() {
   const { threads, isLoading, error } = useThreads();
   const pathname = usePathname();
 
-  // Extract current threadId from pathname (/c/threadId)
-  const currentThreadId = pathname?.split("/c/")[1];
+  // Extract current threadId from pathname (/c/:threadId[?/#...])
+  const currentThreadId = pathname?.match(/^\/c\/([^\/\?\#]+)/)?.[1];
 
   const [editingTitle, setEditingTitle] = useState("");
   const [editingThreadId, setEditingThreadId] = useState<string | null>(null);
