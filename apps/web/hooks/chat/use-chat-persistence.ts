@@ -8,9 +8,9 @@ import { copilotRoleToString } from "@/utils/copilotkit";
 import { isBrowser } from "@/utils/browser";
 import { useAuth } from "@/providers/auth-provider";
 import { convertToCopilotMessages } from "@/utils/copilotkit";
+import { useMessagesByThreadId } from "@/hooks/queries/use-message-by-thread-id";
 import {
   saveMessage,
-  getThreadWithMessages,
   updateThreadTitle,
   generateThreadTitle,
   type Thread,
@@ -39,48 +39,45 @@ export function useChatPersistence({
   const { messages, setMessages } = useCopilotMessagesContext();
 
   const [thread, setThread] = useState<Thread | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [savedMessageIds, setSavedMessageIds] = useState<Set<string>>(
     new Set()
   );
 
-  const loadThread = useCallback(
-    async (threadId: string) => {
-      if (!user) return;
+  const {
+    data,
+    isLoading: isQueryLoading,
+    error: queryError,
+  } = useMessagesByThreadId(threadId, Boolean(user && threadId));
 
-      setIsLoading(true);
-      setError(null);
+  // Sync query data into CopilotKit context and local state
+  useEffect(
+    function syncThreadFromQuery() {
+      if (!data || !threadId) return;
 
-      try {
-        // Load thread with messages
-        const result = await getThreadWithMessages(threadId);
+      const { thread: loadedThread, messages: threadMessages } = data;
 
-        if (!result) {
-          setError("Thread not found");
-          return;
-        }
+      const copilotMessages = convertToCopilotMessages(threadMessages);
+      setMessages(copilotMessages);
+      setThread(loadedThread);
 
-        const { thread, messages: threadMessages } = result;
-
-        const copilotMessages = convertToCopilotMessages(threadMessages);
-        setMessages(copilotMessages);
-
-        setThread(thread);
-
-        // Mark all loaded messages as saved to prevent re-saving
-        const messageKeys = threadMessages.map((msg) =>
-          buildMessageKey(threadId, msg.id)
-        );
-        setSavedMessageIds(new Set(messageKeys));
-      } catch (err) {
-        console.error("Failed to load thread:", err);
-        setError(err instanceof Error ? err.message : "Failed to load thread");
-      } finally {
-        setIsLoading(false);
-      }
+      const messageKeys = threadMessages.map((msg) =>
+        buildMessageKey(threadId, msg.id)
+      );
+      setSavedMessageIds(new Set(messageKeys));
     },
-    [user, setMessages]
+    [data, setMessages, threadId]
+  );
+
+  // Reflect query error into local error state
+  useEffect(
+    function reflectQueryError() {
+      if (!queryError) return;
+      setError(
+        queryError instanceof Error ? queryError.message : String(queryError)
+      );
+    },
+    [queryError]
   );
 
   const updateTitle = useCallback(
@@ -96,15 +93,6 @@ export function useChatPersistence({
       }
     },
     [thread]
-  );
-
-  useEffect(
-    function onMountLoadThread() {
-      if (threadId && user) {
-        loadThread(threadId);
-      }
-    },
-    [loadThread, threadId, user]
   );
 
   /*
@@ -184,7 +172,7 @@ export function useChatPersistence({
 
   return {
     thread,
-    isLoading,
+    isLoading: isQueryLoading,
     error,
   };
 }
