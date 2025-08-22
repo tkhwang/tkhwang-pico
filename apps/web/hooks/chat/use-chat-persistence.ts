@@ -14,7 +14,6 @@ import { saveMessage, type Thread } from "../../lib/supabase/chat";
 
 interface UseChatPersistenceOptions {
   threadId?: string;
-  autoSave?: boolean;
 }
 
 interface UseChatPersistenceReturn {
@@ -25,7 +24,6 @@ interface UseChatPersistenceReturn {
 
 export function useChatPersistence({
   threadId,
-  autoSave = true,
 }: UseChatPersistenceOptions = {}): UseChatPersistenceReturn {
   const { user } = useAuth();
   const { visibleMessages } = useCopilotChat();
@@ -73,8 +71,8 @@ export function useChatPersistence({
    * Auto-save messages when they change
    */
   useEffect(
-    function autoSaveVisibleMessages() {
-      if (!autoSave || !user || !thread || visibleMessages.length === 0) return;
+    function saveVisibleMessages() {
+      if (!user || !thread || visibleMessages.length === 0) return;
 
       const run = async () => {
         try {
@@ -102,7 +100,7 @@ export function useChatPersistence({
       const id = setTimeout(run, 400);
       return () => clearTimeout(id);
     },
-    [autoSave, user, thread, visibleMessages]
+    [user, thread, visibleMessages]
   );
 
   return {

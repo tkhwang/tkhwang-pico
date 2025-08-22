@@ -44,7 +44,6 @@ function ThreadChatInner({ threadId }: { threadId: string }) {
     error: persistenceError,
   } = useChatPersistence({
     threadId,
-    autoSave: true,
   });
 
   // Register copilot actions
