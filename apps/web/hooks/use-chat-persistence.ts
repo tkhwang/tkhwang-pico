@@ -8,7 +8,7 @@ import { copilotRoleToString } from "@/utils/copilotkit";
 import { useAuth } from "@/providers/auth-provider";
 import { convertToCopilotMessages } from "@/utils/copilotkit";
 import { useMessagesByThreadId } from "@/hooks/queries/use-message-by-thread-id";
-import { saveMessage, type Thread } from "../../lib/supabase/chat";
+import { saveMessage, type Thread } from "../lib/supabase/chat";
 
 // Minimal de-duplication by CopilotKit message id
 
