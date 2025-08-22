@@ -1,0 +1,51 @@
+"use client";
+
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { updateThreadTitle, type Thread } from "@/lib/supabase/chat";
+
+interface UpdateThreadTitleParams {
+  threadId: string;
+  title: string;
+}
+
+export function useUpdateThreadTitleMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation<Thread, Error, UpdateThreadTitleParams>({
+    mutationFn: async ({ threadId, title }) => {
+      return await updateThreadTitle(threadId, title);
+    },
+    onSuccess: (data, variables) => {
+      // Update the specific thread in the threads list cache
+      queryClient.setQueryData(
+        ["threads"],
+        (oldData: { id: string; title: string }[]) => {
+          if (!oldData) return oldData;
+          return oldData.map((thread) =>
+            thread.id === variables.threadId
+              ? { ...thread, title: data.title }
+              : thread
+          );
+        }
+      );
+
+      // Update the specific thread data if it exists
+      queryClient.setQueryData(
+        ["thread", variables.threadId],
+        (oldData: { thread: { title: string }; messages: unknown[] }) => {
+          if (!oldData) return oldData;
+          return {
+            ...oldData,
+            thread: { ...oldData.thread, title: data.title },
+          };
+        }
+      );
+    },
+    onError: (error, variables) => {
+      console.error(
+        `Failed to update thread title for ${variables.threadId}:`,
+        error
+      );
+    },
+  });
+}
