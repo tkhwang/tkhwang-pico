@@ -59,23 +59,30 @@ export function useCreateThreadMutation() {
         queryKey: ["threads", variables.userId],
       });
 
+      // Create the initial message object once to avoid duplication
+      const initialMessage = {
+        id: data.messageId,
+        thread_id: data.thread.id,
+        role: "user",
+        content: variables.content,
+        metadata: {
+          saved: true,
+          isFirstMessage: true,
+        },
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+
       // Set initial data for the new thread query
       queryClient.setQueryData(["thread", data.thread.id], {
         thread: data.thread,
-        messages: [
-          {
-            id: data.messageId,
-            thread_id: data.thread.id,
-            role: "user",
-            content: variables.content,
-            metadata: {
-              saved: true,
-              isFirstMessage: true,
-            },
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          },
-        ],
+        messages: [initialMessage],
+      });
+
+      // Keep the new hook's cache in sync to avoid an immediate refetch
+      queryClient.setQueryData(["thread-with-messages", data.thread.id], {
+        thread: data.thread,
+        messages: [initialMessage],
       });
     },
     onError: (error) => {
