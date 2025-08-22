@@ -2,6 +2,7 @@
 
 import { MoreHorizontal, Edit3, Trash2 } from "lucide-react";
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 
 import {
@@ -26,6 +27,9 @@ import { updateThreadTitle } from "@/lib/supabase/chat";
 import { NavChatHistorySkeleton } from "@/components/sidebar/nav-chat-history-skeleton";
 
 export function NavChatHistory() {
+  const router = useRouter();
+  const pathname = usePathname();
+
   const { isMobile } = useSidebar();
   const { threads, isLoading, error, deleteThreadById, refetch } = useThreads();
 
@@ -46,6 +50,9 @@ export function NavChatHistory() {
     try {
       setDeletingThreadId(threadId);
       await deleteThreadById(threadId);
+      if (pathname === `/c/${threadId}`) {
+        router.push("/");
+      }
     } catch (err) {
       console.error(
         "[-][NavChatHistory] handleDeleteChat: Failed to delete chat:",
