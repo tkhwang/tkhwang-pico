@@ -1,8 +1,10 @@
 "use client";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useState } from "react";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { useEffect, useState, type ComponentType } from "react";
+type ReactQueryDevtoolsProps = {
+  buttonPosition?: "top-left" | "top-right" | "bottom-left" | "bottom-right";
+};
 
 export function QueryProvider({ children }: { children: React.ReactNode }) {
   // Create a new QueryClient instance for each component mount
@@ -20,10 +22,29 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
       })
   );
 
+  // Lazily load React Query Devtools only in development
+  const [Devtools, setDevtools] =
+    useState<ComponentType<ReactQueryDevtoolsProps> | null>(null);
+
+  useEffect(() => {
+    if (process.env.NODE_ENV === "development") {
+      import("@tanstack/react-query-devtools")
+        .then((mod) => {
+          setDevtools(
+            () =>
+              mod.ReactQueryDevtools as ComponentType<ReactQueryDevtoolsProps>
+          );
+        })
+        .catch(() => {
+          // No-op: devtools are optional in development
+        });
+    }
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       {children}
-      <ReactQueryDevtools buttonPosition="top-right" />
+      {Devtools ? <Devtools buttonPosition="top-right" /> : null}
     </QueryClientProvider>
   );
 }
