@@ -2,7 +2,7 @@
 
 import { MoreHorizontal, Edit3, Trash2 } from "lucide-react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 
 import {
@@ -12,6 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { cn } from "@/lib/utils";
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -29,8 +30,10 @@ import { NavChatHistorySkeleton } from "@/components/sidebar/nav-chat-history-sk
 
 export function NavChatHistory() {
   const router = useRouter();
-  const pathname = usePathname();
+  const params = useParams();
   const { isMobile } = useSidebar();
+
+  const currentThreadId = params.threadId as string;
 
   const [editingThreadId, setEditingThreadId] = useState<string | null>(null);
   const [editingTitle, setEditingTitle] = useState("");
@@ -38,7 +41,8 @@ export function NavChatHistory() {
   const { data: threads = [], isLoading, error } = useThreadsByUserId();
   const { mutateAsync: deleteThreadById, isPending: isDeletePending } =
     useDeleteThread();
-  const { mutateAsync: updateThreadTitleMutation, isPending: isUpdating } = useUpdateThreadTitle();
+  const { mutateAsync: updateThreadTitleMutation, isPending: isUpdating } =
+    useUpdateThreadTitle();
 
   const handleEditChat = (threadId: string) => {
     const currentTitle = threads.find((t) => t.id === threadId)?.title || "";
@@ -51,7 +55,7 @@ export function NavChatHistory() {
 
     try {
       await deleteThreadById(threadId);
-      if (pathname === `/c/${threadId}`) {
+      if (currentThreadId === threadId) {
         router.push("/");
       }
     } catch (err) {
@@ -72,7 +76,10 @@ export function NavChatHistory() {
       return;
     }
     try {
-      await updateThreadTitleMutation({ threadId: editingThreadId, title: newTitle || "" });
+      await updateThreadTitleMutation({
+        threadId: editingThreadId,
+        title: newTitle || "",
+      });
       setEditingThreadId(null);
       setEditingTitle("");
     } catch (err) {
@@ -110,69 +117,79 @@ export function NavChatHistory() {
         {isLoading ? (
           <NavChatHistorySkeleton />
         ) : (
-          threads.map((thread) => (
-            <SidebarMenuItem key={thread.id}>
-              {editingThreadId === thread.id ? (
-                <div className="w-full px-2 py-1.5">
-                  <Input
-                    value={editingTitle}
-                    onChange={(e) => setEditingTitle(e.target.value)}
-                    autoFocus
-                    disabled={isUpdating}
-                    onBlur={submitRename}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") submitRename();
-                      if (e.key === "Escape") cancelRename();
-                    }}
-                    className="h-8 border-border/40 focus-visible:ring-0 focus-visible:border-border/60 shadow-none"
-                    aria-label="Edit chat title"
-                  />
-                </div>
-              ) : (
-                <SidebarMenuButton asChild className="w-full justify-start">
-                  <Link
-                    href={`/c/${thread.id}`}
-                    aria-label={`Open chat: ${thread.title || "New Chat"}`}
+          threads.map((thread) => {
+            const isCurrentThread = currentThreadId === thread.id;
+            return (
+              <SidebarMenuItem key={thread.id}>
+                {editingThreadId === thread.id ? (
+                  <div className="w-full px-2 py-1.5">
+                    <Input
+                      value={editingTitle}
+                      onChange={(e) => setEditingTitle(e.target.value)}
+                      autoFocus
+                      disabled={isUpdating}
+                      onBlur={submitRename}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") submitRename();
+                        if (e.key === "Escape") cancelRename();
+                      }}
+                      className="h-8 border-border/40 focus-visible:ring-0 focus-visible:border-border/60 shadow-none"
+                      aria-label="Edit chat title"
+                    />
+                  </div>
+                ) : (
+                  <SidebarMenuButton
+                    asChild
+                    className={cn(
+                      "w-full justify-start",
+                      isCurrentThread &&
+                        "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
+                    )}
                   >
-                    <span className="sidebar-text-truncate">
-                      {thread.title || "New Chat"}
-                    </span>
-                  </Link>
-                </SidebarMenuButton>
-              )}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <SidebarMenuAction showOnHover>
-                    <MoreHorizontal />
-                    <span className="sr-only">More</span>
-                  </SidebarMenuAction>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  className="w-48 rounded-xl p-2"
-                  side={isMobile ? "bottom" : "right"}
-                  align={isMobile ? "end" : "start"}
-                >
-                  <DropdownMenuItem
-                    onClick={() => handleEditChat(thread.id)}
-                    className="h-9 px-3"
+                    <Link
+                      href={`/c/${thread.id}`}
+                      aria-label={`Open chat: ${thread.title || "New Chat"}`}
+                    >
+                      <span className="sidebar-text-truncate">
+                        {thread.title || "New Chat"}
+                      </span>
+                    </Link>
+                  </SidebarMenuButton>
+                )}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <SidebarMenuAction showOnHover>
+                      <MoreHorizontal />
+                      <span className="sr-only">More</span>
+                    </SidebarMenuAction>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    className="w-48 rounded-xl p-2"
+                    side={isMobile ? "bottom" : "right"}
+                    align={isMobile ? "end" : "start"}
                   >
-                    <Edit3 className="text-muted-foreground" />
-                    <span>Rename</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    onClick={() => handleDeleteChat(thread.id)}
-                    variant="destructive"
-                    className="h-9 px-3"
-                    disabled={isDeletePending}
-                  >
-                    <Trash2 className="text-muted-foreground" />
-                    <span>{isDeletePending ? "Deleting..." : "Delete"}</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </SidebarMenuItem>
-          ))
+                    <DropdownMenuItem
+                      onClick={() => handleEditChat(thread.id)}
+                      className="h-9 px-3"
+                    >
+                      <Edit3 className="text-muted-foreground" />
+                      <span>Rename</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onClick={() => handleDeleteChat(thread.id)}
+                      variant="destructive"
+                      className="h-9 px-3"
+                      disabled={isDeletePending}
+                    >
+                      <Trash2 className="text-muted-foreground" />
+                      <span>{isDeletePending ? "Deleting..." : "Delete"}</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </SidebarMenuItem>
+            );
+          })
         )}
         {threads.length === 0 && !isLoading && (
           <div className="text-sm text-muted-foreground p-2">No chats yet</div>
