@@ -3,16 +3,13 @@ import {
   useCopilotChat,
   useCopilotMessagesContext,
 } from "@copilotkit/react-core";
-import { TextMessage } from "@copilotkit/runtime-client-gql";
+import { MessageRole, TextMessage } from "@copilotkit/runtime-client-gql";
 import { copilotRoleToString } from "@/utils/copilotkit";
 import { useAuth } from "@/providers/auth-provider";
 import { convertToCopilotMessages } from "@/utils/copilotkit";
 import { useMessagesByThreadId } from "@/hooks/queries/use-message-by-thread-id";
 import { type Thread } from "../lib/supabase/chat";
 import { useSaveMessage } from "@/hooks/mutations/use-save-message";
-
-// Minimal de-duplication by CopilotKit message id
-//
 
 function hasSubstantiveContent(content: string): boolean {
   const trimmed = content.trim();
@@ -35,7 +32,7 @@ export function useChatPersistence({
   threadId,
 }: UseChatPersistenceOptions = {}): UseChatPersistenceReturn {
   const { user } = useAuth();
-  const { visibleMessages } = useCopilotChat();
+  const { visibleMessages, appendMessage } = useCopilotChat();
   const { setMessages } = useCopilotMessagesContext();
 
   const { mutateAsync: saveMessageMutate } = useSaveMessage(threadId);
@@ -58,16 +55,34 @@ export function useChatPersistence({
       const { thread: loadedThread, messages: threadMessages } = data;
 
       setThread(loadedThread);
-      // Seed CopilotKit with DB messages
-      setMessages(convertToCopilotMessages(threadMessages));
+
+      // Check if this is an initial message case (user message but no assistant response)
+      const userMessages = threadMessages.filter((m) => m.role === "user");
+      const assistantMessages = threadMessages.filter(
+        (m) => m.role === "assistant"
+      );
+      const isInitialMessage =
+        userMessages.length === 1 && assistantMessages.length === 0;
+
+      if (isInitialMessage) {
+        // For initial messages, send directly to copilot to trigger AI response
+        const firstUserMessage = new TextMessage({
+          role: MessageRole.User,
+          content: userMessages[0].content,
+        });
+        appendMessage(firstUserMessage);
+      } else {
+        // Seed CopilotKit with DB messages for normal restoration
+        setMessages(convertToCopilotMessages(threadMessages));
+      }
+
       // Seed dedupe set with existing DB message ids
       const seeded = new Set<string>(threadMessages.map((m) => m.id));
       syncedIdsRef.current = seeded;
     },
-    [data, setMessages, threadId]
+    [data, setMessages, threadId, appendMessage]
   );
 
-  // Reflect query error into local error state
   useEffect(
     function reflectQueryError() {
       if (!queryError) return;
@@ -78,11 +93,7 @@ export function useChatPersistence({
     [queryError]
   );
 
-  // Minimal version: no title auto-generation/update logic
-
-  /*
-   * Auto-save messages when they change
-   */
+  //Save messages to DB when they change
   useEffect(
     function saveVisibleMessages() {
       if (!user || !thread || visibleMessages.length === 0) return;

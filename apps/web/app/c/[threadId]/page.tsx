@@ -33,7 +33,6 @@ interface ChatThreadPageProps {
 function ThreadChatInner({ threadId }: { threadId: string }) {
   const { mutateAsync: saveMessageMutate } = useSaveMessage(threadId);
 
-  // Initialize chat persistence
   const {
     thread,
     isLoading: isPersistenceLoading,
@@ -42,11 +41,8 @@ function ThreadChatInner({ threadId }: { threadId: string }) {
     threadId,
   });
 
-  // Register copilot actions
   useCopilotActions();
 
-
-  // Show error if persistence fails
   if (persistenceError) {
     console.error(
       "[-][ThreadChatInner] Chat persistence error:",
