@@ -1,1 +1,1 @@
-# PICO : Personal Intelligent Companion Operator
+# PICO : Personal Intelligent COpilot
