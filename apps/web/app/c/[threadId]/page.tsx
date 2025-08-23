@@ -17,14 +17,12 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { ThemeSwitcher } from "@/components/theme-switcher";
-import { useSearchParams } from "next/navigation";
-import { useEffect, useRef, use } from "react";
-import { useCopilotChat } from "@copilotkit/react-core";
-import { TextMessage, Role as gqlRole } from "@copilotkit/runtime-client-gql";
+import { use } from "react";
 import { getConfig } from "@/lib/config";
-import { useChatPersistence } from "@/hooks/chat/use-chat-persistence";
-import { useCopilotActions } from "@/hooks/chat/use-copilot-actions";
+import { useChatPersistence } from "@/hooks/use-chat-persistence";
+import { useCopilotActions } from "@/hooks/use-copilot-actions";
 import { ChatPageSkeleton } from "@/components/chat/chat-page-skeleton";
+import { useSaveMessage } from "@/hooks/mutations/use-save-message";
 
 interface ChatThreadPageProps {
   params: Promise<{
@@ -33,69 +31,18 @@ interface ChatThreadPageProps {
 }
 
 function ThreadChatInner({ threadId }: { threadId: string }) {
-  const searchParams = useSearchParams();
-  const { appendMessage } = useCopilotChat();
-  const hasSentInitialRef = useRef(false);
+  const { mutateAsync: saveMessageMutate } = useSaveMessage(threadId);
 
-  // Initialize chat persistence
   const {
     thread,
     isLoading: isPersistenceLoading,
     error: persistenceError,
   } = useChatPersistence({
     threadId,
-    autoSave: true,
   });
 
-  // Register copilot actions
   useCopilotActions();
 
-  // Send the initial user message exactly once per thread
-  useEffect(() => {
-    if (hasSentInitialRef.current || isPersistenceLoading) return;
-
-    // If we have existing messages (loaded from DB), don't send initial message
-    if (thread && thread.id === threadId) {
-      hasSentInitialRef.current = true;
-      return;
-    }
-
-    // Prefer sessionStorage (no URL leak), fallback to ?q for backward-compat
-    let initial = "";
-    try {
-      if (typeof window !== "undefined") {
-        const key = `pico:init:${threadId}`;
-        const stored = sessionStorage.getItem(key);
-        if (stored) {
-          initial = stored;
-          sessionStorage.removeItem(key);
-        }
-      }
-    } catch {}
-
-    if (!initial) {
-      const q = searchParams.get("q");
-      if (q) initial = q;
-    }
-
-    if (initial.trim().length > 0) {
-      hasSentInitialRef.current = true;
-      // Send the message that was already saved
-      const message = new TextMessage({
-        role: gqlRole.User,
-        content: initial.trim(),
-      });
-      try {
-        if (typeof window !== "undefined") {
-          // Inform persistence to skip saving this runtime message id
-          sessionStorage.setItem(`pico:skip-saves:${threadId}`, message.id);
-        }
-      } catch {}
-      void appendMessage(message);
-    }
-  }, [appendMessage, searchParams, threadId, thread, isPersistenceLoading]);
-
-  // Show error if persistence fails
   if (persistenceError) {
     console.error(
       "[-][ThreadChatInner] Chat persistence error:",
@@ -111,6 +58,11 @@ function ThreadChatInner({ threadId }: { threadId: string }) {
         className="h-full w-full"
         labels={{
           title: thread?.title || "Your Assistant",
+        }}
+        onSubmitMessage={async (message: string) => {
+          const content = message.trim();
+          if (!content) return;
+          await saveMessageMutate({ threadId, role: "user", content });
         }}
       />
     </div>

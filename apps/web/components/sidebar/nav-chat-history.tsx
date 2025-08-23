@@ -2,6 +2,7 @@
 
 import { MoreHorizontal, Edit3, Trash2 } from "lucide-react";
 import Link from "next/link";
+import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 
 import {
@@ -11,6 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { cn } from "@/lib/utils";
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -20,18 +22,27 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { useThreads } from "@/hooks/use-threads";
+import { useThreadsByUserId } from "@/hooks/queries/use-threads-by-user-id";
+import { useDeleteThread } from "@/hooks/mutations/use-delete-thread";
+import { useUpdateThreadTitle } from "@/hooks/mutations/use-update-thread-title";
 import { Input } from "@/components/ui/input";
-import { updateThreadTitle } from "@/lib/supabase/chat";
 import { NavChatHistorySkeleton } from "@/components/sidebar/nav-chat-history-skeleton";
 
 export function NavChatHistory() {
+  const router = useRouter();
+  const params = useParams();
   const { isMobile } = useSidebar();
-  const { threads, isLoading, error, deleteThreadById, refetch } = useThreads();
-  const [deletingThreadId, setDeletingThreadId] = useState<string | null>(null);
+
+  const currentThreadId = params.threadId as string;
+
   const [editingThreadId, setEditingThreadId] = useState<string | null>(null);
   const [editingTitle, setEditingTitle] = useState("");
-  const [isRenaming, setIsRenaming] = useState(false);
+
+  const { data: threads = [], isLoading, error } = useThreadsByUserId();
+  const { mutateAsync: deleteThreadById, isPending: isDeletePending } =
+    useDeleteThread();
+  const { mutateAsync: updateThreadTitleMutation, isPending: isUpdating } =
+    useUpdateThreadTitle();
 
   const handleEditChat = (threadId: string) => {
     const currentTitle = threads.find((t) => t.id === threadId)?.title || "";
@@ -40,18 +51,18 @@ export function NavChatHistory() {
   };
 
   const handleDeleteChat = async (threadId: string) => {
-    if (deletingThreadId) return; // Prevent multiple deletions
+    if (isDeletePending) return; // Prevent multiple deletions
 
     try {
-      setDeletingThreadId(threadId);
       await deleteThreadById(threadId);
+      if (currentThreadId === threadId) {
+        router.push("/");
+      }
     } catch (err) {
       console.error(
         "[-][NavChatHistory] handleDeleteChat: Failed to delete chat:",
         err
       );
-    } finally {
-      setDeletingThreadId(null);
     }
   };
 
@@ -65,16 +76,17 @@ export function NavChatHistory() {
       return;
     }
     try {
-      setIsRenaming(true);
-      await updateThreadTitle(editingThreadId, newTitle || "");
-      await refetch();
+      await updateThreadTitleMutation({
+        threadId: editingThreadId,
+        title: newTitle || "",
+      });
+      setEditingThreadId(null);
+      setEditingTitle("");
     } catch (err) {
       console.error(
         "[-][NavChatHistory] submitRename: Failed to rename thread:",
         err
       );
-    } finally {
-      setIsRenaming(false);
       setEditingThreadId(null);
       setEditingTitle("");
     }
@@ -105,73 +117,79 @@ export function NavChatHistory() {
         {isLoading ? (
           <NavChatHistorySkeleton />
         ) : (
-          threads.map((thread) => (
-            <SidebarMenuItem key={thread.id}>
-              {editingThreadId === thread.id ? (
-                <div className="w-full px-2 py-1.5">
-                  <Input
-                    value={editingTitle}
-                    onChange={(e) => setEditingTitle(e.target.value)}
-                    autoFocus
-                    disabled={isRenaming}
-                    onBlur={submitRename}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") submitRename();
-                      if (e.key === "Escape") cancelRename();
-                    }}
-                    className="h-8 border-border/40 focus-visible:ring-0 focus-visible:border-border/60 shadow-none"
-                    aria-label="Edit chat title"
-                  />
-                </div>
-              ) : (
-                <SidebarMenuButton asChild className="w-full justify-start">
-                  <Link
-                    href={`/c/${thread.id}`}
-                    aria-label={`Open chat: ${thread.title || "New Chat"}`}
+          threads.map((thread) => {
+            const isCurrentThread = currentThreadId === thread.id;
+            return (
+              <SidebarMenuItem key={thread.id}>
+                {editingThreadId === thread.id ? (
+                  <div className="w-full px-2 py-1.5">
+                    <Input
+                      value={editingTitle}
+                      onChange={(e) => setEditingTitle(e.target.value)}
+                      autoFocus
+                      disabled={isUpdating}
+                      onBlur={submitRename}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") submitRename();
+                        if (e.key === "Escape") cancelRename();
+                      }}
+                      className="h-8 border-border/40 focus-visible:ring-0 focus-visible:border-border/60 shadow-none"
+                      aria-label="Edit chat title"
+                    />
+                  </div>
+                ) : (
+                  <SidebarMenuButton
+                    asChild
+                    className={cn(
+                      "w-full justify-start",
+                      isCurrentThread &&
+                        "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
+                    )}
                   >
-                    <span className="sidebar-text-truncate">
-                      {thread.title || "New Chat"}
-                    </span>
-                  </Link>
-                </SidebarMenuButton>
-              )}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <SidebarMenuAction showOnHover>
-                    <MoreHorizontal />
-                    <span className="sr-only">More</span>
-                  </SidebarMenuAction>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  className="w-48 rounded-xl p-2"
-                  side={isMobile ? "bottom" : "right"}
-                  align={isMobile ? "end" : "start"}
-                >
-                  <DropdownMenuItem
-                    onClick={() => handleEditChat(thread.id)}
-                    className="h-9 px-3"
+                    <Link
+                      href={`/c/${thread.id}`}
+                      aria-label={`Open chat: ${thread.title || "New Chat"}`}
+                    >
+                      <span className="sidebar-text-truncate">
+                        {thread.title || "New Chat"}
+                      </span>
+                    </Link>
+                  </SidebarMenuButton>
+                )}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <SidebarMenuAction showOnHover>
+                      <MoreHorizontal />
+                      <span className="sr-only">More</span>
+                    </SidebarMenuAction>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    className="w-48 rounded-xl p-2"
+                    side={isMobile ? "bottom" : "right"}
+                    align={isMobile ? "end" : "start"}
                   >
-                    <Edit3 className="text-muted-foreground" />
-                    <span>Rename</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    onClick={() => handleDeleteChat(thread.id)}
-                    variant="destructive"
-                    className="h-9 px-3"
-                    disabled={deletingThreadId === thread.id}
-                  >
-                    <Trash2 className="text-muted-foreground" />
-                    <span>
-                      {deletingThreadId === thread.id
-                        ? "Deleting..."
-                        : "Delete"}
-                    </span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </SidebarMenuItem>
-          ))
+                    <DropdownMenuItem
+                      onClick={() => handleEditChat(thread.id)}
+                      className="h-9 px-3"
+                    >
+                      <Edit3 className="text-muted-foreground" />
+                      <span>Rename</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onClick={() => handleDeleteChat(thread.id)}
+                      variant="destructive"
+                      className="h-9 px-3"
+                      disabled={isDeletePending}
+                    >
+                      <Trash2 className="text-muted-foreground" />
+                      <span>{isDeletePending ? "Deleting..." : "Delete"}</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </SidebarMenuItem>
+            );
+          })
         )}
         {threads.length === 0 && !isLoading && (
           <div className="text-sm text-muted-foreground p-2">No chats yet</div>
