@@ -1,6 +1,8 @@
 "use client";
 
-import { useToolMessage } from "@/hooks/use-tool-message";
+import { useEffect, useRef, useState } from "react";
+import { Spinner } from "@/components/ui/shadcn-io/spinner";
+import { SquareCheckBig } from "lucide-react";
 
 interface ChatGenericToolRenderProps {
   name: string;
@@ -13,6 +15,31 @@ export function ChatGenericToolRender({
   status,
   showElapsedSec = false,
 }: ChatGenericToolRenderProps) {
-  const message = useToolMessage(name, status, showElapsedSec);
-  return <p className="text-sm text-gray-500">{message}</p>;
+  const startTimeRef = useRef<number>(Date.now());
+  const [elapsedSec, setElapsedSec] = useState<string>("");
+
+  useEffect(() => {
+    if (status === "complete" && showElapsedSec) {
+      const elapsedMs = Date.now() - startTimeRef.current;
+      setElapsedSec((elapsedMs / 1000).toFixed(1));
+    }
+  }, [status, showElapsedSec]);
+
+  if (status !== "complete") {
+    return (
+      <div className="flex items-center gap-2 text-sm text-gray-500">
+        <Spinner className="h-3 w-3" />
+        <span>{name}</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="text-sm text-gray-500">
+      <SquareCheckBig className="size-4" /> <span>{name}</span>
+      {showElapsedSec && elapsedSec ? (
+        <span className="ml-1">{elapsedSec}s</span>
+      ) : null}
+    </div>
+  );
 }
