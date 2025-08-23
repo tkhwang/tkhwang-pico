@@ -54,32 +54,33 @@ const Ellipsis = ({ size = 24, ...props }: SpinnerVariantProps) => {
       <circle cx="4" cy="12" fill="currentColor" r="2">
         <animate
           attributeName="cy"
-          begin="0;ellipsis3.end+0.25s"
+          begin="0s"
           calcMode="spline"
           dur="0.6s"
-          id="ellipsis1"
           keySplines=".33,.66,.66,1;.33,0,.66,.33"
+          repeatCount="indefinite"
           values="12;6;12"
         />
       </circle>
       <circle cx="12" cy="12" fill="currentColor" r="2">
         <animate
           attributeName="cy"
-          begin="ellipsis1.begin+0.1s"
+          begin="0.1s"
           calcMode="spline"
           dur="0.6s"
           keySplines=".33,.66,.66,1;.33,0,.66,.33"
+          repeatCount="indefinite"
           values="12;6;12"
         />
       </circle>
       <circle cx="20" cy="12" fill="currentColor" r="2">
         <animate
           attributeName="cy"
-          begin="ellipsis1.begin+0.2s"
+          begin="0.2s"
           calcMode="spline"
           dur="0.6s"
-          id="ellipsis3"
           keySplines=".33,.66,.66,1;.33,0,.66,.33"
+          repeatCount="indefinite"
           values="12;6;12"
         />
       </circle>
