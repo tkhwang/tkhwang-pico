@@ -17,8 +17,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { ThemeSwitcher } from "@/components/theme-switcher";
-import { useEffect, useRef, use } from "react";
-import { useCopilotChat } from "@copilotkit/react-core";
+import { use } from "react";
 import { getConfig } from "@/lib/config";
 import { useChatPersistence } from "@/hooks/use-chat-persistence";
 import { useCopilotActions } from "@/hooks/use-copilot-actions";
@@ -32,9 +31,6 @@ interface ChatThreadPageProps {
 }
 
 function ThreadChatInner({ threadId }: { threadId: string }) {
-  const { visibleMessages } = useCopilotChat();
-  const hasSentInitialRef = useRef(false);
-
   const { mutateAsync: saveMessageMutate } = useSaveMessage(threadId);
 
   // Initialize chat persistence
@@ -49,15 +45,6 @@ function ThreadChatInner({ threadId }: { threadId: string }) {
   // Register copilot actions
   useCopilotActions();
 
-  // Send the initial user message exactly once per thread (now handled by DB; no sessionStorage)
-  useEffect(() => {
-    if (hasSentInitialRef.current || isPersistenceLoading) return;
-    // If DB restore already produced visible messages, don't send initial message
-    if (visibleMessages.length > 0) {
-      hasSentInitialRef.current = true;
-      return;
-    }
-  }, [isPersistenceLoading, visibleMessages.length]);
 
   // Show error if persistence fails
   if (persistenceError) {
