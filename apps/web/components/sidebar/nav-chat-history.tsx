@@ -21,22 +21,24 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { useThreads } from "@/hooks/use-threads";
+import { useThreadsByUserId } from "@/hooks/queries/use-threads-by-user-id";
+import { useDeleteThread } from "@/hooks/mutations/use-delete-thread";
+import { useUpdateThreadTitle } from "@/hooks/mutations/use-update-thread-title";
 import { Input } from "@/components/ui/input";
-import { updateThreadTitle } from "@/lib/supabase/chat";
 import { NavChatHistorySkeleton } from "@/components/sidebar/nav-chat-history-skeleton";
 
 export function NavChatHistory() {
   const router = useRouter();
   const pathname = usePathname();
-
   const { isMobile } = useSidebar();
-  const { threads, isLoading, error, deleteThreadById, refetch } = useThreads();
 
-  const [deletingThreadId, setDeletingThreadId] = useState<string | null>(null);
   const [editingThreadId, setEditingThreadId] = useState<string | null>(null);
   const [editingTitle, setEditingTitle] = useState("");
-  const [isRenaming, setIsRenaming] = useState(false);
+
+  const { data: threads = [], isLoading, error } = useThreadsByUserId();
+  const { mutateAsync: deleteThreadById, isPending: isDeletePending } =
+    useDeleteThread();
+  const { mutateAsync: updateThreadTitleMutation, isPending: isUpdating } = useUpdateThreadTitle();
 
   const handleEditChat = (threadId: string) => {
     const currentTitle = threads.find((t) => t.id === threadId)?.title || "";
@@ -45,10 +47,9 @@ export function NavChatHistory() {
   };
 
   const handleDeleteChat = async (threadId: string) => {
-    if (deletingThreadId) return; // Prevent multiple deletions
+    if (isDeletePending) return; // Prevent multiple deletions
 
     try {
-      setDeletingThreadId(threadId);
       await deleteThreadById(threadId);
       if (pathname === `/c/${threadId}`) {
         router.push("/");
@@ -58,8 +59,6 @@ export function NavChatHistory() {
         "[-][NavChatHistory] handleDeleteChat: Failed to delete chat:",
         err
       );
-    } finally {
-      setDeletingThreadId(null);
     }
   };
 
@@ -73,16 +72,14 @@ export function NavChatHistory() {
       return;
     }
     try {
-      setIsRenaming(true);
-      await updateThreadTitle(editingThreadId, newTitle || "");
-      await refetch();
+      await updateThreadTitleMutation({ threadId: editingThreadId, title: newTitle || "" });
+      setEditingThreadId(null);
+      setEditingTitle("");
     } catch (err) {
       console.error(
         "[-][NavChatHistory] submitRename: Failed to rename thread:",
         err
       );
-    } finally {
-      setIsRenaming(false);
       setEditingThreadId(null);
       setEditingTitle("");
     }
@@ -121,7 +118,7 @@ export function NavChatHistory() {
                     value={editingTitle}
                     onChange={(e) => setEditingTitle(e.target.value)}
                     autoFocus
-                    disabled={isRenaming}
+                    disabled={isUpdating}
                     onBlur={submitRename}
                     onKeyDown={(e) => {
                       if (e.key === "Enter") submitRename();
@@ -167,14 +164,10 @@ export function NavChatHistory() {
                     onClick={() => handleDeleteChat(thread.id)}
                     variant="destructive"
                     className="h-9 px-3"
-                    disabled={deletingThreadId === thread.id}
+                    disabled={isDeletePending}
                   >
                     <Trash2 className="text-muted-foreground" />
-                    <span>
-                      {deletingThreadId === thread.id
-                        ? "Deleting..."
-                        : "Delete"}
-                    </span>
+                    <span>{isDeletePending ? "Deleting..." : "Delete"}</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

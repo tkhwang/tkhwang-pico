@@ -20,8 +20,9 @@ import {
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import PicoInput from "@/components/input/pico-input";
 import { useAuth } from "@/providers/auth-provider";
-import { createThread, generateThreadTitle } from "@/lib/supabase/chat";
+import { generateThreadTitle } from "@/lib/supabase/chat";
 import { useSaveMessage } from "@/hooks/mutations/use-save-message";
+import { useCreateThread } from "@/hooks/mutations/use-create-thread";
 
 export function ChatAfterLogin() {
   const [inputValue, setInputValue] = useState("");
@@ -31,6 +32,7 @@ export function ChatAfterLogin() {
   const router = useRouter();
   const { user } = useAuth();
   const { mutateAsync: saveMessageMutate } = useSaveMessage();
+  const { mutateAsync: createThreadMutate } = useCreateThread();
 
   const handleSubmit = async (userMessage: string) => {
     if (!user || creatingRef.current) return;
@@ -45,9 +47,8 @@ export function ChatAfterLogin() {
       }
       const title = generateThreadTitle(userMessageTrimmed);
 
-      // Create thread in Supabase
-      const thread = await createThread({
-        userId: user.id,
+      // Create thread in Supabase (with cache update)
+      const thread = await createThreadMutate({
         title,
       });
 
