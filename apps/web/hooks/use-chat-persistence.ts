@@ -8,12 +8,11 @@ import { copilotRoleToString } from "@/utils/copilotkit";
 import { useAuth } from "@/providers/auth-provider";
 import { convertToCopilotMessages } from "@/utils/copilotkit";
 import { useMessagesByThreadId } from "@/hooks/queries/use-message-by-thread-id";
-import { saveMessage, type Thread } from "../lib/supabase/chat";
+import { type Thread } from "../lib/supabase/chat";
+import { useSaveMessage } from "@/hooks/mutations/use-save-message";
 
 // Minimal de-duplication by CopilotKit message id
-interface MessageStatusLike {
-  status?: { code?: string };
-}
+//
 
 function hasSubstantiveContent(content: string): boolean {
   const trimmed = content.trim();
@@ -38,6 +37,8 @@ export function useChatPersistence({
   const { user } = useAuth();
   const { visibleMessages } = useCopilotChat();
   const { setMessages } = useCopilotMessagesContext();
+
+  const { mutateAsync: saveMessageMutate } = useSaveMessage(threadId);
 
   const [thread, setThread] = useState<Thread | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -91,12 +92,12 @@ export function useChatPersistence({
           const unsynced = visibleMessages.filter(
             (m): m is TextMessage =>
               m instanceof TextMessage &&
-              (m as unknown as MessageStatusLike).status?.code === "Success" &&
               hasSubstantiveContent(m.content) &&
+              copilotRoleToString(m.role) === "assistant" &&
               !syncedIdsRef.current.has(m.id)
           );
           for (const m of unsynced) {
-            await saveMessage({
+            await saveMessageMutate({
               threadId: thread.id,
               role: copilotRoleToString(m.role),
               content: m.content,
@@ -115,7 +116,7 @@ export function useChatPersistence({
       const id = setTimeout(run, 400);
       return () => clearTimeout(id);
     },
-    [user, thread, visibleMessages]
+    [user, thread, visibleMessages, saveMessageMutate]
   );
 
   return {

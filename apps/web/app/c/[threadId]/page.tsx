@@ -17,14 +17,13 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { ThemeSwitcher } from "@/components/theme-switcher";
-import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, use } from "react";
 import { useCopilotChat } from "@copilotkit/react-core";
-import { TextMessage, Role as gqlRole } from "@copilotkit/runtime-client-gql";
 import { getConfig } from "@/lib/config";
 import { useChatPersistence } from "@/hooks/use-chat-persistence";
 import { useCopilotActions } from "@/hooks/use-copilot-actions";
 import { ChatPageSkeleton } from "@/components/chat/chat-page-skeleton";
+import { useSaveMessage } from "@/hooks/mutations/use-save-message";
 
 interface ChatThreadPageProps {
   params: Promise<{
@@ -33,9 +32,10 @@ interface ChatThreadPageProps {
 }
 
 function ThreadChatInner({ threadId }: { threadId: string }) {
-  const searchParams = useSearchParams();
-  const { appendMessage, visibleMessages } = useCopilotChat();
+  const { visibleMessages } = useCopilotChat();
   const hasSentInitialRef = useRef(false);
+
+  const { mutateAsync: saveMessageMutate } = useSaveMessage(threadId);
 
   // Initialize chat persistence
   const {
@@ -49,51 +49,15 @@ function ThreadChatInner({ threadId }: { threadId: string }) {
   // Register copilot actions
   useCopilotActions();
 
-  // Send the initial user message exactly once per thread
+  // Send the initial user message exactly once per thread (now handled by DB; no sessionStorage)
   useEffect(() => {
     if (hasSentInitialRef.current || isPersistenceLoading) return;
-
     // If DB restore already produced visible messages, don't send initial message
     if (visibleMessages.length > 0) {
       hasSentInitialRef.current = true;
       return;
     }
-
-    // Prefer sessionStorage (no URL leak), fallback to ?q for backward-compat
-    let initial = "";
-    try {
-      if (typeof window !== "undefined") {
-        const key = `pico:init:${threadId}`;
-        const stored = sessionStorage.getItem(key);
-        if (stored) {
-          initial = stored;
-          sessionStorage.removeItem(key);
-        }
-      }
-    } catch {}
-
-    if (!initial) {
-      const q = searchParams.get("q");
-      if (q) initial = q;
-    }
-
-    if (initial.trim().length > 0) {
-      hasSentInitialRef.current = true;
-      // Send the message that was already saved
-      const message = new TextMessage({
-        role: gqlRole.User,
-        content: initial.trim(),
-      });
-      void appendMessage(message);
-    }
-  }, [
-    appendMessage,
-    searchParams,
-    threadId,
-    thread,
-    isPersistenceLoading,
-    visibleMessages,
-  ]);
+  }, [isPersistenceLoading, visibleMessages.length]);
 
   // Show error if persistence fails
   if (persistenceError) {
@@ -111,6 +75,11 @@ function ThreadChatInner({ threadId }: { threadId: string }) {
         className="h-full w-full"
         labels={{
           title: thread?.title || "Your Assistant",
+        }}
+        onSubmitMessage={async (message: string) => {
+          const content = message.trim();
+          if (!content) return;
+          await saveMessageMutate({ threadId, role: "user", content });
         }}
       />
     </div>

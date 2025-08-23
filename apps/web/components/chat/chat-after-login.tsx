@@ -21,6 +21,7 @@ import { ThemeSwitcher } from "@/components/theme-switcher";
 import PicoInput from "@/components/input/pico-input";
 import { useAuth } from "@/providers/auth-provider";
 import { createThread, generateThreadTitle } from "@/lib/supabase/chat";
+import { useSaveMessage } from "@/hooks/mutations/use-save-message";
 
 export function ChatAfterLogin() {
   const [inputValue, setInputValue] = useState("");
@@ -29,35 +30,36 @@ export function ChatAfterLogin() {
 
   const router = useRouter();
   const { user } = useAuth();
+  const { mutateAsync: saveMessageMutate } = useSaveMessage();
 
-  const handleSubmit = async (value: string) => {
+  const handleSubmit = async (userMessage: string) => {
     if (!user || creatingRef.current) return;
 
     try {
       creatingRef.current = true;
       setIsCreating(true);
 
-      const valueTrimmed = value.trim();
-      if (valueTrimmed.length === 0) {
+      const userMessageTrimmed = userMessage.trim();
+      if (userMessageTrimmed.length === 0) {
         return;
       }
-      const title = generateThreadTitle(valueTrimmed);
+      const title = generateThreadTitle(userMessageTrimmed);
 
       // Create thread in Supabase
       const thread = await createThread({
         userId: user.id,
         title,
       });
-      // Keep new thread id only for navigation below
 
-      // Store initial message in sessionStorage for CopilotChat initialization
-      try {
-        if (typeof window !== "undefined") {
-          sessionStorage.setItem(`pico:init:${thread.id}`, valueTrimmed);
-        }
-      } catch {}
+      // Persist initial user message to DB
+      await saveMessageMutate({
+        threadId: thread.id,
+        role: "user",
+        content: userMessageTrimmed,
+        metadata: { initial: true },
+      });
 
-      // Navigate to the chat thread page with real thread ID
+      // Navigate to the chat thread page with real thread ID; page will read from DB
       router.push(`/c/${thread.id}`);
     } catch (error) {
       console.error(
@@ -72,7 +74,7 @@ export function ChatAfterLogin() {
         description: "Please try again or try again later.",
         action: {
           label: "Retry",
-          onClick: () => handleSubmit(value),
+          onClick: () => handleSubmit(userMessage),
         },
       });
     } finally {
