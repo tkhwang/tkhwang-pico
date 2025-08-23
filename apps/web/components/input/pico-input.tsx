@@ -1,6 +1,6 @@
 "use client";
 
-import { CloudSunIcon, SearchIcon } from "lucide-react";
+import { CloudSun, Search } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -68,7 +68,7 @@ export default function PicoInput({
                 </div>
                 <div className="flex-[0_0_auto]">
                   <Button type="submit" disabled={disabled}>
-                    <SearchIcon className="mr-2 h-4 w-4" />
+                    <Search className="mr-2 h-4 w-4" />
                     Ask PICO
                   </Button>
                 </div>
@@ -128,7 +128,7 @@ export default function PicoInput({
           </div>
           <div className="mt-10 flex flex-wrap justify-center gap-2 sm:mt-20">
             <Button variant={"outline"}>
-              <CloudSunIcon className="mr-2 h-auto w-3 flex-shrink-0" />
+              <CloudSun className="mr-2 h-auto w-3 flex-shrink-0" />
               Weather
             </Button>
           </div>
