@@ -2,14 +2,14 @@
 // It is safe to delete this file as it does not affect the functionality of your application.
 {
   "cesVersion": "2.18.7",
-  "projectName": "mobile-que",
+  "projectName": "tkhwang-pico-mobile-que",
   "packages": [
     {
       "name": "expo-router",
       "type": "navigation",
       "options": {
-        "type": "tabs"
-      }
+        "type": "tabs",
+      },
     },
     {
       "name": "nativewindui",
@@ -27,14 +27,14 @@
           "ratings-indicator",
           "slider",
           "text",
-          "toggle"
-        ]
-      }
+          "toggle",
+        ],
+      },
     },
     {
       "name": "supabase",
-      "type": "authentication"
-    }
+      "type": "authentication",
+    },
   ],
   "flags": {
     "noGit": false,
@@ -43,16 +43,16 @@
     "importAlias": true,
     "packageManager": "yarn",
     "eas": false,
-    "publish": false
+    "publish": false,
   },
   "packageManager": {
     "type": "yarn",
-    "version": "1.22.22"
+    "version": "1.22.22",
   },
   "os": {
     "type": "Darwin",
     "platform": "darwin",
     "arch": "arm64",
-    "kernelVersion": "25.0.0"
-  }
+    "kernelVersion": "25.0.0",
+  },
 }

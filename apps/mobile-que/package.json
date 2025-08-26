@@ -58,7 +58,7 @@
     "format": "eslint \"**/*.{js,jsx,ts,tsx}\" --fix && prettier \"**/*.{js,jsx,ts,tsx,json}\" --write",
     "ios": "expo start --ios",
     "lint": "eslint \"**/*.{js,jsx,ts,tsx}\" && prettier -c \"**/*.{js,jsx,ts,tsx,json}\"",
-    "run:go": "npx expo start",
+    "run:expo": "npx expo start",
     "start": "expo start",
     "web": "expo start --web"
   },
