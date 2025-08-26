@@ -1,25 +1,4 @@
 {
-  "name": "@tkhwang-pico/mobile",
-  "main": "index.js",
-  "version": "1.0.0",
-  "scripts": {
-    "dev": "expo start -c",
-    "dev:web": "expo start -c --web",
-    "dev:android": "expo start -c --android",
-    "android": "expo start -c --android",
-    "ios": "expo start -c --ios",
-    "web": "expo start -c --web",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "format": "prettier -w .",
-    "format:check": "prettier -c .",
-    "build:ios": "eas build --profile production --platform ios",
-    "build:ios:local": "eas build --profile development-simulator --platform ios --local",
-    "build:android": "eas build --profile preview --platform android",
-    "build:android:local": "eas build --profile development --platform android --local",
-    "clean": "rm -rf .expo node_modules",
-    "postinstall": "npx tailwindcss -i ./global.css -o ./node_modules/.cache/nativewind/global.css"
-  },
   "dependencies": {
     "@react-navigation/native": "^7.0.0",
     "@rn-primitives/avatar": "~1.2.0",
@@ -29,7 +8,7 @@
     "@rn-primitives/tooltip": "~1.2.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
-    "expo": "^53.0.9",
+    "expo": "53.0.22",
     "expo-dev-client": "~5.2.4",
     "expo-linking": "~7.1.5",
     "expo-navigation-bar": "~4.2.4",
@@ -67,5 +46,26 @@
     "prettier": "^3.6.2",
     "typescript": "~5.8.3"
   },
-  "private": true
+  "main": "index.js",
+  "name": "@tkhwang-pico/mobile",
+  "private": true,
+  "scripts": {
+    "android": "expo start -c --android",
+    "build:android": "eas build --profile preview --platform android",
+    "build:android:local": "eas build --profile development --platform android --local",
+    "build:ios": "eas build --profile production --platform ios",
+    "build:ios:local": "eas build --profile development-simulator --platform ios --local",
+    "clean": "rm -rf .expo node_modules",
+    "dev": "expo start -c",
+    "dev:android": "expo start -c --android",
+    "dev:web": "expo start -c --web",
+    "format": "prettier -w .",
+    "format:check": "prettier -c .",
+    "ios": "expo start -c --ios",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "postinstall": "npx tailwindcss -i ./global.css -o ./node_modules/.cache/nativewind/global.css",
+    "web": "expo start -c --web"
+  },
+  "version": "1.0.0"
 }
