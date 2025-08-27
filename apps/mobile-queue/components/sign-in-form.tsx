@@ -1,12 +1,6 @@
 import { SocialConnections } from '@/components/social-connections';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
-import { Text } from '@/components/ui/text';
+import { Card, CardContent, CardDescription, CardTitle } from '@/components/ui/card';
 import { useSignIn } from '@clerk/clerk-expo';
-import { Link, router } from 'expo-router';
 import * as React from 'react';
 import { type TextInput, View } from 'react-native';
 
@@ -58,71 +52,29 @@ export function SignInForm() {
   return (
     <View className="gap-6">
       <Card className="border-border/0 shadow-none sm:border-border sm:shadow-sm sm:shadow-black/5">
-        <CardHeader>
-          <CardTitle className="text-center text-xl sm:text-left">Sign in to mobile-queue</CardTitle>
-          <CardDescription className="text-center sm:text-left">
-            Welcome back! Please sign in to continue
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="gap-6">
-          <View className="gap-6">
-            <View className="gap-1.5">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                placeholder="m@example.com"
-                keyboardType="email-address"
-                autoComplete="email"
-                autoCapitalize="none"
-                onChangeText={setEmail}
-                onSubmitEditing={onEmailSubmitEditing}
-                returnKeyType="next"
-                submitBehavior="submit"
-              />
-              {error.email ? (
-                <Text className="text-sm font-medium text-destructive">{error.email}</Text>
-              ) : null}
-            </View>
-            <View className="gap-1.5">
-              <View className="flex-row items-center">
-                <Label htmlFor="password">Password</Label>
-                <Link asChild href={`/(auth)/forgot-password?email=${email}`}>
-                  <Button
-                    variant="link"
-                    size="sm"
-                    className="ml-auto h-4 px-1 py-0 web:h-fit sm:h-4">
-                    <Text className="font-normal leading-4">Forgot your password?</Text>
-                  </Button>
-                </Link>
-              </View>
-              <Input
-                ref={passwordInputRef}
-                id="password"
-                secureTextEntry
-                onChangeText={setPassword}
-                returnKeyType="send"
-                onSubmitEditing={onSubmit}
-              />
-              {error.password ? (
-                <Text className="text-sm font-medium text-destructive">{error.password}</Text>
-              ) : null}
-            </View>
-            <Button className="w-full" onPress={onSubmit}>
-              <Text>Continue</Text>
-            </Button>
+        <CardContent className="gap-8 pt-12">
+          {/* Icon placeholder space */}
+          <View className="h-16 items-center justify-center">
+            {/* Future icon will be placed here */}
           </View>
-          <Text className="text-center text-sm">
-            Don&apos;t have an account?{' '}
-            <Link href="/(auth)/sign-up" className="text-sm underline underline-offset-4">
-              Sign up
-            </Link>
-          </Text>
-          <View className="flex-row items-center">
-            <Separator className="flex-1" />
-            <Text className="px-4 text-sm text-muted-foreground">or</Text>
-            <Separator className="flex-1" />
+
+          {/* Title and description */}
+          <View className="gap-2">
+            <CardTitle className="text-center text-xl">Sign in to PICO QUEUE</CardTitle>
+            <CardDescription className="text-center">
+              Welcome back! Please sign in to continue
+            </CardDescription>
           </View>
-          <SocialConnections />
+
+          {/* Main content area - for future form fields */}
+          <View className="min-h-[100px]">
+            {/* Future email/password fields will be added here */}
+          </View>
+
+          {/* Social login buttons at the bottom */}
+          <View className="gap-4">
+            <SocialConnections />
+          </View>
         </CardContent>
       </Card>
     </View>
