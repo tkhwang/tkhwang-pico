@@ -65,7 +65,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "postinstall": "npx tailwindcss -i ./global.css -o ./node_modules/.cache/nativewind/global.css",
-    "run:go": "npx expo start",
+    "run:expo": "npx expo start",
     "web": "expo start -c --web"
   },
   "version": "1.0.0"
