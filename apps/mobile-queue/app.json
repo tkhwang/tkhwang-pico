@@ -21,18 +21,27 @@
     "icon": "./assets/icon.png",
     "ios": {
       "bundleIdentifier": "app.tkbetter.pico.queue",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      },
       "supportsTablet": true
     },
     "name": "tkhwangPicoMobileQueue",
     "orientation": "portrait",
     "owner": "tkhwang",
     "plugins": ["expo-router", "expo-web-browser"],
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
     "scheme": "tkhwang-pico-mobile-queue",
     "slug": "tkhwang-pico-mobile-queue",
     "splash": {
       "backgroundColor": "#ffffff",
       "image": "./assets/splash.png",
       "resizeMode": "contain"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/6ee63224-2d7a-4d9d-b057-17117cc087da"
     },
     "userInterfaceStyle": "automatic",
     "version": "1.0.0",
