@@ -1,7 +1,10 @@
-import * as NavigationBar from 'expo-navigation-bar';
-import { useColorScheme as useNativewindColorScheme } from 'nativewind';
 import * as React from 'react';
+
 import { Platform } from 'react-native';
+
+import * as NavigationBar from 'expo-navigation-bar';
+
+import { useColorScheme as useNativewindColorScheme } from 'nativewind';
 
 import { COLORS } from '~/theme/colors';
 

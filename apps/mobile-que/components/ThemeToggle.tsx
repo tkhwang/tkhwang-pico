@@ -1,5 +1,6 @@
-import { Icon } from '@roninoss/icons';
 import { Pressable, View } from 'react-native';
+
+import { Icon } from '@roninoss/icons';
 import Animated, { LayoutAnimationConfig, ZoomInRotate } from 'react-native-reanimated';
 
 import { cn } from '~/lib/cn';

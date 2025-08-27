@@ -1,5 +1,6 @@
-import { StatusBar } from 'expo-status-bar';
 import { Platform } from 'react-native';
+
+import { StatusBar } from 'expo-status-bar';
 
 import { ScreenContent } from '~/components/ScreenContent';
 

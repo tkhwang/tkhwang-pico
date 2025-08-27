@@ -1,14 +1,12 @@
 import '../global.css';
 import 'expo-dev-client';
-import { ThemeProvider as NavThemeProvider } from '@react-navigation/native';
-
-import { ActionSheetProvider } from '@expo/react-native-action-sheet';
-
-import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 
+import { ActionSheetProvider } from '@expo/react-native-action-sheet';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
+import { ThemeProvider as NavThemeProvider } from '@react-navigation/native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { ThemeToggle } from '~/components/ThemeToggle';
