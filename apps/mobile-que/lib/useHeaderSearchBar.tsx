@@ -9,6 +9,8 @@ export function useHeaderSearchBar(props: SearchBarProps = {}) {
   const navigation = useNavigation();
   const [search, setSearch] = React.useState('');
 
+  const { onChangeText: onChangeTextProp, ...rest } = props;
+
   React.useLayoutEffect(() => {
     navigation.setOptions({
       headerSearchBarOptions: {
@@ -21,11 +23,21 @@ export function useHeaderSearchBar(props: SearchBarProps = {}) {
         hideWhenScrolling: false,
         onChangeText(ev) {
           setSearch(ev.nativeEvent.text);
+          onChangeTextProp?.(ev);
         },
-        ...props,
+        ...rest,
       } satisfies SearchBarProps,
     });
-  }, [navigation, colorScheme, colors.foreground, colors.primary, colors.grey, props]);
+  }, [
+    navigation,
+    colorScheme,
+    colors.foreground,
+    colors.primary,
+    colors.grey,
+    props,
+    rest,
+    onChangeTextProp,
+  ]);
 
   return search;
 }
