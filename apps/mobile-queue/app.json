@@ -15,11 +15,11 @@
     "ios": {
       "supportsTablet": true
     },
-    "name": "tkhwangPicoMobileQue",
+    "name": "tkhwangPicoMobileQueue",
     "orientation": "portrait",
     "plugins": ["expo-router", "expo-web-browser"],
-    "scheme": "tkhwang-pico-mobile-que",
-    "slug": "tkhwang-pico-mobile-que",
+    "scheme": "tkhwang-pico-mobile-queue",
+    "slug": "tkhwang-pico-mobile-queue",
     "splash": {
       "backgroundColor": "#ffffff",
       "image": "./assets/splash.png",

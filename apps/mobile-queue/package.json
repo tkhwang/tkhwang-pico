@@ -52,7 +52,7 @@
     "typescript": "~5.8.3"
   },
   "main": "expo-router/entry",
-  "name": "@tkhwang-pico/mobile-que",
+  "name": "@tkhwang-pico/mobile-queue",
   "private": true,
   "scripts": {
     "android": "expo start --android",
