@@ -50,6 +50,8 @@
   },
   "scripts": {
     "android": "expo start -c --android",
+    "build:android": "eas build --platform android --profile preview",
+    "build:ios": "eas build --platform ios --profile production",
     "clean": "rm -rf .expo node_modules",
     "dev": "expo start -c",
     "ios": "expo start -c --ios",
