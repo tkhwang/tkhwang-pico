@@ -1,17 +1,16 @@
-import '../global.css';
-import 'expo-dev-client';
+import '@/global.css';
 
+import { NAV_THEME } from '@/lib/theme';
+import { ClerkProvider, useAuth } from '@clerk/clerk-expo';
+import { tokenCache } from '@clerk/clerk-expo/token-cache';
+import { ThemeProvider } from '@react-navigation/native';
+import { PortalHost } from '@rn-primitives/portal';
 import { Stack } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-
-import { ActionSheetProvider } from '@expo/react-native-action-sheet';
-import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
-import { ThemeProvider as NavThemeProvider } from '@react-navigation/native';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-
-import { ThemeToggle } from '~/components/ThemeToggle';
-import { useColorScheme, useInitialAndroidBarSync } from '~/lib/useColorScheme';
-import { NAV_THEME } from '~/theme';
+import { useColorScheme } from 'nativewind';
+import * as React from 'react';
+import Constants from 'expo-constants';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -19,48 +18,70 @@ export {
 } from 'expo-router';
 
 export default function RootLayout() {
-  useInitialAndroidBarSync();
-  const { colorScheme, isDarkColorScheme } = useColorScheme();
+  const { colorScheme } = useColorScheme();
 
   return (
-    <>
-      <StatusBar
-        key={`root-status-bar-${isDarkColorScheme ? 'light' : 'dark'}`}
-        style={isDarkColorScheme ? 'light' : 'dark'}
-      />
-      {/* WRAP YOUR APP WITH ANY ADDITIONAL PROVIDERS HERE */}
-      {/* <ExampleProvider> */}
-
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        <BottomSheetModalProvider>
-          {/* @ts-expect-error - React type mismatch in monorepo */}
-          <ActionSheetProvider>
-            <NavThemeProvider value={NAV_THEME[colorScheme]}>
-              <Stack screenOptions={SCREEN_OPTIONS}>
-                <Stack.Screen name="(tabs)" options={TABS_OPTIONS} />
-                <Stack.Screen name="modal" options={MODAL_OPTIONS} />
-              </Stack>
-            </NavThemeProvider>
-          </ActionSheetProvider>
-        </BottomSheetModalProvider>
-      </GestureHandlerRootView>
-
-      {/* </ExampleProvider> */}
-    </>
+    <ClerkProvider
+      tokenCache={tokenCache}
+      publishableKey={Constants.expoConfig?.extra?.clerkPublishableKey}>
+      <ThemeProvider value={NAV_THEME[colorScheme ?? 'light']}>
+        <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
+        <Routes />
+        <PortalHost />
+      </ThemeProvider>
+    </ClerkProvider>
   );
 }
 
-const SCREEN_OPTIONS = {
-  animation: 'ios_from_right', // for android
-} as const;
+SplashScreen.preventAutoHideAsync();
 
-const TABS_OPTIONS = {
+function Routes() {
+  const { isSignedIn, isLoaded } = useAuth();
+
+  React.useEffect(() => {
+    if (isLoaded) {
+      SplashScreen.hideAsync();
+    }
+  }, [isLoaded]);
+
+  if (!isLoaded) {
+    return null;
+  }
+
+  return (
+    <Stack>
+      {/* Screens only shown when the user is NOT signed in */}
+      <Stack.Protected guard={!isSignedIn}>
+        <Stack.Screen name="(auth)/sign-in" options={SIGN_IN_SCREEN_OPTIONS} />
+        <Stack.Screen name="(auth)/sign-up" options={SIGN_UP_SCREEN_OPTIONS} />
+        <Stack.Screen name="(auth)/reset-password" options={DEFAULT_AUTH_SCREEN_OPTIONS} />
+        <Stack.Screen name="(auth)/forgot-password" options={DEFAULT_AUTH_SCREEN_OPTIONS} />
+      </Stack.Protected>
+
+      {/* Screens only shown when the user IS signed in */}
+      <Stack.Protected guard={isSignedIn}>
+        <Stack.Screen name="index" />
+      </Stack.Protected>
+
+      {/* Screens outside the guards are accessible to everyone (e.g. not found) */}
+    </Stack>
+  );
+}
+
+const SIGN_IN_SCREEN_OPTIONS = {
   headerShown: false,
+  title: 'Sign in',
+};
+
+const SIGN_UP_SCREEN_OPTIONS = {
+  presentation: 'modal',
+  title: '',
+  headerTransparent: true,
+  gestureEnabled: false,
 } as const;
 
-const MODAL_OPTIONS = {
-  presentation: 'modal',
-  animation: 'fade_from_bottom', // for android
-  title: 'Settings',
-  headerRight: () => <ThemeToggle />,
-} as const;
+const DEFAULT_AUTH_SCREEN_OPTIONS = {
+  title: '',
+  headerShadowVisible: false,
+  headerTransparent: true,
+};

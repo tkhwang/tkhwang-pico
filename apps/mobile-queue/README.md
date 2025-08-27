@@ -1,4 +1,4 @@
-# tkhwang-pico-queue
+# tkhwang-pico-mobile-queue
 
 ## EAS Build/Submit/Update
 
