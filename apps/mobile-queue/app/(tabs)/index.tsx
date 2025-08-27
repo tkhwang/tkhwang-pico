@@ -45,6 +45,7 @@ export default function Home() {
     <>
       <Stack.Screen options={{ title: 'Tab One' }} />
       <Container>
+        {/* @ts-ignore - LegendList has conflicting React type definitions */}
         <LegendList
           contentInsetAdjustmentBehavior="automatic"
           keyboardShouldPersistTaps="handled"
