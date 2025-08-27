@@ -4,19 +4,28 @@
       "adaptiveIcon": {
         "backgroundColor": "#ffffff",
         "foregroundImage": "./assets/adaptive-icon.png"
-      }
+      },
+      "package": "app.tkbetter.pico.queue"
     },
     "assetBundlePatterns": ["**/*"],
     "experiments": {
       "tsconfigPaths": true,
       "typedRoutes": true
     },
+    "extra": {
+      "eas": {
+        "projectId": "6ee63224-2d7a-4d9d-b057-17117cc087da"
+      },
+      "router": {}
+    },
     "icon": "./assets/icon.png",
     "ios": {
+      "bundleIdentifier": "app.tkbetter.pico.queue",
       "supportsTablet": true
     },
     "name": "tkhwangPicoMobileQueue",
     "orientation": "portrait",
+    "owner": "tkhwang",
     "plugins": ["expo-router", "expo-web-browser"],
     "scheme": "tkhwang-pico-mobile-queue",
     "slug": "tkhwang-pico-mobile-queue",
