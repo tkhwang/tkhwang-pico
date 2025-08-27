@@ -1,5 +1,7 @@
 import { View } from 'react-native';
+
 import { Stack } from 'expo-router';
+
 import { Text } from '~/components/nativewindui/Text';
 
 export default function Home() {
