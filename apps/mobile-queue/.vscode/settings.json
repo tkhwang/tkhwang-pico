@@ -1,0 +1,55 @@
+{
+  "tailwindCSS.classAttributes": ["class", "className", "headerClassName"],
+  "typescript.preferences.includePackageJsonAutoImports": "off",
+  "typescript.suggest.autoImports": false,
+  "typescript.disableAutomaticTypeAcquisition": true,
+  "typescript.preferences.disableSuggestions": false,
+  "typescript.updateImportsOnFileMove.enabled": "never",
+  "eslint.workingDirectories": ["."],
+  "eslint.options": {
+    "cache": true,
+    "cacheLocation": ".eslintcache"
+  },
+  "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
+  "files.exclude": {
+    "**/node_modules": true,
+    "**/.expo": true,
+    "**/.expo-shared": true,
+    "**/dist": true,
+    "**/.next": true,
+    "**/.eslintcache": true,
+    "**/yarn.lock": true
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/.expo": true,
+    "**/.expo-shared": true,
+    "**/.next": true,
+    "**/.eslintcache": true,
+    "**/yarn.lock": true
+  },
+  "files.watcherExclude": {
+    "**/node_modules/**": true,
+    "**/.expo/**": true,
+    "**/.expo-shared/**": true,
+    "**/dist/**": true,
+    "**/.next/**": true,
+    "**/.eslintcache": true
+  },
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "emmet.includeLanguages": {
+    "typescript": "html",
+    "typescriptreact": "html"
+  }
+}
