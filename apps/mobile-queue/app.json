@@ -6,7 +6,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png"
       },
       "edgeToEdgeEnabled": true,
-      "package": "app.tkbetter.pico.dev"
+      "package": "app.tkbetter.pico.queue.dev"
     },
     "assetBundlePatterns": ["**/*"],
     "experiments": {
@@ -20,7 +20,7 @@
     },
     "icon": "./assets/images/icon.png",
     "ios": {
-      "bundleIdentifier": "app.tkbetter.pico.dev",
+      "bundleIdentifier": "app.tkbetter.pico.queue.dev",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       },
