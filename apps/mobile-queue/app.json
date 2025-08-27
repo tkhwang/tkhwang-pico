@@ -5,14 +5,22 @@
         "backgroundColor": "#ffffff",
         "foregroundImage": "./assets/images/adaptive-icon.png"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "app.tkbetter.pico.dev"
     },
     "assetBundlePatterns": ["**/*"],
     "experiments": {
       "typedRoutes": true
     },
+    "extra": {
+      "eas": {
+        "projectId": "6ee63224-2d7a-4d9d-b057-17117cc087da"
+      },
+      "router": {}
+    },
     "icon": "./assets/images/icon.png",
     "ios": {
+      "bundleIdentifier": "app.tkbetter.pico.dev",
       "supportsTablet": true
     },
     "name": "@tkhwang-pico/mobile-queue",
