@@ -8,14 +8,8 @@ import { COLORS } from '~/theme/colors';
 function useColorScheme() {
   const { colorScheme, setColorScheme: setNativeWindColorScheme } = useNativewindColorScheme();
 
-  async function setColorScheme(colorScheme: 'light' | 'dark') {
+  function setColorScheme(colorScheme: 'light' | 'dark') {
     setNativeWindColorScheme(colorScheme);
-    if (Platform.OS !== 'android') return;
-    try {
-      await setNavigationBar(colorScheme);
-    } catch (error) {
-      console.error('useColorScheme.tsx", "setColorScheme', error);
-    }
   }
 
   function toggleColorScheme() {
