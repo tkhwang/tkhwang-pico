@@ -1,15 +1,22 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/providers/auth-provider";
-import { deleteThread, type ThreadWithLastMessage } from "@/lib/supabase/chat";
+import { useSupabaseClient } from "@/lib/supabase/client";
+import {
+  deleteThreadWithAuth,
+  type ThreadWithLastMessage,
+} from "@/lib/supabase/chat";
 import { queryKey } from "@/hooks/keys/query-key";
 
 export function useDeleteThread() {
   const { user } = useAuth();
+
+  const supabase = useSupabaseClient();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (threadId: string) => {
-      await deleteThread(threadId);
+      const deleteThreadFn = deleteThreadWithAuth(supabase);
+      await deleteThreadFn(threadId);
     },
     onMutate: async (threadId) => {
       // Cancel any outgoing refetches

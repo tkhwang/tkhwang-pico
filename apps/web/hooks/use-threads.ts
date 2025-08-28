@@ -1,8 +1,9 @@
 import { useEffect, useState, useCallback } from "react";
 import { useAuth } from "@/providers/auth-provider";
+import { useSupabaseClient } from "@/lib/supabase/client";
 import {
-  getUserThreads,
-  deleteThread,
+  getUserThreadsWithAuth,
+  deleteThreadWithAuth,
   type ThreadWithLastMessage,
 } from "../lib/supabase/chat";
 
@@ -16,6 +17,7 @@ interface UseThreadsReturn {
 
 export function useThreads(): UseThreadsReturn {
   const { user } = useAuth();
+  const supabase = useSupabaseClient();
   const [threads, setThreads] = useState<ThreadWithLastMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -30,7 +32,8 @@ export function useThreads(): UseThreadsReturn {
     setError(null);
 
     try {
-      const userThreads = await getUserThreads(user.id);
+      const getUserThreadsFn = getUserThreadsWithAuth(supabase);
+      const userThreads = await getUserThreadsFn(user.id);
       setThreads(userThreads);
     } catch (err) {
       console.error("Failed to fetch threads:", err);
@@ -38,11 +41,12 @@ export function useThreads(): UseThreadsReturn {
     } finally {
       setIsLoading(false);
     }
-  }, [user]);
+  }, [user, supabase]);
 
   const deleteThreadById = useCallback(async (threadId: string) => {
     try {
-      await deleteThread(threadId);
+      const deleteThreadFn = deleteThreadWithAuth(supabase);
+      await deleteThreadFn(threadId);
       // Remove thread from local state
       setThreads((prev) => prev.filter((thread) => thread.id !== threadId));
     } catch (err) {
@@ -50,7 +54,7 @@ export function useThreads(): UseThreadsReturn {
       setError(err instanceof Error ? err.message : "Failed to delete thread");
       throw err; // Re-throw so the component can handle it
     }
-  }, []);
+  }, [supabase]);
 
   const refetch = useCallback(async () => {
     await fetchThreads();

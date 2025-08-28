@@ -2,8 +2,9 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { queryKey } from "@/hooks/keys/query-key";
+import { useSupabaseClient } from "@/lib/supabase/client";
 import {
-  getThreadWithMessages,
+  getThreadWithMessagesWithAuth,
   type Message,
   type Thread,
 } from "@/lib/supabase/chat";
@@ -17,11 +18,15 @@ export function useMessagesByThreadId(
   threadId: string | undefined,
   enabled?: boolean
 ) {
+  const supabase = useSupabaseClient();
+
   return useQuery<ThreadWithMessagesResult>({
     queryKey: queryKey.messages.byThreadId(threadId),
     queryFn: async () => {
       if (!threadId) throw new Error("threadId is required");
-      const result = await getThreadWithMessages(threadId);
+
+      const getThreadWithMessagesFn = getThreadWithMessagesWithAuth(supabase);
+      const result = await getThreadWithMessagesFn(threadId);
       if (!result) throw new Error("Thread not found");
       return result;
     },

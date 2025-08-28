@@ -1,13 +1,16 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/providers/auth-provider";
+import { useSupabaseClient } from "@/lib/supabase/client";
 import {
-  updateThreadTitle,
+  updateThreadTitleWithAuth,
   type ThreadWithLastMessage,
 } from "@/lib/supabase/chat";
 import { queryKey } from "@/hooks/keys/query-key";
 
 export function useUpdateThreadTitle() {
   const { user } = useAuth();
+
+  const supabase = useSupabaseClient();
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -18,7 +21,8 @@ export function useUpdateThreadTitle() {
       threadId: string;
       title: string;
     }) => {
-      await updateThreadTitle(threadId, title);
+      const updateThreadTitleFn = updateThreadTitleWithAuth(supabase);
+      await updateThreadTitleFn(threadId, title);
     },
     onMutate: async ({ threadId, title }) => {
       // Cancel any outgoing refetches
