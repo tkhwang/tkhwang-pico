@@ -30,6 +30,20 @@ export function useCreateThread() {
     },
     {
       onMutate: async (params) => {
+        if (!user?.id) {
+          return {
+            previousThreads: undefined,
+            optimisticThread: {
+              id: "",
+              user_id: "",
+              title: "",
+              metadata: {},
+              created_at: "",
+              updated_at: "",
+              messageCount: 0,
+            },
+          };
+        }
         // Cancel any outgoing refetches
         await queryClient.cancelQueries({
           queryKey: queryKey.threads.byUserId(user?.id),
