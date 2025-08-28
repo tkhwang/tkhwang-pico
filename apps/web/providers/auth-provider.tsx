@@ -15,7 +15,7 @@ interface User {
 interface AuthContextValue {
   user: User | null;
   isLoaded: boolean;
-  signOut: () => void;
+  signOut: ReturnType<typeof useClerkAuth>["signOut"];
   session: AuthClerkSession;
 }
 

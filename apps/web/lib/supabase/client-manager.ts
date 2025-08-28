@@ -4,13 +4,18 @@ import type { Database } from "../../types/types_db";
 import type { AuthClerkSession } from "../../types/auth";
 
 // WeakMap for caching clients by session to avoid recreation
-const clientCache = new WeakMap<NonNullable<AuthClerkSession>, SupabaseClient<Database>>();
+const clientCache = new WeakMap<
+  NonNullable<AuthClerkSession>,
+  SupabaseClient<Database>
+>();
 
 /**
  * Get or create a Supabase client for the given session
  * Uses WeakMap caching to ensure the same session gets the same client instance
  */
-export function getSupabaseClient(session: AuthClerkSession): SupabaseClient<Database> {
+export function getSupabaseClient(
+  session: AuthClerkSession
+): SupabaseClient<Database> {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY;
 
@@ -36,10 +41,8 @@ export function getSupabaseClient(session: AuthClerkSession): SupabaseClient<Dat
 
   // Create new client with auth
   const client = createBrowserClient<Database>(url, key, {
-    accessToken: async () => {
-      const token = await session.getToken();
-      return token || null;
-    },
+    accessToken: async () =>
+      (await session.getToken({ template: "supabase" })) ?? null,
   });
 
   // Cache the client
