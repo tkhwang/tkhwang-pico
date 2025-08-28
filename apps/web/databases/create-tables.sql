@@ -34,20 +34,24 @@ CREATE INDEX IF NOT EXISTS "messages_thread_id_created_at_desc_idx"
   ON "public"."messages" ("thread_id", "created_at" DESC);
 
 -- Create function to automatically update updated_at timestamp
-CREATE OR REPLACE FUNCTION update_updated_at_column()
+CREATE OR REPLACE FUNCTION bump_thread_updated_at()
 RETURNS TRIGGER AS $$
+DECLARE
+  v_thread_id uuid;
 BEGIN
-    NEW.updated_at = now();
-    RETURN NEW;
+  IF TG_OP = 'DELETE' THEN
+    v_thread_id := OLD.thread_id;
+  ELSE
+    v_thread_id := NEW.thread_id;
+  END IF;
+  UPDATE "public"."threads" SET "updated_at" = now() WHERE id = v_thread_id;
+  RETURN CASE WHEN TG_OP = 'DELETE' THEN OLD ELSE NEW END;
 END;
-$$ language 'plpgsql';
-
--- Create trigger to automatically update updated_at for threads
-DROP TRIGGER IF EXISTS update_threads_updated_at ON "public"."threads";
-CREATE TRIGGER update_threads_updated_at
-    BEFORE UPDATE ON "public"."threads"
-    FOR EACH ROW
-    EXECUTE FUNCTION update_updated_at_column();
+$$ LANGUAGE plpgsql;
+CREATE TRIGGER bump_threads_updated_at_on_message
+  AFTER INSERT OR UPDATE OR DELETE ON "public"."messages"
+  FOR EACH ROW
+  EXECUTE FUNCTION bump_thread_updated_at();
 
 -- Keep thread recency in sync with message activity
 DROP TRIGGER IF EXISTS bump_threads_updated_at_on_message ON "public"."messages";
