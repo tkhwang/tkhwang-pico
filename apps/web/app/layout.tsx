@@ -5,9 +5,10 @@ import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "sonner";
-import { AuthProvider } from "@/providers/auth-provider";
 import { QueryProvider } from "@/providers/query-provider";
+import { AuthProvider } from "@/providers/auth-provider";
 import { getConfig } from "@/lib/config";
+import { ClerkProvider } from "@clerk/nextjs";
 
 const config = getConfig();
 
@@ -38,7 +39,11 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <AuthProvider>{children}</AuthProvider>
+            <ClerkProvider>
+              <AuthProvider>
+                {children}
+              </AuthProvider>
+            </ClerkProvider>
             <Toaster position="bottom-right" richColors />
           </ThemeProvider>
         </QueryProvider>
