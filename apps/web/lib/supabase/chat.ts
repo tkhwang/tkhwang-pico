@@ -106,6 +106,7 @@ export async function getUserThreads(
   options: { limit?: number; offset?: number } = {}
 ): Promise<ThreadWithLastMessage[]> {
   if (!session) throw new Error("Authentication required");
+
   const supabase = getSupabaseClient(session);
 
   const { limit = 50, offset = 0 } = options;
