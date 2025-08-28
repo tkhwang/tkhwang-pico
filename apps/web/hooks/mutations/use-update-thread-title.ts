@@ -31,6 +31,9 @@ export function useUpdateThreadTitle() {
     },
     {
       onMutate: async ({ threadId, title }) => {
+        if (!user?.id) {
+          return { previousThreads: undefined };
+        }
         // Cancel any outgoing refetches
         await queryClient.cancelQueries({
           queryKey: queryKey.threads.byUserId(user?.id),

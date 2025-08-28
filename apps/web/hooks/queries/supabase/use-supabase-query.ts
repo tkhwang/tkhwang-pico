@@ -13,15 +13,18 @@ import type { AuthClerkSession } from "@/types/auth";
  */
 export function useSupabaseQuery<TData, TError = Error>(
   queryKey: QueryKey,
-  queryFn: (session: AuthClerkSession) => Promise<TData>,
+  queryFn: (session: NonNullable<AuthClerkSession>) => Promise<TData>,
   options?: Omit<UseQueryOptions<TData, TError>, "queryKey" | "queryFn">
 ) {
   const { session } = useAuth();
 
+  const { enabled, ...restOptions } = options ?? {};
+  const isEnabled = (enabled ?? true) && !!session;
+
   return useQuery<TData, TError>({
     queryKey,
-    queryFn: () => queryFn(session),
-    enabled: options?.enabled !== false && !!session,
-    ...options,
+    queryFn: () => queryFn(session as NonNullable<AuthClerkSession>),
+    ...restOptions,
+    enabled: isEnabled,
   });
 }
