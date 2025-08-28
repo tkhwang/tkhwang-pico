@@ -39,13 +39,14 @@ export async function createThread(
   session: AuthClerkSession,
   { userId, title, metadata = {} }: CreateThreadParams
 ): Promise<Thread> {
+  if (!session) throw new Error("Authentication required");
   const supabase = getSupabaseClient(session);
 
   const { data, error } = await supabase
     .from("threads")
     .insert({
       user_id: userId,
-      title: title || null,
+      title: title?.trim() || null,
       metadata,
     })
     .select()
@@ -123,6 +124,8 @@ export async function getUserThreads(
     `
     )
     .eq("user_id", userId)
+    // Ensure nested messages are chronologically ordered
+    .order("created_at", { foreignTable: "messages", ascending: true })
     .order("updated_at", { ascending: false })
     .range(offset, offset + limit - 1);
 
