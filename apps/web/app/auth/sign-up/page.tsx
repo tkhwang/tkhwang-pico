@@ -7,6 +7,7 @@ export default function Page() {
       <Navbar02Page />
       <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
         <SignUp
+          routing="hash"
           appearance={{
             elements: {
               rootBox: "w-full max-w-sm",
