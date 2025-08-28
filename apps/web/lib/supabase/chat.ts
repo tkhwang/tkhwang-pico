@@ -51,9 +51,7 @@ export async function createThread(
     .select()
     .single();
 
-  if (error) {
-    throw new Error(`Failed to create thread: ${error.message}`);
-  }
+  if (error) throw new Error(`Failed to create thread: ${error.message}`);
 
   return data;
 }
@@ -65,9 +63,8 @@ export async function saveMessage(
   session: AuthClerkSession,
   { threadId, role, content, metadata = {} }: SaveMessageParams
 ): Promise<Message> {
-  if (!session) {
-    throw new Error("Authentication required");
-  }
+  if (!session) throw new Error("Authentication required");
+
   const supabase = getSupabaseClient(session);
 
   const { data, error } = await supabase
@@ -194,11 +191,13 @@ export async function updateThreadTitle(
   threadId: string,
   title: string
 ): Promise<Thread> {
+  if (!session) throw new Error("Authentication required");
+
   const supabase = getSupabaseClient(session);
 
   const { data, error } = await supabase
     .from("threads")
-    .update({ title })
+    .update({ title: title.trim() })
     .eq("id", threadId)
     .select()
     .single();
