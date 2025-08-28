@@ -23,6 +23,7 @@ export function createClient(): SupabaseClient<Database> {
 // Hook-based client for components that need Clerk authentication
 export function useSupabaseClient(): SupabaseClient<Database> {
   const { session } = useSession();
+
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
   const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY!;
 
