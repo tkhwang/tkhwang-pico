@@ -65,6 +65,9 @@ export async function saveMessage(
   session: AuthClerkSession,
   { threadId, role, content, metadata = {} }: SaveMessageParams
 ): Promise<Message> {
+  if (!session) {
+    throw new Error("Authentication required");
+  }
   const supabase = getSupabaseClient(session);
 
   const { data, error } = await supabase
@@ -83,10 +86,15 @@ export async function saveMessage(
   }
 
   // Update thread's updated_at timestamp
-  await supabase
+  const { error: bumpError } = await supabase
     .from("threads")
     .update({ updated_at: new Date().toISOString() })
     .eq("id", threadId);
+
+  if (bumpError) {
+    // Non-fatal; message already saved
+    console.warn("Failed to bump thread.updated_at", bumpError);
+  }
 
   return data;
 }
