@@ -1,6 +1,6 @@
 "use client";
 
-import { useUser } from "@clerk/nextjs";
+import { useAuth as useClerkAuth, useUser } from "@clerk/nextjs";
 import { createContext, useContext, ReactNode } from "react";
 
 interface User {
@@ -14,12 +14,14 @@ interface User {
 interface AuthContextValue {
   user: User | null;
   isLoaded: boolean;
+  signOut: () => void;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const { user: clerkUser, isLoaded } = useUser();
+  const { signOut } = useClerkAuth();
 
   const user: User | null = clerkUser
     ? {
@@ -32,7 +34,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     : null;
 
   return (
-    <AuthContext.Provider value={{ user, isLoaded }}>
+    <AuthContext.Provider value={{ user, isLoaded, signOut }}>
       {children}
     </AuthContext.Provider>
   );
