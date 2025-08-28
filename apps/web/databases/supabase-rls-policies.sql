@@ -63,9 +63,9 @@ ON "public"."messages"
 FOR SELECT
 TO authenticated
 USING (
-  thread_id IN (
-    SELECT id FROM "public"."threads" 
-    WHERE (SELECT auth.jwt()->>'sub') = user_id
+  EXISTS (
+    SELECT 1 FROM "public"."threads" t 
+    WHERE t.id = messages.thread_id AND (SELECT auth.jwt()->>'sub') = t.user_id
   )
 );
 
@@ -75,9 +75,9 @@ ON "public"."messages"
 FOR INSERT
 TO authenticated
 WITH CHECK (
-  thread_id IN (
-    SELECT id FROM "public"."threads" 
-    WHERE (SELECT auth.jwt()->>'sub') = user_id
+  EXISTS (
+    SELECT 1 FROM "public"."threads" t 
+    WHERE t.id = messages.thread_id AND (SELECT auth.jwt()->>'sub') = t.user_id
   )
 );
 
@@ -87,15 +87,15 @@ ON "public"."messages"
 FOR UPDATE
 TO authenticated
 USING (
-  thread_id IN (
-    SELECT id FROM "public"."threads" 
-    WHERE (SELECT auth.jwt()->>'sub') = user_id
+  EXISTS (
+    SELECT 1 FROM "public"."threads" t 
+    WHERE t.id = messages.thread_id AND (SELECT auth.jwt()->>'sub') = t.user_id
   )
 )
 WITH CHECK (
-  thread_id IN (
-    SELECT id FROM "public"."threads" 
-    WHERE (SELECT auth.jwt()->>'sub') = user_id
+  EXISTS (
+    SELECT 1 FROM "public"."threads" t 
+    WHERE t.id = messages.thread_id AND (SELECT auth.jwt()->>'sub') = t.user_id
   )
 );
 
@@ -105,9 +105,9 @@ ON "public"."messages"
 FOR DELETE
 TO authenticated
 USING (
-  thread_id IN (
-    SELECT id FROM "public"."threads" 
-    WHERE (SELECT auth.jwt()->>'sub') = user_id
+  EXISTS (
+    SELECT 1 FROM "public"."threads" t 
+    WHERE t.id = messages.thread_id AND (SELECT auth.jwt()->>'sub') = t.user_id
   )
 );
 
