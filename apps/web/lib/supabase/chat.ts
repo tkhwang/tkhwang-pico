@@ -1,4 +1,4 @@
-import { createClient } from "./client";
+import { createClient, useSupabaseClient } from "./client";
 import type {
   Tables,
   TablesInsert,
@@ -31,243 +31,202 @@ export interface ThreadWithLastMessage extends Thread {
 }
 
 /**
- * Create a new chat thread
+ * Create a new chat thread (client-side with authentication)
+ * Use this in React components that need Clerk authentication
  */
-export async function createThread({
-  userId,
-  title,
-  metadata = {},
-}: CreateThreadParams): Promise<Thread> {
-  const supabase = createClient();
+export function createThreadWithAuth(
+  supabase: ReturnType<typeof useSupabaseClient>
+) {
+  return async function ({
+    userId,
+    title,
+    metadata = {},
+  }: CreateThreadParams): Promise<Thread> {
+    const { data, error } = await supabase
+      .from("threads")
+      .insert({
+        user_id: userId,
+        title: title || null,
+        metadata,
+      })
+      .select()
+      .single();
 
-  const { data, error } = await supabase
-    .from("threads")
-    .insert({
-      user_id: userId,
-      title: title || null,
-      metadata,
-    })
-    .select()
-    .single();
-
-  if (error) {
-    throw new Error(`Failed to create thread: ${error.message}`);
-  }
-
-  return data;
-}
-
-/**
- * Save a message to a thread
- */
-export async function saveMessage({
-  threadId,
-  role,
-  content,
-  metadata = {},
-}: SaveMessageParams): Promise<Message> {
-  const supabase = createClient();
-
-  const { data, error } = await supabase
-    .from("messages")
-    .insert({
-      thread_id: threadId,
-      role,
-      content,
-      metadata,
-    })
-    .select()
-    .single();
-
-  if (error) {
-    throw new Error(`Failed to save message: ${error.message}`);
-  }
-
-  // Update thread's updated_at timestamp
-  await supabase
-    .from("threads")
-    .update({ updated_at: new Date().toISOString() })
-    .eq("id", threadId);
-
-  return data;
-}
-
-/**
- * Get all messages for a thread
- */
-export async function getThreadMessages(threadId: string): Promise<Message[]> {
-  const supabase = createClient();
-
-  const { data, error } = await supabase
-    .from("messages")
-    .select("*")
-    .eq("thread_id", threadId)
-    .order("created_at", { ascending: true });
-
-  if (error) {
-    throw new Error(`Failed to get thread messages: ${error.message}`);
-  }
-
-  return data || [];
-}
-
-/**
- * Get all threads for a user with optional pagination
- */
-export async function getUserThreads(
-  userId: string,
-  options: { limit?: number; offset?: number } = {}
-): Promise<ThreadWithLastMessage[]> {
-  const supabase = createClient();
-  const { limit = 50, offset = 0 } = options;
-
-  // Get threads with their last message
-  const { data, error } = await supabase
-    .from("threads")
-    .select(
-      `
-      *,
-      messages!messages_thread_id_fkey (
-        id,
-        role,
-        content,
-        created_at,
-        metadata
-      )
-    `
-    )
-    .eq("user_id", userId)
-    .order("updated_at", { ascending: false })
-    .range(offset, offset + limit - 1);
-
-  if (error) {
-    throw new Error(`Failed to get user threads: ${error.message}`);
-  }
-
-  // Process threads to include last message and message count
-  const threadsWithLastMessage = (data || []).map((thread) => {
-    const messages = thread.messages || [];
-    const lastMessage =
-      messages.length > 0 ? messages[messages.length - 1] : undefined;
-
-    return {
-      ...thread,
-      lastMessage,
-      messageCount: messages.length,
-      messages: undefined, // Remove messages array to keep response clean
-    } as ThreadWithLastMessage;
-  });
-
-  return threadsWithLastMessage;
-}
-
-/**
- * Get a specific thread by ID
- */
-export async function getThread(threadId: string): Promise<Thread | null> {
-  const supabase = createClient();
-
-  const { data, error } = await supabase
-    .from("threads")
-    .select("*")
-    .eq("id", threadId)
-    .single();
-
-  if (error) {
-    if (error.code === "PGRST116") {
-      return null; // Thread not found
+    if (error) {
+      throw new Error(`Failed to create thread: ${error.message}`);
     }
-    throw new Error(`Failed to get thread: ${error.message}`);
-  }
 
-  return data;
-}
-
-/**
- * Get thread with its messages
- */
-export async function getThreadWithMessages(
-  threadId: string
-): Promise<{ thread: Thread; messages: Message[] } | null> {
-  const supabase = createClient();
-
-  // Get thread and messages in parallel
-  const [threadResult, messagesResult] = await Promise.all([
-    supabase.from("threads").select("*").eq("id", threadId).single(),
-    supabase
-      .from("messages")
-      .select("*")
-      .eq("thread_id", threadId)
-      .order("created_at", { ascending: true }),
-  ]);
-
-  if (threadResult.error) {
-    if (threadResult.error.code === "PGRST116") {
-      return null; // Thread not found
-    }
-    throw new Error(`Failed to get thread: ${threadResult.error.message}`);
-  }
-
-  if (messagesResult.error) {
-    throw new Error(`Failed to get messages: ${messagesResult.error.message}`);
-  }
-
-  return {
-    thread: threadResult.data,
-    messages: messagesResult.data || [],
+    return data;
   };
 }
 
 /**
- * Update a thread's title
+ * Save a message to a thread (client-side with authentication)
  */
-export async function updateThreadTitle(
-  threadId: string,
-  title: string
-): Promise<Thread> {
-  const supabase = createClient();
+export function saveMessageWithAuth(
+  supabase: ReturnType<typeof useSupabaseClient>
+) {
+  return async function ({
+    threadId,
+    role,
+    content,
+    metadata = {},
+  }: SaveMessageParams): Promise<Message> {
+    const { data, error } = await supabase
+      .from("messages")
+      .insert({
+        thread_id: threadId,
+        role,
+        content,
+        metadata,
+      })
+      .select()
+      .single();
 
-  const { data, error } = await supabase
-    .from("threads")
-    .update({ title })
-    .eq("id", threadId)
-    .select()
-    .single();
+    if (error) {
+      throw new Error(`Failed to save message: ${error.message}`);
+    }
 
-  if (error) {
-    throw new Error(`Failed to update thread title: ${error.message}`);
-  }
+    // Update thread's updated_at timestamp
+    await supabase
+      .from("threads")
+      .update({ updated_at: new Date().toISOString() })
+      .eq("id", threadId);
 
-  return data;
+    return data;
+  };
 }
 
 /**
- * Delete a thread and all its messages
+ * Get all threads for a user with optional pagination (client-side with authentication)
  */
-export async function deleteThread(threadId: string): Promise<void> {
-  const supabase = createClient();
+export function getUserThreadsWithAuth(
+  supabase: ReturnType<typeof useSupabaseClient>
+) {
+  return async function (
+    userId: string,
+    options: { limit?: number; offset?: number } = {}
+  ): Promise<ThreadWithLastMessage[]> {
+    const { limit = 50, offset = 0 } = options;
 
-  const { error } = await supabase.from("threads").delete().eq("id", threadId);
+    // Get threads with their last message
+    const { data, error } = await supabase
+      .from("threads")
+      .select(
+        `
+        *,
+        messages!messages_thread_id_fkey (
+          id,
+          role,
+          content,
+          created_at,
+          metadata
+        )
+      `
+      )
+      .eq("user_id", userId)
+      .order("updated_at", { ascending: false })
+      .range(offset, offset + limit - 1);
 
-  if (error) {
-    throw new Error(`Failed to delete thread: ${error.message}`);
-  }
+    if (error) {
+      throw new Error(`Failed to get user threads: ${error.message}`);
+    }
+
+    // Process threads to include last message and message count
+    const threadsWithLastMessage = (data || []).map((thread) => {
+      const messages = thread.messages || [];
+      const lastMessage =
+        messages.length > 0 ? messages[messages.length - 1] : undefined;
+
+      return {
+        ...thread,
+        lastMessage,
+        messageCount: messages.length,
+        messages: undefined, // Remove messages array to keep response clean
+      } as ThreadWithLastMessage;
+    });
+
+    return threadsWithLastMessage;
+  };
 }
 
 /**
- * Delete a specific message
+ * Get thread with its messages (client-side with authentication)
  */
-export async function deleteMessage(messageId: string): Promise<void> {
-  const supabase = createClient();
+export function getThreadWithMessagesWithAuth(
+  supabase: ReturnType<typeof useSupabaseClient>
+) {
+  return async function (
+    threadId: string
+  ): Promise<{ thread: Thread; messages: Message[] } | null> {
+    // Get thread and messages in parallel
+    const [threadResult, messagesResult] = await Promise.all([
+      supabase.from("threads").select("*").eq("id", threadId).single(),
+      supabase
+        .from("messages")
+        .select("*")
+        .eq("thread_id", threadId)
+        .order("created_at", { ascending: true }),
+    ]);
 
-  const { error } = await supabase
-    .from("messages")
-    .delete()
-    .eq("id", messageId);
+    if (threadResult.error) {
+      if (threadResult.error.code === "PGRST116") {
+        return null; // Thread not found
+      }
+      throw new Error(`Failed to get thread: ${threadResult.error.message}`);
+    }
 
-  if (error) {
-    throw new Error(`Failed to delete message: ${error.message}`);
-  }
+    if (messagesResult.error) {
+      throw new Error(
+        `Failed to get messages: ${messagesResult.error.message}`
+      );
+    }
+
+    return {
+      thread: threadResult.data,
+      messages: messagesResult.data || [],
+    };
+  };
+}
+
+/**
+ * Update a thread's title (client-side with authentication)
+ */
+export function updateThreadTitleWithAuth(
+  supabase: ReturnType<typeof useSupabaseClient>
+) {
+  return async function (threadId: string, title: string): Promise<Thread> {
+    const { data, error } = await supabase
+      .from("threads")
+      .update({ title })
+      .eq("id", threadId)
+      .select()
+      .single();
+
+    if (error) {
+      throw new Error(`Failed to update thread title: ${error.message}`);
+    }
+
+    return data;
+  };
+}
+
+/**
+ * Delete a thread and all its messages (client-side with authentication)
+ */
+export function deleteThreadWithAuth(
+  supabase: ReturnType<typeof useSupabaseClient>
+) {
+  return async function (threadId: string): Promise<void> {
+    const { error } = await supabase
+      .from("threads")
+      .delete()
+      .eq("id", threadId);
+
+    if (error) {
+      throw new Error(`Failed to delete thread: ${error.message}`);
+    }
+  };
 }
 
 /**
