@@ -1,4 +1,5 @@
-import { createClient } from "./client";
+import { getSupabaseClient } from "./client-manager";
+import type { AuthClerkSession } from "../../types/auth";
 import type {
   Tables,
   TablesInsert,
@@ -31,42 +32,41 @@ export interface ThreadWithLastMessage extends Thread {
 }
 
 /**
- * Create a new chat thread
+ * Create a new chat thread (client-side with authentication)
+ * Use this in React components that need Clerk authentication
  */
-export async function createThread({
-  userId,
-  title,
-  metadata = {},
-}: CreateThreadParams): Promise<Thread> {
-  const supabase = createClient();
+export async function createThread(
+  session: AuthClerkSession,
+  { userId, title, metadata = {} }: CreateThreadParams
+): Promise<Thread> {
+  if (!session) throw new Error("Authentication required");
+  const supabase = getSupabaseClient(session);
 
   const { data, error } = await supabase
     .from("threads")
     .insert({
       user_id: userId,
-      title: title || null,
+      title: title?.trim() || null,
       metadata,
     })
     .select()
     .single();
 
-  if (error) {
-    throw new Error(`Failed to create thread: ${error.message}`);
-  }
+  if (error) throw new Error(`Failed to create thread: ${error.message}`);
 
   return data;
 }
 
 /**
- * Save a message to a thread
+ * Save a message to a thread (client-side with authentication)
  */
-export async function saveMessage({
-  threadId,
-  role,
-  content,
-  metadata = {},
-}: SaveMessageParams): Promise<Message> {
-  const supabase = createClient();
+export async function saveMessage(
+  session: AuthClerkSession,
+  { threadId, role, content, metadata = {} }: SaveMessageParams
+): Promise<Message> {
+  if (!session) throw new Error("Authentication required");
+
+  const supabase = getSupabaseClient(session);
 
   const { data, error } = await supabase
     .from("messages")
@@ -84,41 +84,31 @@ export async function saveMessage({
   }
 
   // Update thread's updated_at timestamp
-  await supabase
+  const { error: bumpError } = await supabase
     .from("threads")
     .update({ updated_at: new Date().toISOString() })
     .eq("id", threadId);
+
+  if (bumpError) {
+    // Non-fatal; message already saved
+    console.warn("Failed to bump thread.updated_at", bumpError);
+  }
 
   return data;
 }
 
 /**
- * Get all messages for a thread
- */
-export async function getThreadMessages(threadId: string): Promise<Message[]> {
-  const supabase = createClient();
-
-  const { data, error } = await supabase
-    .from("messages")
-    .select("*")
-    .eq("thread_id", threadId)
-    .order("created_at", { ascending: true });
-
-  if (error) {
-    throw new Error(`Failed to get thread messages: ${error.message}`);
-  }
-
-  return data || [];
-}
-
-/**
- * Get all threads for a user with optional pagination
+ * Get all threads for a user with optional pagination (client-side with authentication)
  */
 export async function getUserThreads(
+  session: AuthClerkSession,
   userId: string,
   options: { limit?: number; offset?: number } = {}
 ): Promise<ThreadWithLastMessage[]> {
-  const supabase = createClient();
+  if (!session) throw new Error("Authentication required");
+
+  const supabase = getSupabaseClient(session);
+
   const { limit = 50, offset = 0 } = options;
 
   // Get threads with their last message
@@ -137,6 +127,8 @@ export async function getUserThreads(
     `
     )
     .eq("user_id", userId)
+    // Ensure nested messages are chronologically ordered
+    .order("created_at", { foreignTable: "messages", ascending: true })
     .order("updated_at", { ascending: false })
     .range(offset, offset + limit - 1);
 
@@ -162,34 +154,15 @@ export async function getUserThreads(
 }
 
 /**
- * Get a specific thread by ID
- */
-export async function getThread(threadId: string): Promise<Thread | null> {
-  const supabase = createClient();
-
-  const { data, error } = await supabase
-    .from("threads")
-    .select("*")
-    .eq("id", threadId)
-    .single();
-
-  if (error) {
-    if (error.code === "PGRST116") {
-      return null; // Thread not found
-    }
-    throw new Error(`Failed to get thread: ${error.message}`);
-  }
-
-  return data;
-}
-
-/**
- * Get thread with its messages
+ * Get thread with its messages (client-side with authentication)
  */
 export async function getThreadWithMessages(
+  session: AuthClerkSession,
   threadId: string
 ): Promise<{ thread: Thread; messages: Message[] } | null> {
-  const supabase = createClient();
+  if (!session) throw new Error("Authentication required");
+
+  const supabase = getSupabaseClient(session);
 
   // Get thread and messages in parallel
   const [threadResult, messagesResult] = await Promise.all([
@@ -219,17 +192,20 @@ export async function getThreadWithMessages(
 }
 
 /**
- * Update a thread's title
+ * Update a thread's title (client-side with authentication)
  */
 export async function updateThreadTitle(
+  session: AuthClerkSession,
   threadId: string,
   title: string
 ): Promise<Thread> {
-  const supabase = createClient();
+  if (!session) throw new Error("Authentication required");
+
+  const supabase = getSupabaseClient(session);
 
   const { data, error } = await supabase
     .from("threads")
-    .update({ title })
+    .update({ title: title.trim() || null })
     .eq("id", threadId)
     .select()
     .single();
@@ -242,31 +218,18 @@ export async function updateThreadTitle(
 }
 
 /**
- * Delete a thread and all its messages
+ * Delete a thread and all its messages (client-side with authentication)
  */
-export async function deleteThread(threadId: string): Promise<void> {
-  const supabase = createClient();
+export async function deleteThread(
+  session: AuthClerkSession,
+  threadId: string
+): Promise<void> {
+  const supabase = getSupabaseClient(session);
 
   const { error } = await supabase.from("threads").delete().eq("id", threadId);
 
   if (error) {
     throw new Error(`Failed to delete thread: ${error.message}`);
-  }
-}
-
-/**
- * Delete a specific message
- */
-export async function deleteMessage(messageId: string): Promise<void> {
-  const supabase = createClient();
-
-  const { error } = await supabase
-    .from("messages")
-    .delete()
-    .eq("id", messageId);
-
-  if (error) {
-    throw new Error(`Failed to delete message: ${error.message}`);
   }
 }
 
@@ -295,26 +258,4 @@ export function generateThreadTitle(firstUserMessage: string): string {
   }
 
   return truncated + "...";
-}
-
-/**
- * Check if user owns a thread
- */
-export async function isThreadOwner(
-  threadId: string,
-  userId: string
-): Promise<boolean> {
-  const supabase = createClient();
-
-  const { data, error } = await supabase
-    .from("threads")
-    .select("user_id")
-    .eq("id", threadId)
-    .single();
-
-  if (error || !data) {
-    return false;
-  }
-
-  return data.user_id === userId;
 }

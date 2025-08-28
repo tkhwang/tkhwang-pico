@@ -4,7 +4,6 @@ import { ChevronsUpDown, LogOut, Settings, User } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/providers/auth-provider";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,6 +17,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { useAuth } from "@clerk/nextjs";
 
 export function NavUser({
   user,
@@ -28,8 +28,9 @@ export function NavUser({
     avatar: string;
   };
 }) {
-  const { isMobile } = useSidebar();
   const router = useRouter();
+
+  const { isMobile } = useSidebar();
   const { signOut } = useAuth();
 
   return (

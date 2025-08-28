@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@clerk/nextjs": "^6.31.6",
     "@copilotkit/react-core": "^1.10.2",
     "@copilotkit/react-ui": "^1.10.2",
     "@mastra/client-js": "^0.10.21",

@@ -18,11 +18,13 @@ import { NavChatHistory } from "@/components/sidebar/nav-chat-history";
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user } = useAuth();
 
-  const userData = {
-    name: user?.user_metadata?.name,
-    email: user?.user_metadata?.email,
-    avatar: user?.user_metadata?.avatar_url,
-  };
+  const name =
+    [user?.firstName, user?.lastName].filter(Boolean).join(" ") ||
+    user?.email ||
+    "Account";
+  const email = user?.email ?? "";
+  const avatar = user?.imageUrl || undefined;
+  const userData = { name, email, avatar: avatar as string };
 
   return (
     <Sidebar collapsible="icon" {...props}>

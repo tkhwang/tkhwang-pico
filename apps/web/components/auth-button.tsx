@@ -1,29 +1,40 @@
-import Link from "next/link";
+"use client";
+
+import { SignInButton, SignUpButton, UserButton, SignedIn, SignedOut, useUser } from "@clerk/nextjs";
 import { Button } from "./ui/button";
-import { createClient } from "@/lib/supabase/server";
-import { LogoutButton } from "./auth/logout-button";
 
-export async function AuthButton() {
-  const supabase = await createClient();
+export function AuthButton() {
+  const { user } = useUser();
 
-  // You can also use getUser() which will be slower.
-  const { data } = await supabase.auth.getClaims();
-
-  const user = data?.claims;
-
-  return user ? (
-    <div className="flex items-center gap-4">
-      Hey, {user.email}!
-      <LogoutButton />
-    </div>
-  ) : (
-    <div className="flex gap-2">
-      <Button asChild size="sm" variant={"outline"}>
-        <Link href="/auth/login">Sign in</Link>
-      </Button>
-      <Button asChild size="sm" variant={"default"}>
-        <Link href="/auth/sign-up">Sign up</Link>
-      </Button>
-    </div>
+  return (
+    <>
+      <SignedIn>
+        <div className="flex items-center gap-4">
+          Hey, {user?.emailAddresses[0]?.emailAddress || user?.firstName || 'there'}!
+          <UserButton 
+            afterSignOutUrl="/"
+            appearance={{
+              elements: {
+                avatarBox: "w-8 h-8"
+              }
+            }}
+          />
+        </div>
+      </SignedIn>
+      <SignedOut>
+        <div className="flex gap-2">
+          <SignInButton mode="modal">
+            <Button size="sm" variant="outline">
+              Sign in
+            </Button>
+          </SignInButton>
+          <SignUpButton mode="modal">
+            <Button size="sm" variant="default">
+              Sign up
+            </Button>
+          </SignUpButton>
+        </div>
+      </SignedOut>
+    </>
   );
 }

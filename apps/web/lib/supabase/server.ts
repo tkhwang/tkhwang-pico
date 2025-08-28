@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { auth } from "@clerk/nextjs/server";
 
 /**
  * Especially important if using Fluid compute: Don't put this client in a
@@ -20,7 +21,7 @@ export async function createClient() {
         setAll(cookiesToSet) {
           try {
             cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options),
+              cookieStore.set(name, value, options)
             );
           } catch {
             // The `setAll` method was called from a Server Component.
@@ -29,6 +30,42 @@ export async function createClient() {
           }
         },
       },
-    },
+    }
+  );
+}
+
+/**
+ * Server client with Clerk authentication for protected operations
+ * Use this for operations that require user authentication
+ */
+export async function createClientWithAuth() {
+  const { getToken } = await auth();
+  const cookieStore = await cookies();
+
+  return createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll();
+        },
+        setAll(cookiesToSet) {
+          try {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            );
+          } catch {
+            // The `setAll` method was called from a Server Component.
+            // This can be ignored if you have middleware refreshing
+            // user sessions.
+          }
+        },
+      },
+      accessToken: async () => {
+        const token = await getToken();
+        return token || null;
+      },
+    }
   );
 }

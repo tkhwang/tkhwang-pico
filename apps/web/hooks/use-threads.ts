@@ -15,13 +15,13 @@ interface UseThreadsReturn {
 }
 
 export function useThreads(): UseThreadsReturn {
-  const { user } = useAuth();
+  const { user, session } = useAuth();
   const [threads, setThreads] = useState<ThreadWithLastMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const fetchThreads = useCallback(async () => {
-    if (!user) {
+    if (!user || !session) {
       setThreads([]);
       return;
     }
@@ -30,7 +30,7 @@ export function useThreads(): UseThreadsReturn {
     setError(null);
 
     try {
-      const userThreads = await getUserThreads(user.id);
+      const userThreads = await getUserThreads(session, user.id);
       setThreads(userThreads);
     } catch (err) {
       console.error("Failed to fetch threads:", err);
@@ -38,19 +38,28 @@ export function useThreads(): UseThreadsReturn {
     } finally {
       setIsLoading(false);
     }
-  }, [user]);
+  }, [user, session]);
 
-  const deleteThreadById = useCallback(async (threadId: string) => {
-    try {
-      await deleteThread(threadId);
-      // Remove thread from local state
-      setThreads((prev) => prev.filter((thread) => thread.id !== threadId));
-    } catch (err) {
-      console.error("Failed to delete thread:", err);
-      setError(err instanceof Error ? err.message : "Failed to delete thread");
-      throw err; // Re-throw so the component can handle it
-    }
-  }, []);
+  const deleteThreadById = useCallback(
+    async (threadId: string) => {
+      if (!session) {
+        throw new Error("User not authenticated");
+      }
+
+      try {
+        await deleteThread(session, threadId);
+        // Remove thread from local state
+        setThreads((prev) => prev.filter((thread) => thread.id !== threadId));
+      } catch (err) {
+        console.error("Failed to delete thread:", err);
+        setError(
+          err instanceof Error ? err.message : "Failed to delete thread"
+        );
+        throw err; // Re-throw so the component can handle it
+      }
+    },
+    [session]
+  );
 
   const refetch = useCallback(async () => {
     await fetchThreads();
