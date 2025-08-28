@@ -1,5 +1,6 @@
 "use client";
 
+import { AuthClerkSession } from "@/types/auth";
 import { useAuth as useClerkAuth, useSession, useUser } from "@clerk/nextjs";
 import { createContext, useContext, ReactNode } from "react";
 
@@ -15,7 +16,7 @@ interface AuthContextValue {
   user: User | null;
   isLoaded: boolean;
   signOut: () => void;
-  session: ReturnType<typeof useSession>["session"];
+  session: AuthClerkSession;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
