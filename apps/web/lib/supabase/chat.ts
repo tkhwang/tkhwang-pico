@@ -204,7 +204,7 @@ export async function updateThreadTitle(
 
   const { data, error } = await supabase
     .from("threads")
-    .update({ title: title.trim() })
+    .update({ title: title.trim() || null })
     .eq("id", threadId)
     .select()
     .single();
