@@ -1,4 +1,4 @@
-import { getSupabaseClient } from "./client-manager";
+import { createAuthenticatedSupabaseClient } from "./client";
 import type { AuthClerkSession } from "../../types/auth";
 import type {
   Tables,
@@ -39,8 +39,7 @@ export async function createThread(
   session: AuthClerkSession,
   { userId, title, metadata = {} }: CreateThreadParams
 ): Promise<Thread> {
-  if (!session) throw new Error("Authentication required");
-  const supabase = getSupabaseClient(session);
+  const supabase = createAuthenticatedSupabaseClient(session);
 
   const { data, error } = await supabase
     .from("threads")
@@ -64,9 +63,7 @@ export async function saveMessage(
   session: AuthClerkSession,
   { threadId, role, content, metadata = {} }: SaveMessageParams
 ): Promise<Message> {
-  if (!session) throw new Error("Authentication required");
-
-  const supabase = getSupabaseClient(session);
+  const supabase = createAuthenticatedSupabaseClient(session);
 
   const { data, error } = await supabase
     .from("messages")
@@ -105,9 +102,7 @@ export async function getUserThreads(
   userId: string,
   options: { limit?: number; offset?: number } = {}
 ): Promise<ThreadWithLastMessage[]> {
-  if (!session) throw new Error("Authentication required");
-
-  const supabase = getSupabaseClient(session);
+  const supabase = createAuthenticatedSupabaseClient(session);
 
   const { limit = 50, offset = 0 } = options;
 
@@ -160,9 +155,7 @@ export async function getThreadWithMessages(
   session: AuthClerkSession,
   threadId: string
 ): Promise<{ thread: Thread; messages: Message[] } | null> {
-  if (!session) throw new Error("Authentication required");
-
-  const supabase = getSupabaseClient(session);
+  const supabase = createAuthenticatedSupabaseClient(session);
 
   // Get thread and messages in parallel
   const [threadResult, messagesResult] = await Promise.all([
@@ -199,9 +192,7 @@ export async function updateThreadTitle(
   threadId: string,
   title: string
 ): Promise<Thread> {
-  if (!session) throw new Error("Authentication required");
-
-  const supabase = getSupabaseClient(session);
+  const supabase = createAuthenticatedSupabaseClient(session);
 
   const { data, error } = await supabase
     .from("threads")
@@ -224,7 +215,7 @@ export async function deleteThread(
   session: AuthClerkSession,
   threadId: string
 ): Promise<void> {
-  const supabase = getSupabaseClient(session);
+  const supabase = createAuthenticatedSupabaseClient(session);
 
   const { error } = await supabase.from("threads").delete().eq("id", threadId);
 

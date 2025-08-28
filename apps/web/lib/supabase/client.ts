@@ -3,19 +3,17 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "../../types/types_db";
 import type { AuthClerkSession } from "../../types/auth";
 
-// WeakMap for caching clients by session to avoid recreation
-const clientCache = new WeakMap<
-  NonNullable<AuthClerkSession>,
-  SupabaseClient<Database>
->();
-
 /**
- * Get or create a Supabase client for the given session
- * Uses WeakMap caching to ensure the same session gets the same client instance
+ * Create a Supabase client with authentication required
+ * Throws error if session is null/undefined
  */
-export function getSupabaseClient(
+export function createAuthenticatedSupabaseClient(
   session: AuthClerkSession
 ): SupabaseClient<Database> {
+  if (!session) {
+    throw new Error("Authentication required");
+  }
+
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY;
 
@@ -29,23 +27,9 @@ export function getSupabaseClient(
     );
   }
 
-  // Handle null session case
-  if (!session) {
-    return createBrowserClient<Database>(url, key);
-  }
-
-  // Check cache first
-  if (clientCache.has(session)) {
-    return clientCache.get(session)!;
-  }
-
-  // Create new client with auth
-  const client = createBrowserClient<Database>(url, key, {
+  // Create client with authentication
+  return createBrowserClient<Database>(url, key, {
     accessToken: async () =>
       (await session.getToken({ template: "supabase" })) ?? null,
   });
-
-  // Cache the client
-  clientCache.set(session, client);
-  return client;
 }
