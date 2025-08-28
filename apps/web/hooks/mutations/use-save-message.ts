@@ -12,7 +12,12 @@ import { useSupabaseMutation } from "@/hooks/mutations/supabase/use-supabase-mut
 export function useSaveMessage(providedThreadId?: string) {
   const queryClient = useQueryClient();
 
-  return useSupabaseMutation<Message, Error, SaveMessageParams>(
+  // Allow callers to omit threadId when provided by hook param
+  type SaveMessageVariables = Omit<SaveMessageParams, "threadId"> & {
+    threadId?: string;
+  };
+
+  return useSupabaseMutation<Message, Error, SaveMessageVariables>(
     async (session, params) => {
       const threadId = params.threadId ?? providedThreadId;
       if (!threadId) {

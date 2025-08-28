@@ -14,7 +14,7 @@ export function useSupabaseMutation<
   TContext = unknown,
 >(
   mutationFn: (
-    session: AuthClerkSession,
+    session: NonNullable<AuthClerkSession>,
     variables: TVariables
   ) => Promise<TData>,
   options?: UseMutationOptions<TData, TError, TVariables, TContext>
