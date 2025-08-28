@@ -15,6 +15,7 @@ export default function Page() {
             },
           }}
           fallbackRedirectUrl="/"
+          withSignUp={true}
         />
       </div>
     </>
