@@ -105,7 +105,9 @@ export async function getUserThreads(
   userId: string,
   options: { limit?: number; offset?: number } = {}
 ): Promise<ThreadWithLastMessage[]> {
+  if (!session) throw new Error("Authentication required");
   const supabase = getSupabaseClient(session);
+
   const { limit = 50, offset = 0 } = options;
 
   // Get threads with their last message
@@ -157,6 +159,8 @@ export async function getThreadWithMessages(
   session: AuthClerkSession,
   threadId: string
 ): Promise<{ thread: Thread; messages: Message[] } | null> {
+  if (!session) throw new Error("Authentication required");
+
   const supabase = getSupabaseClient(session);
 
   // Get thread and messages in parallel
