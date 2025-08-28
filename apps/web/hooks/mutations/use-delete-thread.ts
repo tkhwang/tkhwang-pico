@@ -18,6 +18,9 @@ export function useDeleteThread() {
     },
     {
       onMutate: async (threadId) => {
+        if (!user?.id) {
+          return { previousThreads: undefined };
+        }
         // Cancel any outgoing refetches
         await queryClient.cancelQueries({
           queryKey: queryKey.threads.byUserId(user?.id),
