@@ -1,5 +1,3 @@
-import { SignInWithGoogleButton } from "@/components/auth/signin-with-google-button";
-import { SignInWithKakaotalkButton } from "@/components/auth/signin-with-kakaotalk-button";
 import {
   Card,
   CardContent,
@@ -8,6 +6,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import {
+  SignInButton,
+  SignUpButton,
+  SignedIn,
+  SignedOut,
+  UserButton,
+} from "@clerk/nextjs";
 
 export function LoginForm({
   className,
@@ -23,7 +28,7 @@ export function LoginForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form>
+          {/* <form>
             <div className="grid gap-3">
               <div className="flex flex-col gap-4">
                 <SignInWithGoogleButton />
@@ -32,7 +37,18 @@ export function LoginForm({
                 <SignInWithKakaotalkButton />
               </div>
             </div>
-          </form>
+          </form> */}
+          <SignedOut>
+            <SignInButton />
+            <SignUpButton>
+              <button className="bg-[#6c47ff] text-white rounded-full font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 cursor-pointer">
+                Sign Up
+              </button>
+            </SignUpButton>
+          </SignedOut>
+          <SignedIn>
+            <UserButton />
+          </SignedIn>
         </CardContent>
       </Card>
       <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">

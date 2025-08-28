@@ -6,8 +6,9 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/providers/auth-provider";
 
 export const LoginLogoutButton = () => {
-  const { user, signOut } = useAuth();
   const router = useRouter();
+
+  const { user, signOut } = useAuth();
 
   if (user) {
     return (
