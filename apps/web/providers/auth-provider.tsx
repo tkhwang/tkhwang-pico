@@ -8,6 +8,7 @@ interface User {
   email?: string;
   firstName?: string;
   lastName?: string;
+  imageUrl?: string;
 }
 
 interface AuthContextValue {
@@ -26,6 +27,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         email: clerkUser.emailAddresses[0]?.emailAddress,
         firstName: clerkUser.firstName || undefined,
         lastName: clerkUser.lastName || undefined,
+        imageUrl: clerkUser.imageUrl || undefined,
       }
     : null;
 
