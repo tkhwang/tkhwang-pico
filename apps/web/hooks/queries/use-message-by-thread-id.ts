@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { queryKey } from "@/hooks/keys/query-key";
 import { useSupabaseClient } from "@/lib/supabase/client";
 import {
-  getThreadWithMessagesWithAuth,
+  getThreadWithMessages,
   type Message,
   type Thread,
 } from "@/lib/supabase/chat";
@@ -25,7 +25,7 @@ export function useMessagesByThreadId(
     queryFn: async () => {
       if (!threadId) throw new Error("threadId is required");
 
-      const getThreadWithMessagesFn = getThreadWithMessagesWithAuth(supabase);
+      const getThreadWithMessagesFn = getThreadWithMessages(supabase);
       const result = await getThreadWithMessagesFn(threadId);
       if (!result) throw new Error("Thread not found");
       return result;

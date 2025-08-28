@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/providers/auth-provider";
 import { useSupabaseClient } from "@/lib/supabase/client";
 import {
-  getUserThreadsWithAuth,
+  getUserThreads,
   type ThreadWithLastMessage,
 } from "@/lib/supabase/chat";
 import { queryKey } from "@/hooks/keys/query-key";
@@ -16,7 +16,7 @@ export function useThreadsByUserId() {
     queryFn: async (): Promise<ThreadWithLastMessage[]> => {
       if (!user?.id) return [];
 
-      const getUserThreadsFn = getUserThreadsWithAuth(supabase);
+      const getUserThreadsFn = getUserThreads(supabase);
       return await getUserThreadsFn(user.id);
     },
     enabled: !!user?.id,

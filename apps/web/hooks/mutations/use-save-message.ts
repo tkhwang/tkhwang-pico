@@ -4,7 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { queryKey } from "@/hooks/keys/query-key";
 import { useSupabaseClient } from "@/lib/supabase/client";
 import {
-  saveMessageWithAuth,
+  saveMessage,
   type SaveMessageParams,
   type Message,
 } from "@/lib/supabase/chat";
@@ -20,7 +20,7 @@ export function useSaveMessage(providedThreadId?: string) {
         throw new Error("threadId is required");
       }
 
-      const saveMessageFn = saveMessageWithAuth(supabase);
+      const saveMessageFn = saveMessage(supabase);
       return await saveMessageFn({ ...params, threadId });
     },
     onSuccess: async (_data, variables) => {

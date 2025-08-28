@@ -1,4 +1,4 @@
-import { createClient, useSupabaseClient } from "./client";
+import { useSupabaseClient } from "./client";
 import type {
   Tables,
   TablesInsert,
@@ -34,9 +34,7 @@ export interface ThreadWithLastMessage extends Thread {
  * Create a new chat thread (client-side with authentication)
  * Use this in React components that need Clerk authentication
  */
-export function createThreadWithAuth(
-  supabase: ReturnType<typeof useSupabaseClient>
-) {
+export function createThread(supabase: ReturnType<typeof useSupabaseClient>) {
   return async function ({
     userId,
     title,
@@ -63,9 +61,7 @@ export function createThreadWithAuth(
 /**
  * Save a message to a thread (client-side with authentication)
  */
-export function saveMessageWithAuth(
-  supabase: ReturnType<typeof useSupabaseClient>
-) {
+export function saveMessage(supabase: ReturnType<typeof useSupabaseClient>) {
   return async function ({
     threadId,
     role,
@@ -100,9 +96,7 @@ export function saveMessageWithAuth(
 /**
  * Get all threads for a user with optional pagination (client-side with authentication)
  */
-export function getUserThreadsWithAuth(
-  supabase: ReturnType<typeof useSupabaseClient>
-) {
+export function getUserThreads(supabase: ReturnType<typeof useSupabaseClient>) {
   return async function (
     userId: string,
     options: { limit?: number; offset?: number } = {}
@@ -153,7 +147,7 @@ export function getUserThreadsWithAuth(
 /**
  * Get thread with its messages (client-side with authentication)
  */
-export function getThreadWithMessagesWithAuth(
+export function getThreadWithMessages(
   supabase: ReturnType<typeof useSupabaseClient>
 ) {
   return async function (
@@ -192,7 +186,7 @@ export function getThreadWithMessagesWithAuth(
 /**
  * Update a thread's title (client-side with authentication)
  */
-export function updateThreadTitleWithAuth(
+export function updateThreadTitle(
   supabase: ReturnType<typeof useSupabaseClient>
 ) {
   return async function (threadId: string, title: string): Promise<Thread> {
@@ -214,9 +208,7 @@ export function updateThreadTitleWithAuth(
 /**
  * Delete a thread and all its messages (client-side with authentication)
  */
-export function deleteThreadWithAuth(
-  supabase: ReturnType<typeof useSupabaseClient>
-) {
+export function deleteThread(supabase: ReturnType<typeof useSupabaseClient>) {
   return async function (threadId: string): Promise<void> {
     const { error } = await supabase
       .from("threads")
@@ -254,26 +246,4 @@ export function generateThreadTitle(firstUserMessage: string): string {
   }
 
   return truncated + "...";
-}
-
-/**
- * Check if user owns a thread
- */
-export async function isThreadOwner(
-  threadId: string,
-  userId: string
-): Promise<boolean> {
-  const supabase = createClient();
-
-  const { data, error } = await supabase
-    .from("threads")
-    .select("user_id")
-    .eq("id", threadId)
-    .single();
-
-  if (error || !data) {
-    return false;
-  }
-
-  return data.user_id === userId;
 }

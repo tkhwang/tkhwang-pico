@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/providers/auth-provider";
 import { useSupabaseClient } from "@/lib/supabase/client";
 import {
-  createThreadWithAuth,
+  createThread,
   type ThreadWithLastMessage,
   type CreateThreadParams,
 } from "@/lib/supabase/chat";
@@ -18,7 +18,7 @@ export function useCreateThread() {
     mutationFn: async (params: Omit<CreateThreadParams, "userId">) => {
       if (!user?.id) throw new Error("User not authenticated");
 
-      const createThreadFn = createThreadWithAuth(supabase);
+      const createThreadFn = createThread(supabase);
       return await createThreadFn({ ...params, userId: user.id });
     },
     onMutate: async (params) => {
