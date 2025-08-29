@@ -29,24 +29,24 @@ const SOCIAL_CONNECTION_STRATEGIES: {
     label: 'Continue with Google',
     source: { uri: 'https://img.clerk.com/static/google.png?width=160' },
     useTint: false,
-    backgroundColor: 'bg-[#4285F4]',
-    textColor: 'text-white',
+    backgroundColor: 'bg-gray-100 border border-gray-200',
+    textColor: 'text-gray-700',
   },
   {
     type: 'oauth_apple',
     label: 'Continue with Apple',
     source: { uri: 'https://img.clerk.com/static/apple.png?width=160' },
     useTint: true,
-    backgroundColor: 'bg-[#007AFF]',
-    textColor: 'text-white',
+    backgroundColor: 'bg-gray-50 border border-gray-200',
+    textColor: 'text-gray-700',
   },
   {
     type: 'oauth_github',
     label: 'Continue with GitHub',
     source: { uri: 'https://img.clerk.com/static/github.png?width=160' },
     useTint: true,
-    backgroundColor: 'bg-black',
-    textColor: 'text-white',
+    backgroundColor: 'bg-gray-100 border border-gray-200',
+    textColor: 'text-gray-700',
   },
 ];
 
@@ -93,20 +93,22 @@ export function SocialConnections() {
             key={strategy.type}
             className={cn(
               'h-12 w-full flex-row items-center justify-start gap-3 rounded-full pl-1',
-              strategy.backgroundColor,
-              'border-0'
+              strategy.backgroundColor
             )}
             onPress={onSocialLoginPress(strategy.type)}>
             <View className="h-10 w-10 items-center justify-center rounded-full bg-white">
               <Image
-                className={cn('size-5', strategy.useTint && Platform.select({ web: 'dark:invert' }))}
+                className={cn(
+                  'size-5',
+                  strategy.useTint && Platform.select({ web: 'dark:invert' })
+                )}
                 tintColor={Platform.select({
                   native: strategy.useTint ? 'black' : undefined,
                 })}
                 source={strategy.source}
               />
             </View>
-            <Text className={cn('text-base font-medium flex-1 text-center', strategy.textColor)}>
+            <Text className={cn('flex-1 text-center text-base font-medium', strategy.textColor)}>
               {strategy.label}
             </Text>
           </Button>
