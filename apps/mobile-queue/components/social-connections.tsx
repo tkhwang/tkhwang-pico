@@ -37,7 +37,7 @@ const SOCIAL_CONNECTION_STRATEGIES: {
     label: 'Continue with Apple',
     source: { uri: 'https://img.clerk.com/static/apple.png?width=160' },
     useTint: true,
-    backgroundColor: 'bg-black',
+    backgroundColor: 'bg-[#007AFF]',
     textColor: 'text-white',
   },
   {
@@ -92,19 +92,21 @@ export function SocialConnections() {
           <Button
             key={strategy.type}
             className={cn(
-              'h-12 w-full flex-row items-center justify-center gap-3 rounded-full',
+              'h-12 w-full flex-row items-center justify-start gap-3 rounded-full pl-1',
               strategy.backgroundColor,
               'border-0'
             )}
             onPress={onSocialLoginPress(strategy.type)}>
-            <Image
-              className={cn('size-5', strategy.useTint && Platform.select({ web: 'dark:invert' }))}
-              tintColor={Platform.select({
-                native: strategy.useTint ? 'white' : undefined,
-              })}
-              source={strategy.source}
-            />
-            <Text className={cn('text-base font-medium', strategy.textColor)}>
+            <View className="h-10 w-10 items-center justify-center rounded-full bg-white">
+              <Image
+                className={cn('size-5', strategy.useTint && Platform.select({ web: 'dark:invert' }))}
+                tintColor={Platform.select({
+                  native: strategy.useTint ? 'black' : undefined,
+                })}
+                source={strategy.source}
+              />
+            </View>
+            <Text className={cn('text-base font-medium flex-1 text-center', strategy.textColor)}>
               {strategy.label}
             </Text>
           </Button>
