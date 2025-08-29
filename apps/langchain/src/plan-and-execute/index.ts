@@ -20,7 +20,7 @@ const PlanExecuteState = Annotation.Root({
     reducer: (x, y) => y ?? x ?? [],
   }),
   pastSteps: Annotation<[string, string][]>({
-    reducer: (x, y) => x.concat(y),
+    reducer: (x, y) => [...(x ?? []), ...(y ?? [])],
   }),
   response: Annotation<string>({
     reducer: (x, y) => y ?? x,
@@ -86,6 +86,11 @@ const planTool = tool(() => {}, {
   schema: planObject,
 });
 
+interface ToolCall {
+  type: string;
+  args?: any;
+}
+
 const replannerPrompt = ChatPromptTemplate.fromTemplate(
   `For the given objective, come up with a simple step by step plan. 
 This plan should involve individual tasks, that if executed correctly will yield the correct answer. Do not add any superfluous steps.
@@ -141,13 +146,13 @@ async function planStep(state: typeof PlanExecuteState.State) {
 }
 
 async function replanStep(state: typeof PlanExecuteState.State) {
-  const output = await replanner.invoke({
+  const output = (await replanner.invoke({
     input: state.input,
     plan: state.plan.join("\n"),
     pastSteps: state.pastSteps
       .map(([step, result]) => `${step}: ${result}`)
       .join("\n"),
-  });
+  })) as ToolCall[];
   const toolCall = output[0];
 
   if (toolCall.type === "response") {
