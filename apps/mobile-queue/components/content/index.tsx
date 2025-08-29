@@ -23,7 +23,7 @@ function getTypeLabel(type: string) {
     case 'article':
       return 'Article';
     case 'video':
-      return 'Youtube';
+      return 'YouTube';
     case 'paper':
       return 'Paper';
     case 'blog':
