@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { Text } from '@/components/ui/text';
 import { cn } from '@/lib/utils';
 import { useSSO, type StartSSOFlowParams } from '@clerk/clerk-expo';
 import * as AuthSession from 'expo-auth-session';
@@ -17,23 +18,35 @@ type SocialConnectionStrategy = Extract<
 
 const SOCIAL_CONNECTION_STRATEGIES: {
   type: SocialConnectionStrategy;
+  label: string;
   source: ImageSourcePropType;
   useTint?: boolean;
+  backgroundColor: string;
+  textColor: string;
 }[] = [
   {
-    type: 'oauth_apple',
-    source: { uri: 'https://img.clerk.com/static/apple.png?width=160' },
-    useTint: true,
-  },
-  {
     type: 'oauth_google',
+    label: 'Continue with Google',
     source: { uri: 'https://img.clerk.com/static/google.png?width=160' },
     useTint: false,
+    backgroundColor: 'bg-[#4285F4]',
+    textColor: 'text-white',
+  },
+  {
+    type: 'oauth_apple',
+    label: 'Continue with Apple',
+    source: { uri: 'https://img.clerk.com/static/apple.png?width=160' },
+    useTint: true,
+    backgroundColor: 'bg-black',
+    textColor: 'text-white',
   },
   {
     type: 'oauth_github',
+    label: 'Continue with GitHub',
     source: { uri: 'https://img.clerk.com/static/github.png?width=160' },
     useTint: true,
+    backgroundColor: 'bg-black',
+    textColor: 'text-white',
   },
 ];
 
@@ -73,22 +86,27 @@ export function SocialConnections() {
   }
 
   return (
-    <View className="gap-2 sm:flex-row sm:gap-3">
+    <View className="gap-3">
       {SOCIAL_CONNECTION_STRATEGIES.map((strategy) => {
         return (
           <Button
             key={strategy.type}
-            variant="outline"
-            size="sm"
-            className="sm:flex-1"
+            className={cn(
+              'h-12 w-full flex-row items-center justify-center gap-3 rounded-full',
+              strategy.backgroundColor,
+              'border-0'
+            )}
             onPress={onSocialLoginPress(strategy.type)}>
             <Image
-              className={cn('size-4', strategy.useTint && Platform.select({ web: 'dark:invert' }))}
+              className={cn('size-5', strategy.useTint && Platform.select({ web: 'dark:invert' }))}
               tintColor={Platform.select({
-                native: strategy.useTint ? (colorScheme === 'dark' ? 'white' : 'black') : undefined,
+                native: strategy.useTint ? 'white' : undefined,
               })}
               source={strategy.source}
             />
+            <Text className={cn('text-base font-medium', strategy.textColor)}>
+              {strategy.label}
+            </Text>
           </Button>
         );
       })}
