@@ -1,8 +1,9 @@
+import type { ReactNode } from 'react';
 import { View, SafeAreaView } from 'react-native';
 import { Header } from '@/components/header';
 
 interface MainLayoutProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 export function MainLayout({ children }: MainLayoutProps) {
