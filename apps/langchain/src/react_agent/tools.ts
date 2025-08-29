@@ -1,3 +1,5 @@
+import type { Tool } from "@langchain/core/tools";
+
 /**
  * This file defines the tools available to the ReAct agent.
  * Tools are functions that the agent can use to interact with external systems or perform specific tasks.
@@ -20,4 +22,4 @@ const searchTavily = new TavilySearchResults({
  * and add them to this array.
  * See https://js.langchain.com/docs/how_to/custom_tools/#tool-function for more information.
  */
-export const TOOLS = [searchTavily];
+export const TOOLS: ReadonlyArray<Tool> = Object.freeze([searchTavily]);
