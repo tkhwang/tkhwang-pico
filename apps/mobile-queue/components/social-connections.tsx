@@ -33,20 +33,20 @@ const SOCIAL_CONNECTION_STRATEGIES: {
     textColor: 'text-gray-700',
   },
   {
-    type: 'oauth_apple',
-    label: 'Continue with Apple',
-    source: { uri: 'https://img.clerk.com/static/apple.png?width=160' },
-    useTint: true,
-    backgroundColor: 'bg-gray-50 border border-gray-200',
-    textColor: 'text-gray-700',
-  },
-  {
     type: 'oauth_github',
     label: 'Continue with GitHub',
     source: { uri: 'https://img.clerk.com/static/github.png?width=160' },
     useTint: true,
     backgroundColor: 'bg-gray-100 border border-gray-200',
     textColor: 'text-gray-700',
+  },
+  {
+    type: 'oauth_apple',
+    label: 'Sign in with Apple',
+    source: { uri: 'https://img.clerk.com/static/apple.png?width=160' },
+    useTint: true,
+    backgroundColor: 'bg-black',
+    textColor: 'text-white',
   },
 ];
 
@@ -96,14 +96,20 @@ export function SocialConnections() {
               strategy.backgroundColor
             )}
             onPress={onSocialLoginPress(strategy.type)}>
-            <View className="h-10 w-10 items-center justify-center rounded-full bg-white">
+            <View
+              className={cn(
+                'h-10 w-10 items-center justify-center rounded-full',
+                strategy.type === 'oauth_apple' ? 'bg-transparent' : 'bg-white'
+              )}>
               <Image
-                className={cn(
-                  'size-5',
-                  strategy.useTint && Platform.select({ web: 'dark:invert' })
-                )}
+                className="size-5"
                 tintColor={Platform.select({
-                  native: strategy.useTint ? 'black' : undefined,
+                  // Keep Apple glyph white on black; others stay black on white puck.
+                  native: strategy.useTint
+                    ? strategy.type === 'oauth_apple'
+                      ? 'white'
+                      : 'black'
+                    : undefined,
                 })}
                 source={strategy.source}
               />
