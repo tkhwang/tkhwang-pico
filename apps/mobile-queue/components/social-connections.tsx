@@ -29,24 +29,24 @@ const SOCIAL_CONNECTION_STRATEGIES: {
     label: 'Continue with Google',
     source: { uri: 'https://img.clerk.com/static/google.png?width=160' },
     useTint: false,
-    backgroundColor: 'bg-gray-100 border border-gray-200',
-    textColor: 'text-gray-700',
+    backgroundColor: 'bg-white border border-black',
+    textColor: 'text-black',
   },
   {
     type: 'oauth_github',
     label: 'Continue with GitHub',
     source: { uri: 'https://img.clerk.com/static/github.png?width=160' },
     useTint: true,
-    backgroundColor: 'bg-gray-100 border border-gray-200',
-    textColor: 'text-gray-700',
+    backgroundColor: 'bg-white border border-black',
+    textColor: 'text-black',
   },
   {
     type: 'oauth_apple',
-    label: 'Sign in with Apple',
+    label: 'Continue with Apple',
     source: { uri: 'https://img.clerk.com/static/apple.png?width=160' },
     useTint: true,
-    backgroundColor: 'bg-black',
-    textColor: 'text-white',
+    backgroundColor: 'bg-white border border-black',
+    textColor: 'text-black',
   },
 ];
 
@@ -92,7 +92,7 @@ export function SocialConnections() {
           <Button
             key={strategy.type}
             className={cn(
-              'h-12 w-full flex-row items-center justify-start gap-3 rounded-full pl-1',
+              'h-12 w-full flex-row items-center justify-start gap-3 rounded-lg pl-1',
               strategy.backgroundColor
             )}
             onPress={onSocialLoginPress(strategy.type)}>
@@ -104,12 +104,8 @@ export function SocialConnections() {
               <Image
                 className="size-5"
                 tintColor={Platform.select({
-                  // Keep Apple glyph white on black; others stay black on white puck.
-                  native: strategy.useTint
-                    ? strategy.type === 'oauth_apple'
-                      ? 'white'
-                      : 'black'
-                    : undefined,
+                  // Apple glyph black on white; others stay black on white puck.
+                  native: strategy.useTint ? 'black' : undefined,
                 })}
                 source={strategy.source}
               />
