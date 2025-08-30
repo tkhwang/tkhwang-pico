@@ -1,5 +1,7 @@
 import React from 'react';
 import { View, ScrollView, TouchableOpacity } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useColorScheme } from 'nativewind';
 import { MainLayout } from '@/components/main-layout';
 import { Text } from '@/components/ui/text';
 import { ContentType } from '@/components/home';
@@ -58,45 +60,62 @@ const recommendedContent: ContentType[] = [
   },
 ];
 
-const RecommendedItem = ({ item }: { item: ContentType }) => (
-  <TouchableOpacity className="mb-4 rounded-lg border border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50 p-4 dark:border-blue-800 dark:from-blue-950/30 dark:to-indigo-950/30">
-    <View className="mb-2 flex-row items-center">
-      <Text className="text-xs font-medium uppercase text-gray-400 dark:text-gray-500">
-        {item.type}
-      </Text>
-      <View className="ml-2 rounded-full bg-blue-100 px-2 py-0.5 dark:bg-blue-900/50">
-        <Text className="text-xs font-medium text-blue-600 dark:text-blue-400">Recommended</Text>
-      </View>
-    </View>
-    <View className="flex-row items-start">
-      <View className="mr-3 mt-1 h-5 w-5 rounded-full border-2 border-gray-300 dark:border-gray-600" />
-      <View className="flex-1">
-        <Text className="mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100">
-          {item.title}
-        </Text>
-        <Text className="mb-1 text-sm text-gray-600 dark:text-gray-400">{item.source}</Text>
-        <View className="flex-row items-center">
-          <Text className="text-xs text-gray-500 dark:text-gray-500">{item.category}</Text>
-          {(item.readTime || item.videoLength) && (
-            <>
-              <Text className="mx-2 text-xs text-gray-400">•</Text>
-              <Text className="text-xs text-gray-500 dark:text-gray-500">
-                {item.readTime || item.videoLength}
-              </Text>
-            </>
-          )}
-        </View>
-        <View className="mt-2 flex-row items-center">
-          <View className="mr-2 h-2 w-2 rounded-full bg-blue-500" />
-          <Text className="text-xs font-medium text-blue-600 dark:text-blue-400">
-            Based on your AI & Development interests
+const RecommendedItem = ({ item }: { item: ContentType }) => {
+  const { colorScheme } = useColorScheme();
+  const isDark = colorScheme === 'dark';
+
+  const gradientColors = isDark
+    ? (['rgba(30, 58, 138, 0.3)', 'rgba(49, 46, 129, 0.3)'] as const) // blue-950/30 to indigo-950/30
+    : (['#eff6ff', '#eef2ff'] as const); // blue-50 to indigo-50
+
+  return (
+    <TouchableOpacity className="mb-4 rounded-lg border border-blue-200 dark:border-blue-800">
+      <LinearGradient
+        colors={gradientColors}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={{ borderRadius: 8, padding: 16 }}>
+        <View className="mb-2 flex-row items-center">
+          <Text className="text-xs font-medium uppercase text-gray-400 dark:text-gray-500">
+            {item.type}
           </Text>
+          <View className="ml-2 rounded-full bg-blue-100 px-2 py-0.5 dark:bg-blue-900/50">
+            <Text className="text-xs font-medium text-blue-600 dark:text-blue-400">
+              Recommended
+            </Text>
+          </View>
         </View>
-      </View>
-      <Text className="text-2xl">{item.thumbnail}</Text>
-    </View>
-  </TouchableOpacity>
-);
+        <View className="flex-row items-start">
+          <View className="mr-3 mt-1 h-5 w-5 rounded-full border-2 border-gray-300 dark:border-gray-600" />
+          <View className="flex-1">
+            <Text className="mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100">
+              {item.title}
+            </Text>
+            <Text className="mb-1 text-sm text-gray-600 dark:text-gray-400">{item.source}</Text>
+            <View className="flex-row items-center">
+              <Text className="text-xs text-gray-500 dark:text-gray-500">{item.category}</Text>
+              {(item.readTime || item.videoLength) && (
+                <>
+                  <Text className="mx-2 text-xs text-gray-400">•</Text>
+                  <Text className="text-xs text-gray-500 dark:text-gray-500">
+                    {item.readTime || item.videoLength}
+                  </Text>
+                </>
+              )}
+            </View>
+            <View className="mt-2 flex-row items-center">
+              <View className="mr-2 h-2 w-2 rounded-full bg-blue-500" />
+              <Text className="text-xs font-medium text-blue-600 dark:text-blue-400">
+                Based on your AI & Development interests
+              </Text>
+            </View>
+          </View>
+          <Text className="text-2xl">{item.thumbnail}</Text>
+        </View>
+      </LinearGradient>
+    </TouchableOpacity>
+  );
+};
 
 export default function RecommendScreen() {
   return (
