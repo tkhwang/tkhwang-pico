@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { Text } from '@/components/ui/text';
 import { cn } from '@/lib/utils';
 import { useSSO, type StartSSOFlowParams } from '@clerk/clerk-expo';
 import * as AuthSession from 'expo-auth-session';
@@ -17,23 +18,35 @@ type SocialConnectionStrategy = Extract<
 
 const SOCIAL_CONNECTION_STRATEGIES: {
   type: SocialConnectionStrategy;
+  label: string;
   source: ImageSourcePropType;
   useTint?: boolean;
+  backgroundColor: string;
+  textColor: string;
 }[] = [
   {
-    type: 'oauth_apple',
-    source: { uri: 'https://img.clerk.com/static/apple.png?width=160' },
-    useTint: true,
-  },
-  {
     type: 'oauth_google',
+    label: 'Continue with Google',
     source: { uri: 'https://img.clerk.com/static/google.png?width=160' },
     useTint: false,
+    backgroundColor: 'bg-gray-100 border border-gray-200',
+    textColor: 'text-gray-700',
   },
   {
     type: 'oauth_github',
+    label: 'Continue with GitHub',
     source: { uri: 'https://img.clerk.com/static/github.png?width=160' },
     useTint: true,
+    backgroundColor: 'bg-gray-100 border border-gray-200',
+    textColor: 'text-gray-700',
+  },
+  {
+    type: 'oauth_apple',
+    label: 'Sign in with Apple',
+    source: { uri: 'https://img.clerk.com/static/apple.png?width=160' },
+    useTint: true,
+    backgroundColor: 'bg-black',
+    textColor: 'text-white',
   },
 ];
 
@@ -73,22 +86,37 @@ export function SocialConnections() {
   }
 
   return (
-    <View className="gap-2 sm:flex-row sm:gap-3">
+    <View className="gap-3">
       {SOCIAL_CONNECTION_STRATEGIES.map((strategy) => {
         return (
           <Button
             key={strategy.type}
-            variant="outline"
-            size="sm"
-            className="sm:flex-1"
+            className={cn(
+              'h-12 w-full flex-row items-center justify-start gap-3 rounded-full pl-1',
+              strategy.backgroundColor
+            )}
             onPress={onSocialLoginPress(strategy.type)}>
-            <Image
-              className={cn('size-4', strategy.useTint && Platform.select({ web: 'dark:invert' }))}
-              tintColor={Platform.select({
-                native: strategy.useTint ? (colorScheme === 'dark' ? 'white' : 'black') : undefined,
-              })}
-              source={strategy.source}
-            />
+            <View
+              className={cn(
+                'h-10 w-10 items-center justify-center rounded-full',
+                strategy.type === 'oauth_apple' ? 'bg-transparent' : 'bg-white'
+              )}>
+              <Image
+                className="size-5"
+                tintColor={Platform.select({
+                  // Keep Apple glyph white on black; others stay black on white puck.
+                  native: strategy.useTint
+                    ? strategy.type === 'oauth_apple'
+                      ? 'white'
+                      : 'black'
+                    : undefined,
+                })}
+                source={strategy.source}
+              />
+            </View>
+            <Text className={cn('flex-1 text-center text-base font-medium', strategy.textColor)}>
+              {strategy.label}
+            </Text>
           </Button>
         );
       })}
