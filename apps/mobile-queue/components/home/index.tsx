@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, ScrollView, TouchableOpacity } from 'react-native';
 import { Text } from '../ui/text';
 import { Input } from '../ui/input';
@@ -58,11 +58,68 @@ const mockData: ContentType[] = [
   },
 ];
 
-const ContentItem = ({ item }: { item: ContentType }) => (
-  <TouchableOpacity className="mb-4 rounded-lg border border-gray-100 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
-    <Text className="mb-2 text-xs font-medium uppercase text-gray-400 dark:text-gray-500">
-      {item.type}
-    </Text>
+const recommendedData: ContentType[] = [
+  {
+    id: 'r1',
+    title: 'Advanced React Patterns You Should Know',
+    source: 'Dev.to',
+    category: 'Development',
+    readTime: '12 min read',
+    completed: false,
+    thumbnail: '⚛️',
+    type: 'article',
+  },
+  {
+    id: 'r2',
+    title: 'Neural Networks Explained Simply',
+    source: 'Coursera - Andrew Ng',
+    category: 'AI/ML',
+    videoLength: '45 min lecture',
+    completed: false,
+    thumbnail: '🧮',
+    type: 'lecture',
+  },
+  {
+    id: 'r3',
+    title: 'Transformer Architecture Research Paper',
+    source: 'Google Research',
+    category: 'Research',
+    readTime: '60 min read',
+    completed: false,
+    thumbnail: '🤖',
+    type: 'paper',
+  },
+  {
+    id: 'r4',
+    title: 'Building Scalable Mobile Apps',
+    source: 'YouTube - Tech Talk',
+    category: 'Mobile',
+    videoLength: '30 min video',
+    completed: false,
+    thumbnail: '📱',
+    type: 'video',
+  },
+];
+
+const ContentItem = ({
+  item,
+  isRecommended = false,
+}: {
+  item: ContentType;
+  isRecommended?: boolean;
+}) => (
+  <TouchableOpacity
+    className={`mb-4 rounded-lg border p-4 ${isRecommended ? 'border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950/30' : 'border-gray-100 bg-white dark:border-gray-700 dark:bg-gray-800'}`}>
+    <View className="mb-2 flex-row items-center">
+      <Text className="text-xs font-medium uppercase text-gray-400 dark:text-gray-500">
+        {item.type}
+      </Text>
+      {isRecommended && (
+        <View className="ml-2 rounded-full bg-blue-100 px-2 py-0.5 dark:bg-blue-900/50">
+          <Text className="text-xs font-medium text-blue-600 dark:text-blue-400">Recommended</Text>
+        </View>
+      )}
+    </View>
     <View className="flex-row items-start">
       <View
         className={`mr-3 mt-1 h-5 w-5 rounded-full border-2 ${item.completed ? 'border-green-500 bg-green-50 dark:bg-green-900/20' : 'border-gray-300 dark:border-gray-600'}`}>
