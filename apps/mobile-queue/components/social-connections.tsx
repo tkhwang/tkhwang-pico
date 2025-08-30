@@ -92,7 +92,7 @@ export function SocialConnections() {
           <Button
             key={strategy.type}
             className={cn(
-              'h-12 w-full flex-row items-center justify-start gap-3 rounded-full pl-1',
+              'h-12 w-full flex-row items-center justify-start gap-3 rounded-lg pl-1',
               strategy.backgroundColor
             )}
             onPress={onSocialLoginPress(strategy.type)}>
