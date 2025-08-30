@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { View, ScrollView, TouchableOpacity } from 'react-native';
 import { Text } from '../ui/text';
 import { Input } from '../ui/input';
+import { FAB } from '../fab';
+import { FabModal } from './fab-modal';
 
 export interface ContentType {
   id: string;
@@ -58,49 +60,6 @@ const mockData: ContentType[] = [
   },
 ];
 
-const recommendedData: ContentType[] = [
-  {
-    id: 'r1',
-    title: 'Advanced React Patterns You Should Know',
-    source: 'Dev.to',
-    category: 'Development',
-    readTime: '12 min read',
-    completed: false,
-    thumbnail: '⚛️',
-    type: 'article',
-  },
-  {
-    id: 'r2',
-    title: 'Neural Networks Explained Simply',
-    source: 'Coursera - Andrew Ng',
-    category: 'AI/ML',
-    videoLength: '45 min lecture',
-    completed: false,
-    thumbnail: '🧮',
-    type: 'lecture',
-  },
-  {
-    id: 'r3',
-    title: 'Transformer Architecture Research Paper',
-    source: 'Google Research',
-    category: 'Research',
-    readTime: '60 min read',
-    completed: false,
-    thumbnail: '🤖',
-    type: 'paper',
-  },
-  {
-    id: 'r4',
-    title: 'Building Scalable Mobile Apps',
-    source: 'YouTube - Tech Talk',
-    category: 'Mobile',
-    videoLength: '30 min video',
-    completed: false,
-    thumbnail: '📱',
-    type: 'video',
-  },
-];
-
 const ContentItem = ({
   item,
   isRecommended = false,
@@ -148,6 +107,13 @@ const ContentItem = ({
 );
 
 export function Home() {
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const handleContentSubmit = (url: string, responseData: any) => {
+    console.log('Content added:', { url, responseData });
+    // TODO: Add content to the queue
+  };
+
   return (
     <View className="flex-1 bg-gray-50 dark:bg-gray-900">
       {/* Search Bar */}
@@ -169,6 +135,16 @@ export function Home() {
           <ContentItem key={item.id} item={item} />
         ))}
       </ScrollView>
+
+      {/* Floating Action Button */}
+      <FAB onPress={() => setIsModalVisible(true)} />
+
+      {/* Add Content Modal */}
+      <FabModal
+        visible={isModalVisible}
+        onClose={() => setIsModalVisible(false)}
+        onSubmit={handleContentSubmit}
+      />
     </View>
   );
 }
