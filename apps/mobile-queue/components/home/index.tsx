@@ -2,8 +2,6 @@ import React from 'react';
 import { View, ScrollView, TouchableOpacity } from 'react-native';
 import { Text } from '../ui/text';
 import { Input } from '../ui/input';
-import { Avatar, AvatarFallback } from '../ui/avatar';
-import { Content } from '@/components/content';
 
 export interface ContentType {
   id: string;
@@ -14,7 +12,7 @@ export interface ContentType {
   videoLength?: string;
   completed: boolean;
   thumbnail: string;
-  type: 'article' | 'video' | 'paper' | 'blog';
+  type: 'article' | 'video' | 'paper' | 'lecture';
 }
 
 const mockData: ContentType[] = [
@@ -48,34 +46,70 @@ const mockData: ContentType[] = [
     thumbnail: '📄',
     type: 'paper',
   },
+  {
+    id: '4',
+    title: 'Introduction to Deep Learning - Stanford CS229',
+    source: 'Stanford Online',
+    category: 'Education',
+    videoLength: '90 min lecture',
+    completed: false,
+    thumbnail: '🎓',
+    type: 'lecture',
+  },
 ];
 
-export function Home() {
-  const completedCount = mockData.filter((item) => item.completed).length;
-  const totalCount = mockData.length;
+const ContentItem = ({ item }: { item: ContentType }) => (
+  <TouchableOpacity className="mb-4 rounded-lg border border-gray-100 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
+    <Text className="mb-2 text-xs font-medium uppercase text-gray-400 dark:text-gray-500">
+      {item.type}
+    </Text>
+    <View className="flex-row items-start">
+      <View
+        className={`mr-3 mt-1 h-5 w-5 rounded-full border-2 ${item.completed ? 'border-green-500 bg-green-50 dark:bg-green-900/20' : 'border-gray-300 dark:border-gray-600'}`}>
+        {item.completed && <Text className="text-center text-xs text-green-500">✓</Text>}
+      </View>
+      <View className="flex-1">
+        <Text className="mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100">
+          {item.title}
+        </Text>
+        <Text className="mb-1 text-sm text-gray-600 dark:text-gray-400">{item.source}</Text>
+        <View className="flex-row items-center">
+          <Text className="text-xs text-gray-500 dark:text-gray-500">{item.category}</Text>
+          {(item.readTime || item.videoLength) && (
+            <>
+              <Text className="mx-2 text-xs text-gray-400">•</Text>
+              <Text className="text-xs text-gray-500 dark:text-gray-500">
+                {item.readTime || item.videoLength}
+              </Text>
+            </>
+          )}
+        </View>
+      </View>
+      <Text className="text-2xl">{item.thumbnail}</Text>
+    </View>
+  </TouchableOpacity>
+);
 
+export function Home() {
   return (
-    <View className="flex-1 bg-white dark:bg-gray-900">
+    <View className="flex-1 bg-gray-50 dark:bg-gray-900">
       {/* Search Bar */}
-      <View className="mb-4 px-4">
+      <View className="mb-4 px-4 pt-2">
         <View className="relative">
           <Input
             placeholder="Search content..."
-            className="h-12 rounded-lg border-gray-200 bg-gray-50 pl-10 pr-12 dark:border-gray-700 dark:bg-gray-800"
+            className="h-12 rounded-lg border-gray-200 bg-white pl-10 pr-4 dark:border-gray-700 dark:bg-gray-800"
           />
           <View className="absolute left-3 top-3">
             <Text className="text-lg text-gray-400 dark:text-gray-500">🔍</Text>
           </View>
-          <TouchableOpacity className="absolute right-3 top-3">
-            <Text className="text-lg text-gray-400 dark:text-gray-500">⚙️</Text>
-          </TouchableOpacity>
         </View>
       </View>
 
       {/* Content List */}
       <ScrollView className="flex-1 px-4" showsVerticalScrollIndicator={false}>
         {mockData.map((item) => (
-          <Content key={item.id} item={item} />
+          <ContentItem key={item.id} item={item} />
         ))}
       </ScrollView>
     </View>
