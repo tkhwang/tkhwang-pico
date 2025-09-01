@@ -40,11 +40,13 @@ create table if not exists public.contents (
   fetched_at    timestamptz,                       -- 크롤/파싱 시각
   status        content_status not null default 'pending',
   is_public     boolean not null default false,    -- 공개 추천 풀 포함 여부
-  metadata      jsonb not null default '{}',
-
-  -- 같은 콘텐츠를 URL 기준으로 한 번만 보관(정규화 성공 시 canonical_url 우선)
-  unique (coalesce(canonical_url, url))
+  metadata      jsonb not null default '{}'
+  -- unique 제약 조건 제거, 대신 아래에 unique index 추가
 );
+
+-- URL 유니크 인덱스 (coalesce 함수 사용)
+create unique index if not exists idx_contents_unique_url 
+  on public.contents (coalesce(canonical_url, url));
 
 create index if not exists idx_contents_domain on public.contents(domain);
 create index if not exists idx_contents_status on public.contents(status);
@@ -81,9 +83,13 @@ create table if not exists public.content_embeddings (
   chunk_index      int,                              -- scope='chunk'용
   embedding        vector(1536) not null,            -- ⬅️ DIM 수정
   embedding_model  text not null,                    -- 예: text-embedding-3-small
-  created_at       timestamptz not null default now(),
-  unique(content_id, scope, coalesce(chunk_index,-1), embedding_model)
+  created_at       timestamptz not null default now()
+  -- unique 제약 조건 제거, 대신 아래에 unique index 추가
 );
+
+-- content_embeddings 유니크 인덱스 (coalesce 사용)
+create unique index if not exists idx_content_embeddings_unique
+  on public.content_embeddings (content_id, scope, coalesce(chunk_index,-1), embedding_model);
 
 -- ANN 인덱스 (코사인 권장)
 create index if not exists content_embeddings_embedding_ivfflat
@@ -137,6 +143,23 @@ drop trigger if exists trg_set_content_domain on public.contents;
 create trigger trg_set_content_domain
 before insert or update of url on public.contents
 for each row execute function public.set_content_domain();
+
+-- ----------------------------------------------------------------------------
+-- recommendation_logs table (참조되었지만 정의되지 않은 테이블 추가)
+-- ----------------------------------------------------------------------------
+create table if not exists public.recommendation_logs (
+  id          bigserial primary key,
+  user_id     uuid not null references auth.users(id) on delete cascade,
+  content_id  uuid references public.contents(id) on delete cascade,
+  rec_type    text not null,                       -- 'content', 'comment' 등
+  score       float4,
+  shown_at    timestamptz not null default now(),
+  clicked     boolean not null default false,
+  metadata    jsonb not null default '{}'
+);
+
+create index if not exists idx_recommendation_logs_user on public.recommendation_logs(user_id);
+create index if not exists idx_recommendation_logs_shown_at on public.recommendation_logs(shown_at);
 
 -- ----------------------------------------------------------------------------
 -- enable row level security
