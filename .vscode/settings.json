@@ -36,5 +36,9 @@
       "mode": "auto"
     }
   ],
-  "deno.enable": true
+  "deno.enable": false,
+  "deno.enablePaths": ["./apps/mobile-queue/supabase/functions"],
+  "typescript.preferences.includePackageJsonAutoImports": "auto",
+  "typescript.suggest.autoImports": true,
+  "typescript.updateImportsOnFileMove.enabled": "always"
 }
