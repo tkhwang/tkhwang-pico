@@ -14,20 +14,14 @@ export class ContentsService {
     userId: string;
     isPublic: boolean;
   }) {
-    const upsertRes = await this.supabaseService.client
-      .from('contents')
-      .upsert({ url, is_public: isPublic }, { onConflict: 'url' })
-      .select('*')
-      .single();
-
-    type UpsertResponse =
-      import('@supabase/supabase-js').PostgrestSingleResponse<
-        import('../supabase/types').ContentsRow
-      >;
     const { data: contents, error: errorOfUpsert } =
-      upsertRes as UpsertResponse;
+      await this.supabaseService.client
+        .from('contents')
+        .upsert({ url, is_public: isPublic }, { onConflict: 'url' })
+        .select('*')
+        .single();
 
-    if (errorOfUpsert || !contents) {
+    if (errorOfUpsert) {
       throw new Error(
         errorOfUpsert?.message ?? 'No content returned from upsert',
       );
