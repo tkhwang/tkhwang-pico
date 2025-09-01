@@ -63,7 +63,7 @@ end $$;
 -- ----------------------------------------------------------------------------
 create table if not exists public.user_contents (
   id          uuid primary key default gen_random_uuid(),
-  user_id     uuid not null references auth.users(id) on delete cascade,
+  user_id     text not null,  -- Clerk user ID (e.g., user_xxx)
   content_id  uuid not null references public.contents(id) on delete cascade,
   note        text,                  -- 개인 메모 (optional)
   labels      text[] default '{}',   -- 개인 라벨/폴더
@@ -105,7 +105,7 @@ create index if not exists content_embeddings_embedding_ivfflat
 -- user_embeddings table
 -- ----------------------------------------------------------------------------
 create table if not exists public.user_embeddings (
-  user_id         uuid primary key references auth.users(id) on delete cascade,
+  user_id         text primary key,  -- Clerk user ID (e.g., user_xxx)
   source          text not null default 'history',   -- history/onboarding/mix
   embedding       vector(1536) not null,             -- ⬅️ DIM 수정
   embedding_model text not null,
@@ -117,7 +117,7 @@ create table if not exists public.user_embeddings (
 -- ----------------------------------------------------------------------------
 create table if not exists public.user_content_interactions (
   id          bigserial primary key,
-  user_id     uuid not null references auth.users(id) on delete cascade,
+  user_id     text not null,  -- Clerk user ID (e.g., user_xxx)
   content_id  uuid not null references public.contents(id) on delete cascade,
   type        interaction_type not null,
   value       smallint,      -- rating 등 점수형
@@ -153,7 +153,7 @@ for each row execute function public.set_content_domain();
 -- ----------------------------------------------------------------------------
 create table if not exists public.recommendation_logs (
   id          bigserial primary key,
-  user_id     uuid not null references auth.users(id) on delete cascade,
+  user_id     text not null,  -- Clerk user ID (e.g., user_xxx)
   content_id  uuid references public.contents(id) on delete cascade,
   rec_type    text not null,                       -- 'content', 'comment' 등
   score       float4,
@@ -166,60 +166,37 @@ create index if not exists idx_recommendation_logs_user on public.recommendation
 create index if not exists idx_recommendation_logs_shown_at on public.recommendation_logs(shown_at);
 
 -- ----------------------------------------------------------------------------
--- enable row level security
+-- Row Level Security Configuration
 -- ----------------------------------------------------------------------------
+-- RLS disabled for user tables since authentication is handled by Clerk/backend
+-- Only enable RLS for tables that need it
 alter table public.contents                      enable row level security;
-alter table public.user_contents                 enable row level security;
 alter table public.content_embeddings            enable row level security;
-alter table public.user_embeddings               enable row level security;
-alter table public.user_content_interactions     enable row level security;
-alter table public.recommendation_logs           enable row level security;
 
--- contents: 공개 또는 내가 저장한 것
+-- contents: 공개 콘텐츠만 접근 가능 (backend에서 private 접근 처리)
 drop policy if exists "contents_select" on public.contents;
 create policy "contents_select" on public.contents
 for select
 to authenticated, anon
-using (
-  is_public
-  or exists (
-    select 1 from public.user_contents uc
-    where uc.content_id = contents.id and uc.user_id = auth.uid()
-  )
-);
+using (is_public = true);
 
 -- contents: 쓰기는 서버에서만(일반 클라이언트 금지)
 revoke all on public.contents from anon, authenticated;
 
--- user_contents: 본인만
-drop policy if exists "user_contents_rw" on public.user_contents;
-create policy "user_contents_rw" on public.user_contents
-for all to authenticated
-using (auth.uid() = user_id)
-with check (auth.uid() = user_id);
+-- user_contents: RLS 비활성화 (backend에서 인증 처리)
+-- No RLS policies needed - authentication handled by backend
 
 -- content_embeddings: 정책 미설정(=차단). RPC/Service key로만 사용.
 revoke all on public.content_embeddings from anon, authenticated;
 
--- user_embeddings: 본인만
-drop policy if exists "user_embeddings_rw" on public.user_embeddings;
-create policy "user_embeddings_rw" on public.user_embeddings
-for all to authenticated
-using (auth.uid() = user_id)
-with check (auth.uid() = user_id);
+-- user_embeddings: RLS 비활성화 (backend에서 인증 처리)
+-- No RLS policies needed - authentication handled by backend
 
--- interactions: 본인만
-drop policy if exists "uci_rw" on public.user_content_interactions;
-create policy "uci_rw" on public.user_content_interactions
-for all to authenticated
-using (auth.uid() = user_id)
-with check (auth.uid() = user_id);
+-- user_content_interactions: RLS 비활성화 (backend에서 인증 처리)
+-- No RLS policies needed - authentication handled by backend
 
--- recommendation_logs: 본인만 읽기
-drop policy if exists "reclogs_select" on public.recommendation_logs;
-create policy "reclogs_select" on public.recommendation_logs
-for select to authenticated
-using (auth.uid() = user_id);
+-- recommendation_logs: RLS 비활성화 (backend에서 인증 처리)
+-- No RLS policies needed - authentication handled by backend
 
 -- ----------------------------------------------------------------------------
 -- similar_to_content function
@@ -255,6 +232,7 @@ grant execute on function public.similar_to_content(uuid,int,text) to anon, auth
 -- recommend_for_user function
 -- ----------------------------------------------------------------------------
 create or replace function public.recommend_for_user(
+  p_user_id text,  -- Pass Clerk user ID as parameter
   p_limit int default 20,
   p_model text default null
 )
@@ -263,7 +241,7 @@ language sql security definer set search_path=public as $$
   with ue as (
     select embedding, embedding_model
     from public.user_embeddings
-    where user_id = auth.uid()
+    where user_id = p_user_id
     limit 1
   )
   select ce.content_id,
@@ -278,5 +256,5 @@ language sql security definer set search_path=public as $$
   limit greatest(1, p_limit);
 $$;
 
-revoke all on function public.recommend_for_user(int,text) from public;
-grant execute on function public.recommend_for_user(int,text) to authenticated;
+revoke all on function public.recommend_for_user(text,int,text) from public;
+grant execute on function public.recommend_for_user(text,int,text) to authenticated;
