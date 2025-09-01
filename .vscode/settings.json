@@ -31,5 +31,10 @@
     "typescript",
     "typescriptreact"
   ],
-  "eslint.workingDirectories": [{ "mode": "auto" }]
+  "eslint.workingDirectories": [
+    {
+      "mode": "auto"
+    }
+  ],
+  "deno.enable": true
 }
