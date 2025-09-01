@@ -333,3 +333,7 @@ s3_region = "env(S3_REGION)"
 s3_access_key = "env(S3_ACCESS_KEY)"
 # Configures AWS_SECRET_ACCESS_KEY for S3 bucket
 s3_secret_key = "env(S3_SECRET_KEY)"
+
+[functions.clerk-user-sync]
+# 외부 호출이므로 Supabase 자체 JWT 검증은 끕니다. Svix 서명으로 검증합니다.
+verify_jwt = false
