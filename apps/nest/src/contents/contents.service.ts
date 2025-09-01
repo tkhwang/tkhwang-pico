@@ -36,12 +36,27 @@ export class ContentsService {
         { onConflict: 'user_id,content_id' },
       );
 
-    if (errorOfUpsertUserContents)
+    if (errorOfUpsertUserContents) {
       throw new Error(errorOfUpsertUserContents.message);
+    }
 
     return {
       contentId: contents.id,
       status: contents.status,
     };
+  }
+
+  async getSimilarContents(contentId: string, limit = 10) {
+    const { data, error } = await this.supabaseService.client.rpc(
+      'similar_to_content',
+      { p_content_id: contentId, p_limit: limit },
+    );
+
+    if (error) throw error;
+
+    return (data ?? []).map((item) => ({
+      ...item,
+      score: 1 - item.distance,
+    }));
   }
 }
