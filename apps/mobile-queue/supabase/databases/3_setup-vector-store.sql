@@ -21,38 +21,42 @@ do $$ begin
   end if;
 end $$;
 
--- ----------------------------------------------------------------------------
--- contents table
--- ----------------------------------------------------------------------------
-create table if not exists public.contents (
-  id            uuid primary key default gen_random_uuid(),
-  url           text not null,                     -- 원본 URL
-  canonical_url text,                              -- 정규화된 URL
-  domain        text,                              -- 예: example.com
-  title         text,
-  author        text,
-  lang          text,
-  summary       text,
-  tags          text[] default '{}',
-  word_count    int,
-  token_count   int,
-  published_at  timestamptz,
-  fetched_at    timestamptz,                       -- 크롤/파싱 시각
-  status        content_status not null default 'pending',
-  is_public     boolean not null default false,    -- 공개 추천 풀 포함 여부
-  metadata      jsonb not null default '{}'
-  -- unique 제약 조건 제거, 대신 아래에 unique index 추가
-);
+  -- ----------------------------------------------------------------------------
+  -- contents table
+  -- ----------------------------------------------------------------------------
+  create table if not exists public.contents (
+    id            uuid primary key default gen_random_uuid(),
+    url           text not null,                     -- 원본 URL
+    canonical_url text,                              -- 정규화된 URL
+    domain        text,                              -- 예: example.com
+    title         text,
+    author        text,
+    lang          text,
+    summary       text,
+    tags          text[] default '{}',
+    word_count    int,
+    token_count   int,
+    published_at  timestamptz,
+    fetched_at    timestamptz,                       -- 크롤/파싱 시각
+    status        content_status not null default 'pending',
+    is_public     boolean not null default false,    -- 공개 추천 풀 포함 여부
+    metadata      jsonb not null default '{}'
+  );
 
--- URL 유니크 인덱스 (coalesce 함수 사용)
-create unique index if not exists idx_contents_unique_url 
-  on public.contents (coalesce(canonical_url, url));
+  -- URL 유니크 인덱스 (원본 URL에 대한 unique 제약)
+  create unique index if not exists idx_contents_url
+    on public.contents (url);
 
-create index if not exists idx_contents_domain on public.contents(domain);
-create index if not exists idx_contents_status on public.contents(status);
-create index if not exists idx_contents_is_public on public.contents(is_public);
-create index if not exists idx_contents_tags on public.contents using gin(tags);
-create index if not exists idx_contents_title_trgm on public.contents using gin (title gin_trgm_ops);
+  -- URL 유니크 인덱스 (정규화된 URL 우선, 없으면 원본 URL)
+  create unique index if not exists idx_contents_unique_url
+    on public.contents (coalesce(canonical_url, url));
+
+  create index if not exists idx_contents_domain on public.contents(domain);
+  create index if not exists idx_contents_status on public.contents(status);
+  create index if not exists idx_contents_is_public on public.contents(is_public);
+  create index if not exists idx_contents_tags on public.contents using gin(tags);
+  create index if not exists idx_contents_title_trgm on public.contents using gin (title
+   gin_trgm_ops);
 
 -- ----------------------------------------------------------------------------
 -- user_contents table
