@@ -74,7 +74,28 @@ export class IngestService {
         }
       }
 
-      // Update content in database
+      // Preserve existing metadata, then update content in database
+      const { data: existingMetaRow } = await this.supabaseService.serviceClient
+        .from('contents')
+        .select('metadata')
+        .eq('id', contentId)
+        .single();
+
+      // Ensure metadata is an object before spreading
+      const existingMeta = existingMetaRow?.metadata;
+      const baseMetadata =
+        typeof existingMeta === 'object' &&
+        existingMeta !== null &&
+        !Array.isArray(existingMeta)
+          ? existingMeta
+          : {};
+
+      const mergedMetadata = {
+        ...baseMetadata,
+        image_url: metadata.imageUrl,
+        site_name: metadata.siteName,
+      };
+
       const { error } = await this.supabaseService.serviceClient
         .from('contents')
         .update({
@@ -88,10 +109,7 @@ export class IngestService {
           word_count: metadata.wordCount,
           fetched_at: new Date().toISOString(),
           status: 'ready',
-          metadata: {
-            image_url: metadata.imageUrl,
-            site_name: metadata.siteName,
-          },
+          metadata: mergedMetadata,
         })
         .eq('id', contentId);
 
