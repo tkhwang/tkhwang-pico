@@ -74,7 +74,7 @@ export class IngestSummaryService {
 
     try {
       const model =
-        this.configService.get<string>('OPENAI_MODEL') || 'gpt-3.5-turbo';
+        this.configService.get<string>('OPENAI_MODEL') || 'gpt-4o-mini';
 
       const response = await this.openai.chat.completions.create({
         model,
