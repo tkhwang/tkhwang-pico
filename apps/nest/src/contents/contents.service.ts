@@ -73,10 +73,10 @@ export class ContentsService {
     );
     if (error) throw error;
 
-    return (data ?? []).map((item: any) => ({
+    return (data ?? []).map((item) => ({
       ...item,
       // cosine distance ∈ [0,2] → score ∈ [0,1]
-      score: 1 - item.distance / 2,
+      score: (2 - item.distance) / 2,
     }));
   }
 }
