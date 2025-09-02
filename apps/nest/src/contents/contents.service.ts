@@ -4,11 +4,16 @@ import {
   BadRequestException,
   InternalServerErrorException,
 } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { redactUrl, toCanonicalUrl } from '../utils/url';
+import { EVENTS } from '../common/constants/events';
 
 @Injectable()
 export class ContentsService {
-  constructor(private readonly supabaseService: SupabaseService) {}
+  constructor(
+    private readonly supabaseService: SupabaseService,
+    private readonly eventEmitter: EventEmitter2,
+  ) {}
 
   async saveUrl({
     url,
@@ -65,6 +70,13 @@ export class ContentsService {
         'Failed to save user content link',
       );
     }
+
+    // Emit event for content processing
+    this.eventEmitter.emit(EVENTS.CONTENT.CREATED, {
+      contentId: contents.id,
+      url: canonicalUrl,
+      userId,
+    });
 
     return {
       contentId: contents.id,
