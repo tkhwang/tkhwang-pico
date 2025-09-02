@@ -155,9 +155,10 @@ export class IngestExtractService {
     // Parse published date
     let publishedAt: Date | null = null;
     if (articlePublished) {
-      try {
-        publishedAt = new Date(articlePublished);
-      } catch {
+      const ts = Date.parse(articlePublished);
+      if (!Number.isNaN(ts)) {
+        publishedAt = new Date(ts);
+      } else {
         this.logger.warn(`Failed to parse published date: ${articlePublished}`);
       }
     }
