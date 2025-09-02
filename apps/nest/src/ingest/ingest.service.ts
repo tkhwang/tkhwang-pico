@@ -21,7 +21,7 @@ export class IngestService {
     private readonly summaryService: IngestSummaryService,
   ) {}
 
-  @OnEvent(EVENTS.CONTENT.CREATED)
+  @OnEvent(EVENTS.CONTENT.CREATED, { async: true })
   async handleContentCreated(payload: ContentCreatedEvent) {
     this.logger.log(`Processing content: ${payload.contentId}`);
 
