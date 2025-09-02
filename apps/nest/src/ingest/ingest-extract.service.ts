@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import * as cheerio from 'cheerio';
 import { JSDOM } from 'jsdom';
 import { Readability } from '@mozilla/readability';
-import { franc } from 'franc-min';
+import { detectLang } from 'src/utils/url';
 
 export interface ContentMetadata {
   title: string;
@@ -135,13 +135,10 @@ export class IngestExtractService {
     const domain = urlObj.hostname;
 
     // Detect language
-    let lang = htmlLang || 'en';
-    if (!htmlLang && (title || summary)) {
+    let lang = htmlLang || null;
+    if (!lang) {
       const textSample = `${title} ${summary}`.substring(0, 500);
-      const detectedLang = franc(textSample);
-      if (detectedLang !== 'und') {
-        lang = detectedLang;
-      }
+      lang = detectLang(textSample) || 'en';
     }
 
     // Parse tags
