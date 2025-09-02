@@ -38,8 +38,22 @@ export function contentHash(text: string): string {
 }
 
 export function detectLang(text: string): string | null {
-  const code = franc(text || '', { minLength: 20 });
-  return code === 'und' ? null : code; // ISO-639-3
+  const code3 = franc(text || '', { minLength: 20 });
+  if (code3 === 'und') return null;
+  const map: Record<string, string> = {
+    eng: 'en',
+    kor: 'ko',
+    jpn: 'ja',
+    zho: 'zh',
+    spa: 'es',
+    fra: 'fr',
+    deu: 'de',
+    ita: 'it',
+    nld: 'nl',
+    rus: 'ru',
+    por: 'pt',
+  };
+  return map[code3] ?? code3.slice(0, 2);
 }
 
 export function hostname(url: string): string | null {
