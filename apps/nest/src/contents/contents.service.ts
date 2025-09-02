@@ -4,7 +4,7 @@ import {
   BadRequestException,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { toCanonicalUrl } from '../utils/url';
+import { redactUrl, toCanonicalUrl } from '../utils/url';
 
 @Injectable()
 export class ContentsService {
@@ -36,7 +36,7 @@ export class ContentsService {
           {
             url: canonicalUrl, // 유니크 키로 사용
             canonical_url: canonicalUrl, // 보조 컬럼
-            metadata: { original_url: url }, // 원본 URL 보존(선택)
+            metadata: { original_url: redactUrl(url) }, // 원본 URL(민감 파라미터 제거)
           },
           { onConflict: 'url' },
         )
