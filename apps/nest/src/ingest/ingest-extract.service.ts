@@ -28,8 +28,8 @@ export class IngestExtractService {
       throw new Error(`Unsupported protocol: ${u.protocol}`);
     }
 
-    // TODO(ssrf): Resolve DNS and block private ranges (10/172.16/192.168/169.254/127/::1)
-    // can add later.
+    // SSRF guard: block private/reserved IPs for initial URL
+    await this.assertPublicHost(u);
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 15_000);
     try {
@@ -46,10 +46,20 @@ export class IngestExtractService {
       }
 
       const ctype = res.headers.get('content-type') || '';
-      if (!ctype.includes('text/html')) {
+      if (!/(text\/html|application\/xhtml\+xml)/i.test(ctype)) {
         throw new Error(`Unsupported content-type: ${ctype}`);
       }
 
+      // Guard extremely large bodies
+      const len = res.headers.get('content-length');
+      const MAX = 2_000_000; // ~2 MB
+      if (len && Number(len) > MAX) {
+        throw new Error(`Response too large: ${len} bytes`);
+      }
+      // Re-validate final URL after redirects
+      if (res.url) {
+        await this.assertPublicHost(new URL(res.url));
+      }
       return await res.text();
     } finally {
       clearTimeout(timer);
@@ -181,5 +191,48 @@ export class IngestExtractService {
       wordCount,
       domain,
     };
+  }
+
+  /*
+   *  Private
+   */
+  // Place inside IngestExtractService
+  private async assertPublicHost(u: URL) {
+    // localhost / explicit IPs
+    const host = u.hostname.toLowerCase();
+    if (host === 'localhost' || host === '127.0.0.1' || host === '[::1]') {
+      throw new Error(`Blocked private host: ${host}`);
+    }
+    // DNS resolve and block private ranges
+    const { promises: dns } = await import('node:dns');
+    const results = await dns.lookup(host, { all: true, verbatim: true });
+    for (const r of results) {
+      if (this.isPrivateAddress(r.address)) {
+        throw new Error(`Blocked private address: ${r.address}`);
+      }
+    }
+  }
+
+  private isPrivateAddress(addr: string): boolean {
+    // IPv4
+    const m = addr.match(/^(\d+)\.(\d+)\.(\d+)\.(\d+)$/);
+    if (m) {
+      const [a, b] = [Number(m[1]), Number(m[2])];
+      return (
+        a === 10 ||
+        (a === 172 && b >= 16 && b <= 31) ||
+        (a === 192 && b === 168) ||
+        a === 127 ||
+        (a === 169 && b === 254)
+      );
+    }
+    // IPv6: loopback, link-local, unique-local
+    const lower = addr.toLowerCase();
+    return (
+      lower === '::1' ||
+      lower.startsWith('fe80:') ||
+      lower.startsWith('fc') ||
+      lower.startsWith('fd')
+    );
   }
 }
