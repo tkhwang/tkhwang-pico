@@ -1,8 +1,8 @@
-import { IsBoolean, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsOptional, IsUrl, MaxLength } from 'class-validator';
 
 export class SaveContentDto {
-  @IsString()
-  @IsNotEmpty()
+  @IsUrl({ require_protocol: true })
+  @MaxLength(2048)
   url: string;
 
   @IsBoolean()

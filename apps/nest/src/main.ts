@@ -11,6 +11,9 @@ async function bootstrap() {
       whitelist: true,
       transform: true,
       forbidNonWhitelisted: true,
+      transformOptions: {
+        enableImplicitConversion: true, // Convert string values to their proper types
+      },
     }),
   );
 
