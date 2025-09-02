@@ -124,7 +124,6 @@ export type Database = {
           domain: string | null;
           fetched_at: string | null;
           id: string;
-          is_public: boolean;
           lang: string | null;
           metadata: Json;
           published_at: string | null;
@@ -142,7 +141,6 @@ export type Database = {
           domain?: string | null;
           fetched_at?: string | null;
           id?: string;
-          is_public?: boolean;
           lang?: string | null;
           metadata?: Json;
           published_at?: string | null;
@@ -160,7 +158,6 @@ export type Database = {
           domain?: string | null;
           fetched_at?: string | null;
           id?: string;
-          is_public?: boolean;
           lang?: string | null;
           metadata?: Json;
           published_at?: string | null;
@@ -375,6 +372,7 @@ export type Database = {
           archived: boolean;
           content_id: string;
           id: string;
+          is_public: boolean;
           labels: string[] | null;
           note: string | null;
           saved_at: string;
@@ -384,6 +382,7 @@ export type Database = {
           archived?: boolean;
           content_id: string;
           id?: string;
+          is_public?: boolean;
           labels?: string[] | null;
           note?: string | null;
           saved_at?: string;
@@ -393,6 +392,7 @@ export type Database = {
           archived?: boolean;
           content_id?: string;
           id?: string;
+          is_public?: boolean;
           labels?: string[] | null;
           note?: string | null;
           saved_at?: string;
