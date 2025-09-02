@@ -10,7 +10,11 @@ export class IngestSummaryService {
   constructor(private readonly configService: ConfigService) {
     const apiKey = this.configService.get<string>('OPENAI_API_KEY');
     if (apiKey) {
-      this.openai = new OpenAI({ apiKey });
+      this.openai = new OpenAI({
+        apiKey,
+        timeout: 15_000, // 15s
+        maxRetries: 2, // SDK default is 2; keep explicit
+      });
     } else {
       this.logger.warn(
         'OpenAI API key not configured. AI summaries will be unavailable.',
