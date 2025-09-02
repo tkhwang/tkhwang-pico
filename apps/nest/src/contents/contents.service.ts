@@ -13,7 +13,7 @@ export class ContentsService {
   }: {
     url: string;
     userId: string;
-    isPublic: boolean;
+    isPublic?: boolean;
   }) {
     const canonicalUrl = toCanonicalUrl(url);
 
