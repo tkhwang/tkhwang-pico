@@ -1,5 +1,9 @@
 import { SupabaseService } from './../supabase/supabase.service';
-import { Injectable, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { toCanonicalUrl } from '../utils/url';
 
 @Injectable()
@@ -57,7 +61,9 @@ export class ContentsService {
       );
 
     if (errorOfUpsertUserContents) {
-      throw new Error(errorOfUpsertUserContents.message);
+      throw new InternalServerErrorException(
+        'Failed to save user content link',
+      );
     }
 
     return {
