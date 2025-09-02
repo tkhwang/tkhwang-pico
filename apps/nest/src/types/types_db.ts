@@ -14,6 +14,42 @@ export type Database = {
   };
   public: {
     Tables: {
+      co_visitation: {
+        Row: {
+          dst_content_id: string;
+          score: number;
+          src_content_id: string;
+          updated_at: string;
+        };
+        Insert: {
+          dst_content_id: string;
+          score: number;
+          src_content_id: string;
+          updated_at?: string;
+        };
+        Update: {
+          dst_content_id?: string;
+          score?: number;
+          src_content_id?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'co_visitation_dst_content_id_fkey';
+            columns: ['dst_content_id'];
+            isOneToOne: false;
+            referencedRelation: 'contents';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'co_visitation_src_content_id_fkey';
+            columns: ['src_content_id'];
+            isOneToOne: false;
+            referencedRelation: 'contents';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       content_embeddings: {
         Row: {
           chunk_index: number | null;
@@ -47,6 +83,35 @@ export type Database = {
             foreignKeyName: 'content_embeddings_content_id_fkey';
             columns: ['content_id'];
             isOneToOne: false;
+            referencedRelation: 'contents';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      content_factors: {
+        Row: {
+          bias: number | null;
+          content_id: string;
+          factors: string;
+          updated_at: string;
+        };
+        Insert: {
+          bias?: number | null;
+          content_id: string;
+          factors: string;
+          updated_at?: string;
+        };
+        Update: {
+          bias?: number | null;
+          content_id?: string;
+          factors?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'content_factors_content_id_fkey';
+            columns: ['content_id'];
+            isOneToOne: true;
             referencedRelation: 'contents';
             referencedColumns: ['id'];
           },
@@ -173,39 +238,64 @@ export type Database = {
       };
       recommendation_logs: {
         Row: {
-          clicked: boolean;
-          content_id: string | null;
+          algo: string;
+          clicked_id: string | null;
+          converted_id: string | null;
           id: number;
-          metadata: Json;
-          rec_type: string;
-          score: number | null;
-          shown_at: string;
+          request_ctx: Json;
+          results: Json;
+          served_at: string;
           user_id: string;
         };
         Insert: {
-          clicked?: boolean;
-          content_id?: string | null;
+          algo: string;
+          clicked_id?: string | null;
+          converted_id?: string | null;
           id?: number;
-          metadata?: Json;
-          rec_type: string;
-          score?: number | null;
-          shown_at?: string;
+          request_ctx?: Json;
+          results: Json;
+          served_at?: string;
           user_id: string;
         };
         Update: {
-          clicked?: boolean;
-          content_id?: string | null;
+          algo?: string;
+          clicked_id?: string | null;
+          converted_id?: string | null;
           id?: number;
-          metadata?: Json;
-          rec_type?: string;
-          score?: number | null;
-          shown_at?: string;
+          request_ctx?: Json;
+          results?: Json;
+          served_at?: string;
           user_id?: string;
+        };
+        Relationships: [];
+      };
+      similar_items_cf: {
+        Row: {
+          content_id: string;
+          neighbor_id: string;
+          score: number;
+        };
+        Insert: {
+          content_id: string;
+          neighbor_id: string;
+          score: number;
+        };
+        Update: {
+          content_id?: string;
+          neighbor_id?: string;
+          score?: number;
         };
         Relationships: [
           {
-            foreignKeyName: 'recommendation_logs_content_id_fkey';
+            foreignKeyName: 'similar_items_cf_content_id_fkey';
             columns: ['content_id'];
+            isOneToOne: false;
+            referencedRelation: 'contents';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'similar_items_cf_neighbor_id_fkey';
+            columns: ['neighbor_id'];
             isOneToOne: false;
             referencedRelation: 'contents';
             referencedColumns: ['id'];
@@ -342,6 +432,27 @@ export type Database = {
         };
         Relationships: [];
       };
+      user_factors: {
+        Row: {
+          bias: number | null;
+          factors: string;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          bias?: number | null;
+          factors: string;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          bias?: number | null;
+          factors?: string;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: {
       [_ in never]: never;
@@ -350,6 +461,10 @@ export type Database = {
       binary_quantize: {
         Args: { '': string } | { '': unknown };
         Returns: unknown;
+      };
+      current_clerk_user_id: {
+        Args: Record<PropertyKey, never>;
+        Returns: string;
       };
       gtrgm_compress: {
         Args: { '': unknown };
@@ -423,8 +538,17 @@ export type Database = {
         Args: { '': string } | { '': unknown };
         Returns: unknown;
       };
+      recommend_feed: {
+        Args: { p_lang?: string; p_limit?: number; p_model?: string };
+        Returns: {
+          content_id: string;
+          distance: number;
+        }[];
+      };
       recommend_for_user: {
-        Args: { p_limit?: number; p_model?: string };
+        Args:
+          | { p_limit?: number; p_model?: string }
+          | { p_limit?: number; p_model?: string; p_user_id: string };
         Returns: {
           content_id: string;
           distance: number;
@@ -447,6 +571,13 @@ export type Database = {
         Returns: {
           content_id: string;
           distance: number;
+        }[];
+      };
+      similar_to_content_cf: {
+        Args: { p_content_id: string; p_limit?: number };
+        Returns: {
+          neighbor_id: string;
+          score: number;
         }[];
       };
       sparsevec_out: {
