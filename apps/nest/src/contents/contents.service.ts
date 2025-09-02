@@ -1,5 +1,5 @@
 import { SupabaseService } from './../supabase/supabase.service';
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { toCanonicalUrl } from '../utils/url';
 
 @Injectable()
@@ -15,7 +15,14 @@ export class ContentsService {
     userId: string;
     isPublic?: boolean;
   }) {
-    const canonicalUrl = toCanonicalUrl(url);
+    let canonicalUrl: string;
+    try {
+      canonicalUrl = toCanonicalUrl(url);
+    } catch (error) {
+      throw new BadRequestException(
+        `Invalid URL: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
+    }
 
     const { data: contents, error: errorOfUpsert } =
       await this.supabaseService.client
