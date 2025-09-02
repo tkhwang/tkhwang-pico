@@ -26,7 +26,7 @@ export class ContentsService {
 
     // 1) contents upsert (정규화된 URL을 키로 사용)
     const { data: contents, error: errorOfUpsert } =
-      await this.supabaseService.client
+      await this.supabaseService.serviceClient
         .from('contents')
         .upsert(
           {
@@ -47,7 +47,7 @@ export class ContentsService {
 
     // 2) user_contents upsert (개인 공개 여부를 여기서 관리)
     const { error: errorOfUpsertUserContents } =
-      await this.supabaseService.client.from('user_contents').upsert(
+      await this.supabaseService.serviceClient.from('user_contents').upsert(
         {
           user_id: userId,
           content_id: contents.id,
@@ -67,10 +67,11 @@ export class ContentsService {
   }
 
   async getSimilarContents(contentId: string, limit = 10) {
-    const { data, error } = await this.supabaseService.client.rpc(
+    const { data, error } = await this.supabaseService.serviceClient.rpc(
       'similar_to_content',
       { p_content_id: contentId, p_limit: limit },
     );
+
     if (error) throw error;
 
     return (data ?? []).map((item) => ({
