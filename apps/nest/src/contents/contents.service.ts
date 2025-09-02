@@ -69,7 +69,8 @@ export class ContentsService {
 
     return (data ?? []).map((item) => ({
       ...item,
-      score: 1 - item.distance,
+      // map distance∈[0,2] → score∈[0,1]
+      score: (2 - item.distance) / 2,
     }));
   }
 }
