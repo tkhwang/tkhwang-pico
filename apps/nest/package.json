@@ -15,7 +15,6 @@
     "class-validator": "^0.14.2",
     "crypto": "^1.0.1",
     "franc-min": "^6.2.0",
-    "got": "^14.4.8",
     "jose": "^5.9.6",
     "jsdom": "^26.1.0",
     "normalize-url": "6.1.0",
