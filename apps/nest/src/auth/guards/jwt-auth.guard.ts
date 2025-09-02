@@ -5,7 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Request } from 'express';
-import * as jwt from 'jsonwebtoken';
+import { decodeJwt } from 'jose';
 
 export interface RequestWithUser extends Request {
   user?: {
@@ -22,7 +22,7 @@ interface ClerkJWTPayload {
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
-  async canActivate(context: ExecutionContext): Promise<boolean> {
+  canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest<RequestWithUser>();
     const token = this.extractTokenFromHeader(request);
 
@@ -32,7 +32,7 @@ export class JwtAuthGuard implements CanActivate {
 
     try {
       // Simply decode Clerk JWT to get user ID (no verification for speed)
-      const decoded = jwt.decode(token) as ClerkJWTPayload;
+      const decoded = decodeJwt(token) as ClerkJWTPayload;
 
       if (!decoded || !decoded.sub) {
         throw new UnauthorizedException('Invalid token format');
