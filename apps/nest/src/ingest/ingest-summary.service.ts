@@ -35,11 +35,7 @@ export class IngestSummaryService {
       const model =
         this.configService.get<string>('OPENAI_MODEL') || 'gpt-3.5-turbo';
 
-      const systemPrompt =
-        lang === 'ko'
-          ? '당신은 웹 콘텐츠를 요약하는 전문가입니다. 주어진 텍스트의 핵심 내용을 2-3문장으로 간결하게 요약해주세요.'
-          : 'You are an expert at summarizing web content. Summarize the key points of the given text in 2-3 sentences.';
-
+      const systemPrompt = this.getSystemPrompt(lang);
       const response = await this.openai.chat.completions.create({
         model,
         messages: [
@@ -116,5 +112,16 @@ export class IngestSummaryService {
       );
       return [];
     }
+  }
+
+  /*
+   *  Private
+   */
+  private getSystemPrompt(rawLang: string) {
+    const norm = (rawLang ?? 'en').toLowerCase();
+    const isKO = norm === 'ko' || norm.startsWith('ko-') || norm === 'kor';
+    return isKO
+      ? '당신은 웹 콘텐츠를 요약하는 전문가입니다. 주어진 텍스트의 핵심 내용을 2-3문장으로 간결하게 요약해주세요.'
+      : 'You are an expert at summarizing web content. Summarize the key points of the given text in 2-3 sentences.';
   }
 }
