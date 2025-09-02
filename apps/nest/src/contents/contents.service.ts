@@ -1,5 +1,6 @@
 import { SupabaseService } from './../supabase/supabase.service';
 import { Injectable } from '@nestjs/common';
+import { toCanonicalUrl } from '../utils/url';
 
 @Injectable()
 export class ContentsService {
@@ -14,10 +15,15 @@ export class ContentsService {
     userId: string;
     isPublic: boolean;
   }) {
+    const canonicalUrl = toCanonicalUrl(url);
+
     const { data: contents, error: errorOfUpsert } =
       await this.supabaseService.client
         .from('contents')
-        .upsert({ url, is_public: isPublic }, { onConflict: 'url' })
+        .upsert(
+          { url: canonicalUrl, is_public: isPublic },
+          { onConflict: 'url' },
+        )
         .select('*')
         .single();
 
