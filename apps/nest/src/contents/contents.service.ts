@@ -9,7 +9,7 @@ export class ContentsService {
   async saveUrl({
     url,
     userId,
-    isPublic = false,
+    isPublic = false, // ← 개인 공개(프로필 노출) 여부
   }: {
     url: string;
     userId: string;
@@ -24,11 +24,16 @@ export class ContentsService {
       );
     }
 
+    // 1) contents upsert (정규화된 URL을 키로 사용)
     const { data: contents, error: errorOfUpsert } =
       await this.supabaseService.client
         .from('contents')
         .upsert(
-          { url: canonicalUrl, is_public: isPublic },
+          {
+            url: canonicalUrl, // 유니크 키로 사용
+            canonical_url: canonicalUrl, // 보조 컬럼
+            metadata: { original_url: url }, // 원본 URL 보존(선택)
+          },
           { onConflict: 'url' },
         )
         .select('*')
@@ -40,11 +45,13 @@ export class ContentsService {
       );
     }
 
+    // 2) user_contents upsert (개인 공개 여부를 여기서 관리)
     const { error: errorOfUpsertUserContents } =
       await this.supabaseService.client.from('user_contents').upsert(
         {
           user_id: userId,
           content_id: contents.id,
+          is_public: isPublic, // ✅ 개인 공개 플래그는 여기
         },
         { onConflict: 'user_id,content_id' },
       );
@@ -55,7 +62,7 @@ export class ContentsService {
 
     return {
       contentId: contents.id,
-      status: contents.status,
+      status: contents.status, // pending → 워커가 ready로 변경
     };
   }
 
@@ -64,13 +71,12 @@ export class ContentsService {
       'similar_to_content',
       { p_content_id: contentId, p_limit: limit },
     );
-
     if (error) throw error;
 
-    return (data ?? []).map((item) => ({
+    return (data ?? []).map((item: any) => ({
       ...item,
-      // map distance∈[0,2] → score∈[0,1]
-      score: (2 - item.distance) / 2,
+      // cosine distance ∈ [0,2] → score ∈ [0,1]
+      score: 1 - item.distance / 2,
     }));
   }
 }
