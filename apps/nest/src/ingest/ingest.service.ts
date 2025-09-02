@@ -51,11 +51,13 @@ export class IngestService {
 
       // Generate AI summary if needed
       let finalSummary = metadata.summary;
+      const normalizedLang = (metadata.lang || 'en').slice(0, 2).toLowerCase();
+
       if (!finalSummary || finalSummary.length < 50) {
         this.logger.log(`Generating AI summary for ${url}`);
         const aiSummary = await this.summaryService.generateSummary(
           metadata.summary || metadata.title || '',
-          metadata.lang,
+          normalizedLang,
         );
         if (aiSummary) {
           finalSummary = aiSummary;
@@ -79,7 +81,7 @@ export class IngestService {
           title: metadata.title,
           summary: finalSummary,
           author: metadata.author,
-          lang: metadata.lang,
+          lang: normalizedLang,
           tags: keywords,
           domain: metadata.domain,
           published_at: metadata.publishedAt?.toISOString(),
