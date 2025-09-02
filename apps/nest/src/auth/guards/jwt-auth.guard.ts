@@ -5,7 +5,8 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Request } from 'express';
-import { decodeJwt } from 'jose';
+import { createRemoteJWKSet, jwtVerify } from 'jose';
+import { ConfigService } from '@nestjs/config';
 
 export interface RequestWithUser extends Request {
   user?: {
@@ -14,15 +15,11 @@ export interface RequestWithUser extends Request {
   };
 }
 
-interface ClerkJWTPayload {
-  sub: string; // Clerk user ID
-  email?: string;
-  [key: string]: any;
-}
-
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
-  canActivate(context: ExecutionContext): boolean {
+  constructor(private readonly config: ConfigService) {}
+
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<RequestWithUser>();
     const token = this.extractTokenFromHeader(request);
 
@@ -31,19 +28,25 @@ export class JwtAuthGuard implements CanActivate {
     }
 
     try {
-      // Simply decode Clerk JWT to get user ID (no verification for speed)
-      const decoded = decodeJwt(token) as ClerkJWTPayload;
+      const issuer = this.config.get<string>('CLERK_JWT_ISSUER'); // e.g. https://<your-subdomain>.clerk.accounts.dev
+      const audience = this.config.get<string>('CLERK_JWT_AUDIENCE'); // your API audience if set
+      if (!issuer)
+        throw new UnauthorizedException(
+          'Auth misconfigured: CLERK_JWT_ISSUER missing',
+        );
 
-      if (!decoded || !decoded.sub) {
-        throw new UnauthorizedException('Invalid token format');
-      }
+      const jwks = createRemoteJWKSet(
+        new URL(`${issuer}/.well-known/jwks.json`),
+      );
+      const { payload } = await jwtVerify(token, jwks, {
+        issuer,
+        audience: audience || undefined,
+      });
+      if (!payload.sub)
+        throw new UnauthorizedException('Token missing subject');
+      request.user = { id: payload.sub };
 
-      // Attach minimal user info to request
-      request.user = {
-        id: decoded.sub, // Clerk user ID
-      };
-
-      console.log('✅ Clerk User ID extracted:', decoded.sub);
+      console.log('✅ Clerk User ID extracted:', payload.sub);
       return true;
     } catch (error) {
       console.error('❌ Token decode failed:', error);
