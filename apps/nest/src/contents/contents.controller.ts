@@ -6,6 +6,8 @@ import {
   Post,
   Query,
   UseGuards,
+  DefaultValuePipe,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { ContentsService } from './contents.service';
 import { SaveContentDto } from 'src/contents/contents.dto';
@@ -27,10 +29,12 @@ export class ContentsController {
   }
 
   @Get(':id/similar')
+  @UseGuards(JwtAuthGuard) // If you intend public access, ensure the RPC enforces is_public only.
   async getSimilarContents(
     @Param('id') id: string,
-    @Query('limit') limit = 10,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
   ) {
-    return this.contentsService.getSimilarContents(id, Number(limit));
+    const safeLimit = Math.max(1, Math.min(50, limit));
+    return this.contentsService.getSimilarContents(id, safeLimit);
   }
 }
