@@ -232,7 +232,7 @@ grant select on public.contents to authenticated, anon;      -- RLS로 공개/�
 grant select, insert, update, delete on public.user_contents to authenticated;
 grant select, insert, update, delete on public.user_embeddings to authenticated;
 grant select, insert, update, delete on public.user_content_interactions to authenticated;
-grant select, insert on public.recommendation_logs to authenticated;
+grant select, insert, update, delete on public.recommendation_logs to authenticated;
 grant select on public.user_factors, public.content_factors to authenticated;
 grant select on public.co_visitation, public.similar_items_cf to authenticated;
 
