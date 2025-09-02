@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { redactUrl, toCanonicalUrl } from '../utils/url';
+import { EVENTS } from '../common/constants/events';
 
 @Injectable()
 export class ContentsService {
@@ -71,7 +72,7 @@ export class ContentsService {
     }
 
     // Emit event for content processing
-    this.eventEmitter.emit('content.created', {
+    this.eventEmitter.emit(EVENTS.CONTENT.CREATED, {
       contentId: contents.id,
       url: canonicalUrl,
       userId,

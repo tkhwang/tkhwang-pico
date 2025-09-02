@@ -3,6 +3,7 @@ import { OnEvent } from '@nestjs/event-emitter';
 import { SupabaseService } from '../supabase/supabase.service';
 import { IngestExtractService } from './ingest-extract.service';
 import { IngestSummaryService } from './ingest-summary.service';
+import { EVENTS } from '../common/constants/events';
 
 export interface ContentCreatedEvent {
   contentId: string;
@@ -20,7 +21,7 @@ export class IngestService {
     private readonly summaryService: IngestSummaryService,
   ) {}
 
-  @OnEvent('content.created')
+  @OnEvent(EVENTS.CONTENT.CREATED)
   async handleContentCreated(payload: ContentCreatedEvent) {
     this.logger.log(`Processing content: ${payload.contentId}`);
 
