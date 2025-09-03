@@ -1,6 +1,6 @@
 import { createAuthenticatedSupabaseClient } from "./client";
 import type { AuthClerkSession } from "../../types/auth";
-import {
+import type {
   Json,
   Tables,
   TablesInsert,

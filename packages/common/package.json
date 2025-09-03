@@ -3,8 +3,12 @@
     "typescript": "^5.0.0"
   },
   "exports": {
-    ".": "./src/index.ts",
-    "./supabase": "./src/supabase/database.types.ts"
+    ".": {
+      "types": "./src/index.ts"
+    },
+    "./supabase": {
+      "types": "./src/supabase/database.types.ts"
+    }
   },
   "main": "./src/index.ts",
   "name": "@tkhwang-pico/common",
@@ -13,6 +17,7 @@
     "generate-types": "npx supabase gen types typescript --project-id hgkmrremnwapjdbebvqo --schema public >./src/supabase/database.types.ts",
     "typecheck": "tsc --noEmit"
   },
+  "sideEffects": false,
   "types": "./src/index.ts",
   "version": "1.0.0"
 }
