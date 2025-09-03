@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, TouchableOpacity, Image } from 'react-native';
+import { View, TouchableOpacity, Image, Linking, Alert } from 'react-native';
 import { Text } from '../ui/text';
 import type { UserContentWithDetails } from '@tkhwang-pico/common';
 
@@ -28,8 +28,31 @@ export function ContentItem({ item }: ContentItemProps) {
     return null;
   }
 
+  const handlePress = async () => {
+    const url = content.canonical_url || content.url;
+
+    if (!url) {
+      Alert.alert('No URL', 'No URL available for this content');
+      return;
+    }
+
+    try {
+      const supported = await Linking.canOpenURL(url);
+      if (supported) {
+        await Linking.openURL(url);
+      } else {
+        Alert.alert('Unable to open', `Cannot open URL: ${url}`);
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Failed to open URL');
+      console.error('Error opening URL:', error);
+    }
+  };
+
   return (
-    <TouchableOpacity className="mb-4 rounded-lg border border-gray-100 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
+    <TouchableOpacity
+      className="mb-4 rounded-lg border border-gray-100 bg-white p-4 dark:border-gray-700 dark:bg-gray-800"
+      onPress={handlePress}>
       {/* Meta Information */}
       <View className="mb-2 flex-row items-center">
         <Text className="text-xs text-gray-400 dark:text-gray-500">
