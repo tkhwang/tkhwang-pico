@@ -1,6 +1,7 @@
 {
   "author": "",
   "dependencies": {
+    "@tkhwang-pico/common": "*",
     "@langchain/core": "^0.3.72",
     "@langchain/openai": "^0.6.9",
     "@mozilla/readability": "^0.6.0",
