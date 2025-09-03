@@ -22,7 +22,7 @@ if (!supabaseAnonKey) throw new Error('Missing EXPO_PUBLIC_SUPABASE_ANON_KEY');
  * Create an authenticated Supabase client with Clerk token
  * This follows the same pattern as the web app
  */
-export function createAuthenticatedSupabaseClient(clerkToken: string | null) {
+export function createSupabaseClientWithClerkAuth(clerkToken: string | null) {
   if (!clerkToken) {
     throw new Error('Authentication required');
   }
