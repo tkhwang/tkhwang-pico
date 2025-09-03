@@ -1,5 +1,6 @@
 import { SocialConnections } from '@/components/social-connections';
 import { Card, CardContent, CardDescription, CardTitle } from '@/components/ui/card';
+import { Text } from '@/components/ui/text';
 import { useSignIn } from '@clerk/clerk-expo';
 import * as React from 'react';
 import { type TextInput, View } from 'react-native';
@@ -60,7 +61,13 @@ export function SignInForm() {
 
           {/* Title and description */}
           <View className="gap-2">
-            <CardTitle className="text-center text-xl">Sign in to PICO QUEUE</CardTitle>
+            <View className="flex-row items-center justify-center gap-1">
+              <Text className="text-xl font-semibold text-card-foreground">Sign in to</Text>
+              <Text className="text-xl font-bold text-gray-900 dark:text-gray-100">
+                <Text className="lowercase">pico</Text>
+                <Text className="uppercase text-blue-600 dark:text-blue-400">QUEUE</Text>
+              </Text>
+            </View>
             <CardDescription className="text-center">
               Welcome back! Please sign in to continue
             </CardDescription>
