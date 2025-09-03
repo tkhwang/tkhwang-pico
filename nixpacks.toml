@@ -1,0 +1,19 @@
+[phases.setup]
+nixPkgs = ["nodejs_20", "yarn"]
+
+[variables]
+NODE_ENV = "production"
+
+[phases.install]
+cmds = [
+  "yarn install --frozen-lockfile"
+]
+
+[phases.build]
+cmds = [
+  "yarn workspace nest build"
+]
+
+[start]
+cmd = "node apps/nest/dist/main.js"
+
