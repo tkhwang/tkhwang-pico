@@ -1,11 +1,11 @@
 import { createAuthenticatedSupabaseClient } from "./client";
 import type { AuthClerkSession } from "../../types/auth";
 import type {
+  Json,
   Tables,
   TablesInsert,
   TablesUpdate,
-  Json,
-} from "../../types/types_db";
+} from "@tkhwang-pico/common/supabase";
 
 export type Thread = Tables<"threads">;
 export type Message = Tables<"messages">;

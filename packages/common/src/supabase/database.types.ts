@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: '13.0.4';
+    PostgrestVersion: "13.0.4";
   };
   public: {
     Tables: {
@@ -35,18 +35,18 @@ export type Database = {
         };
         Relationships: [
           {
-            foreignKeyName: 'co_visitation_dst_content_id_fkey';
-            columns: ['dst_content_id'];
+            foreignKeyName: "co_visitation_dst_content_id_fkey";
+            columns: ["dst_content_id"];
             isOneToOne: false;
-            referencedRelation: 'contents';
-            referencedColumns: ['id'];
+            referencedRelation: "contents";
+            referencedColumns: ["id"];
           },
           {
-            foreignKeyName: 'co_visitation_src_content_id_fkey';
-            columns: ['src_content_id'];
+            foreignKeyName: "co_visitation_src_content_id_fkey";
+            columns: ["src_content_id"];
             isOneToOne: false;
-            referencedRelation: 'contents';
-            referencedColumns: ['id'];
+            referencedRelation: "contents";
+            referencedColumns: ["id"];
           },
         ];
       };
@@ -58,7 +58,7 @@ export type Database = {
           embedding: string;
           embedding_model: string;
           id: number;
-          scope: Database['public']['Enums']['embedding_scope'];
+          scope: Database["public"]["Enums"]["embedding_scope"];
         };
         Insert: {
           chunk_index?: number | null;
@@ -67,7 +67,7 @@ export type Database = {
           embedding: string;
           embedding_model: string;
           id?: number;
-          scope?: Database['public']['Enums']['embedding_scope'];
+          scope?: Database["public"]["Enums"]["embedding_scope"];
         };
         Update: {
           chunk_index?: number | null;
@@ -76,15 +76,15 @@ export type Database = {
           embedding?: string;
           embedding_model?: string;
           id?: number;
-          scope?: Database['public']['Enums']['embedding_scope'];
+          scope?: Database["public"]["Enums"]["embedding_scope"];
         };
         Relationships: [
           {
-            foreignKeyName: 'content_embeddings_content_id_fkey';
-            columns: ['content_id'];
+            foreignKeyName: "content_embeddings_content_id_fkey";
+            columns: ["content_id"];
             isOneToOne: false;
-            referencedRelation: 'contents';
-            referencedColumns: ['id'];
+            referencedRelation: "contents";
+            referencedColumns: ["id"];
           },
         ];
       };
@@ -109,11 +109,11 @@ export type Database = {
         };
         Relationships: [
           {
-            foreignKeyName: 'content_factors_content_id_fkey';
-            columns: ['content_id'];
+            foreignKeyName: "content_factors_content_id_fkey";
+            columns: ["content_id"];
             isOneToOne: true;
-            referencedRelation: 'contents';
-            referencedColumns: ['id'];
+            referencedRelation: "contents";
+            referencedColumns: ["id"];
           },
         ];
       };
@@ -127,7 +127,7 @@ export type Database = {
           lang: string | null;
           metadata: Json;
           published_at: string | null;
-          status: Database['public']['Enums']['content_status'];
+          status: Database["public"]["Enums"]["content_status"];
           summary: string | null;
           tags: string[] | null;
           title: string | null;
@@ -144,7 +144,7 @@ export type Database = {
           lang?: string | null;
           metadata?: Json;
           published_at?: string | null;
-          status?: Database['public']['Enums']['content_status'];
+          status?: Database["public"]["Enums"]["content_status"];
           summary?: string | null;
           tags?: string[] | null;
           title?: string | null;
@@ -161,7 +161,7 @@ export type Database = {
           lang?: string | null;
           metadata?: Json;
           published_at?: string | null;
-          status?: Database['public']['Enums']['content_status'];
+          status?: Database["public"]["Enums"]["content_status"];
           summary?: string | null;
           tags?: string[] | null;
           title?: string | null;
@@ -198,11 +198,11 @@ export type Database = {
         };
         Relationships: [
           {
-            foreignKeyName: 'messages_thread_id_fkey';
-            columns: ['thread_id'];
+            foreignKeyName: "messages_thread_id_fkey";
+            columns: ["thread_id"];
             isOneToOne: false;
-            referencedRelation: 'threads';
-            referencedColumns: ['id'];
+            referencedRelation: "threads";
+            referencedColumns: ["id"];
           },
         ];
       };
@@ -284,18 +284,18 @@ export type Database = {
         };
         Relationships: [
           {
-            foreignKeyName: 'similar_items_cf_content_id_fkey';
-            columns: ['content_id'];
+            foreignKeyName: "similar_items_cf_content_id_fkey";
+            columns: ["content_id"];
             isOneToOne: false;
-            referencedRelation: 'contents';
-            referencedColumns: ['id'];
+            referencedRelation: "contents";
+            referencedColumns: ["id"];
           },
           {
-            foreignKeyName: 'similar_items_cf_neighbor_id_fkey';
-            columns: ['neighbor_id'];
+            foreignKeyName: "similar_items_cf_neighbor_id_fkey";
+            columns: ["neighbor_id"];
             isOneToOne: false;
-            referencedRelation: 'contents';
-            referencedColumns: ['id'];
+            referencedRelation: "contents";
+            referencedColumns: ["id"];
           },
         ];
       };
@@ -332,7 +332,7 @@ export type Database = {
           created_at: string;
           dwell_ms: number | null;
           id: number;
-          type: Database['public']['Enums']['interaction_type'];
+          type: Database["public"]["Enums"]["interaction_type"];
           user_id: string;
           value: number | null;
           weight: number | null;
@@ -342,7 +342,7 @@ export type Database = {
           created_at?: string;
           dwell_ms?: number | null;
           id?: number;
-          type: Database['public']['Enums']['interaction_type'];
+          type: Database["public"]["Enums"]["interaction_type"];
           user_id: string;
           value?: number | null;
           weight?: number | null;
@@ -352,18 +352,18 @@ export type Database = {
           created_at?: string;
           dwell_ms?: number | null;
           id?: number;
-          type?: Database['public']['Enums']['interaction_type'];
+          type?: Database["public"]["Enums"]["interaction_type"];
           user_id?: string;
           value?: number | null;
           weight?: number | null;
         };
         Relationships: [
           {
-            foreignKeyName: 'user_content_interactions_content_id_fkey';
-            columns: ['content_id'];
+            foreignKeyName: "user_content_interactions_content_id_fkey";
+            columns: ["content_id"];
             isOneToOne: false;
-            referencedRelation: 'contents';
-            referencedColumns: ['id'];
+            referencedRelation: "contents";
+            referencedColumns: ["id"];
           },
         ];
       };
@@ -400,11 +400,11 @@ export type Database = {
         };
         Relationships: [
           {
-            foreignKeyName: 'user_contents_content_id_fkey';
-            columns: ['content_id'];
+            foreignKeyName: "user_contents_content_id_fkey";
+            columns: ["content_id"];
             isOneToOne: false;
-            referencedRelation: 'contents';
-            referencedColumns: ['id'];
+            referencedRelation: "contents";
+            referencedColumns: ["id"];
           },
         ];
       };
@@ -459,7 +459,7 @@ export type Database = {
     };
     Functions: {
       binary_quantize: {
-        Args: { '': string } | { '': unknown };
+        Args: { "": string } | { "": unknown };
         Returns: unknown;
       };
       current_clerk_user_id: {
@@ -467,75 +467,75 @@ export type Database = {
         Returns: string;
       };
       gtrgm_compress: {
-        Args: { '': unknown };
+        Args: { "": unknown };
         Returns: unknown;
       };
       gtrgm_decompress: {
-        Args: { '': unknown };
+        Args: { "": unknown };
         Returns: unknown;
       };
       gtrgm_in: {
-        Args: { '': unknown };
+        Args: { "": unknown };
         Returns: unknown;
       };
       gtrgm_options: {
-        Args: { '': unknown };
+        Args: { "": unknown };
         Returns: undefined;
       };
       gtrgm_out: {
-        Args: { '': unknown };
+        Args: { "": unknown };
         Returns: unknown;
       };
       halfvec_avg: {
-        Args: { '': number[] };
+        Args: { "": number[] };
         Returns: unknown;
       };
       halfvec_out: {
-        Args: { '': unknown };
+        Args: { "": unknown };
         Returns: unknown;
       };
       halfvec_send: {
-        Args: { '': unknown };
+        Args: { "": unknown };
         Returns: string;
       };
       halfvec_typmod_in: {
-        Args: { '': unknown[] };
+        Args: { "": unknown[] };
         Returns: number;
       };
       hnsw_bit_support: {
-        Args: { '': unknown };
+        Args: { "": unknown };
         Returns: unknown;
       };
       hnsw_halfvec_support: {
-        Args: { '': unknown };
+        Args: { "": unknown };
         Returns: unknown;
       };
       hnsw_sparsevec_support: {
-        Args: { '': unknown };
+        Args: { "": unknown };
         Returns: unknown;
       };
       hnswhandler: {
-        Args: { '': unknown };
+        Args: { "": unknown };
         Returns: unknown;
       };
       ivfflat_bit_support: {
-        Args: { '': unknown };
+        Args: { "": unknown };
         Returns: unknown;
       };
       ivfflat_halfvec_support: {
-        Args: { '': unknown };
+        Args: { "": unknown };
         Returns: unknown;
       };
       ivfflathandler: {
-        Args: { '': unknown };
+        Args: { "": unknown };
         Returns: unknown;
       };
       l2_norm: {
-        Args: { '': unknown };
+        Args: { "": unknown } | { "": unknown };
         Returns: number;
       };
       l2_normalize: {
-        Args: { '': string } | { '': unknown };
+        Args: { "": string } | { "": unknown } | { "": unknown };
         Returns: unknown;
       };
       recommend_feed: {
@@ -555,7 +555,7 @@ export type Database = {
         }[];
       };
       set_limit: {
-        Args: { '': number };
+        Args: { "": number };
         Returns: number;
       };
       show_limit: {
@@ -563,7 +563,7 @@ export type Database = {
         Returns: number;
       };
       show_trgm: {
-        Args: { '': string };
+        Args: { "": string };
         Returns: string[];
       };
       similar_to_content: {
@@ -581,55 +581,55 @@ export type Database = {
         }[];
       };
       sparsevec_out: {
-        Args: { '': unknown };
+        Args: { "": unknown };
         Returns: unknown;
       };
       sparsevec_send: {
-        Args: { '': unknown };
+        Args: { "": unknown };
         Returns: string;
       };
       sparsevec_typmod_in: {
-        Args: { '': unknown[] };
+        Args: { "": unknown[] };
         Returns: number;
       };
       vector_avg: {
-        Args: { '': number[] };
+        Args: { "": number[] };
         Returns: string;
       };
       vector_dims: {
-        Args: { '': string } | { '': unknown };
+        Args: { "": string } | { "": unknown };
         Returns: number;
       };
       vector_norm: {
-        Args: { '': string };
+        Args: { "": string };
         Returns: number;
       };
       vector_out: {
-        Args: { '': string };
+        Args: { "": string };
         Returns: unknown;
       };
       vector_send: {
-        Args: { '': string };
+        Args: { "": string };
         Returns: string;
       };
       vector_typmod_in: {
-        Args: { '': unknown[] };
+        Args: { "": unknown[] };
         Returns: number;
       };
     };
     Enums: {
-      content_status: 'pending' | 'ready' | 'failed' | 'archived';
-      embedding_scope: 'summary' | 'chunk' | 'title' | 'tags';
+      content_status: "pending" | "ready" | "failed" | "archived";
+      embedding_scope: "summary" | "chunk" | "title" | "tags";
       interaction_type:
-        | 'save'
-        | 'open'
-        | 'click'
-        | 'like'
-        | 'complete'
-        | 'share'
-        | 'archive'
-        | 'dismiss'
-        | 'rating';
+        | "save"
+        | "open"
+        | "click"
+        | "like"
+        | "complete"
+        | "share"
+        | "archive"
+        | "dismiss"
+        | "rating";
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -637,36 +637,36 @@ export type Database = {
   };
 };
 
-type DatabaseWithoutInternals = Omit<Database, '__InternalSupabase'>;
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">;
 
 type DefaultSchema = DatabaseWithoutInternals[Extract<
   keyof Database,
-  'public'
+  "public"
 >];
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
-    | keyof (DefaultSchema['Tables'] & DefaultSchema['Views'])
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals;
   }
-    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
-        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Views'])
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals;
 }
-  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
-      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Views'])[TableName] extends {
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R;
     }
     ? R
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema['Tables'] &
-        DefaultSchema['Views'])
-    ? (DefaultSchema['Tables'] &
-        DefaultSchema['Views'])[DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
         Row: infer R;
       }
       ? R
@@ -675,23 +675,23 @@ export type Tables<
 
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema['Tables']
+    | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals;
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals;
 }
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I;
     }
     ? I
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema['Tables']
-    ? DefaultSchema['Tables'][DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
         Insert: infer I;
       }
       ? I
@@ -700,23 +700,23 @@ export type TablesInsert<
 
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema['Tables']
+    | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals;
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals;
 }
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U;
     }
     ? U
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema['Tables']
-    ? DefaultSchema['Tables'][DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
         Update: infer U;
       }
       ? U
@@ -725,53 +725,53 @@ export type TablesUpdate<
 
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
-    | keyof DefaultSchema['Enums']
+    | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals;
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions['schema']]['Enums']
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
     : never = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals;
 }
-  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions['schema']]['Enums'][EnumName]
-  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema['Enums']
-    ? DefaultSchema['Enums'][DefaultSchemaEnumNameOrOptions]
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
     : never;
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
-    | keyof DefaultSchema['CompositeTypes']
+    | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals;
   }
-    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes']
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
     : never = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals;
 }
-  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes'][CompositeTypeName]
-  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema['CompositeTypes']
-    ? DefaultSchema['CompositeTypes'][PublicCompositeTypeNameOrOptions]
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never;
 
 export const Constants = {
   public: {
     Enums: {
-      content_status: ['pending', 'ready', 'failed', 'archived'],
-      embedding_scope: ['summary', 'chunk', 'title', 'tags'],
+      content_status: ["pending", "ready", "failed", "archived"],
+      embedding_scope: ["summary", "chunk", "title", "tags"],
       interaction_type: [
-        'save',
-        'open',
-        'click',
-        'like',
-        'complete',
-        'share',
-        'archive',
-        'dismiss',
-        'rating',
+        "save",
+        "open",
+        "click",
+        "like",
+        "complete",
+        "share",
+        "archive",
+        "dismiss",
+        "rating",
       ],
     },
   },

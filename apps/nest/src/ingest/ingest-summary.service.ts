@@ -5,39 +5,34 @@ import OpenAI from 'openai';
 @Injectable()
 export class IngestSummaryService {
   private readonly logger = new Logger(IngestSummaryService.name);
-  private openai: OpenAI | null = null;
+  private readonly openai: OpenAI;
+  private readonly defaultModel = 'gpt-4o-mini';
 
   constructor(private readonly configService: ConfigService) {
     const apiKey = this.configService.get<string>('OPENAI_API_KEY');
-    if (apiKey) {
-      this.openai = new OpenAI({
-        apiKey,
-        timeout: 15_000, // 15s
-        maxRetries: 2, // SDK default is 2; keep explicit
-      });
-    } else {
-      this.logger.warn(
-        'OpenAI API key not configured. AI summaries will be unavailable.',
-      );
+    if (!apiKey) {
+      this.logger.error('OpenAI API key not configured.');
+      throw new Error('OpenAI API key not configured.');
     }
+
+    this.openai = new OpenAI({
+      apiKey,
+      timeout: 15_000, // 15s
+      maxRetries: 2, // SDK default is 2; keep explicit
+    });
   }
 
   async generateSummary(
     content: string,
     lang: string = 'en',
   ): Promise<string | null> {
-    if (!this.openai) {
-      this.logger.warn('OpenAI not configured, skipping summary generation');
-      return null;
-    }
-
     if (!content || content.trim().length < 100) {
       return null;
     }
 
     try {
       const model =
-        this.configService.get<string>('OPENAI_MODEL') || 'gpt-3.5-turbo';
+        this.configService.get<string>('OPENAI_MODEL') || this.defaultModel;
 
       const systemPrompt = this.getSystemPrompt(lang);
       const response = await this.openai.chat.completions.create({
@@ -72,13 +67,13 @@ export class IngestSummaryService {
   }
 
   async extractKeywords(text: string): Promise<string[]> {
-    if (!this.openai || !text) {
+    if (!text) {
       return [];
     }
 
     try {
       const model =
-        this.configService.get<string>('OPENAI_MODEL') || 'gpt-4o-mini';
+        this.configService.get<string>('OPENAI_MODEL') || this.defaultModel;
 
       const response = await this.openai.chat.completions.create({
         model,

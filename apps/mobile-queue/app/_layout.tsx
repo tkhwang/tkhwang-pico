@@ -1,8 +1,9 @@
 import '@/global.css';
 
 import { NAV_THEME } from '@/lib/theme';
-import { ClerkProvider, useAuth } from '@clerk/clerk-expo';
+import { ClerkProvider, ClerkLoaded, useAuth } from '@clerk/clerk-expo';
 import { tokenCache } from '@clerk/clerk-expo/token-cache';
+import { QueryProvider } from '@/providers/query-provider';
 import { ThemeProvider } from '@react-navigation/native';
 import { PortalHost } from '@rn-primitives/portal';
 import { Stack } from 'expo-router';
@@ -11,6 +12,13 @@ import { StatusBar } from 'expo-status-bar';
 import { useColorScheme } from 'nativewind';
 import * as React from 'react';
 import Constants from 'expo-constants';
+
+// React 19 types require components to explicitly include `children`.
+// Some versions of @clerk/clerk-expo don't declare `children` in props,
+// so we cast to a type that includes it to satisfy TS without runtime changes.
+const ClerkProviderExtended = ClerkProvider as React.ComponentType<
+  React.PropsWithChildren<React.ComponentProps<typeof ClerkProvider>>
+>;
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -21,15 +29,17 @@ export default function RootLayout() {
   const { colorScheme } = useColorScheme();
 
   return (
-    <ClerkProvider
+    <ClerkProviderExtended
       tokenCache={tokenCache}
       publishableKey={Constants.expoConfig?.extra?.clerkPublishableKey}>
-      <ThemeProvider value={NAV_THEME[colorScheme ?? 'light']}>
-        <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
-        <Routes />
-        <PortalHost />
-      </ThemeProvider>
-    </ClerkProvider>
+      <QueryProvider>
+        <ThemeProvider value={NAV_THEME[colorScheme ?? 'light']}>
+          <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
+          <Routes />
+          <PortalHost />
+        </ThemeProvider>
+      </QueryProvider>
+    </ClerkProviderExtended>
   );
 }
 
@@ -53,9 +63,6 @@ function Routes() {
       {/* Screens only shown when the user is NOT signed in */}
       <Stack.Protected guard={!isSignedIn}>
         <Stack.Screen name="(auth)/sign-in" options={SIGN_IN_SCREEN_OPTIONS} />
-        <Stack.Screen name="(auth)/sign-up" options={SIGN_UP_SCREEN_OPTIONS} />
-        <Stack.Screen name="(auth)/reset-password" options={DEFAULT_AUTH_SCREEN_OPTIONS} />
-        <Stack.Screen name="(auth)/forgot-password" options={DEFAULT_AUTH_SCREEN_OPTIONS} />
       </Stack.Protected>
 
       {/* Screens only shown when the user IS signed in */}
@@ -72,17 +79,4 @@ function Routes() {
 const SIGN_IN_SCREEN_OPTIONS = {
   headerShown: false,
   title: 'Sign in',
-};
-
-const SIGN_UP_SCREEN_OPTIONS = {
-  presentation: 'modal',
-  title: '',
-  headerTransparent: true,
-  gestureEnabled: false,
-} as const;
-
-const DEFAULT_AUTH_SCREEN_OPTIONS = {
-  title: '',
-  headerShadowVisible: false,
-  headerTransparent: true,
 };
