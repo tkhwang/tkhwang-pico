@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, TouchableOpacity, Image, Linking, Alert } from 'react-native';
 import { Text } from '../ui/text';
+import { Icon } from '../ui/icon';
+import { ExternalLinkIcon } from 'lucide-react-native';
 import type { UserContentWithDetails } from '@tkhwang-pico/common';
 
 interface ContentItemProps {
@@ -28,7 +30,7 @@ export function ContentItem({ item }: ContentItemProps) {
     return null;
   }
 
-  const handlePress = async () => {
+  const handleLongPress = async () => {
     const url = content.canonical_url || content.url;
 
     if (!url) {
@@ -49,33 +51,47 @@ export function ContentItem({ item }: ContentItemProps) {
     }
   };
 
+  const handlePress = () => {
+    // Regular tap can be used for other actions like selection or showing details
+    console.log('Item tapped:', content.title);
+  };
+
   return (
     <TouchableOpacity
       className="mb-4 rounded-lg border border-gray-100 bg-white p-4 dark:border-gray-700 dark:bg-gray-800"
-      onPress={handlePress}>
+      onPress={handlePress}
+      onLongPress={handleLongPress}
+      delayLongPress={500}>
       {/* Meta Information */}
-      <View className="mb-2 flex-row items-center">
-        <Text className="text-xs text-gray-400 dark:text-gray-500">
-          {content.domain || 'CONTENT'}
-        </Text>
-        <Text className="mx-1.5 text-xs text-gray-400">•</Text>
-        <Text className="text-xs text-gray-400 dark:text-gray-500">
-          {item.saved_at ? formatDate(item.saved_at) : 'Unknown date'}
-        </Text>
-        {content.word_count ? (
-          <React.Fragment>
-            <Text className="mx-1.5 text-xs text-gray-400">•</Text>
-            <Text className="text-xs text-gray-400 dark:text-gray-500">
-              {`${Math.ceil(content.word_count / 200)} min read`}
-            </Text>
-          </React.Fragment>
-        ) : null}
-        {item.is_public ? (
-          <React.Fragment>
-            <Text className="mx-1.5 text-xs text-gray-400">•</Text>
-            <Text className="text-xs font-medium text-green-600 dark:text-green-400">Public</Text>
-          </React.Fragment>
-        ) : null}
+      <View className="mb-2 flex-row items-center justify-between">
+        <View className="flex-1 flex-row items-center">
+          <Text className="text-xs text-gray-400 dark:text-gray-500">
+            {content.domain || 'CONTENT'}
+          </Text>
+          <Text className="mx-1.5 text-xs text-gray-400">•</Text>
+          <Text className="text-xs text-gray-400 dark:text-gray-500">
+            {item.saved_at ? formatDate(item.saved_at) : 'Unknown date'}
+          </Text>
+          {content.word_count ? (
+            <React.Fragment>
+              <Text className="mx-1.5 text-xs text-gray-400">•</Text>
+              <Text className="text-xs text-gray-400 dark:text-gray-500">
+                {`${Math.ceil(content.word_count / 200)} min read`}
+              </Text>
+            </React.Fragment>
+          ) : null}
+          {item.is_public ? (
+            <React.Fragment>
+              <Text className="mx-1.5 text-xs text-gray-400">•</Text>
+              <Text className="text-xs font-medium text-green-600 dark:text-green-400">Public</Text>
+            </React.Fragment>
+          ) : null}
+        </View>
+        {/* Long press hint */}
+        <View className="flex-row items-center">
+          <Icon as={ExternalLinkIcon} className="mr-1 h-3 w-3 text-gray-400 dark:text-gray-500" />
+          <Text className="text-xs text-gray-400 dark:text-gray-500">Hold</Text>
+        </View>
       </View>
 
       {/* Content with thumbnail */}
