@@ -2,6 +2,7 @@
   "name": "tkhwang-pico",
   "version": "0.0.1",
   "private": true,
+  "packageManager": "yarn@1.22.22",
   "scripts": {
     "clean": "rm -rf node_modules apps/*/node_modules apps/*/dist apps/*/build apps/web/.next apps/mobile-queue/.expo "
   },
