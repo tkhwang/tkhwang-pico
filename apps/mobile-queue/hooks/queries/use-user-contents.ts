@@ -7,11 +7,10 @@ import { useSupabaseQuery } from '@/hooks/queries/supabase/use-supabase-query';
 export function useUserContents() {
   const { user } = useUser();
 
-  if (!user?.id) return { data: [], isLoading: false, isError: false };
-
   return useSupabaseQuery(
-    queryKey.userContents.byUserId(user.id),
+    user?.id ? queryKey.userContents.byUserId(user.id) : ['no-user'],
     async (clerkToken): Promise<UserContentWithDetails[]> => {
+      if (!user?.id) return [];
       return await getUserContents(clerkToken, user.id);
     },
     {
