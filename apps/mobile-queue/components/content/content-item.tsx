@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, TouchableOpacity } from 'react-native';
+import { View, TouchableOpacity, Image } from 'react-native';
 import { Text } from '../ui/text';
 import type { UserContentWithDetails } from '@tkhwang-pico/common';
 
@@ -30,22 +30,39 @@ export function ContentItem({ item }: ContentItemProps) {
 
   return (
     <TouchableOpacity className="mb-4 rounded-lg border border-gray-100 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
+      {/* Meta Information */}
       <View className="mb-2 flex-row items-center">
-        <Text className="text-xs font-medium uppercase text-gray-400 dark:text-gray-500">
+        <Text className="text-xs text-gray-400 dark:text-gray-500">
           {content.domain || 'CONTENT'}
         </Text>
+        <Text className="mx-1.5 text-xs text-gray-400">•</Text>
+        <Text className="text-xs text-gray-400 dark:text-gray-500">
+          {formatDate(item.saved_at)}
+        </Text>
+        {content.word_count && (
+          <>
+            <Text className="mx-1.5 text-xs text-gray-400">•</Text>
+            <Text className="text-xs text-gray-400 dark:text-gray-500">
+              {`${Math.ceil(content.word_count / 200)} min read`}
+            </Text>
+          </>
+        )}
         {item.is_public && (
-          <View className="ml-2 rounded-full bg-green-100 px-2 py-0.5 dark:bg-green-900/50">
+          <>
+            <Text className="mx-1.5 text-xs text-gray-400">•</Text>
             <Text className="text-xs font-medium text-green-600 dark:text-green-400">Public</Text>
-          </View>
+          </>
         )}
       </View>
+
+      {/* Content with thumbnail */}
       <View className="flex-row items-start">
         <View
           className={`mr-3 mt-1 h-5 w-5 rounded-full border-2 ${item.archived ? 'border-gray-300 bg-gray-50 dark:bg-gray-900/20' : 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'}`}>
           {item.archived && <Text className="text-center text-xs text-gray-500">✓</Text>}
         </View>
-        <View className="flex-1">
+        <View className="flex-1 pr-3">
+          {/* Title */}
           <Text
             className="mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100"
             numberOfLines={2}>
@@ -61,19 +78,6 @@ export function ContentItem({ item }: ContentItemProps) {
               {item.note}
             </Text>
           )}
-          <View className="flex-row items-center">
-            <Text className="text-xs text-gray-500 dark:text-gray-500">
-              {formatDate(item.saved_at)}
-            </Text>
-            {content.word_count && (
-              <View className="flex-row items-center">
-                <Text className="mx-2 text-xs text-gray-400">•</Text>
-                <Text className="text-xs text-gray-500 dark:text-gray-500">
-                  {`${Math.ceil(content.word_count / 200)} min read`}
-                </Text>
-              </View>
-            )}
-          </View>
           {item.labels && item.labels.length > 0 && (
             <View className="mt-2 flex-row flex-wrap">
               {item.labels.map((label, index) => (
@@ -86,7 +90,22 @@ export function ContentItem({ item }: ContentItemProps) {
             </View>
           )}
         </View>
-        <Text className="text-2xl">📄</Text>
+
+        {/* Thumbnail */}
+        {content.metadata &&
+        typeof content.metadata === 'object' &&
+        'image_url' in content.metadata &&
+        content.metadata.image_url ? (
+          <Image
+            source={{ uri: content.metadata.image_url as string }}
+            className="h-20 w-20 rounded-lg"
+            resizeMode="cover"
+          />
+        ) : (
+          <View className="h-20 w-20 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800">
+            <Text className="text-2xl">📄</Text>
+          </View>
+        )}
       </View>
     </TouchableOpacity>
   );
