@@ -13,6 +13,13 @@ import { useColorScheme } from 'nativewind';
 import * as React from 'react';
 import Constants from 'expo-constants';
 
+// React 19 types require components to explicitly include `children`.
+// Some versions of @clerk/clerk-expo don't declare `children` in props,
+// so we cast to a type that includes it to satisfy TS without runtime changes.
+const ClerkProviderExtended = ClerkProvider as React.ComponentType<
+  React.PropsWithChildren<React.ComponentProps<typeof ClerkProvider>>
+>;
+
 export {
   // Catch any errors thrown by the Layout component.
   ErrorBoundary,
@@ -22,7 +29,7 @@ export default function RootLayout() {
   const { colorScheme } = useColorScheme();
 
   return (
-    <ClerkProvider
+    <ClerkProviderExtended
       tokenCache={tokenCache}
       publishableKey={Constants.expoConfig?.extra?.clerkPublishableKey}>
       <QueryProvider>
@@ -32,7 +39,7 @@ export default function RootLayout() {
           <PortalHost />
         </ThemeProvider>
       </QueryProvider>
-    </ClerkProvider>
+    </ClerkProviderExtended>
   );
 }
 
