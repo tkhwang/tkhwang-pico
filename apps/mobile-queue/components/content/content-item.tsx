@@ -60,29 +60,29 @@ export function ContentItem({ item }: ContentItemProps) {
         </Text>
         <Text className="mx-1.5 text-xs text-gray-400">•</Text>
         <Text className="text-xs text-gray-400 dark:text-gray-500">
-          {formatDate(item.saved_at)}
+          {item.saved_at ? formatDate(item.saved_at) : 'Unknown date'}
         </Text>
-        {content.word_count && (
-          <>
+        {content.word_count ? (
+          <React.Fragment>
             <Text className="mx-1.5 text-xs text-gray-400">•</Text>
             <Text className="text-xs text-gray-400 dark:text-gray-500">
               {`${Math.ceil(content.word_count / 200)} min read`}
             </Text>
-          </>
-        )}
-        {item.is_public && (
-          <>
+          </React.Fragment>
+        ) : null}
+        {item.is_public ? (
+          <React.Fragment>
             <Text className="mx-1.5 text-xs text-gray-400">•</Text>
             <Text className="text-xs font-medium text-green-600 dark:text-green-400">Public</Text>
-          </>
-        )}
+          </React.Fragment>
+        ) : null}
       </View>
 
       {/* Content with thumbnail */}
       <View className="flex-row items-start">
         <View
-          className={`mr-3 mt-1 h-5 w-5 rounded-full border-2 ${item.archived ? 'border-gray-300 bg-gray-50 dark:bg-gray-900/20' : 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'}`}>
-          {item.archived && <Text className="text-center text-xs text-gray-500">✓</Text>}
+          className={`mr-3 mt-1 h-5 w-5 items-center justify-center rounded-full border-2 ${item.archived ? 'border-gray-300 bg-gray-50 dark:bg-gray-900/20' : 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'}`}>
+          {item.archived ? <Text className="text-xs text-gray-500">✓</Text> : null}
         </View>
         <View className="flex-1 pr-3">
           {/* Title */}
@@ -91,17 +91,17 @@ export function ContentItem({ item }: ContentItemProps) {
             numberOfLines={2}>
             {content.title || 'Untitled'}
           </Text>
-          {content.summary && (
+          {content.summary ? (
             <Text className="mb-2 text-sm text-gray-600 dark:text-gray-400" numberOfLines={3}>
               {content.summary}
             </Text>
-          )}
-          {item.note && (
+          ) : null}
+          {item.note ? (
             <Text className="mb-2 text-sm italic text-gray-500 dark:text-gray-500">
               {item.note}
             </Text>
-          )}
-          {item.labels && item.labels.length > 0 && (
+          ) : null}
+          {item.labels && item.labels.length > 0 ? (
             <View className="mt-2 flex-row flex-wrap">
               {item.labels.map((label, index) => (
                 <View
@@ -111,7 +111,7 @@ export function ContentItem({ item }: ContentItemProps) {
                 </View>
               ))}
             </View>
-          )}
+          ) : null}
         </View>
 
         {/* Thumbnail */}
