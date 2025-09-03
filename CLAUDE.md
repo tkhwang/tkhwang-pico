@@ -11,6 +11,7 @@ PICO (Personal Intelligent Companion Operator) is a cross-platform monorepo with
 - **Mastra AI agent system** (`apps/mastra/`) - Intelligent routing and specialized AI agents (weather, fallback)
 - **Nest.js backend** (`apps/nest/`) - Node.js backend service
 - **LangChain system** (`apps/langchain/`) - Alternative AI agent implementation using LangChain.js
+- **Common package** (`packages/common/`) - Shared types and utilities across apps
 - **Shared UI components** using shadcn/ui patterns adapted for each platform
 
 ## Development Commands
@@ -19,6 +20,7 @@ PICO (Personal Intelligent Companion Operator) is a cross-platform monorepo with
 
 ```bash
 yarn                    # Install all dependencies
+yarn clean              # Clean all node_modules, build artifacts, and caches
 ```
 
 ### Mobile App (`apps/mobile-queue/`)
@@ -43,7 +45,6 @@ yarn dev               # Start Next.js dev server with Turbopack
 yarn build             # Build for production
 yarn start             # Start production server
 yarn lint              # Run ESLint
-yarn generate-types   # Generate Supabase TypeScript types
 ```
 
 ### Mastra AI System (`apps/mastra/`)
@@ -125,8 +126,8 @@ The project implements a unique cross-platform UI approach:
 
 ### Theming & Styling
 
-- **Mobile**: NativeWind (Tailwind for React Native) with platform-specific variants
-- **Web**: Standard Tailwind CSS v4 with enhanced design tokens
+- **Mobile**: NativeWind v4 (Tailwind for React Native) with platform-specific variants
+- **Web**: Tailwind CSS v3.4 with enhanced design tokens
 - **Shared Colors**: Both platforms use HSL color definitions for consistency
 - **Theme Toggle**: Cross-platform dark/light mode with system preference detection
 
@@ -181,18 +182,21 @@ The mobile app uses Expo Application Services (EAS) for builds:
 ### Mobile-Specific
 
 - Expo SDK 53 with React Native 0.79.5
-- `@rn-primitives`: Accessible React Native components
+- `@rn-primitives/*`: Accessible React Native UI primitives (avatar, label, popover, portal, separator, slot)
 - `expo-router`: File-based navigation
+- `expo-auth-session`, `expo-web-browser`: OAuth authentication flow
+- `expo-secure-store`: Secure token storage
 - NativeWind v4: Tailwind CSS for React Native
 
 ### Web-Specific
 
 - Next.js 15.4.0 with React 19
-- `@radix-ui`: Accessible web components
+- `@radix-ui/*`: Accessible web UI primitives (dialog, dropdown-menu, avatar, etc.)
 - `@supabase/supabase-js`, `@supabase/ssr`: Database and authentication
 - `@tanstack/react-query`: Client-side data fetching and caching
+- `@copilotkit/react-core`, `@copilotkit/react-ui`: AI chat interface
 - `next-themes`: Theme management with system preference detection
-- Tailwind CSS v4 with enhanced features
+- Tailwind CSS v3.4 with tailwindcss-animate
 - TypeScript 5 with strict configuration
 
 ## Environment Configuration
@@ -268,6 +272,14 @@ Currently no test infrastructure is configured. When adding tests:
 - **E2E**: Playwright could work for web, Detox for mobile
 - **AI Agents**: Test routing logic and agent responses with mock data
 
+## Package Resolution
+
+The monorepo enforces specific React versions across all packages:
+- React: 19.0.0
+- React DOM: 19.0.0
+
+These are enforced via `resolutions` in the root `package.json`.
+
 ## Build Artifacts
 
 Mobile app generates APK files in the root directory (e.g., `build-1755019814115.apk`). These should be added to `.gitignore` if not already present.
@@ -290,8 +302,6 @@ The Mastra system uses LibSQL with in-memory storage by default. When configured
 - **Protected Routes**: Middleware-based route protection
 
 ## Deployment Platforms
-
-### Production Deployments
 
 - **Web App**: Vercel (automatic deployments from main branch)
 - **Mastra AI**: Mastra Cloud (dedicated AI agent hosting)
@@ -316,3 +326,10 @@ The Mastra system uses LibSQL with in-memory storage by default. When configured
 
 - **Workspace resolution**: Always run `yarn` from repository root after package changes
 - **Cross-package imports**: Use workspace protocol `@tkhwang-pico/common` for shared code
+- **React version conflicts**: Enforced via root `resolutions` to React 19.0.0
+
+### AI Agent Integration
+
+- **Mastra server must be running**: Start with `cd apps/mastra && yarn dev` before web app
+- **CopilotKit runtime**: Connects to Mastra agents via `/api/copilotkit` endpoint
+- **Agent routing**: Routing network analyzes intent and dispatches to appropriate agents
