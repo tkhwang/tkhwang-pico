@@ -1,8 +1,9 @@
 import '@/global.css';
 
 import { NAV_THEME } from '@/lib/theme';
-import { ClerkProvider, useAuth } from '@clerk/clerk-expo';
+import { ClerkProvider, ClerkLoaded, useAuth } from '@clerk/clerk-expo';
 import { tokenCache } from '@clerk/clerk-expo/token-cache';
+import { QueryProvider } from '@/providers/query-provider';
 import { ThemeProvider } from '@react-navigation/native';
 import { PortalHost } from '@rn-primitives/portal';
 import { Stack } from 'expo-router';
@@ -24,11 +25,13 @@ export default function RootLayout() {
     <ClerkProvider
       tokenCache={tokenCache}
       publishableKey={Constants.expoConfig?.extra?.clerkPublishableKey}>
-      <ThemeProvider value={NAV_THEME[colorScheme ?? 'light']}>
-        <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
-        <Routes />
-        <PortalHost />
-      </ThemeProvider>
+      <QueryProvider>
+        <ThemeProvider value={NAV_THEME[colorScheme ?? 'light']}>
+          <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
+          <Routes />
+          <PortalHost />
+        </ThemeProvider>
+      </QueryProvider>
     </ClerkProvider>
   );
 }
