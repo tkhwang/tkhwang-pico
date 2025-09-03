@@ -38,6 +38,12 @@ export function ContentItem({ item }: ContentItemProps) {
       return;
     }
 
+    // Only allow http(s) URLs
+    if (!/^https?:\/\//i.test(url)) {
+      Alert.alert('Unsafe URL', 'Only http(s) URLs are allowed.');
+      return;
+    }
+
     try {
       const supported = await Linking.canOpenURL(url);
       if (supported) {
@@ -47,7 +53,7 @@ export function ContentItem({ item }: ContentItemProps) {
       }
     } catch (error) {
       Alert.alert('Error', 'Failed to open URL');
-      console.error('Error opening URL:', error);
+      if (__DEV__) console.error('Error opening URL:', error);
     }
   };
 
