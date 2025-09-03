@@ -2,6 +2,9 @@
   "name": "tkhwang-pico",
   "version": "0.0.1",
   "private": true,
+  "scripts": {
+    "clean": "rm -rf node_modules apps/*/node_modules apps/*/dist apps/*/build apps/web/.next apps/mobile-queue/.expo "
+  },
   "workspaces": [
     "apps/*",
     "packages/*"
