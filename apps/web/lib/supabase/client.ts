@@ -1,7 +1,7 @@
 import { AuthClerkSession } from "@/types/auth";
 import { createBrowserClient } from "@supabase/ssr";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { Database } from "@tkhwang-pico/common/supabase";
+import type { Database } from "@tkhwang-pico/common/supabase";
 
 /**
  * Create a Supabase client with authentication required
