@@ -1,0 +1,18 @@
+{
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./supabase": "./src/supabase/database.types.ts"
+  },
+  "main": "./src/index.ts",
+  "name": "@tkhwang-pico/common",
+  "private": true,
+  "scripts": {
+    "generate-types": "npx supabase gen types typescript --project-id hgkmrremnwapjdbebvqo --schema public >./src/supabase/database.types.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "types": "./src/index.ts",
+  "version": "1.0.0"
+}
