@@ -5,7 +5,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Project Overview
 
 PICO (Personal Intelligent Companion Operator) is a cross-platform monorepo with AI agent system architecture using Yarn workspaces. The project includes:
-- **Mobile app** (`apps/mobile-queue/`) - React Native + Expo with cross-platform support (iOS/Android/Web) 
+
+- **Mobile app** (`apps/mobile-queue/`) - React Native + Expo with cross-platform support (iOS/Android/Web)
 - **Web app** (`apps/web/`) - Next.js 15.4.0 with React 19 patterns, Supabase auth, and CopilotKit integration
 - **Mastra AI agent system** (`apps/mastra/`) - Intelligent routing and specialized AI agents (weather, fallback)
 - **Nest.js backend** (`apps/nest/`) - Node.js backend service
@@ -15,11 +16,13 @@ PICO (Personal Intelligent Companion Operator) is a cross-platform monorepo with
 ## Development Commands
 
 ### Root Level (Monorepo)
+
 ```bash
 yarn                    # Install all dependencies
 ```
 
 ### Mobile App (`apps/mobile-queue/`)
+
 ```bash
 yarn dev               # Start Expo development server with cache clear
 yarn android           # Start with Android emulator
@@ -34,6 +37,7 @@ yarn clean             # Clean Expo cache and node_modules
 ```
 
 ### Web App (`apps/web/`)
+
 ```bash
 yarn dev               # Start Next.js dev server with Turbopack
 yarn build             # Build for production
@@ -43,6 +47,7 @@ yarn generate-types   # Generate Supabase TypeScript types
 ```
 
 ### Mastra AI System (`apps/mastra/`)
+
 ```bash
 yarn dev               # Start Mastra development server with hot reload
 yarn build             # Build Mastra agent system
@@ -50,6 +55,7 @@ yarn start             # Start production Mastra server
 ```
 
 ### Nest.js Backend (`apps/nest/`)
+
 ```bash
 yarn dev               # Start Nest.js development server
 yarn build             # Build for production
@@ -57,6 +63,7 @@ yarn start             # Start production server
 ```
 
 ### LangChain System (`apps/langchain/`)
+
 ```bash
 yarn dev               # Start LangChain development server
 yarn build             # Build LangChain agent system
@@ -66,59 +73,71 @@ yarn start             # Start production server
 ## Architecture & Patterns
 
 ### AI Agent System Architecture
+
 The project features a sophisticated AI agent system using Mastra framework:
 
 **Routing Network** (`apps/mastra/src/mastra/network/routing-network.ts`):
+
 - Intelligent routing system that analyzes user intent and routes to appropriate agents
 - Supports multiple languages (Korean/English) with language detection
 - Uses OpenAI GPT-4o-mini for routing decisions
 
 **Specialized Agents**:
+
 - **Weather Agent**: Provides weather information and forecasts
 - **Fallback Agent**: Handles general queries and provides fallback responses
 - **Routing Agent**: Central dispatcher that determines which agent should handle each request
 
 **Vector Database Integration**:
+
 - Uses LibSQL with in-memory storage for telemetry and evaluations
 - Configurable to use persistent file storage (file:../mastra.db) when needed
 
 **CopilotKit Integration**:
+
 - Web app integrates with Mastra agents via CopilotKit runtime
 - Real-time agent communication through `/api/copilotkit` endpoint
 - Dynamic agent loading with runtime initialization
 
 ### Cross-Platform Component Strategy
+
 The project implements a unique cross-platform UI approach:
 
 **Mobile Components** (`apps/mobile-queue/components/ui/`):
+
 - Built on `@rn-primitives` for React Native compatibility
 - Uses `react-native-web` for web rendering
 - Platform-specific styling with `web:` and `native:` prefixes in Tailwind
 - Components wrap React Native `Pressable` and other native primitives
 
 **Web Components** (`apps/web/components/ui/`):
+
 - Built on `@radix-ui` primitives for web-native accessibility
 - Standard HTML elements with enhanced focus/interaction states
 - Uses `@radix-ui/react-slot` for component composition
 
 ### Authentication & Data Management
+
 - **Supabase Integration**: Authentication, database, and real-time features
 - **TanStack Query**: Client-side data fetching and caching with React Query
 - **Type Safety**: Automatic TypeScript type generation from Supabase schema
 - **Chat Persistence**: Thread-based chat history with user-specific data storage
 
 ### Theming & Styling
+
 - **Mobile**: NativeWind (Tailwind for React Native) with platform-specific variants
 - **Web**: Standard Tailwind CSS v4 with enhanced design tokens
 - **Shared Colors**: Both platforms use HSL color definitions for consistency
 - **Theme Toggle**: Cross-platform dark/light mode with system preference detection
 
 ### Navigation & Routing
+
 - **Mobile**: Expo Router (file-based routing) with React Navigation integration
 - **Web**: Next.js App Router with file-based routing
 - Both use similar layout patterns and component organization
 
 ### Key Architectural Decisions
+
 1. **AI-First Architecture**: Mastra agents as core intelligence layer with routing network
 2. **Monorepo Structure**: Yarn workspaces for dependency management and code sharing
 3. **Platform-Specific UI Libraries**: @rn-primitives for mobile, @radix-ui for web
@@ -129,6 +148,7 @@ The project implements a unique cross-platform UI approach:
 ## EAS Build Configuration
 
 The mobile app uses Expo Application Services (EAS) for builds:
+
 - **development**: Local development with dev client (APK output for Android)
 - **development-simulator**: iOS simulator builds
 - **preview**: Android release builds for testing
@@ -136,8 +156,7 @@ The mobile app uses Expo Application Services (EAS) for builds:
 
 ## Common File Patterns
 
-- `~/` path alias in mobile app points to project root
-- `@/` path alias in web app points to project root directory
+- `@/` path alias in both mobile and web apps points to their respective app root directories
 - UI components follow shadcn/ui naming and structure conventions
 - Cross-platform components maintain similar APIs but different implementations
 - Theme constants defined in `lib/constants.ts` for mobile, CSS variables for web
@@ -145,6 +164,7 @@ The mobile app uses Expo Application Services (EAS) for builds:
 ## Dependencies & Tools
 
 ### AI & Intelligence Layer (Mastra)
+
 - `@mastra/core`: Core Mastra framework for agent orchestration
 - `@mastra/libsql`: LibSQL storage and vector database integration
 - `@mastra/memory`, `@mastra/rag`: Memory and RAG capabilities
@@ -152,18 +172,21 @@ The mobile app uses Expo Application Services (EAS) for builds:
 - `@copilotkit/runtime`, `@copilotkit/react-*`: Real-time AI chat interface
 
 ### Shared Utilities
+
 - `class-variance-authority`: Component variant management
 - `clsx` & `tailwind-merge`: Conditional styling utilities
 - `lucide-react`/`lucide-react-native`: Consistent iconography
 - `zod`: Runtime type validation and schema definition
 
 ### Mobile-Specific
+
 - Expo SDK 53 with React Native 0.79.5
 - `@rn-primitives`: Accessible React Native components
 - `expo-router`: File-based navigation
 - NativeWind v4: Tailwind CSS for React Native
 
-### Web-Specific  
+### Web-Specific
+
 - Next.js 15.4.0 with React 19
 - `@radix-ui`: Accessible web components
 - `@supabase/supabase-js`, `@supabase/ssr`: Database and authentication
@@ -175,7 +198,8 @@ The mobile app uses Expo Application Services (EAS) for builds:
 ## Environment Configuration
 
 ### Required Environment Variables
-The web application requires several environment variables for proper operation:
+
+#### Web App (`apps/web/.env.local`)
 
 ```bash
 # Web App Configuration
@@ -186,12 +210,28 @@ NEXT_PUBLIC_COPILOTKIT_LICENSE_KEY=your_license_key
 # Supabase Configuration
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY=your_supabase_anon_key
+```
 
-# OpenAI Configuration (for Mastra)
+#### Mobile App (`apps/mobile-queue/.env`)
+
+```bash
+# Supabase Configuration
+EXPO_PUBLIC_SUPABASE_URL=your_supabase_url
+EXPO_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+
+# Clerk Authentication
+EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
+```
+
+#### Mastra AI System (`apps/mastra/.env`)
+
+```bash
+# OpenAI Configuration
 OPENAI_API_KEY=your_openai_api_key
 ```
 
 ### Development Setup
+
 1. Set up environment variables in `.env.local` files for each app
 2. Install dependencies: `yarn` (from root)
 3. Start Mastra server: `cd apps/mastra && yarn dev`
@@ -203,21 +243,25 @@ The web app validates required environment variables on startup and will throw d
 ## Code Quality & Linting
 
 ### ESLint Configuration
+
 - **Web**: Next.js + TypeScript + TanStack Query rules
 - **Mobile**: Expo + Prettier + import ordering rules
 - **Mastra**: Standard TypeScript configuration
 
 ### Import Organization (Mobile)
+
 Mobile app enforces strict import ordering:
+
 1. Built-in modules
 2. External packages (React/React Native first)
-3. Internal modules (`~/` alias)
+3. Internal modules (`@/` alias)
 4. Relative imports
 5. Type imports
 
 ## Testing & Quality
 
 Currently no test infrastructure is configured. When adding tests:
+
 - **Mastra**: Consider Jest for agent logic and vector database operations
 - **Mobile**: Consider Expo testing tools or React Native Testing Library
 - **Web**: Jest + React Testing Library would be appropriate
@@ -229,3 +273,46 @@ Currently no test infrastructure is configured. When adding tests:
 Mobile app generates APK files in the root directory (e.g., `build-1755019814115.apk`). These should be added to `.gitignore` if not already present.
 
 The Mastra system uses LibSQL with in-memory storage by default. When configured for persistence, it creates database files for storing telemetry and evaluation data.
+
+## Authentication Architecture
+
+### Mobile App
+
+- **Clerk Authentication**: Primary auth provider with Supabase JWT integration
+- **Token Flow**: Clerk JWT tokens are passed to Supabase for RLS (Row Level Security)
+- **Session Management**: Uses `expo-secure-store` for secure token storage
+- **Supabase Client**: Created with Clerk JWT token via `createSupabaseClientWithClerkAuth()`
+
+### Web App
+
+- **Supabase Auth**: Direct authentication with Supabase
+- **Session Handling**: Server-side session management with `@supabase/ssr`
+- **Protected Routes**: Middleware-based route protection
+
+## Deployment Platforms
+
+### Production Deployments
+
+- **Web App**: Vercel (automatic deployments from main branch)
+- **Mastra AI**: Mastra Cloud (dedicated AI agent hosting)
+- **Nest.js Backend**: Railway (container-based deployment)
+- **Mobile App**: Expo EAS Build for iOS/Android app stores
+- **Database**: Supabase (Postgres with real-time, auth, and storage)
+
+## Common Troubleshooting
+
+### Mobile Development Issues
+
+- **Metro bundler issues**: Run `yarn clean` then `yarn dev` from mobile app directory
+- **iOS simulator not starting**: Ensure Xcode is installed and run `yarn ios`
+- **Android build failures**: Check that Android SDK is properly configured
+
+### Supabase Integration
+
+- **RLS policies**: Ensure proper JWT configuration for Clerk-Supabase integration
+- **Type generation**: Run `yarn generate-types` after schema changes
+
+### Monorepo Dependencies
+
+- **Workspace resolution**: Always run `yarn` from repository root after package changes
+- **Cross-package imports**: Use workspace protocol `@tkhwang-pico/common` for shared code
