@@ -15,15 +15,7 @@ export class ContentsService {
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
-  async saveUrl({
-    url,
-    userId,
-    isPublic = false, // ← 개인 공개(프로필 노출) 여부
-  }: {
-    url: string;
-    userId: string;
-    isPublic?: boolean;
-  }) {
+  async saveUrl({ url, userId }: { url: string; userId: string }) {
     let canonicalUrl: string;
     try {
       canonicalUrl = toCanonicalUrl(url);
@@ -54,13 +46,12 @@ export class ContentsService {
       );
     }
 
-    // 2) user_contents upsert (개인 공개 여부를 여기서 관리)
+    // 2) user_contents upsert
     const { error: errorOfUpsertUserContents } =
       await this.supabaseService.serviceClient.from('user_contents').upsert(
         {
           user_id: userId,
           content_id: contents.id,
-          is_public: isPublic, // ✅ 개인 공개 플래그는 여기
         },
         { onConflict: 'user_id,content_id' },
       );
