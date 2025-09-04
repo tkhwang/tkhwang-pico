@@ -8,9 +8,9 @@ import { HomeSearch } from '@/components/home/home-search';
 export function Home() {
   const [isModalVisible, setIsModalVisible] = useState(false);
 
-  const handleContentSubmit = (url: string, responseData: any) => {
-    console.log('Content added:', { url, responseData });
-    // TODO: Add content to the queue
+  const handleContentSaved = () => {
+    console.log('Content saved successfully');
+    setIsModalVisible(false);
   };
 
   return (
@@ -28,7 +28,7 @@ export function Home() {
       <FabModal
         visible={isModalVisible}
         onClose={() => setIsModalVisible(false)}
-        onSubmit={handleContentSubmit}
+        onSuccess={handleContentSaved}
       />
     </View>
   );

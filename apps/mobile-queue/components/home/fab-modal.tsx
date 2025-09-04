@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   ScrollView,
@@ -10,49 +10,48 @@ import {
 import { Text } from '../ui/text';
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';
+import { useSaveContent } from '@/hooks/mutations/use-save-content';
 
 interface FabModalProps {
   visible: boolean;
   onClose: () => void;
-  onSubmit?: (url: string, responseData: any) => void;
+  onSuccess?: () => void;
 }
 
-export function FabModal({ visible, onClose, onSubmit }: FabModalProps) {
+export function FabModal({ visible, onClose, onSuccess }: FabModalProps) {
   const [url, setUrl] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [responseData, setResponseData] = useState<any>(null);
+
+  const saveContentMutation = useSaveContent({
+    onSuccess: () => {
+      setUrl('');
+      onSuccess?.();
+      onClose();
+    },
+  });
 
   const handleSubmitUrl = async () => {
     if (!url.trim()) return;
 
-    setIsLoading(true);
-    try {
-      // Mock API call - replace with actual endpoint
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      // Mock response data
-      const mockResponse = {
-        title: 'Understanding React Native Navigation',
-        source: 'Medium',
-        category: 'Development',
-        type: 'article',
-        readTime: '8 min read',
-        thumbnail: '📱',
-        url: url,
-      };
-
-      setResponseData(mockResponse);
-      onSubmit?.(url, mockResponse);
-    } catch (error) {
-      console.error('Error fetching content:', error);
-    } finally {
-      setIsLoading(false);
+    // Validate URL format
+    const urlPattern = /^https?:\/\/.+/;
+    if (!urlPattern.test(url.trim())) {
+      alert('Please enter a valid URL starting with http:// or https://');
+      return;
     }
+
+    saveContentMutation.mutate(url.trim());
   };
+
+  // Reset form when modal closes
+  useEffect(() => {
+    if (!visible) {
+      setUrl('');
+      saveContentMutation.reset();
+    }
+  }, [visible]);
 
   const handleCloseModal = () => {
     setUrl('');
-    setResponseData(null);
     onClose();
   };
 
@@ -98,44 +97,21 @@ export function FabModal({ visible, onClose, onSubmit }: FabModalProps) {
                 {/* Submit Button */}
                 <Button
                   onPress={handleSubmitUrl}
-                  disabled={!url.trim() || isLoading}
+                  disabled={!url.trim() || saveContentMutation.isPending}
                   className="mb-6 h-12 rounded-lg bg-blue-500 active:bg-blue-600 disabled:opacity-50">
                   <Text className="font-semibold text-white">
-                    {isLoading ? 'Fetching...' : 'Add Content'}
+                    {saveContentMutation.isPending ? 'Saving...' : 'Add Content'}
                   </Text>
                 </Button>
 
-                {/* Response Display */}
-                {responseData && (
+                {/* Success Message */}
+                {saveContentMutation.isSuccess && (
                   <View className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800">
-                    <Text className="mb-3 text-lg font-semibold text-gray-900 dark:text-gray-100">
-                      Content Preview
-                    </Text>
-                    <View className="space-y-2">
-                      <View>
-                        <Text className="text-xs font-medium uppercase text-gray-400 dark:text-gray-500">
-                          {responseData.type}
-                        </Text>
-                        <Text className="text-base font-medium text-gray-900 dark:text-gray-100">
-                          {responseData.title}
-                        </Text>
-                      </View>
-                      <Text className="text-sm text-gray-600 dark:text-gray-400">
-                        {responseData.source}
+                    <View className="flex-row items-center">
+                      <Text className="mr-2 text-2xl">✅</Text>
+                      <Text className="text-base font-medium text-gray-900 dark:text-gray-100">
+                        Content saved successfully!
                       </Text>
-                      <View className="flex-row items-center">
-                        <Text className="text-xs text-gray-500 dark:text-gray-500">
-                          {responseData.category}
-                        </Text>
-                        {responseData.readTime && (
-                          <>
-                            <Text className="mx-2 text-xs text-gray-400">•</Text>
-                            <Text className="text-xs text-gray-500 dark:text-gray-500">
-                              {responseData.readTime}
-                            </Text>
-                          </>
-                        )}
-                      </View>
                     </View>
                   </View>
                 )}
