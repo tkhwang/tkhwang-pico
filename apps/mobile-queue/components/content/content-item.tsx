@@ -64,66 +64,73 @@ export function ContentItem({ item }: ContentItemProps) {
 
   return (
     <TouchableOpacity
-      className="mb-4 rounded-lg border border-gray-100 bg-white p-4 dark:border-gray-700 dark:bg-gray-800"
+      className="mb-2 rounded-lg border border-gray-100 bg-white p-3 dark:border-gray-700 dark:bg-gray-800"
       onPress={handlePress}
       onLongPress={handleLongPress}
       delayLongPress={500}>
       {/* Meta Information */}
-      <View className="mb-2 flex-row items-center justify-between">
+      <View className="mb-1.5 flex-row items-center justify-between">
         <View className="flex-1 flex-row items-center">
           <Text className="text-xs text-gray-400 dark:text-gray-500">
             {content.domain || 'CONTENT'}
           </Text>
-          <Text className="mx-1.5 text-xs text-gray-400">•</Text>
+          <Text className="mx-1 text-xs text-gray-400">•</Text>
           <Text className="text-xs text-gray-400 dark:text-gray-500">
             {item.saved_at ? formatDate(item.saved_at) : 'Unknown date'}
           </Text>
           {content.word_count ? (
             <React.Fragment>
-              <Text className="mx-1.5 text-xs text-gray-400">•</Text>
+              <Text className="mx-1 text-xs text-gray-400">•</Text>
               <Text className="text-xs text-gray-400 dark:text-gray-500">
-                {`${Math.ceil(content.word_count / 200)} min read`}
+                {`${Math.ceil(content.word_count / 200)} min`}
               </Text>
             </React.Fragment>
           ) : null}
         </View>
         {/* Long press hint */}
-        <View className="flex-row items-center">
-          <Icon as={ExternalLinkIcon} className="mr-1 h-3 w-3 text-gray-400 dark:text-gray-500" />
-          <Text className="text-xs text-gray-400 dark:text-gray-500">Hold</Text>
+        <View className="flex-row items-center opacity-60">
+          <Icon
+            as={ExternalLinkIcon}
+            className="mr-0.5 h-2.5 w-2.5 text-gray-400 dark:text-gray-500"
+          />
+          <Text className="text-[10px] text-gray-400 dark:text-gray-500">Hold</Text>
         </View>
       </View>
 
       {/* Content with thumbnail */}
       <View className="flex-row items-start">
         <View
-          className={`mr-3 mt-1 h-5 w-5 items-center justify-center rounded-full border-2 ${item.archived ? 'border-gray-300 bg-gray-50 dark:bg-gray-900/20' : 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'}`}>
-          {item.archived ? <Text className="text-xs text-gray-500">✓</Text> : null}
+          className={`mr-2 mt-0.5 h-4 w-4 items-center justify-center rounded-full border-2 ${item.archived ? 'border-gray-300 bg-gray-50 dark:bg-gray-900/20' : 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'}`}>
+          {item.archived ? <Text className="text-[10px] text-gray-500">✓</Text> : null}
         </View>
-        <View className="flex-1 pr-3">
+        <View className="flex-1 pr-2">
           {/* Title */}
           <Text
-            className="mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100"
+            className="mb-1 text-base font-semibold text-gray-900 dark:text-gray-100"
             numberOfLines={2}>
             {content.title || 'Untitled'}
           </Text>
           {content.summary ? (
-            <Text className="mb-2 text-sm text-gray-600 dark:text-gray-400" numberOfLines={3}>
+            <Text className="mb-1 text-xs text-gray-600 dark:text-gray-400" numberOfLines={2}>
               {content.summary}
             </Text>
           ) : null}
           {item.note ? (
-            <Text className="mb-2 text-sm italic text-gray-500 dark:text-gray-500">
+            <Text
+              className="mb-1 text-xs italic text-gray-500 dark:text-gray-500"
+              numberOfLines={1}>
               {item.note}
             </Text>
           ) : null}
           {item.labels && item.labels.length > 0 ? (
-            <View className="mt-2 flex-row flex-wrap">
+            <View className="mt-1 flex-row flex-wrap">
               {item.labels.map((label, index) => (
                 <View
                   key={index}
-                  className="mr-2 mt-1 rounded-full bg-gray-100 px-2 py-1 dark:bg-gray-700">
-                  <Text className="text-xs text-gray-600 dark:text-gray-400">{String(label)}</Text>
+                  className="mr-1.5 mt-1 rounded-full bg-gray-100 px-1.5 py-0.5 dark:bg-gray-700">
+                  <Text className="text-[10px] text-gray-600 dark:text-gray-400">
+                    {String(label)}
+                  </Text>
                 </View>
               ))}
             </View>
@@ -137,12 +144,12 @@ export function ContentItem({ item }: ContentItemProps) {
         content.metadata.image_url ? (
           <Image
             source={{ uri: content.metadata.image_url as string }}
-            className="h-20 w-20 rounded-lg"
+            className="h-16 w-16 rounded-md"
             resizeMode="cover"
           />
         ) : (
-          <View className="h-20 w-20 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800">
-            <Text className="text-2xl">📄</Text>
+          <View className="h-16 w-16 items-center justify-center rounded-md bg-gray-100 dark:bg-gray-800">
+            <Text className="text-xl">📄</Text>
           </View>
         )}
       </View>
