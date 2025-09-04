@@ -1,21 +1,15 @@
 import React from 'react';
-import { View, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, TouchableOpacity } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { Text } from '../ui/text';
 import { ContentItem } from './content-item';
 import { useUserContents } from '@/hooks/queries/use-user-contents';
+import { ContentListSkeleton } from '@/components/content/content-list-skeleton';
 
 export function ContentList() {
   const { data: userContents = [], isLoading, error, refetch } = useUserContents();
 
-  if (isLoading) {
-    return (
-      <View className="flex-1 items-center justify-center">
-        <ActivityIndicator size="large" color="#3B82F6" />
-        <Text className="mt-4 text-gray-500 dark:text-gray-400">Loading contents...</Text>
-      </View>
-    );
-  }
+  if (isLoading) return <ContentListSkeleton />;
 
   if (error) {
     return (
