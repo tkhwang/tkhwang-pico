@@ -86,12 +86,6 @@ export function ContentItem({ item }: ContentItemProps) {
               </Text>
             </React.Fragment>
           ) : null}
-          {item.is_public ? (
-            <React.Fragment>
-              <Text className="mx-1.5 text-xs text-gray-400">•</Text>
-              <Text className="text-xs font-medium text-green-600 dark:text-green-400">Public</Text>
-            </React.Fragment>
-          ) : null}
         </View>
         {/* Long press hint */}
         <View className="flex-row items-center">
