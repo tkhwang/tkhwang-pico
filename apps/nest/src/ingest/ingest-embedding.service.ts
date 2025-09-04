@@ -2,6 +2,8 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import OpenAI from 'openai';
 import { SupabaseService } from '../supabase/supabase.service';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { EVENTS } from '../common/constants/events';
 
 @Injectable()
 export class IngestEmbeddingService {
@@ -12,6 +14,7 @@ export class IngestEmbeddingService {
   constructor(
     private readonly configService: ConfigService,
     private readonly supabaseService: SupabaseService,
+    private readonly eventEmitter: EventEmitter2,
   ) {
     const apiKey = this.configService.get<string>('OPENAI_API_KEY');
     if (!apiKey) {
@@ -101,6 +104,9 @@ export class IngestEmbeddingService {
           return { ok: false };
         }
       }
+
+      // Notify downstream that this content's embedding is ready
+      this.eventEmitter.emit(EVENTS.EMBEDDING.COMPLETED, { contentId, model });
 
       return { ok: true, model };
     } catch (error) {

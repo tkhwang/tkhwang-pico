@@ -62,11 +62,16 @@ export class ContentsService {
       );
     }
 
-    // Emit event for content processing
+    // Emit events for processing and personalization
     this.eventEmitter.emit(EVENTS.CONTENT.CREATED, {
       contentId: contents.id,
       url: canonicalUrl,
       userId,
+    });
+
+    this.eventEmitter.emit(EVENTS.USER.CONTENT_SAVED, {
+      userId,
+      contentId: contents.id,
     });
 
     return {
