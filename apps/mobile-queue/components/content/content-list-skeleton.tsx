@@ -1,30 +1,29 @@
-import { ScrollView, View } from 'react-native';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withRepeat,
-  withTiming,
-  interpolate,
-} from 'react-native-reanimated';
-import { useEffect } from 'react';
+import { ScrollView, View, Animated } from 'react-native';
+import { useEffect, useRef } from 'react';
 
 function SkeletonCard() {
-  const shimmer = useSharedValue(0);
+  const fadeAnim = useRef(new Animated.Value(0.5)).current;
 
   useEffect(() => {
-    shimmer.value = withRepeat(withTiming(1, { duration: 1500 }), -1, true);
-  }, [shimmer]);
-
-  const animatedStyle = useAnimatedStyle(() => {
-    const opacity = interpolate(shimmer.value, [0, 1], [0.5, 1.0]);
-    return {
-      opacity,
-    };
-  });
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 1500,
+          useNativeDriver: true,
+        }),
+        Animated.timing(fadeAnim, {
+          toValue: 0.5,
+          duration: 1500,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+  }, [fadeAnim]);
 
   return (
     <View className="mb-2 rounded-lg border border-gray-100 bg-white p-3 dark:border-gray-700 dark:bg-gray-800">
-      <Animated.View style={animatedStyle as any}>
+      <Animated.View style={{ opacity: fadeAnim }}>
         {/* Meta Information - Top */}
         <View className="mb-2 flex-row items-center">
           <View className="h-3 w-16 rounded bg-gray-200 dark:bg-gray-700" />
