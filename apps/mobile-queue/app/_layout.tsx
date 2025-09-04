@@ -12,6 +12,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useColorScheme } from 'nativewind';
 import * as React from 'react';
 import Constants from 'expo-constants';
+import { View, Text } from 'react-native';
 
 // React 19 types require components to explicitly include `children`.
 // Some versions of @clerk/clerk-expo don't declare `children` in props,
@@ -23,10 +24,29 @@ const ClerkProviderExtended = ClerkProvider as React.ComponentType<
 export default function RootLayout() {
   const { colorScheme } = useColorScheme();
 
+  const clerkPublishableKey =
+    process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY ||
+    (Constants.expoConfig?.extra as any)?.clerkPublishableKey;
+
+  // Prevent native crash by guarding missing key in production
+  React.useEffect(() => {
+    if (!clerkPublishableKey) {
+      SplashScreen.hideAsync().catch(() => {});
+    }
+  }, [clerkPublishableKey]);
+
+  if (!clerkPublishableKey) {
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+        <Text style={{ fontSize: 16, textAlign: 'center' }}>
+          Missing Clerk publishable key. Set EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY.
+        </Text>
+      </View>
+    );
+  }
+
   return (
-    <ClerkProviderExtended
-      tokenCache={tokenCache}
-      publishableKey={Constants.expoConfig?.extra?.clerkPublishableKey}>
+    <ClerkProviderExtended tokenCache={tokenCache} publishableKey={clerkPublishableKey}>
       <QueryProvider>
         <ThemeProvider value={NAV_THEME[colorScheme ?? 'light']}>
           <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
