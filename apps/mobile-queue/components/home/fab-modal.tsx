@@ -6,6 +6,7 @@ import {
   Modal,
   TouchableWithoutFeedback,
   Pressable,
+  Alert,
 } from 'react-native';
 import { Text } from '../ui/text';
 import { Input } from '../ui/input';
@@ -35,7 +36,7 @@ export function FabModal({ visible, onClose, onSuccess }: FabModalProps) {
     // Validate URL format
     const urlPattern = /^https?:\/\/.+/;
     if (!urlPattern.test(url.trim())) {
-      alert('Please enter a valid URL starting with http:// or https://');
+      Alert.alert('Invalid URL', 'Please enter a valid URL starting with http:// or https://');
       return;
     }
 
