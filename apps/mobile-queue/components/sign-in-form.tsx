@@ -62,11 +62,10 @@ export function SignInForm() {
           {/* Title and description */}
           <View className="gap-2">
             <View className="flex-row items-center justify-center gap-1">
-              <Text className="text-xl font-semibold text-card-foreground">Sign in to</Text>
-              <Text className="text-xl font-bold text-gray-900 dark:text-gray-100">
-                <Text className="lowercase">pico</Text>
-                <Text className="uppercase text-blue-600 dark:text-blue-400">QUEUE</Text>
-              </Text>
+              <View className="flex-row items-center gap-0">
+                <Text className="text-xl font-semibold text-card-foreground">Sign in to pico</Text>
+                <Text className="text-xl font-semibold text-blue-600">QUEUE</Text>
+              </View>
             </View>
             <CardDescription className="text-center">
               Welcome back! Please sign in to continue
