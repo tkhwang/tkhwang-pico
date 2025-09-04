@@ -1,20 +1,25 @@
-import React from 'react';
-import { View, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { View, TouchableOpacity, RefreshControl, ScrollView } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
 import { Text } from '../ui/text';
 import { ContentItem } from './content-item';
 import { useUserContents } from '@/hooks/queries/use-user-contents';
+import { ContentListSkeleton } from '@/components/content/content-list-skeleton';
 
 export function ContentList() {
   const { data: userContents = [], isLoading, error, refetch } = useUserContents();
+  const [refreshing, setRefreshing] = useState(false);
 
-  if (isLoading) {
-    return (
-      <View className="flex-1 items-center justify-center">
-        <ActivityIndicator size="large" color="#3B82F6" />
-        <Text className="mt-4 text-gray-500 dark:text-gray-400">Loading contents...</Text>
-      </View>
-    );
-  }
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await refetch();
+    } finally {
+      setRefreshing(false);
+    }
+  }, [refetch]);
+
+  if (isLoading && !refreshing) return <ContentListSkeleton />;
 
   if (error) {
     return (
@@ -35,7 +40,23 @@ export function ContentList() {
 
   if (userContents.length === 0) {
     return (
-      <View className="flex-1 items-center justify-center px-4">
+      <ScrollView
+        className="flex-1"
+        contentContainerStyle={{
+          flexGrow: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          paddingHorizontal: 16,
+        }}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#3B82F6"
+            colors={['#3B82F6']}
+            progressBackgroundColor="#ffffff"
+          />
+        }>
         <Text className="mb-4 text-4xl">📚</Text>
         <Text className="mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100">
           No saved contents yet
@@ -43,15 +64,35 @@ export function ContentList() {
         <Text className="text-center text-sm text-gray-500 dark:text-gray-400">
           Tap the + button to add your first content
         </Text>
-      </View>
+      </ScrollView>
     );
   }
 
+  const renderItem = ({ item }: { item: (typeof userContents)[0] }) => {
+    return <ContentItem item={item} />;
+  };
+
   return (
-    <ScrollView className="flex-1 px-4" showsVerticalScrollIndicator={false}>
-      {userContents.map((item) => (
-        <ContentItem key={item.id} item={item} />
-      ))}
-    </ScrollView>
+    <View className="flex-1">
+      <FlashList
+        data={userContents}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id}
+        estimatedItemSize={120}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingHorizontal: 16 }}
+        removeClippedSubviews={true}
+        drawDistance={200}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#3B82F6"
+            colors={['#3B82F6']}
+            progressBackgroundColor="#ffffff"
+          />
+        }
+      />
+    </View>
   );
 }
