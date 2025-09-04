@@ -26,7 +26,7 @@ export class ContentsService {
     }
 
     // 1) contents upsert (정규화된 URL을 키로 사용)
-    const { data: contents, error: errorOfUpsert } =
+    const { data: contents, error: upsertContentsError } =
       await this.supabaseService.serviceClient
         .from('contents')
         .upsert(
@@ -40,14 +40,14 @@ export class ContentsService {
         .select('*')
         .single();
 
-    if (errorOfUpsert) {
+    if (upsertContentsError) {
       throw new Error(
-        errorOfUpsert?.message ?? 'No content returned from upsert',
+        upsertContentsError?.message ?? 'No content returned from upsert',
       );
     }
 
     // 2) user_contents upsert
-    const { error: errorOfUpsertUserContents } =
+    const { error: upsertUserContentsError } =
       await this.supabaseService.serviceClient.from('user_contents').upsert(
         {
           user_id: userId,
@@ -56,7 +56,7 @@ export class ContentsService {
         { onConflict: 'user_id,content_id' },
       );
 
-    if (errorOfUpsertUserContents) {
+    if (upsertUserContentsError) {
       throw new InternalServerErrorException(
         'Failed to save user content link',
       );
