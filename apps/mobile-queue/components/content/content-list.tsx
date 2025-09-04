@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
 import { Text } from '../ui/text';
 import { ContentItem } from './content-item';
 import { useUserContents } from '@/hooks/queries/use-user-contents';
@@ -47,11 +48,22 @@ export function ContentList() {
     );
   }
 
+  const renderItem = ({ item }: { item: (typeof userContents)[0] }) => {
+    return <ContentItem item={item} />;
+  };
+
   return (
-    <ScrollView className="flex-1 px-4" showsVerticalScrollIndicator={false}>
-      {userContents.map((item) => (
-        <ContentItem key={item.id} item={item} />
-      ))}
-    </ScrollView>
+    <View className="flex-1">
+      <FlashList
+        data={userContents}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id}
+        estimatedItemSize={120}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingHorizontal: 16 }}
+        removeClippedSubviews={true}
+        drawDistance={200}
+      />
+    </View>
   );
 }
