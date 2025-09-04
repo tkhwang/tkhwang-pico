@@ -109,9 +109,8 @@ export class IngestExtractService {
 
     let readabilityContent: ReadabilityParsed | null = null;
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
       const dom = new JSDOM(html, { url });
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument
+
       const reader = new Readability(dom.window.document);
       readabilityContent = reader.parse() as ReadabilityParsed | null;
     } catch (error) {
