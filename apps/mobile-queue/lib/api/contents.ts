@@ -5,15 +5,8 @@ interface SaveContentRequest {
 }
 
 interface SaveContentResponse {
-  id: string;
-  url: string;
-  title?: string;
-  author?: string;
-  domain?: string;
-  summary?: string;
-  published_at?: string;
-  tags?: string[];
-  word_count?: number;
+  contentId: string;
+  status: 'pending' | 'ready' | 'failed' | 'archived';
 }
 
 /**
