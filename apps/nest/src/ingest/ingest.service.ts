@@ -3,6 +3,7 @@ import { OnEvent } from '@nestjs/event-emitter';
 import { SupabaseService } from '../supabase/supabase.service';
 import { IngestExtractService } from './ingest-extract.service';
 import { IngestSummaryService } from './ingest-summary.service';
+import { IngestEmbeddingService } from './ingest-embedding.service';
 import { EVENTS } from '../common/constants/events';
 
 export interface ContentCreatedEvent {
@@ -19,6 +20,7 @@ export class IngestService {
     private readonly supabaseService: SupabaseService,
     private readonly extractService: IngestExtractService,
     private readonly summaryService: IngestSummaryService,
+    private readonly embeddingService: IngestEmbeddingService,
   ) {}
 
   @OnEvent(EVENTS.CONTENT.CREATED, { async: true })
@@ -96,25 +98,50 @@ export class IngestService {
         site_name: metadata.siteName,
       };
 
-      const { error } = await this.supabaseService.serviceClient
-        .from('contents')
-        .update({
-          title: metadata.title,
-          summary: finalSummary,
-          author: metadata.author,
-          lang: normalizedLang,
-          tags: keywords,
-          domain: metadata.domain,
-          published_at: metadata.publishedAt?.toISOString(),
-          word_count: metadata.wordCount,
-          fetched_at: new Date().toISOString(),
-          status: 'ready',
-          metadata: mergedMetadata,
-        })
-        .eq('id', contentId);
+      const { error: updateContentError } =
+        await this.supabaseService.serviceClient
+          .from('contents')
+          .update({
+            title: metadata.title,
+            summary: finalSummary,
+            author: metadata.author,
+            lang: normalizedLang,
+            tags: keywords,
+            domain: metadata.domain,
+            published_at: metadata.publishedAt?.toISOString(),
+            word_count: metadata.wordCount,
+            fetched_at: new Date().toISOString(),
+            status: 'ready',
+            metadata: mergedMetadata,
+          })
+          .eq('id', contentId);
 
-      if (error) {
-        throw new Error(`Failed to update content: ${error.message}`);
+      if (updateContentError) {
+        throw new Error(
+          `Failed to update content: ${updateContentError.message}`,
+        );
+      }
+
+      // Create/Update summary embedding (best-effort; don't fail the whole ingest)
+      try {
+        const baseText =
+          finalSummary || metadata.summary || metadata.title || '';
+        const upsertSummaryEmbeddingResult =
+          await this.embeddingService.upsertSummaryEmbedding(
+            contentId,
+            baseText,
+          );
+        if (!upsertSummaryEmbeddingResult.ok) {
+          this.logger.warn(
+            `Embedding not saved for contentId=${contentId} (model=${upsertSummaryEmbeddingResult.model ?? 'n/a'})`,
+          );
+        }
+      } catch (e) {
+        this.logger.warn(
+          `Embedding generation failed for contentId=${contentId}: ${
+            e instanceof Error ? e.message : 'Unknown error'
+          }`,
+        );
       }
 
       this.logger.log(`Successfully processed content: ${contentId}`);
@@ -131,18 +158,22 @@ export class IngestService {
     }
   }
 
+  /*
+   *  Private methods
+   */
   private async updateContentStatus(
     contentId: string,
     status: 'pending' | 'ready' | 'failed' | 'archived',
   ) {
-    const { error } = await this.supabaseService.serviceClient
-      .from('contents')
-      .update({ status })
-      .eq('id', contentId);
+    const { error: updateContentsError } =
+      await this.supabaseService.serviceClient
+        .from('contents')
+        .update({ status })
+        .eq('id', contentId);
 
-    if (error) {
+    if (updateContentsError) {
       this.logger.error(
-        `Failed to update content status to ${status}: ${error.message}`,
+        `Failed to update content status to ${status}: ${updateContentsError.message}`,
       );
     }
   }
