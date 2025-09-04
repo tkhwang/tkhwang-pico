@@ -1,8 +1,10 @@
+import { getRequiredEnv } from '@/utils/env';
+
 /**
  * Nest.js API client configuration
  */
 
-const API_URL = process.env.EXPO_PUBLIC_NEST_API_URL;
+const API_URL = getRequiredEnv('EXPO_PUBLIC_NEST_API_URL');
 
 interface RequestOptions {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
@@ -17,10 +19,14 @@ interface RequestOptions {
 export async function nestApi<T = any>(endpoint: string, options: RequestOptions = {}): Promise<T> {
   const { method = 'GET', headers = {}, body, token } = options;
 
-  const url = `${API_URL}${endpoint}`;
+  // Ensure proper URL construction
+  const base = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL;
+  const path = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+  const url = `${base}${path}`;
 
   const requestHeaders: Record<string, string> = {
     'Content-Type': 'application/json',
+    Accept: 'application/json',
     ...headers,
   };
 
@@ -54,6 +60,12 @@ export async function nestApi<T = any>(endpoint: string, options: RequestOptions
     return data;
   } catch (error) {
     if (error instanceof Error) {
+      // Provide more context for network errors
+      if (error.message === 'Network request failed') {
+        throw new Error(
+          `Network request failed. Please check if the server is running at ${API_URL}`
+        );
+      }
       throw error;
     }
     throw new Error('An unexpected error occurred');
