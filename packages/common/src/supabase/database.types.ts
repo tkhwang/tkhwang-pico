@@ -372,7 +372,6 @@ export type Database = {
           archived: boolean;
           content_id: string;
           id: string;
-          is_public: boolean;
           labels: string[] | null;
           note: string | null;
           saved_at: string;
@@ -382,7 +381,6 @@ export type Database = {
           archived?: boolean;
           content_id: string;
           id?: string;
-          is_public?: boolean;
           labels?: string[] | null;
           note?: string | null;
           saved_at?: string;
@@ -392,7 +390,6 @@ export type Database = {
           archived?: boolean;
           content_id?: string;
           id?: string;
-          is_public?: boolean;
           labels?: string[] | null;
           note?: string | null;
           saved_at?: string;

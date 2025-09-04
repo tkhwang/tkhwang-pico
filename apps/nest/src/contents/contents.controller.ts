@@ -24,12 +24,11 @@ export class ContentsController {
     return this.contentsService.saveUrl({
       url: saveContentDto.url,
       userId,
-      isPublic: saveContentDto.isPublic ?? false,
     });
   }
 
   @Get(':id/similar')
-  @UseGuards(JwtAuthGuard) // If you intend public access, ensure the RPC enforces is_public only.
+  @UseGuards(JwtAuthGuard)
   async getSimilarContents(
     @Param('id') id: string,
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,

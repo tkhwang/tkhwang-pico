@@ -65,13 +65,12 @@ alter table public.contents
   check (status <> 'ready' or domain is not null);
 
 -- ============================================================================
--- User Contents (개인 라이브러리)  ※ 개인 노출은 여기서 관리
+-- User Contents (개인 라이브러리)
 -- ============================================================================
 create table if not exists public.user_contents (
   id          uuid primary key default gen_random_uuid(),
   user_id     text not null,  -- Clerk ID (e.g., user_***)
   content_id  uuid not null references public.contents(id) on delete cascade,
-  is_public   boolean not null default false,  -- ◀ 개인 공개 여부
   note        text,
   labels      text[] default '{}',
   archived    boolean not null default false,
@@ -81,7 +80,6 @@ create table if not exists public.user_contents (
 create index if not exists idx_user_contents_user on public.user_contents(user_id);
 create index if not exists idx_user_contents_content on public.user_contents(content_id);
 create index if not exists idx_user_contents_archived on public.user_contents(archived);
-create index if not exists idx_user_contents_is_public on public.user_contents(is_public);
 
 -- ============================================================================
 -- Content Embeddings (벡터)
