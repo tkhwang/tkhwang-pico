@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, TouchableOpacity } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { View, TouchableOpacity, RefreshControl, ScrollView } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { Text } from '../ui/text';
 import { ContentItem } from './content-item';
@@ -8,8 +8,18 @@ import { ContentListSkeleton } from '@/components/content/content-list-skeleton'
 
 export function ContentList() {
   const { data: userContents = [], isLoading, error, refetch } = useUserContents();
+  const [refreshing, setRefreshing] = useState(false);
 
-  if (isLoading) return <ContentListSkeleton />;
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await refetch();
+    } finally {
+      setRefreshing(false);
+    }
+  }, [refetch]);
+
+  if (isLoading && !refreshing) return <ContentListSkeleton />;
 
   if (error) {
     return (
@@ -30,7 +40,23 @@ export function ContentList() {
 
   if (userContents.length === 0) {
     return (
-      <View className="flex-1 items-center justify-center px-4">
+      <ScrollView
+        className="flex-1"
+        contentContainerStyle={{
+          flexGrow: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          paddingHorizontal: 16,
+        }}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#3B82F6"
+            colors={['#3B82F6']}
+            progressBackgroundColor="#ffffff"
+          />
+        }>
         <Text className="mb-4 text-4xl">📚</Text>
         <Text className="mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100">
           No saved contents yet
@@ -38,7 +64,7 @@ export function ContentList() {
         <Text className="text-center text-sm text-gray-500 dark:text-gray-400">
           Tap the + button to add your first content
         </Text>
-      </View>
+      </ScrollView>
     );
   }
 
@@ -57,6 +83,15 @@ export function ContentList() {
         contentContainerStyle={{ paddingHorizontal: 16 }}
         removeClippedSubviews={true}
         drawDistance={200}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#3B82F6"
+            colors={['#3B82F6']}
+            progressBackgroundColor="#ffffff"
+          />
+        }
       />
     </View>
   );
