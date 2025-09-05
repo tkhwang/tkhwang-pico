@@ -49,11 +49,10 @@ export async function markAsComplete(clerkToken: string, userContentId: string):
 
     const { error } = await supabase
       .from('user_contents')
-      .update({
-        todo_status: 'completed',
-        completed_at: new Date().toISOString(),
-      })
-      .eq('id', userContentId);
+      .update({ todo_status: 'completed' })
+      .eq('id', userContentId)
+      .select('id')
+      .single();
 
     if (error) {
       console.error('Error marking as complete:', error);
