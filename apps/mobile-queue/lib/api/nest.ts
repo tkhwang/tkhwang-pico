@@ -4,7 +4,7 @@ import { getRequiredEnv } from '@/utils/env';
  * Nest.js API client configuration
  */
 
-const API_URL = getRequiredEnv('EXPO_PUBLIC_NEST_API_URL');
+const NEST_API_URL = process.env.EXPO_PUBLIC_NEST_API_URL!;
 
 interface RequestOptions {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
@@ -20,7 +20,7 @@ export async function nestApi<T = any>(endpoint: string, options: RequestOptions
   const { method = 'GET', headers = {}, body, token } = options;
 
   // Ensure proper URL construction
-  const base = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL;
+  const base = NEST_API_URL.endsWith('/') ? NEST_API_URL.slice(0, -1) : NEST_API_URL;
   const path = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
   const url = `${base}${path}`;
 
@@ -63,7 +63,7 @@ export async function nestApi<T = any>(endpoint: string, options: RequestOptions
       // Provide more context for network errors
       if (error.message === 'Network request failed') {
         throw new Error(
-          `Network request failed. Please check if the server is running at ${API_URL}`
+          `Network request failed. Please check if the server is running at ${NEST_API_URL}`
         );
       }
       throw error;
