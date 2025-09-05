@@ -9,7 +9,7 @@ import type { TodoFilterType } from '@tkhwang-pico/common';
 
 export function Home() {
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [todoFilter, setTodoFilter] = useState<TodoFilterType>('all');
+  const [todoFilter, setTodoFilter] = useState<TodoFilterType>('pending');
 
   const handleContentSaved = () => {
     console.log('Content saved successfully');

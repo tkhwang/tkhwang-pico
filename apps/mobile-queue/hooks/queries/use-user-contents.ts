@@ -4,7 +4,7 @@ import type { UserContentWithDetails, TodoFilterType } from '@tkhwang-pico/commo
 import { queryKey } from '@/hooks/keys/query-key';
 import { useSupabaseQuery } from '@/hooks/queries/supabase/use-supabase-query';
 
-export function useUserContents(todoFilter: TodoFilterType = 'all') {
+export function useUserContents(todoFilter: TodoFilterType = 'pending') {
   const { user } = useUser();
 
   return useSupabaseQuery(
