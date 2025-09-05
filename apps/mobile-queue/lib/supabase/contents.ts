@@ -1,14 +1,15 @@
 import { createSupabaseClientWithClerkAuth } from '../../utils/supabase';
-import type { UserContentWithDetails } from '@tkhwang-pico/common';
+import type { UserContentWithDetails, TodoFilterType } from '@tkhwang-pico/common';
 
 export async function getUserContents(
   clerkToken: string,
-  userId: string
+  userId: string,
+  todoFilter: TodoFilterType = 'all'
 ): Promise<UserContentWithDetails[]> {
   try {
     const supabase = createSupabaseClientWithClerkAuth(clerkToken);
 
-    const { data, error } = await supabase
+    let query = supabase
       .from('user_contents')
       .select(
         `
@@ -16,8 +17,17 @@ export async function getUserContents(
         contents!content_id(*)
       `
       )
-      .eq('user_id', userId)
-      .order('saved_at', { ascending: false });
+      .eq('user_id', userId);
+
+    // Apply todo status filter
+    if (todoFilter !== 'all') {
+      query = query.eq('todo_status', todoFilter);
+    }
+
+    // Order by saved_at
+    query = query.order('saved_at', { ascending: false });
+
+    const { data, error } = await query;
 
     if (error) {
       console.error('Error fetching user contents:', error);
