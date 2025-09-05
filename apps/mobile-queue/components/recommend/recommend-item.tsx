@@ -64,7 +64,7 @@ export function RecommendItem({ recommendation }: RecommendItemProps) {
       className="mb-4 overflow-hidden rounded-xl bg-white shadow-sm dark:bg-gray-800">
       <View className="p-4">
         {/* Score Indicator */}
-        <View className="mt-3 flex-row items-center border-t border-gray-100 pt-3 dark:border-gray-700">
+        <View className="mb-2 flex-row items-center">
           <Icon
             as={TrendingUpIcon}
             size={14}
