@@ -133,9 +133,15 @@ export class UserEmbeddingService {
 
     const vectors: number[][] = [];
     for (const row of embRows ?? []) {
-      const raw = row.embedding as unknown as string;
-      if (!raw) continue;
-      const vec = parsePgvectorString(raw);
+      const val = row.embedding as unknown;
+      let vec: number[] = [];
+      if (Array.isArray(val)) {
+        vec = (val as unknown[]).filter((x) =>
+          Number.isFinite(x as number),
+        ) as number[];
+      } else if (typeof val === 'string') {
+        vec = parsePgvectorString(val);
+      }
       if (vec.length) vectors.push(vec);
     }
 
