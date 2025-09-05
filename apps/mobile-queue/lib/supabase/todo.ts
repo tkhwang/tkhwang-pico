@@ -25,9 +25,9 @@ export async function toggleTodoStatus(
     // Update the status
     const { error: updateError } = await supabase
       .from('user_contents')
+      // completed_at updated by trigger
       .update({
         todo_status: newStatus,
-        completed_at: newStatus === 'completed' ? new Date().toISOString() : null,
       })
       .eq('id', userContentId);
 
