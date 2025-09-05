@@ -63,6 +63,34 @@ export function RecommendItem({ recommendation }: RecommendItemProps) {
       activeOpacity={0.7}
       className="mb-4 overflow-hidden rounded-xl bg-white shadow-sm dark:bg-gray-800">
       <View className="p-4">
+        {/* Score Indicator */}
+        <View className="mt-3 flex-row items-center border-t border-gray-100 pt-3 dark:border-gray-700">
+          <Icon
+            as={TrendingUpIcon}
+            size={14}
+            className={`mr-1 ${getScoreColor(scorePercentage)}`}
+          />
+          <Text className={`text-xs font-medium ${getScoreColor(scorePercentage)}`}>
+            {scorePercentage}% Match
+          </Text>
+
+          {/* Tags if available */}
+          {content.tags && content.tags.length > 0 && (
+            <>
+              <Text className="mx-2 text-gray-300 dark:text-gray-600">•</Text>
+              <View className="flex-1 flex-row flex-wrap">
+                {content.tags.slice(0, 3).map((tag, index) => (
+                  <View
+                    key={index}
+                    className="mb-1 mr-1 rounded-full bg-gray-100 px-2 py-0.5 dark:bg-gray-700">
+                    <Text className="text-xs text-gray-600 dark:text-gray-400">#{tag}</Text>
+                  </View>
+                ))}
+              </View>
+            </>
+          )}
+        </View>
+
         {/* Header Row - Domain and Link indicator */}
         <View className="mb-2 flex-row items-center justify-between">
           {/* Domain */}
@@ -137,34 +165,6 @@ export function RecommendItem({ recommendation }: RecommendItemProps) {
               </View>
             )}
           </View>
-        </View>
-
-        {/* Score Indicator */}
-        <View className="mt-3 flex-row items-center border-t border-gray-100 pt-3 dark:border-gray-700">
-          <Icon
-            as={TrendingUpIcon}
-            size={14}
-            className={`mr-1 ${getScoreColor(scorePercentage)}`}
-          />
-          <Text className={`text-xs font-medium ${getScoreColor(scorePercentage)}`}>
-            {scorePercentage}% Match
-          </Text>
-
-          {/* Tags if available */}
-          {content.tags && content.tags.length > 0 && (
-            <>
-              <Text className="mx-2 text-gray-300 dark:text-gray-600">•</Text>
-              <View className="flex-1 flex-row flex-wrap">
-                {content.tags.slice(0, 3).map((tag, index) => (
-                  <View
-                    key={index}
-                    className="mb-1 mr-1 rounded-full bg-gray-100 px-2 py-0.5 dark:bg-gray-700">
-                    <Text className="text-xs text-gray-600 dark:text-gray-400">#{tag}</Text>
-                  </View>
-                ))}
-              </View>
-            </>
-          )}
         </View>
       </View>
     </TouchableOpacity>
