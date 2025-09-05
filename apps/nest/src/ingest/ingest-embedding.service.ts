@@ -10,6 +10,7 @@ export class IngestEmbeddingService {
   private readonly logger = new Logger(IngestEmbeddingService.name);
   private readonly openai: OpenAI;
   private readonly defaultEmbeddingModel = 'text-embedding-3-small';
+  private readonly pgvectorDimension: number;
 
   constructor(
     private readonly configService: ConfigService,
@@ -27,6 +28,13 @@ export class IngestEmbeddingService {
       timeout: 15_000,
       maxRetries: 2,
     });
+
+    // Get expected pgvector dimension from config or use default
+    this.pgvectorDimension = this.configService.get<number>(
+      'PGVECTOR_DIM',
+      1536,
+    );
+    this.logger.log(`Expected pgvector dimension: ${this.pgvectorDimension}`);
   }
 
   async upsertSummaryEmbedding(
@@ -58,6 +66,13 @@ export class IngestEmbeddingService {
           `Empty embedding returned for contentId=${contentId.substring(0, 8)}...`,
         );
         return { ok: false };
+      }
+
+      // Validate embedding dimension
+      if (vector.length !== this.pgvectorDimension) {
+        const errorMsg = `Embedding dimension mismatch for contentId=${contentId.substring(0, 8)}... Expected ${this.pgvectorDimension} dimensions but received ${vector.length} dimensions from model ${model}`;
+        this.logger.error(errorMsg);
+        throw new Error(errorMsg);
       }
 
       const insertEmbeddingsResult = await this.supabaseService.serviceClient
