@@ -24,7 +24,7 @@ function ThemeToggle() {
 
 export function Header() {
   return (
-    <View className="mb-4 flex-row items-center justify-between border-b border-gray-100 bg-white px-4 py-2 dark:border-gray-700 dark:bg-gray-800">
+    <View className="flex-row items-center justify-between border-b border-gray-100 bg-white px-4 py-2 dark:border-gray-700 dark:bg-gray-800">
       <ThemeToggle />
       <View className="absolute left-0 right-0 items-center">
         <View className="flex-row items-center gap-0">

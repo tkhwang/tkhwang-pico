@@ -9,14 +9,14 @@ interface ContentHeaderProps {
 
 export function ContentHeader({ filter, onFilterChange }: ContentHeaderProps) {
   const filters: { value: TodoFilterType; label: string }[] = [
-    { value: 'all', label: 'ALL' },
     { value: 'pending', label: 'PENDING' },
     { value: 'completed', label: 'COMPLETED' },
+    { value: 'all', label: 'ALL' },
   ];
 
   return (
     <View className="px-4 pb-2 pt-4">
-      <View className="flex-row space-x-4">
+      <View className="flex-row gap-4">
         {filters.map(({ value, label }) => (
           <TouchableOpacity
             key={value}
@@ -24,7 +24,7 @@ export function ContentHeader({ filter, onFilterChange }: ContentHeaderProps) {
             className={`flex-1 rounded-full px-4 py-2 ${
               filter === value
                 ? 'bg-gray-200 dark:bg-gray-700'
-                : 'border border-gray-100 bg-gray-50 dark:border-gray-800 dark:bg-gray-900/50'
+                : 'border border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-900/50'
             }`}>
             <Text
               className={`text-center text-sm font-medium ${
