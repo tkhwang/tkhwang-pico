@@ -6,6 +6,7 @@ import { TimelineItem } from './timeline-item';
 import { useUserContents } from '@/hooks/queries/use-user-contents';
 import { ContentListSkeleton } from '@/components/content/content-list-skeleton';
 import type { UserContentWithDetails } from '@tkhwang-pico/common';
+import { TimelineListSkeleton } from '@/components/timeline/timeline-list-skeleton';
 
 interface GroupedContent {
   date: string;
@@ -49,7 +50,7 @@ export function TimelineList() {
     }));
   }, [contents]);
 
-  if (isLoading && !refreshing) return <ContentListSkeleton />;
+  if (isLoading && !refreshing) return <TimelineListSkeleton />;
 
   if (error) {
     return (
