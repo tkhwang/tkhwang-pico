@@ -1,6 +1,6 @@
 import { Tabs } from 'expo-router';
 import { Icon } from '@/components/ui/icon';
-import { HomeIcon, StarIcon, CalendarDaysIcon, SettingsIcon } from 'lucide-react-native';
+import { HomeIcon, SparklesIcon, CalendarDaysIcon, SettingsIcon } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 
 export default function TabLayout() {
@@ -34,11 +34,11 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="saves"
+        name="recommend"
         options={{
           title: 'Recommend',
           headerShown: false,
-          tabBarIcon: ({ color, size }) => <Icon as={StarIcon} size={size} color={color} />,
+          tabBarIcon: ({ color, size }) => <Icon as={SparklesIcon} size={size} color={color} />,
         }}
       />
       <Tabs.Screen
