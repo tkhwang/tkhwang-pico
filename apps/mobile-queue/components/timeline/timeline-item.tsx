@@ -1,8 +1,8 @@
 import React from 'react';
-import { View, TouchableOpacity, Linking, Image } from 'react-native';
+import { View, TouchableOpacity, Linking, Image, Alert } from 'react-native';
 import { Text } from '../ui/text';
 import { Icon } from '../ui/icon';
-import { ClockIcon } from 'lucide-react-native';
+import { ClockIcon, ExternalLinkIcon } from 'lucide-react-native';
 import type { UserContentWithDetails } from '@tkhwang-pico/common';
 
 interface TimelineCardProps {
@@ -27,15 +27,34 @@ function TimelineCard({ item, isFirstOfDay = false }: TimelineCardProps) {
       })
     : '';
 
-  const handlePress = () => {
-    if (content?.url) {
-      Linking.openURL(content.url).catch((err) => console.error('Failed to open URL:', err));
+  const handleLongPress = async () => {
+    const url = content?.canonical_url || content?.url;
+    if (!url) {
+      Alert.alert('No URL', 'No URL available for this content');
+      return;
+    }
+    if (!/^https?:\/\//i.test(url)) {
+      Alert.alert('Unsafe URL', 'Only http(s) URLs are allowed.');
+      return;
+    }
+
+    try {
+      const isSupported = await Linking.canOpenURL(url);
+      if (isSupported) {
+        await Linking.openURL(url);
+      } else {
+        Alert.alert('Unable to open', `Cannot open URL: ${url}`);
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Failed to open URL');
+      if (__DEV__) console.error('Error opening URL:', error);
     }
   };
 
   return (
     <TouchableOpacity
-      onPress={handlePress}
+      onLongPress={handleLongPress}
+      delayLongPress={500}
       activeOpacity={0.7}
       className="overflow-hidden rounded-xl bg-white shadow-sm dark:bg-gray-800">
       <View className="flex-row py-3 pl-1.5 pr-3">
@@ -57,12 +76,24 @@ function TimelineCard({ item, isFirstOfDay = false }: TimelineCardProps) {
 
         {/* Content - Right */}
         <View className="flex-1">
-          {/* Domain - Top */}
-          {content?.domain && (
-            <View className="mb-2 self-start rounded-full bg-gray-100 px-2 py-0.5 dark:bg-gray-700">
-              <Text className="text-xs text-gray-600 dark:text-gray-400">{content.domain}</Text>
+          {/* Top Header Row - Domain and Hold indicator */}
+          <View className="mb-2 flex-row items-center justify-between">
+            {/* Domain - Left */}
+            {content?.domain && (
+              <View className="self-start rounded-full bg-gray-100 px-2 py-0.5 dark:bg-gray-700">
+                <Text className="text-xs text-gray-600 dark:text-gray-400">{content.domain}</Text>
+              </View>
+            )}
+
+            {/* Hold to open link indicator - Right */}
+            <View className="flex-row items-center opacity-60">
+              <Icon
+                as={ExternalLinkIcon}
+                className="mr-0.5 h-2.5 w-2.5 text-gray-400 dark:text-gray-500"
+              />
+              <Text className="text-[10px] text-gray-400 dark:text-gray-500">Hold</Text>
             </View>
-          )}
+          </View>
 
           {/* Title and Thumbnail Row */}
           <View className="flex-row">
