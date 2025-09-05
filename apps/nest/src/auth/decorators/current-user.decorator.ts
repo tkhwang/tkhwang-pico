@@ -14,3 +14,13 @@ export const UserId = createParamDecorator(
     return request.user?.id;
   },
 );
+
+export const UserToken = createParamDecorator(
+  (_data: unknown, ctx: ExecutionContext): string | undefined => {
+    const request = ctx
+      .switchToHttp()
+      .getRequest<{ headers: { authorization?: string } }>();
+    const authHeader = request.headers.authorization;
+    return authHeader?.replace('Bearer ', '');
+  },
+);
