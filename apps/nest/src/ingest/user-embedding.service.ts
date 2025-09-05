@@ -13,7 +13,13 @@ function parsePgvectorString(input: string): number[] {
       ? s.substring(1, s.length - 1)
       : s;
   if (!body) return [];
-  return body.split(',').map((v) => Number(v.trim()));
+
+  const out: number[] = [];
+  for (const token of body.split(',')) {
+    const n = Number(token.trim());
+    if (Number.isFinite(n)) out.push(n);
+  }
+  return out;
 }
 
 function toPgvectorString(vec: number[]): string {
