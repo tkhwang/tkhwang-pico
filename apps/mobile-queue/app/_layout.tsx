@@ -6,15 +6,13 @@ import { tokenCache } from '@clerk/clerk-expo/token-cache';
 import { QueryProvider } from '@/providers/query-provider';
 import { ThemeProvider } from '@react-navigation/native';
 import { PortalHost } from '@rn-primitives/portal';
-import { Tabs } from 'expo-router';
+import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useColorScheme } from 'nativewind';
 import * as React from 'react';
 import Constants from 'expo-constants';
-import { View, Text, SafeAreaView } from 'react-native';
-import { SignInForm } from '@/components/sign-in-form';
-import TabLayout from './(tabs)/_layout';
+import { View, Text } from 'react-native';
 
 // React 19 types require components to explicitly include `children`.
 // Some versions of @clerk/clerk-expo don't declare `children` in props,
@@ -78,15 +76,16 @@ function Routes() {
 
   if (!isLoaded) return null;
 
-  // Simple conditional rendering based on auth state
-  if (isSignedIn) return <TabLayout />;
-
-  // Show sign in form when not authenticated with SafeArea
   return (
-    <SafeAreaView className="flex-1 bg-white dark:bg-gray-900">
-      <View className="flex-1 items-center justify-center p-4">
-        <SignInForm />
-      </View>
-    </SafeAreaView>
+    <Stack screenOptions={{ headerShown: false }}>
+      {isSignedIn ? (
+        <>
+          <Stack.Screen name="index" />
+          <Stack.Screen name="(tabs)" />
+        </>
+      ) : (
+        <Stack.Screen name="(auth)/sign-in" />
+      )}
+    </Stack>
   );
 }
