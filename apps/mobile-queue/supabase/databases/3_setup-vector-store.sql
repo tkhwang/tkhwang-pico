@@ -81,6 +81,9 @@ create index if not exists idx_user_contents_user on public.user_contents(user_i
 create index if not exists idx_user_contents_content on public.user_contents(content_id);
 create index if not exists idx_user_contents_archived on public.user_contents(archived);
 
+-- Composite index for efficient user content queries ordered by saved_at
+create index if not exists idx_user_contents_user_saved_at on public.user_contents(user_id, saved_at DESC);
+
 -- ============================================================================
 -- Content Embeddings (벡터)
 -- ============================================================================
