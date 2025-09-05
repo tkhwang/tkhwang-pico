@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { View, RefreshControl, ScrollView } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { Text } from '../ui/text';
@@ -24,6 +24,12 @@ export function RecommendList() {
       setRefreshing(false);
     }
   }, [refetch]);
+
+  const items = useMemo(() => recommendations.filter((r) => !!r.contents), [recommendations]);
+
+  const renderItem = useCallback(({ item }: { item: Recommendation }) => {
+    return <RecommendItem recommendation={item} />;
+  }, []);
 
   if (isLoading && !refreshing) {
     return <RecommendListSkeleton />;
@@ -73,10 +79,6 @@ export function RecommendList() {
       </ScrollView>
     );
   }
-
-  const renderItem = ({ item }: { item: Recommendation }) => {
-    return <RecommendItem recommendation={item} />;
-  };
 
   return (
     <View className="flex-1 bg-gray-50 dark:bg-gray-900">
