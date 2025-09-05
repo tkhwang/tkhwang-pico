@@ -12,7 +12,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useColorScheme } from 'nativewind';
 import * as React from 'react';
 import Constants from 'expo-constants';
-import { View, Text } from 'react-native';
+import { View, Text, SafeAreaView } from 'react-native';
 import { SignInForm } from '@/components/sign-in-form';
 import TabLayout from './(tabs)/_layout';
 
@@ -76,19 +76,17 @@ function Routes() {
     }
   }, [isLoaded]);
 
-  if (!isLoaded) {
-    return null;
-  }
+  if (!isLoaded) return null;
 
   // Simple conditional rendering based on auth state
-  if (isSignedIn) {
-    return <TabLayout />;
-  }
+  if (isSignedIn) return <TabLayout />;
 
-  // Show sign in form when not authenticated
+  // Show sign in form when not authenticated with SafeArea
   return (
-    <View className="flex-1 items-center justify-center p-4">
-      <SignInForm />
-    </View>
+    <SafeAreaView className="flex-1 bg-white dark:bg-gray-900">
+      <View className="flex-1 items-center justify-center p-4">
+        <SignInForm />
+      </View>
+    </SafeAreaView>
   );
 }
