@@ -5,9 +5,14 @@ import { Text } from '../ui/text';
 import { ContentItem } from './content-item';
 import { useUserContents } from '@/hooks/queries/use-user-contents';
 import { ContentListSkeleton } from '@/components/content/content-list-skeleton';
+import type { TodoFilterType } from '@tkhwang-pico/common';
 
-export function ContentList() {
-  const { data: userContents = [], isLoading, error, refetch } = useUserContents();
+interface ContentListProps {
+  todoFilter: TodoFilterType;
+}
+
+export function ContentList({ todoFilter }: ContentListProps) {
+  const { data: userContents = [], isLoading, error, refetch } = useUserContents(todoFilter);
   const [refreshing, setRefreshing] = useState(false);
 
   const onRefresh = useCallback(async () => {
