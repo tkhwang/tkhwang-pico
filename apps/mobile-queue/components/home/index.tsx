@@ -4,9 +4,12 @@ import { FAB } from '../fab';
 import { FabModal } from './fab-modal';
 import { ContentList } from '../content/content-list';
 import { HomeSearch } from '@/components/home/home-search';
+import { ContentHeader } from '@/components/content/content-header';
+import type { TodoFilterType } from '@tkhwang-pico/common';
 
 export function Home() {
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [todoFilter, setTodoFilter] = useState<TodoFilterType>('pending');
 
   const handleContentSaved = () => {
     console.log('Content saved successfully');
@@ -15,11 +18,12 @@ export function Home() {
 
   return (
     <View className="flex-1 bg-gray-50 dark:bg-gray-900">
-      {/* Search Bar */}
+      {/* Content Header */}
+      <ContentHeader filter={todoFilter} onFilterChange={setTodoFilter} />
       <HomeSearch />
 
       {/* Content List */}
-      <ContentList />
+      <ContentList todoFilter={todoFilter} />
 
       {/* Floating Action Button */}
       <FAB onPress={() => setIsModalVisible(true)} />

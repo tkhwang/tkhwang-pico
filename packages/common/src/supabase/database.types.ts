@@ -370,29 +370,35 @@ export type Database = {
       user_contents: {
         Row: {
           archived: boolean;
+          completed_at: string | null;
           content_id: string;
           id: string;
           labels: string[] | null;
           note: string | null;
           saved_at: string;
+          todo_status: Database["public"]["Enums"]["content_todo_status"];
           user_id: string;
         };
         Insert: {
           archived?: boolean;
+          completed_at?: string | null;
           content_id: string;
           id?: string;
           labels?: string[] | null;
           note?: string | null;
           saved_at?: string;
+          todo_status?: Database["public"]["Enums"]["content_todo_status"];
           user_id: string;
         };
         Update: {
           archived?: boolean;
+          completed_at?: string | null;
           content_id?: string;
           id?: string;
           labels?: string[] | null;
           note?: string | null;
           saved_at?: string;
+          todo_status?: Database["public"]["Enums"]["content_todo_status"];
           user_id?: string;
         };
         Relationships: [
@@ -616,6 +622,7 @@ export type Database = {
     };
     Enums: {
       content_status: "pending" | "ready" | "failed" | "archived";
+      content_todo_status: "pending" | "completed";
       embedding_scope: "summary" | "chunk" | "title" | "tags";
       interaction_type:
         | "save"
@@ -758,6 +765,7 @@ export const Constants = {
   public: {
     Enums: {
       content_status: ["pending", "ready", "failed", "archived"],
+      content_todo_status: ["pending", "completed"],
       embedding_scope: ["summary", "chunk", "title", "tags"],
       interaction_type: [
         "save",

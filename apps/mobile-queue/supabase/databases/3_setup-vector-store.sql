@@ -19,6 +19,9 @@ do $$ begin
     create type interaction_type as enum
       ('save','open','click','like','complete','share','archive','dismiss','rating');
   end if;
+  if not exists (select 1 from pg_type where typname='content_todo_status') then
+    create type content_todo_status as enum ('pending','completed');
+  end if;
 end $$;
 
 -- ============================================================================
@@ -71,18 +74,19 @@ create table if not exists public.user_contents (
   id          uuid primary key default gen_random_uuid(),
   user_id     text not null,  -- Clerk ID (e.g., user_***)
   content_id  uuid not null references public.contents(id) on delete cascade,
+  todo_status content_todo_status not null default 'pending',
   note        text,
   labels      text[] default '{}',
   archived    boolean not null default false,
+  completed_at timestamptz,
   saved_at    timestamptz not null default now(),
   unique (user_id, content_id)
 );
 create index if not exists idx_user_contents_user on public.user_contents(user_id);
 create index if not exists idx_user_contents_content on public.user_contents(content_id);
 create index if not exists idx_user_contents_archived on public.user_contents(archived);
-
--- Composite index for efficient user content queries ordered by saved_at
 create index if not exists idx_user_contents_user_saved_at on public.user_contents(user_id, saved_at DESC);
+create index if not exists idx_user_contents_todo_status on public.user_contents(user_id, todo_status, saved_at DESC);
 
 -- ============================================================================
 -- Content Embeddings (벡터)
@@ -195,6 +199,33 @@ drop trigger if exists trg_set_content_domain on public.contents;
 create trigger trg_set_content_domain
 before insert or update of url on public.contents
 for each row execute function public.set_content_domain();
+
+-- ============================================================================
+-- Todo Status 자동 관리
+-- ============================================================================
+create or replace function public.auto_set_completed_timestamp()
+returns trigger language plpgsql as $$
+begin
+  if TG_OP = 'INSERT' then
+    if new.todo_status = 'completed' and new.completed_at is null then
+      new.completed_at := now();
+    elsif new.todo_status <> 'completed' then
+      new.completed_at := null;
+    end if;
+  else
+    if new.todo_status = 'completed' and old.todo_status <> 'completed' then
+      new.completed_at := now();
+    elsif new.todo_status <> 'completed' and old.todo_status = 'completed' then
+      new.completed_at := null;
+    end if;
+  end if;
+  return new;
+end $$;
+
+drop trigger if exists trg_auto_completed_timestamp on public.user_contents;
+create trigger trg_auto_completed_timestamp
+before insert or update on public.user_contents
+for each row execute function public.auto_set_completed_timestamp();
 
 -- ============================================================================
 -- RLS 설정

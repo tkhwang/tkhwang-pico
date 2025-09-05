@@ -8,3 +8,8 @@ export interface UserContentWithDetails extends UserContent {
   content?: Content;
   contents?: Content;
 }
+
+// Todo filter type based on database enum with 'all' option
+export type ContentTodoStatus =
+  Database["public"]["Enums"]["content_todo_status"];
+export type TodoFilterType = ContentTodoStatus | "all";

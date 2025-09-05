@@ -7,6 +7,7 @@ import type { UserContentWithDetails } from '@tkhwang-pico/common';
 
 interface ContentItemProps {
   item: UserContentWithDetails;
+  onToggleComplete?: (id: string) => void;
 }
 
 const formatDate = (dateString: string) => {
@@ -23,7 +24,7 @@ const formatDate = (dateString: string) => {
   return `${Math.floor(diffDays / 365)} years ago`;
 };
 
-export function ContentItem({ item }: ContentItemProps) {
+export function ContentItem({ item, onToggleComplete }: ContentItemProps) {
   // Ensure content exists - check both possible field names
   const content = item.content || item.contents;
   if (!item || !content) {
@@ -60,6 +61,12 @@ export function ContentItem({ item }: ContentItemProps) {
   const handlePress = () => {
     // Regular tap can be used for other actions like selection or showing details
     console.log('Item tapped:', content.title);
+  };
+
+  const handleCheckboxPress = () => {
+    if (onToggleComplete) {
+      onToggleComplete(item.id);
+    }
   };
 
   return (
@@ -99,14 +106,26 @@ export function ContentItem({ item }: ContentItemProps) {
 
       {/* Content with thumbnail */}
       <View className="flex-row items-start">
-        <View
-          className={`mr-2 mt-0.5 h-4 w-4 items-center justify-center rounded-full border-2 ${item.archived ? 'border-gray-300 bg-gray-50 dark:bg-gray-900/20' : 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'}`}>
-          {item.archived ? <Text className="text-[10px] text-gray-500">✓</Text> : null}
-        </View>
+        <TouchableOpacity onPress={handleCheckboxPress} className="mr-2 mt-0.5">
+          <View
+            className={`h-5 w-5 items-center justify-center rounded-full border-2 ${
+              item.todo_status === 'completed'
+                ? 'border-green-500 bg-green-500'
+                : 'border-blue-500 bg-transparent'
+            }`}>
+            {item.todo_status === 'completed' ? (
+              <Text className="text-xs text-white">✓</Text>
+            ) : null}
+          </View>
+        </TouchableOpacity>
         <View className="flex-1 pr-2">
           {/* Title */}
           <Text
-            className="mb-1 text-base font-semibold text-gray-900 dark:text-gray-100"
+            className={`mb-1 text-base font-semibold ${
+              item.todo_status === 'completed'
+                ? 'text-gray-500 dark:text-gray-500'
+                : 'text-gray-900 dark:text-gray-100'
+            }`}
             numberOfLines={2}>
             {content.title || 'Untitled'}
           </Text>

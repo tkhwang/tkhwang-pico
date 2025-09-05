@@ -24,12 +24,13 @@ function ThemeToggle() {
 
 export function Header() {
   return (
-    <View className="mb-4 flex-row items-center justify-between border-b border-gray-100 bg-white px-4 py-2 dark:border-gray-700 dark:bg-gray-800">
+    <View className="flex-row items-center justify-between border-b border-gray-100 bg-white px-4 py-2 dark:border-gray-700 dark:bg-gray-800">
       <ThemeToggle />
       <View className="absolute left-0 right-0 items-center">
-        <Text className="text-lg font-bold text-gray-900 dark:text-gray-100">
-          pico<Text className="text-blue-600 dark:text-blue-400">QUEUE</Text>
-        </Text>
+        <View className="flex-row items-center gap-0">
+          <Text className="text-gray-900 dark:text-gray-100">pico</Text>
+          <Text className="font-bold text-blue-600 dark:text-blue-400">QUEUE</Text>
+        </View>
       </View>
       <UserMenu />
     </View>
