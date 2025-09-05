@@ -5,11 +5,11 @@ import { Icon } from '../ui/icon';
 import { ExternalLinkIcon, ClockIcon } from 'lucide-react-native';
 import type { UserContentWithDetails } from '@tkhwang-pico/common';
 
-interface TimelineItemInternalProps {
+interface TimelineCardProps {
   item: UserContentWithDetails;
 }
 
-function TimelineItemInternal({ item }: TimelineItemInternalProps) {
+function TimelineCard({ item }: TimelineCardProps) {
   const content = item.contents;
   const completedTime = item.completed_at
     ? new Date(item.completed_at).toLocaleTimeString('en-US', {
@@ -112,7 +112,7 @@ export function TimelineItem({ date, items }: TimelineItemProps) {
       {/* Items for this date */}
       <View className="space-y-3">
         {items.map((item) => (
-          <TimelineItemInternal key={item.id} item={item} />
+          <TimelineCard key={item.id} item={item} />
         ))}
       </View>
     </View>
