@@ -24,8 +24,12 @@ export async function getUserContents(
       query = query.eq('todo_status', todoFilter);
     }
 
-    // Order by saved_at
-    query = query.order('saved_at', { ascending: false });
+    // Order by saved_at for most filters, but by completed_at for completed items
+    if (todoFilter === 'completed') {
+      query = query.order('completed_at', { ascending: false });
+    } else {
+      query = query.order('saved_at', { ascending: false });
+    }
 
     const { data, error } = await query;
 
