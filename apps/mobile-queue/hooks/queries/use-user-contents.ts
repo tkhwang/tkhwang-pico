@@ -1,17 +1,18 @@
 import { useUser } from '@clerk/clerk-expo';
 import { getUserContents } from '@/lib/supabase/contents';
-import type { UserContentWithDetails } from '@tkhwang-pico/common';
+import type { UserContentWithDetails, TodoFilterType } from '@tkhwang-pico/common';
 import { queryKey } from '@/hooks/keys/query-key';
 import { useSupabaseQuery } from '@/hooks/queries/supabase/use-supabase-query';
 
-export function useUserContents() {
+export function useUserContents(todoFilter: TodoFilterType = 'all') {
   const { user } = useUser();
 
   return useSupabaseQuery(
-    user?.id ? queryKey.userContents.byUserId(user.id) : ['no-user'],
+    user?.id ? [...queryKey.userContents.byUserId(user.id), todoFilter] : ['no-user'],
     async (clerkToken): Promise<UserContentWithDetails[]> => {
       if (!user?.id) return [];
-      return await getUserContents(clerkToken, user.id);
+
+      return await getUserContents(clerkToken, user.id, todoFilter);
     },
     {
       enabled: !!user?.id,
