@@ -17,7 +17,7 @@ export function useSaveContent(options?: UseSaveContentOptions) {
   const { user } = useUser();
 
   type MutationContext = {
-    previousItems?: UserContentWithDetails[];
+    previousQueries?: Array<[queryKey: unknown[], data: UserContentWithDetails[]]>;
     optimisticId?: string;
   };
 
@@ -30,14 +30,20 @@ export function useSaveContent(options?: UseSaveContentOptions) {
       return saveContent(url, token);
     },
     onMutate: async (url: string) => {
-      if (!user?.id) return { previousItems: undefined };
+      if (!user?.id) return { previousQueries: undefined };
 
       const key = queryKey.userContents.byUserId(user.id);
       await queryClient.cancelQueries({ queryKey: key });
 
-      // Get the first matching query data (without filter)
-      const queryCache = queryClient.getQueriesData<UserContentWithDetails[]>({ queryKey: key });
-      const previousItems = queryCache?.[0]?.[1] ?? [];
+      // Get all matching query data (including all filter variants)
+      const allQueries = queryClient.getQueriesData<UserContentWithDetails[]>({
+        queryKey: key,
+      });
+
+      // Filter out queries with undefined data and convert to mutable arrays
+      const previousQueries: Array<[unknown[], UserContentWithDetails[]]> = allQueries
+        .filter((entry): entry is [unknown[], UserContentWithDetails[]] => entry[1] !== undefined)
+        .map(([queryKey, data]) => [[...queryKey], data]);
 
       const optimisticId = `optimistic-${Math.random().toString(36).slice(2)}`;
       const optimisticContentId = `optimistic-${Math.random().toString(36).slice(2)}`;
@@ -80,40 +86,38 @@ export function useSaveContent(options?: UseSaveContentOptions) {
         contents: optimisticContent,
       };
 
-      const existsIndex = previousItems.findIndex((it) => {
-        const c = (it as any).content || it.contents;
-        return c?.canonical_url === url || c?.url === url;
+      // Apply optimistic update to each query cache separately
+      previousQueries.forEach(([specificQueryKey, data]) => {
+        const existsIndex = data.findIndex((it) => {
+          const c = (it as any).content || it.contents;
+          return c?.canonical_url === url || c?.url === url;
+        });
+
+        let nextItems: UserContentWithDetails[];
+        if (existsIndex !== -1) {
+          // Move existing to top and refresh saved_at
+          nextItems = [...data];
+          const existing = { ...nextItems[existsIndex], saved_at: savedAt };
+          nextItems.splice(existsIndex, 1);
+          nextItems.unshift(existing);
+        } else {
+          nextItems = [optimisticItem, ...data];
+        }
+
+        // Update this specific query cache
+        queryClient.setQueryData(specificQueryKey, nextItems);
       });
 
-      let nextItems: UserContentWithDetails[];
-      if (existsIndex !== -1) {
-        // Move existing to top and refresh saved_at
-        nextItems = [...previousItems];
-        const existing = { ...nextItems[existsIndex], saved_at: savedAt };
-        nextItems.splice(existsIndex, 1);
-        nextItems.unshift(existing);
-      } else {
-        nextItems = [optimisticItem, ...previousItems];
-      }
-
-      // Update all matching queries (including filtered variants)
-      queryClient.setQueriesData<UserContentWithDetails[]>(
-        { queryKey: key },
-        (oldData) => nextItems
-      );
-
-      return { previousItems, optimisticId };
+      return { previousQueries, optimisticId };
     },
     onError: (error: Error, _url, context) => {
       console.error('Failed to save content:', error);
 
-      if (user?.id && context?.previousItems) {
-        const key = queryKey.userContents.byUserId(user.id);
-        // Rollback all matching queries (including filtered variants)
-        queryClient.setQueriesData<UserContentWithDetails[]>(
-          { queryKey: key },
-          (oldData) => context.previousItems
-        );
+      // Rollback each query cache to its previous state
+      if (context?.previousQueries) {
+        context.previousQueries.forEach(([specificQueryKey, previousData]) => {
+          queryClient.setQueryData(specificQueryKey, previousData);
+        });
       }
 
       Alert.alert(
@@ -127,27 +131,33 @@ export function useSaveContent(options?: UseSaveContentOptions) {
     onSuccess: (data, _url, context) => {
       if (user?.id) {
         const key = queryKey.userContents.byUserId(user.id);
-        // Update all matching queries (including filtered variants)
-        queryClient.setQueriesData<UserContentWithDetails[]>(
-          { queryKey: key },
-          (curr) => {
-            const items = curr ?? [];
-            return items.map((it) => {
-              if (it.id === context?.optimisticId || it.content_id.startsWith('optimistic-')) {
-                const contents = (it as any).content || it.contents;
-                const updatedContents: Content | undefined = contents
-                  ? { ...contents, id: data.contentId, status: data.status }
-                  : undefined;
-                return {
-                  ...it,
-                  content_id: data.contentId,
-                  contents: updatedContents ?? it.contents,
-                } as UserContentWithDetails;
-              }
-              return it;
-            });
-          }
-        );
+
+        // Get current state of all queries
+        const currentQueries = queryClient.getQueriesData<UserContentWithDetails[]>({
+          queryKey: key,
+        });
+
+        // Update each query cache separately
+        currentQueries.forEach(([specificQueryKey, currentData]) => {
+          if (!currentData) return;
+
+          const updatedItems = currentData.map((it) => {
+            if (it.id === context?.optimisticId || it.content_id.startsWith('optimistic-')) {
+              const contents = (it as any).content || it.contents;
+              const updatedContents: Content | undefined = contents
+                ? { ...contents, id: data.contentId, status: data.status }
+                : undefined;
+              return {
+                ...it,
+                content_id: data.contentId,
+                contents: updatedContents ?? it.contents,
+              } as UserContentWithDetails;
+            }
+            return it;
+          });
+
+          queryClient.setQueryData(specificQueryKey, updatedItems);
+        });
 
         // Slight delay before invalidation to allow UI to reflect optimistic item
         setTimeout(() => {
