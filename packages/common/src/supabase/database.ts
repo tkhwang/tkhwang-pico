@@ -12,3 +12,11 @@ export interface UserContentWithDetails extends UserContent {
 export type ContentTodoStatus =
   Database["public"]["Enums"]["content_todo_status"];
 export type TodoFilterType = ContentTodoStatus | "all";
+
+// Recommendation type for recommendation feed
+export interface Recommendation {
+  content_id: string;
+  distance: number;
+  score: number;
+  contents?: Content;
+}
