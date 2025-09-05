@@ -25,8 +25,8 @@ const formatDate = (dateString: string) => {
 };
 
 export function ContentItem({ item, onToggleComplete }: ContentItemProps) {
-  // Ensure content exists - check both possible field names
-  const content = item.content || item.contents;
+  // Ensure content exists
+  const content = item.contents;
   if (!item || !content) {
     return null;
   }
