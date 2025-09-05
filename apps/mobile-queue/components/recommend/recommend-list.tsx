@@ -11,6 +11,7 @@ export function RecommendList() {
   const {
     data: recommendations = [],
     isLoading,
+    isRefetching,
     error,
     refetch,
   } = useRecommendations({ limit: 30 });
@@ -25,7 +26,10 @@ export function RecommendList() {
     }
   }, [refetch]);
 
-  const items = useMemo(() => recommendations.filter((r) => !!r.contents), [recommendations]);
+  const validRecommendations = useMemo(
+    () => recommendations.filter((r) => !!r.contents),
+    [recommendations]
+  );
 
   const renderItem = useCallback(({ item }: { item: Recommendation }) => {
     return <RecommendItem recommendation={item} />;
@@ -83,7 +87,7 @@ export function RecommendList() {
   return (
     <View className="flex-1 bg-gray-50 dark:bg-gray-900">
       <FlashList
-        data={recommendations}
+        data={validRecommendations}
         renderItem={renderItem}
         keyExtractor={(item) => item.content_id}
         estimatedItemSize={150}
@@ -91,7 +95,7 @@ export function RecommendList() {
         contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 16 }}
         refreshControl={
           <RefreshControl
-            refreshing={refreshing}
+            refreshing={isRefetching}
             onRefresh={onRefresh}
             tintColor="#3B82F6"
             colors={['#3B82F6']}
