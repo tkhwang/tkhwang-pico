@@ -1,10 +1,8 @@
-import { getRequiredEnv } from '@/utils/env';
+import { getApiUrl } from '@/utils/platform';
 
 /**
  * Nest.js API client configuration
  */
-
-const NEST_API_URL = process.env.EXPO_PUBLIC_NEST_API_URL!;
 
 interface RequestOptions {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
@@ -18,6 +16,9 @@ interface RequestOptions {
  */
 export async function nestApi<T = any>(endpoint: string, options: RequestOptions = {}): Promise<T> {
   const { method = 'GET', headers = {}, body, token } = options;
+
+  // Get platform-specific API URL
+  const NEST_API_URL = getApiUrl();
 
   // Ensure proper URL construction
   const base = NEST_API_URL.endsWith('/') ? NEST_API_URL.slice(0, -1) : NEST_API_URL;

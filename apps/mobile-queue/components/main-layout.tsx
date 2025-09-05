@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { View, SafeAreaView } from 'react-native';
+import { View, SafeAreaView, Platform, StatusBar } from 'react-native';
 import { Header } from '@/components/header';
 
 interface MainLayoutProps {
@@ -8,7 +8,11 @@ interface MainLayoutProps {
 
 export function MainLayout({ children }: MainLayoutProps) {
   return (
-    <SafeAreaView className="flex-1 bg-white dark:bg-gray-900">
+    <SafeAreaView
+      className="flex-1 bg-white dark:bg-gray-900"
+      style={{
+        paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+      }}>
       <View className="flex-1 bg-white dark:bg-gray-900">
         <Header />
         <View className="flex-1">{children}</View>

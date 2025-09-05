@@ -16,18 +16,19 @@ export function ContentHeader({ filter, onFilterChange }: ContentHeaderProps) {
 
   return (
     <View className="px-4 pb-2 pt-4">
-      <View className="flex-row gap-4">
+      <View className="flex-row gap-2">
         {filters.map(({ value, label }) => (
           <TouchableOpacity
             key={value}
             onPress={() => onFilterChange(value)}
-            className={`flex-1 rounded-full px-4 py-2 ${
+            className={`flex-1 rounded-full px-2 py-2 ${
               filter === value
                 ? 'bg-gray-200 dark:bg-gray-700'
                 : 'border border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-900/50'
             }`}>
             <Text
-              className={`text-center text-sm font-medium ${
+              numberOfLines={1}
+              className={`text-center text-xs font-medium ${
                 filter === value
                   ? 'text-gray-800 dark:text-gray-200'
                   : 'text-gray-500 dark:text-gray-500'
