@@ -7,4 +7,9 @@ export const queryKey = {
       return ['user_contents', userId] as const;
     },
   },
+  recommendations: {
+    byUserId: (userId: string) => {
+      return ['recommendations', userId] as const;
+    },
+  },
 } as const;
