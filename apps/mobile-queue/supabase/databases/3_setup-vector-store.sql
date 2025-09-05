@@ -206,19 +206,25 @@ for each row execute function public.set_content_domain();
 create or replace function public.auto_set_completed_timestamp()
 returns trigger language plpgsql as $$
 begin
-  -- When marking as completed
-  if new.todo_status = 'completed' and old.todo_status = 'pending' then
-    new.completed_at := now();
-  -- When marking as pending (uncompleting)
-  elsif new.todo_status = 'pending' and old.todo_status = 'completed' then
-    new.completed_at := null;
+  if TG_OP = 'INSERT' then
+    if new.todo_status = 'completed' and new.completed_at is null then
+      new.completed_at := now();
+    elsif new.todo_status <> 'completed' then
+      new.completed_at := null;
+    end if;
+  else
+    if new.todo_status = 'completed' and old.todo_status <> 'completed' then
+      new.completed_at := now();
+    elsif new.todo_status <> 'completed' and old.todo_status = 'completed' then
+      new.completed_at := null;
+    end if;
   end if;
   return new;
 end $$;
 
 drop trigger if exists trg_auto_completed_timestamp on public.user_contents;
 create trigger trg_auto_completed_timestamp
-before update on public.user_contents
+before insert or update on public.user_contents
 for each row execute function public.auto_set_completed_timestamp();
 
 -- ============================================================================
