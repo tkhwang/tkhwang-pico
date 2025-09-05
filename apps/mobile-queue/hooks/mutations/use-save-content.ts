@@ -35,7 +35,9 @@ export function useSaveContent(options?: UseSaveContentOptions) {
       const key = queryKey.userContents.byUserId(user.id);
       await queryClient.cancelQueries({ queryKey: key });
 
-      const previousItems = queryClient.getQueryData<UserContentWithDetails[]>(key) ?? [];
+      // Get the first matching query data (without filter)
+      const queryCache = queryClient.getQueriesData<UserContentWithDetails[]>({ queryKey: key });
+      const previousItems = queryCache?.[0]?.[1] ?? [];
 
       const optimisticId = `optimistic-${Math.random().toString(36).slice(2)}`;
       const optimisticContentId = `optimistic-${Math.random().toString(36).slice(2)}`;
@@ -73,6 +75,8 @@ export function useSaveContent(options?: UseSaveContentOptions) {
         archived: false,
         labels: [],
         note: null,
+        todo_status: 'pending',
+        completed_at: null,
         contents: optimisticContent,
       };
 
@@ -92,7 +96,11 @@ export function useSaveContent(options?: UseSaveContentOptions) {
         nextItems = [optimisticItem, ...previousItems];
       }
 
-      queryClient.setQueryData<UserContentWithDetails[]>(key, nextItems);
+      // Update all matching queries (including filtered variants)
+      queryClient.setQueriesData<UserContentWithDetails[]>(
+        { queryKey: key },
+        (oldData) => nextItems
+      );
 
       return { previousItems, optimisticId };
     },
@@ -101,7 +109,11 @@ export function useSaveContent(options?: UseSaveContentOptions) {
 
       if (user?.id && context?.previousItems) {
         const key = queryKey.userContents.byUserId(user.id);
-        queryClient.setQueryData<UserContentWithDetails[]>(key, context.previousItems);
+        // Rollback all matching queries (including filtered variants)
+        queryClient.setQueriesData<UserContentWithDetails[]>(
+          { queryKey: key },
+          (oldData) => context.previousItems
+        );
       }
 
       Alert.alert(
@@ -115,23 +127,27 @@ export function useSaveContent(options?: UseSaveContentOptions) {
     onSuccess: (data, _url, context) => {
       if (user?.id) {
         const key = queryKey.userContents.byUserId(user.id);
-        queryClient.setQueryData<UserContentWithDetails[]>(key, (curr) => {
-          const items = curr ?? [];
-          return items.map((it) => {
-            if (it.id === context?.optimisticId || it.content_id.startsWith('optimistic-')) {
-              const contents = (it as any).content || it.contents;
-              const updatedContents: Content | undefined = contents
-                ? { ...contents, id: data.contentId, status: data.status }
-                : undefined;
-              return {
-                ...it,
-                content_id: data.contentId,
-                contents: updatedContents ?? it.contents,
-              } as UserContentWithDetails;
-            }
-            return it;
-          });
-        });
+        // Update all matching queries (including filtered variants)
+        queryClient.setQueriesData<UserContentWithDetails[]>(
+          { queryKey: key },
+          (curr) => {
+            const items = curr ?? [];
+            return items.map((it) => {
+              if (it.id === context?.optimisticId || it.content_id.startsWith('optimistic-')) {
+                const contents = (it as any).content || it.contents;
+                const updatedContents: Content | undefined = contents
+                  ? { ...contents, id: data.contentId, status: data.status }
+                  : undefined;
+                return {
+                  ...it,
+                  content_id: data.contentId,
+                  contents: updatedContents ?? it.contents,
+                } as UserContentWithDetails;
+              }
+              return it;
+            });
+          }
+        );
 
         // Slight delay before invalidation to allow UI to reflect optimistic item
         setTimeout(() => {
