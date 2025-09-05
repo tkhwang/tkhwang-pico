@@ -1,4 +1,4 @@
-import { createSupabaseClientWithClerkAuth } from '../../utils/supabase';
+import { createSupabaseClientWithClerkAuth } from '@/utils/supabase';
 
 export async function toggleTodoStatus(
   clerkToken: string,
