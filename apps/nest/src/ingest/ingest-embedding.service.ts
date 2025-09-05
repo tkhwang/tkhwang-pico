@@ -4,6 +4,7 @@ import OpenAI from 'openai';
 import { SupabaseService } from '../supabase/supabase.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { EVENTS } from '../common/constants/events';
+import { APP_ERRORS } from '../consts/app-errors';
 
 @Injectable()
 export class IngestEmbeddingService {
@@ -88,12 +89,10 @@ export class IngestEmbeddingService {
         .single();
 
       if (insertEmbeddingsResult.error) {
-        // If unique violation due to existing row, perform update instead
-        const msg = insertEmbeddingsResult.error.message || '';
-        const isUnique = /duplicate key value|unique constraint|conflict/i.test(
-          msg,
-        );
-        if (!isUnique) {
+        if (
+          insertEmbeddingsResult.error.code !==
+          APP_ERRORS.POSTGRES.UNIQUE_VIOLATION
+        ) {
           this.logger.error(
             `Insert embedding failed for contentId=${contentId}: ${insertEmbeddingsResult.error.message}`,
           );
