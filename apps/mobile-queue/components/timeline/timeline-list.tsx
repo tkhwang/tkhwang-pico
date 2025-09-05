@@ -2,7 +2,7 @@ import React, { useState, useCallback, useMemo } from 'react';
 import { View, RefreshControl, ScrollView } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { Text } from '../ui/text';
-import { TimelineDateSection } from './timeline-item';
+import { TimelineItem } from './timeline-item';
 import { useUserContents } from '@/hooks/queries/use-user-contents';
 import { ContentListSkeleton } from '@/components/content/content-list-skeleton';
 import type { UserContentWithDetails } from '@tkhwang-pico/common';
@@ -96,7 +96,7 @@ export function TimelineList() {
   }
 
   const renderItem = ({ item }: { item: GroupedContent }) => {
-    return <TimelineDateSection date={item.date} items={item.items} />;
+    return <TimelineItem date={item.date} items={item.items} />;
   };
 
   return (
