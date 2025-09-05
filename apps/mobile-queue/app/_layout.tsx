@@ -6,13 +6,15 @@ import { tokenCache } from '@clerk/clerk-expo/token-cache';
 import { QueryProvider } from '@/providers/query-provider';
 import { ThemeProvider } from '@react-navigation/native';
 import { PortalHost } from '@rn-primitives/portal';
-import { Stack } from 'expo-router';
+import { Tabs } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useColorScheme } from 'nativewind';
 import * as React from 'react';
 import Constants from 'expo-constants';
 import { View, Text } from 'react-native';
+import { SignInForm } from '@/components/sign-in-form';
+import TabLayout from './(tabs)/_layout';
 
 // React 19 types require components to explicitly include `children`.
 // Some versions of @clerk/clerk-expo don't declare `children` in props,
@@ -20,6 +22,9 @@ import { View, Text } from 'react-native';
 const ClerkProviderExtended = ClerkProvider as React.ComponentType<
   React.PropsWithChildren<React.ComponentProps<typeof ClerkProvider>>
 >;
+
+// Cast ClerkLoaded to ensure type compatibility with React 19
+const ClerkLoadedExtended = ClerkLoaded as React.ComponentType<React.PropsWithChildren>;
 
 export default function RootLayout() {
   const { colorScheme } = useColorScheme();
@@ -47,13 +52,15 @@ export default function RootLayout() {
 
   return (
     <ClerkProviderExtended tokenCache={tokenCache} publishableKey={clerkPublishableKey}>
-      <QueryProvider>
-        <ThemeProvider value={NAV_THEME[colorScheme ?? 'light']}>
-          <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
-          <Routes />
-          <PortalHost />
-        </ThemeProvider>
-      </QueryProvider>
+      <ClerkLoadedExtended>
+        <QueryProvider>
+          <ThemeProvider value={NAV_THEME[colorScheme ?? 'light']}>
+            <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
+            <Routes />
+            <PortalHost />
+          </ThemeProvider>
+        </QueryProvider>
+      </ClerkLoadedExtended>
     </ClerkProviderExtended>
   );
 }
@@ -73,25 +80,15 @@ function Routes() {
     return null;
   }
 
+  // Simple conditional rendering based on auth state
+  if (isSignedIn) {
+    return <TabLayout />;
+  }
+
+  // Show sign in form when not authenticated
   return (
-    <Stack>
-      {/* Screens only shown when the user is NOT signed in */}
-      <Stack.Protected guard={!isSignedIn}>
-        <Stack.Screen name="(auth)/sign-in" options={SIGN_IN_SCREEN_OPTIONS} />
-      </Stack.Protected>
-
-      {/* Screens only shown when the user IS signed in */}
-      <Stack.Protected guard={isSignedIn}>
-        <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      </Stack.Protected>
-
-      {/* Screens outside the guards are accessible to everyone (e.g. not found) */}
-    </Stack>
+    <View className="flex-1 items-center justify-center p-4">
+      <SignInForm />
+    </View>
   );
 }
-
-const SIGN_IN_SCREEN_OPTIONS = {
-  headerShown: false,
-  title: 'Sign in',
-};
