@@ -172,9 +172,10 @@ export class IngestService {
     const message = error.message.toLowerCase();
 
     // Check for HTTP status codes that indicate unrecoverable errors
+    if (message.includes('400 bad request')) return true;
+    if (message.includes('401 unauthorized')) return true;
     if (message.includes('403 forbidden')) return true;
     if (message.includes('404 not found')) return true;
-    if (message.includes('401 unauthorized')) return true;
     if (message.includes('410 gone')) return true;
     if (message.includes('451 unavailable for legal reasons')) return true;
 
