@@ -35,9 +35,14 @@ export function SwipeableContentItem({ item, onToggleComplete }: SwipeableConten
   };
 
   const triggerAction = (action: 'complete' | 'delete') => {
-    console.log(`Action triggered: ${action} for item ${item.id}`);
-    // UI only - no actual mutations
-    // Just reset the position after showing the action
+    if (action === 'complete' && onToggleComplete) {
+      onToggleComplete(item.id);
+    }
+    if (__DEV__) {
+      // Keep useful trace in development; avoid noisy logs in production
+      // eslint-disable-next-line no-console
+      console.log(`Action triggered: ${action} for item ${item.id}`);
+    }
     translateX.value = withSpring(0, springConfig);
   };
 
