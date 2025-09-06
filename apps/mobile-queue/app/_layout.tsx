@@ -84,7 +84,7 @@ function Routes() {
           <Stack.Screen name="(tabs)" />
         </>
       ) : (
-        <Stack.Screen name="(auth)/sign-in" />
+        <Stack.Screen name="sign-in" />
       )}
     </Stack>
   );

@@ -26,7 +26,7 @@ export function UserMenu() {
     await signOut();
 
     // Force navigation to sign-in page after signing out
-    router.replace('/(auth)/sign-in');
+    router.replace('/sign-in');
   }
 
   return (
