@@ -1,4 +1,5 @@
-import { SupabaseService } from './../supabase/supabase.service';
+import { ContentsRepository } from '../supabase/contents.repository';
+import { UserContentsRepository } from '../supabase/user-contents.repository';
 import {
   Injectable,
   BadRequestException,
@@ -11,8 +12,9 @@ import { EVENTS } from '../common/constants/events';
 @Injectable()
 export class ContentsService {
   constructor(
-    private readonly supabaseService: SupabaseService,
     private readonly eventEmitter: EventEmitter2,
+    private readonly contentsRepository: ContentsRepository,
+    private readonly userContentsRepository: UserContentsRepository,
   ) {}
 
   async saveUrl({ url, userId }: { url: string; userId: string }) {
@@ -26,37 +28,16 @@ export class ContentsService {
     }
 
     // 1) contents upsert (정규화된 URL을 키로 사용)
-    const { data: contents, error: upsertContentsError } =
-      await this.supabaseService.serviceClient
-        .from('contents')
-        .upsert(
-          {
-            url: canonicalUrl, // 유니크 키로 사용
-            canonical_url: canonicalUrl, // 보조 컬럼
-            metadata: { original_url: redactUrl(url) }, // 원본 URL(민감 파라미터 제거)
-          },
-          { onConflict: 'url' },
-        )
-        .select('*')
-        .single();
-
-    if (upsertContentsError) {
-      throw new Error(
-        upsertContentsError?.message ?? 'No content returned from upsert',
-      );
-    }
+    const contents = await this.contentsRepository.upsertContent({
+      url: canonicalUrl, // 유니크 키로 사용
+      canonical_url: canonicalUrl, // 보조 컬럼
+      metadata: { original_url: redactUrl(url) }, // 원본 URL(민감 파라미터 제거)
+    });
 
     // 2) user_contents upsert
-    const { error: upsertUserContentsError } =
-      await this.supabaseService.serviceClient.from('user_contents').upsert(
-        {
-          user_id: userId,
-          content_id: contents.id,
-        },
-        { onConflict: 'user_id,content_id' },
-      );
-
-    if (upsertUserContentsError) {
+    try {
+      await this.userContentsRepository.linkUserContent(userId, contents.id);
+    } catch {
       throw new InternalServerErrorException(
         'Failed to save user content link',
       );
@@ -81,17 +62,6 @@ export class ContentsService {
   }
 
   async getSimilarContents(contentId: string, limit = 10) {
-    const { data, error } = await this.supabaseService.serviceClient.rpc(
-      'similar_to_content',
-      { p_content_id: contentId, p_limit: limit },
-    );
-
-    if (error) throw error;
-
-    return (data ?? []).map((item) => ({
-      ...item,
-      // cosine distance ∈ [0,2] → score ∈ [0,1]
-      score: (2 - item.distance) / 2,
-    }));
+    return this.contentsRepository.getSimilarContents(contentId, limit);
   }
 }
