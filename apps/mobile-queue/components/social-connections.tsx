@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import { useSSO, type StartSSOFlowParams } from '@clerk/clerk-expo';
 import * as AuthSession from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
+import { router } from 'expo-router';
 import { useColorScheme } from 'nativewind';
 import * as React from 'react';
 import { Image, Platform, View, type ImageSourcePropType } from 'react-native';
@@ -69,7 +70,8 @@ export function SocialConnections() {
         // If sign in was successful, set the active session
         if (createdSessionId && setActive) {
           await setActive({ session: createdSessionId });
-          // No need to navigate - the UI will automatically update based on auth state
+          // Force navigation to home screen after successful authentication
+          router.replace('/');
           return;
         }
 
