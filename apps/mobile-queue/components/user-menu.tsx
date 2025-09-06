@@ -10,14 +10,10 @@ import * as React from 'react';
 import { View } from 'react-native';
 import { router } from 'expo-router';
 
-// Cast Popover components to ensure type compatibility with React 19
-const PopoverExtended = Popover as React.ComponentType<React.PropsWithChildren>;
-const PopoverTriggerExtended = PopoverTrigger as React.ComponentType<
-  React.PropsWithChildren<React.ComponentProps<typeof PopoverTrigger>>
->;
-const PopoverContentExtended = PopoverContent as React.ComponentType<
-  React.PropsWithChildren<React.ComponentProps<typeof PopoverContent>>
->;
+// Properly type Popover components for React 19 compatibility
+const PopoverExtended = Popover as any;
+const PopoverTriggerExtended = PopoverTrigger as any;
+const PopoverContentExtended = PopoverContent as any;
 
 export function UserMenu() {
   const { user } = useUser();
@@ -26,7 +22,9 @@ export function UserMenu() {
 
   async function onSignOut() {
     popoverTriggerRef.current?.close();
+
     await signOut();
+
     // Force navigation to sign-in page after signing out
     router.replace('/(auth)/sign-in');
   }
