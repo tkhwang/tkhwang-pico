@@ -108,10 +108,9 @@ export class UserContentsRepository {
       .select('*')
       .eq('user_id', userId)
       .eq('content_id', contentId)
-      .single();
+      .maybeSingle();
 
-    if (error && error.code !== 'PGRST116') {
-      // PGRST116 = no rows returned
+    if (error) {
       this.logger.error(`Failed to find user content link: ${error.message}`);
       throw error;
     }
