@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
-import { SupabaseService } from '../supabase/supabase.service';
+import { ContentsRepository } from '../supabase/contents.repository';
+import { UserContentsRepository } from '../supabase/user-contents.repository';
 import { IngestExtractService } from './ingest-extract.service';
 import { IngestSummaryService } from './ingest-summary.service';
 import { IngestEmbeddingService } from './ingest-embedding.service';
@@ -17,10 +18,11 @@ export class IngestService {
   private readonly logger = new Logger(IngestService.name);
 
   constructor(
-    private readonly supabaseService: SupabaseService,
     private readonly extractService: IngestExtractService,
     private readonly summaryService: IngestSummaryService,
     private readonly embeddingService: IngestEmbeddingService,
+    private readonly contentsRepository: ContentsRepository,
+    private readonly userContentsRepository: UserContentsRepository,
   ) {}
 
   @OnEvent(EVENTS.CONTENT.CREATED, { async: true })
@@ -77,19 +79,15 @@ export class IngestService {
       }
 
       // Preserve existing metadata, then update content in database
-      const { data: existingMetaRow } = await this.supabaseService.serviceClient
-        .from('contents')
-        .select('metadata')
-        .eq('id', contentId)
-        .single();
+      const existingMetadata =
+        await this.contentsRepository.getMetadata(contentId);
 
       // Ensure metadata is an object before spreading
-      const existingMeta = existingMetaRow?.metadata;
       const baseMetadata =
-        typeof existingMeta === 'object' &&
-        existingMeta !== null &&
-        !Array.isArray(existingMeta)
-          ? existingMeta
+        typeof existingMetadata === 'object' &&
+        existingMetadata !== null &&
+        !Array.isArray(existingMetadata)
+          ? existingMetadata
           : {};
 
       const mergedMetadata = {
@@ -98,29 +96,19 @@ export class IngestService {
         site_name: metadata.siteName,
       };
 
-      const { error: updateContentError } =
-        await this.supabaseService.serviceClient
-          .from('contents')
-          .update({
-            title: metadata.title,
-            summary: finalSummary,
-            author: metadata.author,
-            lang: normalizedLang,
-            tags: keywords,
-            domain: metadata.domain,
-            published_at: metadata.publishedAt?.toISOString(),
-            word_count: metadata.wordCount,
-            fetched_at: new Date().toISOString(),
-            status: 'ready',
-            metadata: mergedMetadata,
-          })
-          .eq('id', contentId);
-
-      if (updateContentError) {
-        throw new Error(
-          `Failed to update content: ${updateContentError.message}`,
-        );
-      }
+      await this.contentsRepository.updateContent(contentId, {
+        title: metadata.title,
+        summary: finalSummary,
+        author: metadata.author,
+        lang: normalizedLang,
+        tags: keywords,
+        domain: metadata.domain,
+        published_at: metadata.publishedAt?.toISOString(),
+        word_count: metadata.wordCount,
+        fetched_at: new Date().toISOString(),
+        status: 'ready',
+        metadata: mergedMetadata,
+      });
 
       // Create/Update summary embedding (best-effort; don't fail the whole ingest)
       try {
@@ -152,8 +140,24 @@ export class IngestService {
         }`,
       );
 
-      // Update status to failed
-      await this.updateContentStatus(contentId, 'failed');
+      // Check if this is an unrecoverable error (403, 404, etc.)
+      if (this.isUnrecoverableError(error)) {
+        this.logger.warn(
+          `Deleting content ${contentId} due to unrecoverable error: ${
+            error instanceof Error ? error.message : 'Unknown error'
+          }`,
+        );
+
+        // Delete from user_contents first (foreign key constraint)
+        await this.userContentsRepository.deleteByContentId(contentId);
+
+        // Then delete from contents
+        await this.contentsRepository.deleteContent(contentId);
+      } else {
+        // For recoverable errors, just mark as failed
+        await this.contentsRepository.updateStatus(contentId, 'failed');
+      }
+
       throw error;
     }
   }
@@ -161,20 +165,24 @@ export class IngestService {
   /*
    *  Private methods
    */
-  private async updateContentStatus(
-    contentId: string,
-    status: 'pending' | 'ready' | 'failed' | 'archived',
-  ) {
-    const { error: updateContentsError } =
-      await this.supabaseService.serviceClient
-        .from('contents')
-        .update({ status })
-        .eq('id', contentId);
 
-    if (updateContentsError) {
-      this.logger.error(
-        `Failed to update content status to ${status}: ${updateContentsError.message}`,
-      );
-    }
+  private isUnrecoverableError(error: unknown): boolean {
+    if (!(error instanceof Error)) return false;
+
+    const message = error.message.toLowerCase();
+
+    // Check for HTTP status codes that indicate unrecoverable errors
+    if (message.includes('403 forbidden')) return true;
+    if (message.includes('404 not found')) return true;
+    if (message.includes('401 unauthorized')) return true;
+    if (message.includes('410 gone')) return true;
+    if (message.includes('451 unavailable for legal reasons')) return true;
+
+    // Check for other unrecoverable conditions
+    if (message.includes('unsupported protocol')) return true;
+    if (message.includes('unsupported content-type')) return true;
+
+    // Default to recoverable (network errors, timeouts, etc.)
+    return false;
   }
 }

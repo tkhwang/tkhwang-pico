@@ -35,8 +35,13 @@ export class IngestExtractService {
     try {
       const res = await fetch(url, {
         headers: {
-          'user-agent': 'Mozilla/5.0 ReadItLaterBot/1.0 (+contact@yourdomain)',
-          accept: 'text/html,application/xhtml+xml',
+          'user-agent':
+            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+          accept:
+            'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+          'accept-language': 'en-US,en;q=0.9,ko;q=0.8',
+          'accept-encoding': 'gzip, deflate, br',
+          'cache-control': 'no-cache',
         },
         redirect: 'follow',
         signal: controller.signal,

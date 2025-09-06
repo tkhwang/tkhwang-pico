@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { View, TouchableOpacity, RefreshControl, ScrollView } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { Text } from '../ui/text';
-import { ContentItem } from './content-item';
+import { SwipeableContentItem } from './swipeable-content-item';
 import { useUserContents } from '@/hooks/queries/use-user-contents';
 import { ContentListSkeleton } from '@/components/content/content-list-skeleton';
 import { useToggleTodo } from '@/hooks/mutations/use-toggle-todo';
@@ -83,7 +83,7 @@ export function ContentList({ todoFilter }: ContentListProps) {
   }
 
   const renderItem = ({ item }: { item: (typeof userContents)[0] }) => {
-    return <ContentItem item={item} onToggleComplete={handleToggleComplete} />;
+    return <SwipeableContentItem item={item} onToggleComplete={handleToggleComplete} />;
   };
 
   return (
