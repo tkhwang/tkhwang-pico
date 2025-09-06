@@ -19,26 +19,37 @@ interface SwipeableContentItemProps {
   onToggleComplete?: (id: string) => void;
 }
 
-const SWIPE_THRESHOLD = 75;
-const MAX_SWIPE_DISTANCE = 200;
+const SWIPE_THRESHOLD = 60;
+const MAX_SWIPE_DISTANCE = 150;
+const SWIPE_DAMPING = 0.4; // Lower damping for much slower movement
 
 export function SwipeableContentItem({ item, onToggleComplete }: SwipeableContentItemProps) {
   const translateX = useSharedValue(0);
   const itemHeight = useSharedValue(0);
 
+  const springConfig = {
+    damping: 25, // Even higher damping for smoother animation
+    stiffness: 70, // Much lower stiffness for slower movement
+    mass: 1.5, // Higher mass for heavier feel
+    velocity: 0,
+  };
+
   const triggerAction = (action: 'complete' | 'delete') => {
     console.log(`Action triggered: ${action} for item ${item.id}`);
     // UI only - no actual mutations
     // Just reset the position after showing the action
-    translateX.value = withSpring(0);
+    translateX.value = withSpring(0, springConfig);
   };
 
   const panGesture = Gesture.Pan()
     .onUpdate((event) => {
+      // Apply damping factor for smoother movement
+      const dampedTranslation = event.translationX * SWIPE_DAMPING;
+
       // Limit the swipe distance
       translateX.value = Math.max(
         -MAX_SWIPE_DISTANCE,
-        Math.min(MAX_SWIPE_DISTANCE, event.translationX)
+        Math.min(MAX_SWIPE_DISTANCE, dampedTranslation)
       );
     })
     .onEnd(() => {
@@ -51,7 +62,7 @@ export function SwipeableContentItem({ item, onToggleComplete }: SwipeableConten
         runOnJS(triggerAction)('delete');
       } else {
         // Return to center if not past threshold
-        translateX.value = withSpring(0);
+        translateX.value = withSpring(0, springConfig);
       }
     });
 
