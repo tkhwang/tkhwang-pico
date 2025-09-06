@@ -8,6 +8,12 @@ import type { TriggerRef } from '@rn-primitives/popover';
 import { LogOutIcon, PlusIcon, SettingsIcon } from 'lucide-react-native';
 import * as React from 'react';
 import { View } from 'react-native';
+import { router } from 'expo-router';
+
+// Properly type Popover components for React 19 compatibility
+const PopoverExtended = Popover as any;
+const PopoverTriggerExtended = PopoverTrigger as any;
+const PopoverContentExtended = PopoverContent as any;
 
 export function UserMenu() {
   const { user } = useUser();
@@ -16,17 +22,21 @@ export function UserMenu() {
 
   async function onSignOut() {
     popoverTriggerRef.current?.close();
+
     await signOut();
+
+    // Force navigation to sign-in page after signing out
+    router.replace('/sign-in');
   }
 
   return (
-    <Popover>
-      <PopoverTrigger asChild ref={popoverTriggerRef}>
+    <PopoverExtended>
+      <PopoverTriggerExtended asChild ref={popoverTriggerRef}>
         <Button variant="ghost" size="icon" className="size-8 rounded-full">
           <UserAvatar />
         </Button>
-      </PopoverTrigger>
-      <PopoverContent align="end" side="bottom" className="w-80 p-0">
+      </PopoverTriggerExtended>
+      <PopoverContentExtended align="end" side="bottom" className="w-80 p-0">
         <View className="gap-3 border-b border-border p-3">
           <View className="flex-row items-center gap-3">
             <UserAvatar className="size-10" />
@@ -71,8 +81,8 @@ export function UserMenu() {
           </View>
           <Text>Add account</Text>
         </Button>
-      </PopoverContent>
-    </Popover>
+      </PopoverContentExtended>
+    </PopoverExtended>
   );
 }
 

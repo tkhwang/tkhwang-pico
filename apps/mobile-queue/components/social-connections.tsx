@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import { useSSO, type StartSSOFlowParams } from '@clerk/clerk-expo';
 import * as AuthSession from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
-import { useColorScheme } from 'nativewind';
+import { router } from 'expo-router';
 import * as React from 'react';
 import { Image, Platform, View, type ImageSourcePropType } from 'react-native';
 
@@ -51,14 +51,13 @@ const SOCIAL_CONNECTION_STRATEGIES: {
 
 export function SocialConnections() {
   useWarmUpBrowser();
-  const { colorScheme } = useColorScheme();
   const { startSSOFlow } = useSSO();
 
   function onSocialLoginPress(strategy: SocialConnectionStrategy) {
     return async () => {
       try {
         // Start the authentication process by calling `startSSOFlow()`
-        const { createdSessionId, setActive, signIn } = await startSSOFlow({
+        const { createdSessionId, setActive } = await startSSOFlow({
           strategy,
           // For web, defaults to current path
           // For native, you must pass a scheme, like AuthSession.makeRedirectUri({ scheme, path })
@@ -69,7 +68,8 @@ export function SocialConnections() {
         // If sign in was successful, set the active session
         if (createdSessionId && setActive) {
           await setActive({ session: createdSessionId });
-          // No need to navigate - the UI will automatically update based on auth state
+          // Force navigation to home screen after successful authentication
+          router.replace('/');
           return;
         }
 
