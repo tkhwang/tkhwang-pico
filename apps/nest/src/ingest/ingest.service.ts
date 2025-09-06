@@ -152,9 +152,51 @@ export class IngestService {
         }`,
       );
 
-      // Update status to failed
-      await this.updateContentStatus(contentId, 'failed');
+      // Check if this is an unrecoverable error (403, 404, etc.)
+      if (this.isUnrecoverableError(error)) {
+        this.logger.warn(
+          `Deleting content ${contentId} due to unrecoverable error: ${
+            error instanceof Error ? error.message : 'Unknown error'
+          }`,
+        );
+
+        // Delete from user_contents first (foreign key constraint)
+        await this.deleteUserContent(contentId);
+
+        // Then delete from contents
+        await this.deleteContent(contentId);
+      } else {
+        // For recoverable errors, just mark as failed
+        await this.updateContentStatus(contentId, 'failed');
+      }
+
       throw error;
+    }
+  }
+
+  async deleteUserContent(contentId: string): Promise<void> {
+    const { error } = await this.supabaseService.serviceClient
+      .from('user_contents')
+      .delete()
+      .eq('content_id', contentId);
+
+    if (error) {
+      this.logger.error(
+        `Failed to delete user_contents for content ${contentId}: ${error.message}`,
+      );
+    }
+  }
+
+  async deleteContent(contentId: string): Promise<void> {
+    const { error } = await this.supabaseService.serviceClient
+      .from('contents')
+      .delete()
+      .eq('id', contentId);
+
+    if (error) {
+      this.logger.error(
+        `Failed to delete content ${contentId}: ${error.message}`,
+      );
     }
   }
 
@@ -176,5 +218,25 @@ export class IngestService {
         `Failed to update content status to ${status}: ${updateContentsError.message}`,
       );
     }
+  }
+
+  private isUnrecoverableError(error: unknown): boolean {
+    if (!(error instanceof Error)) return false;
+
+    const message = error.message.toLowerCase();
+
+    // Check for HTTP status codes that indicate unrecoverable errors
+    if (message.includes('403 forbidden')) return true;
+    if (message.includes('404 not found')) return true;
+    if (message.includes('401 unauthorized')) return true;
+    if (message.includes('410 gone')) return true;
+    if (message.includes('451 unavailable for legal reasons')) return true;
+
+    // Check for other unrecoverable conditions
+    if (message.includes('unsupported protocol')) return true;
+    if (message.includes('unsupported content-type')) return true;
+
+    // Default to recoverable (network errors, timeouts, etc.)
+    return false;
   }
 }
