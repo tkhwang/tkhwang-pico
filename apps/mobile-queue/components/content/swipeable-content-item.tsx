@@ -42,6 +42,9 @@ export function SwipeableContentItem({ item, onToggleComplete }: SwipeableConten
   };
 
   const panGesture = Gesture.Pan()
+    .activeOffsetX([-10, 10]) // Require 10px horizontal movement to activate
+    .failOffsetY([-5, 5]) // Cancel if vertical movement exceeds 5px
+    .shouldCancelWhenOutside(true)
     .onUpdate((event) => {
       // Apply damping factor for smoother movement
       const dampedTranslation = event.translationX * SWIPE_DAMPING;
