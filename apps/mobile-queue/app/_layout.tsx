@@ -1,4 +1,5 @@
 import '@/global.css';
+import 'react-native-gesture-handler';
 
 import { NAV_THEME } from '@/lib/theme';
 import { ClerkProvider, ClerkLoaded, useAuth } from '@clerk/clerk-expo';
@@ -6,6 +7,7 @@ import { tokenCache } from '@clerk/clerk-expo/token-cache';
 import { QueryProvider } from '@/providers/query-provider';
 import { ThemeProvider } from '@react-navigation/native';
 import { PortalHost } from '@rn-primitives/portal';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
@@ -49,17 +51,19 @@ export default function RootLayout() {
   }
 
   return (
-    <ClerkProviderExtended tokenCache={tokenCache} publishableKey={clerkPublishableKey}>
-      <ClerkLoadedExtended>
-        <QueryProvider>
-          <ThemeProvider value={NAV_THEME[colorScheme ?? 'light']}>
-            <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
-            <Routes />
-            <PortalHost />
-          </ThemeProvider>
-        </QueryProvider>
-      </ClerkLoadedExtended>
-    </ClerkProviderExtended>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ClerkProviderExtended tokenCache={tokenCache} publishableKey={clerkPublishableKey}>
+        <ClerkLoadedExtended>
+          <QueryProvider>
+            <ThemeProvider value={NAV_THEME[colorScheme ?? 'light']}>
+              <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
+              <Routes />
+              <PortalHost />
+            </ThemeProvider>
+          </QueryProvider>
+        </ClerkLoadedExtended>
+      </ClerkProviderExtended>
+    </GestureHandlerRootView>
   );
 }
 
