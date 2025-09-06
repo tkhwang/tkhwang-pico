@@ -1,5 +1,5 @@
-import '@/global.css';
 import 'react-native-gesture-handler';
+import '@/global.css';
 
 import { NAV_THEME } from '@/lib/theme';
 import { ClerkProvider, ClerkLoaded, useAuth } from '@clerk/clerk-expo';
