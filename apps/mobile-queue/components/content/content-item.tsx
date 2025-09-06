@@ -71,7 +71,7 @@ export function ContentItem({ item, onToggleComplete }: ContentItemProps) {
 
   return (
     <TouchableOpacity
-      className="mb-2 rounded-lg border border-gray-100 bg-white p-3 dark:border-gray-700 dark:bg-gray-800"
+      className="rounded-lg border border-gray-100 bg-white p-3 dark:border-gray-700 dark:bg-gray-800"
       onPress={handlePress}
       onLongPress={handleLongPress}
       delayLongPress={500}>
