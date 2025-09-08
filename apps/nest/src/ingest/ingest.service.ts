@@ -6,6 +6,7 @@ import { IngestExtractService } from './ingest-extract.service';
 import { IngestSummaryService } from './ingest-summary.service';
 import { IngestEmbeddingService } from './ingest-embedding.service';
 import { EVENTS } from '../common/constants/events';
+import { HtmlCacheService } from '../cache/html-cache.service';
 
 export interface ContentCreatedEvent {
   contentId: string;
@@ -21,6 +22,7 @@ export class IngestService {
     private readonly extractService: IngestExtractService,
     private readonly summaryService: IngestSummaryService,
     private readonly embeddingService: IngestEmbeddingService,
+    private readonly htmlCache: HtmlCacheService,
     private readonly contentsRepository: ContentsRepository,
     private readonly userContentsRepository: UserContentsRepository,
   ) {}
@@ -45,9 +47,16 @@ export class IngestService {
       // Keep status as pending during processing
       // Note: Consider adding 'processing' to the database enum if needed
 
-      // Fetch HTML
-      this.logger.log(`Fetching HTML for ${url}`);
-      const html = await this.extractService.fetchHtml(url);
+      // Try to get HTML from cache first
+      let html = this.htmlCache.get(contentId);
+
+      if (html) {
+        this.logger.log(`Using cached HTML for ${url}`);
+      } else {
+        // Fetch HTML if not in cache
+        this.logger.log(`Fetching HTML for ${url} (cache miss)`);
+        html = await this.extractService.fetchHtml(url);
+      }
 
       // Extract metadata
       this.logger.log(`Extracting metadata for ${url}`);
