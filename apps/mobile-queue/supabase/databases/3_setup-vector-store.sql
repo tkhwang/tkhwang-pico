@@ -324,10 +324,11 @@ create table if not exists public.debug_failed_contents (
   metadata      jsonb not null default '{}'
 );
 
--- 인덱스
-create index if not exists idx_debug_failed_user on public.debug_failed_contents(user_id);
-create index if not exists idx_debug_failed_attempted on public.debug_failed_contents(attempted_at desc);
-create index if not exists idx_debug_failed_error_type on public.debug_failed_contents(error_type);
+-- Composite indexes optimized for WHERE + ORDER BY
+create index if not exists idx_debug_failed_user_attempted
+  on public.debug_failed_contents(user_id, attempted_at desc);
+create index if not exists idx_debug_failed_error_type_attempted
+  on public.debug_failed_contents(error_type, attempted_at desc);
 
 -- RLS 설정
 alter table public.debug_failed_contents enable row level security;
