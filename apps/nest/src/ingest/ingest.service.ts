@@ -6,6 +6,7 @@ import { IngestExtractService } from './ingest-extract.service';
 import { IngestSummaryService } from './ingest-summary.service';
 import { IngestEmbeddingService } from './ingest-embedding.service';
 import { EVENTS } from '../common/constants/events';
+import { HtmlCacheService } from '../cache/html-cache.service';
 
 export interface ContentCreatedEvent {
   contentId: string;
@@ -21,6 +22,7 @@ export class IngestService {
     private readonly extractService: IngestExtractService,
     private readonly summaryService: IngestSummaryService,
     private readonly embeddingService: IngestEmbeddingService,
+    private readonly htmlCache: HtmlCacheService,
     private readonly contentsRepository: ContentsRepository,
     private readonly userContentsRepository: UserContentsRepository,
   ) {}
@@ -45,9 +47,24 @@ export class IngestService {
       // Keep status as pending during processing
       // Note: Consider adding 'processing' to the database enum if needed
 
-      // Fetch HTML
-      this.logger.log(`Fetching HTML for ${url}`);
-      const html = await this.extractService.fetchHtml(url);
+      // Try to get HTML from cache first
+      let html = this.htmlCache.get(contentId);
+
+      if (html) {
+        this.logger.log(`Using cached HTML for ${url}`);
+      } else {
+        // Fetch HTML if not in cache
+        this.logger.log(`Fetching HTML for ${url} (cache miss)`);
+        html = await this.extractService.fetchHtml(url);
+        // Write-through so subsequent steps can reuse it
+        try {
+          this.htmlCache.set(contentId, html, url);
+        } catch (e) {
+          this.logger.warn(
+            `Failed to cache HTML for ${contentId}: ${e instanceof Error ? e.message : 'Unknown error'}`,
+          );
+        }
+      }
 
       // Extract metadata
       this.logger.log(`Extracting metadata for ${url}`);
@@ -141,7 +158,7 @@ export class IngestService {
       );
 
       // Check if this is an unrecoverable error (403, 404, etc.)
-      if (this.isUnrecoverableError(error)) {
+      if (this.extractService.isUnrecoverableError(error)) {
         this.logger.warn(
           `Deleting content ${contentId} due to unrecoverable error: ${
             error instanceof Error ? error.message : 'Unknown error'
@@ -160,30 +177,5 @@ export class IngestService {
 
       throw error;
     }
-  }
-
-  /*
-   *  Private methods
-   */
-
-  private isUnrecoverableError(error: unknown): boolean {
-    if (!(error instanceof Error)) return false;
-
-    const message = error.message.toLowerCase();
-
-    // Check for HTTP status codes that indicate unrecoverable errors
-    if (message.includes('400 bad request')) return true;
-    if (message.includes('401 unauthorized')) return true;
-    if (message.includes('403 forbidden')) return true;
-    if (message.includes('404 not found')) return true;
-    if (message.includes('410 gone')) return true;
-    if (message.includes('451 unavailable for legal reasons')) return true;
-
-    // Check for other unrecoverable conditions
-    if (message.includes('unsupported protocol')) return true;
-    if (message.includes('unsupported content-type')) return true;
-
-    // Default to recoverable (network errors, timeouts, etc.)
-    return false;
   }
 }

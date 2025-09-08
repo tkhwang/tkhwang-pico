@@ -198,6 +198,79 @@ export class IngestExtractService {
   }
 
   /*
+   *  Public helper methods
+   */
+
+  isUnrecoverableError(error: unknown): boolean {
+    const errorType = this.getErrorType(error);
+
+    // Define which error types are unrecoverable
+    const unrecoverableTypes = new Set([
+      'bad_request',
+      'access_denied',
+      'not_found',
+      'legal_restriction',
+      'unsupported_protocol',
+      'unsupported_content',
+      'security_block',
+      'too_large',
+    ]);
+
+    return unrecoverableTypes.has(errorType);
+  }
+
+  getErrorType(error: unknown): string {
+    if (!(error instanceof Error)) return 'unknown';
+
+    const message = error.message.toLowerCase();
+
+    // HTTP status codes
+    if (
+      message.includes('403 forbidden') ||
+      message.includes('401 unauthorized')
+    ) {
+      return 'access_denied';
+    }
+    if (message.includes('404 not found') || message.includes('410 gone')) {
+      return 'not_found';
+    }
+    if (message.includes('400 bad request')) {
+      return 'bad_request';
+    }
+    if (message.includes('451 unavailable')) {
+      return 'legal_restriction';
+    }
+
+    // Protocol/content issues
+    if (message.includes('unsupported protocol')) {
+      return 'unsupported_protocol';
+    }
+    if (message.includes('unsupported content-type')) {
+      return 'unsupported_content';
+    }
+
+    // Security blocks
+    if (message.includes('blocked private')) {
+      return 'security_block';
+    }
+
+    // Size issues
+    if (message.includes('response too large')) {
+      return 'too_large';
+    }
+
+    // Network issues
+    if (message.includes('aborted') || message.includes('timeout')) {
+      return 'timeout';
+    }
+    if (message.includes('fetch failed') || message.includes('network')) {
+      return 'network_error';
+    }
+
+    return 'unknown';
+  }
+
+  /*
    *  Private
    */
   // Place inside IngestExtractService

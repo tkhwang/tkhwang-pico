@@ -171,6 +171,39 @@ export type Database = {
         };
         Relationships: [];
       };
+      debug_failed_contents: {
+        Row: {
+          attempted_at: string;
+          error_code: number | null;
+          error_message: string;
+          error_type: string | null;
+          id: string;
+          metadata: Json;
+          url: string;
+          user_id: string;
+        };
+        Insert: {
+          attempted_at?: string;
+          error_code?: number | null;
+          error_message: string;
+          error_type?: string | null;
+          id?: string;
+          metadata?: Json;
+          url: string;
+          user_id: string;
+        };
+        Update: {
+          attempted_at?: string;
+          error_code?: number | null;
+          error_message?: string;
+          error_type?: string | null;
+          id?: string;
+          metadata?: Json;
+          url?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
       messages: {
         Row: {
           content: string;
