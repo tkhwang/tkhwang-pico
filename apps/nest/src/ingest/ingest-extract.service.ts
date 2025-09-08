@@ -198,6 +198,84 @@ export class IngestExtractService {
   }
 
   /*
+   *  Public helper methods
+   */
+
+  isUnrecoverableError(error: unknown): boolean {
+    if (!(error instanceof Error)) return false;
+
+    const message = error.message.toLowerCase();
+
+    // Check for HTTP status codes that indicate unrecoverable errors
+    if (message.includes('400 bad request')) return true;
+    if (message.includes('401 unauthorized')) return true;
+    if (message.includes('403 forbidden')) return true;
+    if (message.includes('404 not found')) return true;
+    if (message.includes('410 gone')) return true;
+    if (message.includes('451 unavailable for legal reasons')) return true;
+
+    // Check for other unrecoverable conditions
+    if (message.includes('unsupported protocol')) return true;
+    if (message.includes('unsupported content-type')) return true;
+    if (message.includes('blocked private')) return true;
+    if (message.includes('response too large')) return true;
+
+    // Default to recoverable (network errors, timeouts, etc.)
+    return false;
+  }
+
+  getErrorType(error: unknown): string {
+    if (!(error instanceof Error)) return 'unknown';
+
+    const message = error.message.toLowerCase();
+
+    // HTTP status codes
+    if (
+      message.includes('403 forbidden') ||
+      message.includes('401 unauthorized')
+    ) {
+      return 'access_denied';
+    }
+    if (message.includes('404 not found') || message.includes('410 gone')) {
+      return 'not_found';
+    }
+    if (message.includes('400 bad request')) {
+      return 'bad_request';
+    }
+    if (message.includes('451 unavailable')) {
+      return 'legal_restriction';
+    }
+
+    // Protocol/content issues
+    if (message.includes('unsupported protocol')) {
+      return 'unsupported_protocol';
+    }
+    if (message.includes('unsupported content-type')) {
+      return 'unsupported_content';
+    }
+
+    // Security blocks
+    if (message.includes('blocked private')) {
+      return 'security_block';
+    }
+
+    // Size issues
+    if (message.includes('response too large')) {
+      return 'too_large';
+    }
+
+    // Network issues
+    if (message.includes('aborted') || message.includes('timeout')) {
+      return 'timeout';
+    }
+    if (message.includes('fetch failed') || message.includes('network')) {
+      return 'network_error';
+    }
+
+    return 'unknown';
+  }
+
+  /*
    *  Private
    */
   // Place inside IngestExtractService

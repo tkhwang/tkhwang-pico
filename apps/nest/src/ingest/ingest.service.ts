@@ -141,7 +141,7 @@ export class IngestService {
       );
 
       // Check if this is an unrecoverable error (403, 404, etc.)
-      if (this.isUnrecoverableError(error)) {
+      if (this.extractService.isUnrecoverableError(error)) {
         this.logger.warn(
           `Deleting content ${contentId} due to unrecoverable error: ${
             error instanceof Error ? error.message : 'Unknown error'
@@ -160,30 +160,5 @@ export class IngestService {
 
       throw error;
     }
-  }
-
-  /*
-   *  Private methods
-   */
-
-  private isUnrecoverableError(error: unknown): boolean {
-    if (!(error instanceof Error)) return false;
-
-    const message = error.message.toLowerCase();
-
-    // Check for HTTP status codes that indicate unrecoverable errors
-    if (message.includes('400 bad request')) return true;
-    if (message.includes('401 unauthorized')) return true;
-    if (message.includes('403 forbidden')) return true;
-    if (message.includes('404 not found')) return true;
-    if (message.includes('410 gone')) return true;
-    if (message.includes('451 unavailable for legal reasons')) return true;
-
-    // Check for other unrecoverable conditions
-    if (message.includes('unsupported protocol')) return true;
-    if (message.includes('unsupported content-type')) return true;
-
-    // Default to recoverable (network errors, timeouts, etc.)
-    return false;
   }
 }
