@@ -2,6 +2,24 @@
 
 Personal AI playground
 
+## Content Recommendation Flow
+
+## Vertical Applications
+
+### picoQUEUE `/apps/mobile-queue` : Content recommendation mobile app
+
+### Recommend flow
+
+![img](./docs/pico-queue-embdding-flow.png)
+
+### Technology
+
+- [expo react native](https://docs.expo.dev/)
+- AUTH: [Clerk](https://clerk.com/docs)
+- [Supabase](https://supabase.com/docs): database
+- Tanstack query
+- [react native reusables](https://reactnativereusables.com/docs)
+
 ## AI Playground
 
 ### AI Backend
@@ -20,15 +38,3 @@ With [nest.js](https://docs.nestjs.com/) API Server
 
 - `/apps/web` : [next.js](https://nextjs.org/docs)
   - deployed on [vercel](https://vercel.com/docs)
-
-## Vertical Field Application:
-
-### `/apps/mobile-queue` QUEUE : Content recommendation
-
-### Technology
-
-- [expo react native](https://docs.expo.dev/)
-- AUTH: [Clerk](https://clerk.com/docs)
-- [Supabase](https://supabase.com/docs): database
-- Tanstack query
-- [react native reusables](https://reactnativereusables.com/docs)
