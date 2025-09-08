@@ -56,6 +56,14 @@ export class IngestService {
         // Fetch HTML if not in cache
         this.logger.log(`Fetching HTML for ${url} (cache miss)`);
         html = await this.extractService.fetchHtml(url);
+        // Write-through so subsequent steps can reuse it
+        try {
+          this.htmlCache.set(contentId, html, url);
+        } catch (e) {
+          this.logger.warn(
+            `Failed to cache HTML for ${contentId}: ${e instanceof Error ? e.message : 'Unknown error'}`,
+          );
+        }
       }
 
       // Extract metadata
