@@ -311,6 +311,38 @@ drop policy if exists simcf_read on public.similar_items_cf;
 create policy simcf_read on public.similar_items_cf for select to authenticated using (true);
 
 -- ============================================================================
+-- Debug Failed Contents (fetch 실패한 URL 정보)
+-- ============================================================================
+create table if not exists public.debug_failed_contents (
+  id            uuid primary key default gen_random_uuid(),
+  url           text not null,
+  user_id       text not null,   -- Clerk ID
+  error_code    int,
+  error_message text not null,
+  error_type    text,             -- 'unrecoverable', 'timeout', 'network', etc.
+  attempted_at  timestamptz not null default now(),
+  metadata      jsonb not null default '{}'
+);
+
+-- 인덱스
+create index if not exists idx_debug_failed_user on public.debug_failed_contents(user_id);
+create index if not exists idx_debug_failed_attempted on public.debug_failed_contents(attempted_at desc);
+create index if not exists idx_debug_failed_error_type on public.debug_failed_contents(error_type);
+
+-- RLS 설정
+alter table public.debug_failed_contents enable row level security;
+
+-- 권한 설정: 서비스 계정만 쓰기 가능, authenticated는 자신의 것만 읽기 가능
+revoke all on public.debug_failed_contents from anon, authenticated;
+grant select on public.debug_failed_contents to authenticated;
+
+-- RLS Policy: 본인의 실패 기록만 볼 수 있음
+drop policy if exists debug_failed_contents_select on public.debug_failed_contents;
+create policy debug_failed_contents_select on public.debug_failed_contents
+for select to authenticated
+using (user_id = public.current_clerk_user_id());
+
+-- ============================================================================
 -- RPC (JWT 기반)
 -- ============================================================================
 -- 유사 콘텐츠: 전역 ready 코퍼스에서만
