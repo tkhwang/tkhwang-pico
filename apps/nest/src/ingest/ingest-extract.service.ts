@@ -202,26 +202,21 @@ export class IngestExtractService {
    */
 
   isUnrecoverableError(error: unknown): boolean {
-    if (!(error instanceof Error)) return false;
+    const errorType = this.getErrorType(error);
 
-    const message = error.message.toLowerCase();
+    // Define which error types are unrecoverable
+    const unrecoverableTypes = new Set([
+      'bad_request',
+      'access_denied',
+      'not_found',
+      'legal_restriction',
+      'unsupported_protocol',
+      'unsupported_content',
+      'security_block',
+      'too_large',
+    ]);
 
-    // Check for HTTP status codes that indicate unrecoverable errors
-    if (message.includes('400 bad request')) return true;
-    if (message.includes('401 unauthorized')) return true;
-    if (message.includes('403 forbidden')) return true;
-    if (message.includes('404 not found')) return true;
-    if (message.includes('410 gone')) return true;
-    if (message.includes('451 unavailable for legal reasons')) return true;
-
-    // Check for other unrecoverable conditions
-    if (message.includes('unsupported protocol')) return true;
-    if (message.includes('unsupported content-type')) return true;
-    if (message.includes('blocked private')) return true;
-    if (message.includes('response too large')) return true;
-
-    // Default to recoverable (network errors, timeouts, etc.)
-    return false;
+    return unrecoverableTypes.has(errorType);
   }
 
   getErrorType(error: unknown): string {
