@@ -17,6 +17,7 @@
     "franc-min": "^6.2.0",
     "jose": "^5.9.6",
     "jsdom": "^26.1.0",
+    "lru-cache": "^11.2.1",
     "normalize-url": "6.1.0",
     "openai": "^5.16.0",
     "reflect-metadata": "^0.2.2",
