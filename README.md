@@ -1,24 +1,23 @@
 # PICO : Personal Intelligent COpilot
 
-Personal AI playground
+Personal AI playground and vertical field applications using PICO
 
-## Content Recommendation Flow
+## picoQUEUE: Content recommendation
 
-## Vertical Applications
-
-### picoQUEUE `/apps/mobile-queue` : Content recommendation mobile app
-
-### Recommend flow
-
-![img](./docs/pico-queue-embdding-flow.png)
+`/apps/mobile-queue` : Content recommendation mobile app
 
 ### Technology
 
 - [expo react native](https://docs.expo.dev/)
-- AUTH: [Clerk](https://clerk.com/docs)
 - [Supabase](https://supabase.com/docs): database
+  - `pgvector` : vector plugin
+- AUTH: [Clerk](https://clerk.com/docs)
 - Tanstack query
 - [react native reusables](https://reactnativereusables.com/docs)
+
+### Recommend flow
+
+![img](./docs/pico-queue-embdding-flow.png)
 
 ## AI Playground
 
