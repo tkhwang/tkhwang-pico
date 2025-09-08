@@ -15,9 +15,15 @@ Personal AI playground and vertical field applications using PICO
 - Tanstack query
 - [react native reusables](https://reactnativereusables.com/docs)
 
-### Recommend flow
+### Content Recommendation Flow
 
-![img](./docs/pico-queue-embdding-flow.png)
+#### 1. Content Ingestion (POST /contents/save)
+
+![img](./docs/pico-queue-content-ingest-flow.png)
+
+#### 2. Recommendation Generation (GET /users/recommendations)
+
+![img](./docs/pico-queue-recommend-flow.png)
 
 ## AI Playground
 
