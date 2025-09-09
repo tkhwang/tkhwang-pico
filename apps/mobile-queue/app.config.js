@@ -33,7 +33,19 @@ export default ({ config }) => ({
     name: '@tkhwang-pico/mobile-queue',
     newArchEnabled: true,
     orientation: 'portrait',
-    plugins: ['expo-router', 'expo-secure-store', 'expo-web-browser'],
+    plugins: [
+      'expo-router',
+      'expo-secure-store',
+      'expo-web-browser',
+      [
+        '@sentry/react-native/expo',
+        {
+          url: 'https://sentry.io/',
+          project: 'tkhwang-pico-queue',
+          organization: 'tkhwang',
+        },
+      ],
+    ],
     runtimeVersion: {
       policy: 'appVersion',
     },
