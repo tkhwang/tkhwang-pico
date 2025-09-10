@@ -15,6 +15,23 @@ import { useColorScheme } from 'nativewind';
 import * as React from 'react';
 import Constants from 'expo-constants';
 import { View, Text } from 'react-native';
+import * as Sentry from '@sentry/react-native';
+
+Sentry.init({
+  dsn: process.env.EXPO_PUBLIC_SENTRY_DSN,
+
+  // Adds more context data to events (IP address, cookies, user, etc.)
+  // For more information, visit: https://docs.sentry.io/platforms/react-native/data-management/data-collected/
+  sendDefaultPii: true,
+
+  // Configure Session Replay
+  replaysSessionSampleRate: 0.1,
+  replaysOnErrorSampleRate: 1,
+  integrations: [Sentry.mobileReplayIntegration(), Sentry.feedbackIntegration()],
+
+  // uncomment the line below to enable Spotlight (https://spotlightjs.com)
+  // spotlight: __DEV__,
+});
 
 // React 19 types require components to explicitly include `children`.
 // Some versions of @clerk/clerk-expo don't declare `children` in props,
@@ -26,7 +43,7 @@ const ClerkProviderExtended = ClerkProvider as React.ComponentType<
 // Cast ClerkLoaded to ensure type compatibility with React 19
 const ClerkLoadedExtended = ClerkLoaded as React.ComponentType<React.PropsWithChildren>;
 
-export default function RootLayout() {
+export default Sentry.wrap(function RootLayout() {
   const { colorScheme } = useColorScheme();
 
   const clerkPublishableKey =
@@ -65,7 +82,7 @@ export default function RootLayout() {
       </ClerkProviderExtended>
     </GestureHandlerRootView>
   );
-}
+});
 
 SplashScreen.preventAutoHideAsync();
 
