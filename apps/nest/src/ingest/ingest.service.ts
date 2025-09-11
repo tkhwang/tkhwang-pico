@@ -1,12 +1,14 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
+
+import { HtmlCacheService } from '../cache/html-cache.service';
+import { EVENTS } from '../common/constants/events';
 import { ContentsRepository } from '../supabase/contents.repository';
 import { UserContentsRepository } from '../supabase/user-contents.repository';
+
+import { IngestEmbeddingService } from './ingest-embedding.service';
 import { IngestExtractService } from './ingest-extract.service';
 import { IngestSummaryService } from './ingest-summary.service';
-import { IngestEmbeddingService } from './ingest-embedding.service';
-import { EVENTS } from '../common/constants/events';
-import { HtmlCacheService } from '../cache/html-cache.service';
 
 export interface ContentCreatedEvent {
   contentId: string;

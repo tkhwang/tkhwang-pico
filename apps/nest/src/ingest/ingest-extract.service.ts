@@ -1,7 +1,7 @@
+import { Readability } from '@mozilla/readability';
 import { Injectable, Logger } from '@nestjs/common';
 import * as cheerio from 'cheerio';
 import { JSDOM } from 'jsdom';
-import { Readability } from '@mozilla/readability';
 import { detectLang } from 'src/utils/url';
 
 export interface ContentMetadata {

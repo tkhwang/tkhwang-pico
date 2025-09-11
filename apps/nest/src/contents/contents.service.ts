@@ -1,18 +1,19 @@
-import { ContentsRepository } from '../supabase/contents.repository';
-import { UserContentsRepository } from '../supabase/user-contents.repository';
-import { DebugRepository } from '../supabase/debug.repository';
 import {
-  Injectable,
   BadRequestException,
-  InternalServerErrorException,
   HttpException,
   HttpStatus,
+  Injectable,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { redactUrl, toCanonicalUrl } from '../utils/url';
+
+import { HtmlCacheService } from '../cache/html-cache.service';
 import { EVENTS } from '../common/constants/events';
 import { IngestExtractService } from '../ingest/ingest-extract.service';
-import { HtmlCacheService } from '../cache/html-cache.service';
+import { ContentsRepository } from '../supabase/contents.repository';
+import { DebugRepository } from '../supabase/debug.repository';
+import { UserContentsRepository } from '../supabase/user-contents.repository';
+import { redactUrl, toCanonicalUrl } from '../utils/url';
 
 @Injectable()
 export class ContentsService {

@@ -1,4 +1,5 @@
 import { Global, Module } from '@nestjs/common';
+
 import { HtmlCacheService } from './html-cache.service';
 
 @Global()

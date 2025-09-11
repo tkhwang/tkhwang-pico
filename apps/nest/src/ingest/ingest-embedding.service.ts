@@ -1,10 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import OpenAI from 'openai';
-import { SupabaseService } from '../supabase/supabase.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import OpenAI from 'openai';
+
 import { EVENTS } from '../common/constants/events';
 import { APP_ERRORS } from '../consts/app-errors';
+import { SupabaseService } from '../supabase/supabase.service';
 
 @Injectable()
 export class IngestEmbeddingService {
