@@ -1,8 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { OnEvent } from '@nestjs/event-emitter';
 import { ConfigService } from '@nestjs/config';
-import { SupabaseService } from '../supabase/supabase.service';
+import { OnEvent } from '@nestjs/event-emitter';
+
 import { EVENTS } from '../common/constants/events';
+import { SupabaseService } from '../supabase/supabase.service';
 
 function parsePgvectorString(input: string): number[] {
   // Accept "[0.1,0.2,0.3]" or "{0.1,0.2}" fallback

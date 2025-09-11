@@ -1,8 +1,10 @@
 import { Module } from '@nestjs/common';
+
+import { IngestModule } from '../ingest/ingest.module';
+import { SupabaseModule } from '../supabase/supabase.module';
+
 import { ContentsController } from './contents.controller';
 import { ContentsService } from './contents.service';
-import { SupabaseModule } from '../supabase/supabase.module';
-import { IngestModule } from '../ingest/ingest.module';
 
 @Module({
   imports: [SupabaseModule, IngestModule],

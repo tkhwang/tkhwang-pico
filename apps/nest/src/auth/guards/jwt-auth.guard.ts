@@ -1,12 +1,12 @@
 import {
-  Injectable,
   CanActivate,
   ExecutionContext,
+  Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Request } from 'express';
 import { createRemoteJWKSet, jwtVerify } from 'jose';
-import { ConfigService } from '@nestjs/config';
 
 export interface RequestWithUser extends Request {
   user?: {

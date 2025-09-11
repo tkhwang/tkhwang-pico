@@ -1,6 +1,7 @@
-import normalizeUrl from 'normalize-url';
 import * as crypto from 'crypto';
+
 import { franc } from 'franc-min';
+import normalizeUrl from 'normalize-url';
 
 export function toCanonicalUrl(url: string): string {
   return normalizeUrl(url, {

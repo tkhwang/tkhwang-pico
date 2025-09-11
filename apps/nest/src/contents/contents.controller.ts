@@ -1,18 +1,20 @@
 import {
   Body,
   Controller,
+  DefaultValuePipe,
   Get,
   Param,
+  ParseIntPipe,
   Post,
   Query,
   UseGuards,
-  DefaultValuePipe,
-  ParseIntPipe,
 } from '@nestjs/common';
-import { ContentsService } from './contents.service';
 import { SaveContentDto } from 'src/contents/contents.dto';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+
 import { UserId } from '../auth/decorators/current-user.decorator';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+
+import { ContentsService } from './contents.service';
 
 @Controller('contents')
 export class ContentsController {

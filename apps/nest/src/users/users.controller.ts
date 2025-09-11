@@ -1,14 +1,16 @@
 import {
   Controller,
+  DefaultValuePipe,
   Get,
+  ParseIntPipe,
   Query,
   UseGuards,
-  DefaultValuePipe,
-  ParseIntPipe,
 } from '@nestjs/common';
-import { UsersService } from './users.service';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+
 import { UserToken } from '../auth/decorators/current-user.decorator';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+
+import { UsersService } from './users.service';
 
 @Controller('users')
 export class UsersController {
