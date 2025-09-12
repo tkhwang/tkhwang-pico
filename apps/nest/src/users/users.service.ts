@@ -1,10 +1,18 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 
 import { SupabaseService } from '../supabase/supabase.service';
+import { UserContentsRepository } from '../supabase/user-contents.repository';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly supabaseService: SupabaseService) {}
+  constructor(
+    private readonly supabaseService: SupabaseService,
+    private readonly userContentsRepository: UserContentsRepository,
+  ) {}
 
   async getRecommendations(userToken: string, limit = 20, lang?: string) {
     // Use user-specific client with RLS
@@ -62,5 +70,25 @@ export class UsersService {
       score: (2 - item.distance) / 2,
       contents: contentMap.get(item.content_id) || null,
     }));
+  }
+
+  async deleteUserContent(userId: string, contentId: string) {
+    // First check if the user_content link exists and belongs to the user
+    const userContent = await this.userContentsRepository.findByUserAndContent(
+      userId,
+      contentId,
+    );
+
+    if (!userContent)
+      throw new NotFoundException('User content link not found');
+
+    // Delete the user_content link
+    await this.userContentsRepository.deleteByContentId(contentId);
+
+    return {
+      success: true,
+      message: 'User content link deleted successfully',
+      deletedContentId: contentId,
+    };
   }
 }

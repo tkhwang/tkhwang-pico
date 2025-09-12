@@ -1,13 +1,15 @@
 import {
   Controller,
   DefaultValuePipe,
+  Delete,
   Get,
+  Param,
   ParseIntPipe,
   Query,
   UseGuards,
 } from '@nestjs/common';
 
-import { UserToken } from '../auth/decorators/current-user.decorator';
+import { UserId, UserToken } from '../auth/decorators/current-user.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 import { UsersService } from './users.service';
@@ -25,5 +27,14 @@ export class UsersController {
   ) {
     const safeLimit = Math.max(1, Math.min(50, limit));
     return this.usersService.getRecommendations(token, safeLimit, lang);
+  }
+
+  @Delete('contents/:id')
+  @UseGuards(JwtAuthGuard)
+  async deleteUserContent(
+    @UserId() userId: string,
+    @Param('id') contentId: string,
+  ) {
+    return this.usersService.deleteUserContent(userId, contentId);
   }
 }
