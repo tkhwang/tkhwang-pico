@@ -15,10 +15,6 @@ do $$ begin
   if not exists (select 1 from pg_type where typname='embedding_scope') then
     create type embedding_scope as enum ('summary','chunk','title','tags');
   end if;
-  if not exists (select 1 from pg_type where typname='interaction_type') then
-    create type interaction_type as enum
-      ('save','open','click','like','complete','share','archive','dismiss','rating');
-  end if;
   if not exists (select 1 from pg_type where typname='content_todo_status') then
     create type content_todo_status as enum ('pending','completed');
   end if;
@@ -119,69 +115,24 @@ create table if not exists public.user_embeddings (
 );
 
 -- ============================================================================
--- Interactions (행동 로그)
+-- Debug Failed Contents (fetch 실패한 URL 정보)
 -- ============================================================================
-create table if not exists public.user_content_interactions (
-  id          bigserial primary key,
-  user_id     text not null,   -- Clerk ID
-  content_id  uuid not null references public.contents(id) on delete cascade,
-  type        interaction_type not null,
-  value       smallint,
-  dwell_ms    int,
-  weight      real,
-  created_at  timestamptz not null default now()
-);
-create index if not exists idx_uci_user on public.user_content_interactions(user_id);
-create index if not exists idx_uci_content on public.user_content_interactions(content_id);
-create index if not exists idx_uci_type on public.user_content_interactions(type);
-
--- ============================================================================
--- Recommendation Logs (서빙 로깅)
--- ============================================================================
-create table if not exists public.recommendation_logs (
-  id           bigserial primary key,
-  user_id      text not null,   -- Clerk ID
-  algo         text not null,   -- 'cbf','hybrid','trending'...
-  request_ctx  jsonb not null default '{}',
-  results      jsonb not null,  -- [{content_id, score}, ...]
-  served_at    timestamptz not null default now(),
-  clicked_id   uuid,
-  converted_id uuid
-);
-create index if not exists idx_reclogs_user on public.recommendation_logs(user_id);
-create index if not exists idx_reclogs_served_at on public.recommendation_logs(served_at);
-
--- ============================================================================
--- Collaborative Filtering 확장 (옵션)
--- ============================================================================
-create table if not exists public.user_factors (
-  user_id   text primary key,           -- Clerk ID
-  factors   vector(64) not null,        -- K=64 예시
-  bias      real default 0,
-  updated_at timestamptz not null default now()
+create table if not exists public.debug_failed_contents (
+  id            uuid primary key default gen_random_uuid(),
+  url           text not null,
+  user_id       text not null,   -- Clerk ID
+  error_code    int,
+  error_message text not null,
+  error_type    text,             -- 'unrecoverable', 'timeout', 'network', etc.
+  attempted_at  timestamptz not null default now(),
+  metadata      jsonb not null default '{}'
 );
 
-create table if not exists public.content_factors (
-  content_id uuid primary key references public.contents(id) on delete cascade,
-  factors    vector(64) not null,
-  bias       real default 0,
-  updated_at timestamptz not null default now()
-);
-
-create table if not exists public.co_visitation (
-  src_content_id uuid not null references public.contents(id) on delete cascade,
-  dst_content_id uuid not null references public.contents(id) on delete cascade,
-  score          double precision not null,
-  updated_at     timestamptz not null default now(),
-  primary key (src_content_id, dst_content_id)
-);
-
-create table if not exists public.similar_items_cf (
-  content_id  uuid not null references public.contents(id) on delete cascade,
-  neighbor_id uuid not null references public.contents(id) on delete cascade,
-  score       real not null,
-  primary key (content_id, neighbor_id)
-);
+-- Composite indexes optimized for WHERE + ORDER BY
+create index if not exists idx_debug_failed_user_attempted
+  on public.debug_failed_contents(user_id, attempted_at desc);
+create index if not exists idx_debug_failed_error_type_attempted
+  on public.debug_failed_contents(error_type, attempted_at desc);
 
 -- ============================================================================
 -- Domain 자동 채우기 (간단 Fallback)
@@ -230,37 +181,24 @@ for each row execute function public.auto_set_completed_timestamp();
 -- ============================================================================
 -- RLS 설정
 -- ============================================================================
-alter table public.contents                      enable row level security;
-alter table public.user_contents                 enable row level security;
-alter table public.content_embeddings            enable row level security;
-alter table public.user_embeddings               enable row level security;
-alter table public.user_content_interactions     enable row level security;
-alter table public.recommendation_logs           enable row level security;
-alter table public.user_factors                  enable row level security;
-alter table public.content_factors               enable row level security;
-alter table public.co_visitation                 enable row level security;
-alter table public.similar_items_cf              enable row level security;
+alter table public.contents enable row level security;
+alter table public.user_contents enable row level security;
+alter table public.content_embeddings enable row level security;
+alter table public.user_embeddings enable row level security;
+alter table public.debug_failed_contents enable row level security;
 
 -- 권한 최소화
 revoke all on public.contents from anon, authenticated;
 revoke all on public.content_embeddings from anon, authenticated;
 revoke all on public.user_contents from anon, authenticated;
 revoke all on public.user_embeddings from anon, authenticated;
-revoke all on public.user_content_interactions from anon, authenticated;
-revoke all on public.recommendation_logs from anon, authenticated;
-revoke all on public.user_factors from anon, authenticated;
-revoke all on public.content_factors from anon, authenticated;
-revoke all on public.co_visitation from anon, authenticated;
-revoke all on public.similar_items_cf from anon, authenticated;
+revoke all on public.debug_failed_contents from anon, authenticated;
 
 -- 필요한 최소 권한 (RLS가 최종 필터링)
 grant select on public.contents to authenticated, anon;         -- 전역 read only
 grant select, insert, update, delete on public.user_contents to authenticated;
 grant select, insert, update, delete on public.user_embeddings to authenticated;
-grant select, insert, update, delete on public.user_content_interactions to authenticated;
-grant select, insert, update, delete on public.recommendation_logs to authenticated;
-grant select on public.user_factors, public.content_factors to authenticated;
-grant select on public.co_visitation, public.similar_items_cf to authenticated;
+grant select on public.debug_failed_contents to authenticated;
 
 -- RLS Policies
 -- contents: 누구나 읽기 가능(전역 공개 카탈로그), 쓰기는 서버에서만
@@ -283,61 +221,7 @@ for all to authenticated
 using (user_id = public.current_clerk_user_id())
 with check (user_id = public.current_clerk_user_id());
 
--- interactions: 본인만
-drop policy if exists uci_rw on public.user_content_interactions;
-create policy uci_rw on public.user_content_interactions
-for all to authenticated
-using (user_id = public.current_clerk_user_id())
-with check (user_id = public.current_clerk_user_id());
-
--- recommendation_logs: 본인만
-drop policy if exists reclogs_rw on public.recommendation_logs;
-create policy reclogs_rw on public.recommendation_logs
-for all to authenticated
-using (user_id = public.current_clerk_user_id())
-with check (user_id = public.current_clerk_user_id());
-
--- cf 관련 read-only
-drop policy if exists cf_read on public.user_factors;
-create policy cf_read on public.user_factors for select to authenticated using (true);
-
-drop policy if exists cf_item_read on public.content_factors;
-create policy cf_item_read on public.content_factors for select to authenticated using (true);
-
-drop policy if exists covis_read on public.co_visitation;
-create policy covis_read on public.co_visitation for select to authenticated using (true);
-
-drop policy if exists simcf_read on public.similar_items_cf;
-create policy simcf_read on public.similar_items_cf for select to authenticated using (true);
-
--- ============================================================================
--- Debug Failed Contents (fetch 실패한 URL 정보)
--- ============================================================================
-create table if not exists public.debug_failed_contents (
-  id            uuid primary key default gen_random_uuid(),
-  url           text not null,
-  user_id       text not null,   -- Clerk ID
-  error_code    int,
-  error_message text not null,
-  error_type    text,             -- 'unrecoverable', 'timeout', 'network', etc.
-  attempted_at  timestamptz not null default now(),
-  metadata      jsonb not null default '{}'
-);
-
--- Composite indexes optimized for WHERE + ORDER BY
-create index if not exists idx_debug_failed_user_attempted
-  on public.debug_failed_contents(user_id, attempted_at desc);
-create index if not exists idx_debug_failed_error_type_attempted
-  on public.debug_failed_contents(error_type, attempted_at desc);
-
--- RLS 설정
-alter table public.debug_failed_contents enable row level security;
-
--- 권한 설정: 서비스 계정만 쓰기 가능, authenticated는 자신의 것만 읽기 가능
-revoke all on public.debug_failed_contents from anon, authenticated;
-grant select on public.debug_failed_contents to authenticated;
-
--- RLS Policy: 본인의 실패 기록만 볼 수 있음
+-- debug_failed_contents: 본인의 실패 기록만 볼 수 있음
 drop policy if exists debug_failed_contents_select on public.debug_failed_contents;
 create policy debug_failed_contents_select on public.debug_failed_contents
 for select to authenticated
@@ -373,7 +257,7 @@ $$;
 revoke all on function public.similar_to_content(uuid,int,text) from public;
 grant execute on function public.similar_to_content(uuid,int,text) to authenticated, anon;
 
--- 개인화 피드: 내가 본/저장한 것은 제외
+-- 개인화 피드: 내가 저장한 것은 제외
 create or replace function public.recommend_feed(
   p_limit int default 20,
   p_model text default null,
@@ -403,29 +287,10 @@ language sql security definer set search_path=public as $$
   from base b
   left join public.user_contents uc
     on uc.content_id = b.content_id and uc.user_id = (select uid from me)
-  left join public.user_content_interactions uci
-    on uci.content_id = b.content_id and uci.user_id = (select uid from me)
-  where uc.id is null and uci.id is null
+  where uc.id is null  -- 이미 저장한 콘텐츠는 제외
   order by b.distance
   limit greatest(1, p_limit);
 $$;
 
 revoke all on function public.recommend_feed(int,text,text) from public;
 grant execute on function public.recommend_feed(int,text,text) to authenticated;
-
--- CF 기반 유사 아이템 (옵션)
-create or replace function public.similar_to_content_cf(
-  p_content_id uuid,
-  p_limit int default 20
-)
-returns table (neighbor_id uuid, score real)
-language sql security definer set search_path=public as $$
-  select neighbor_id, score
-  from public.similar_items_cf
-  where content_id = p_content_id
-  order by score desc
-  limit greatest(1, p_limit);
-$$;
-
-revoke all on function public.similar_to_content_cf(uuid,int) from public;
-grant execute on function public.similar_to_content_cf(uuid,int) to authenticated, anon;
