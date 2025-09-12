@@ -1,10 +1,21 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 
 import { SupabaseService } from '../supabase/supabase.service';
+import { UserContentsRepository } from '../supabase/user-contents.repository';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly supabaseService: SupabaseService) {}
+  private readonly logger = new Logger(UsersService.name);
+
+  constructor(
+    private readonly supabaseService: SupabaseService,
+    private readonly userContentsRepository: UserContentsRepository,
+  ) {}
 
   async getRecommendations(userToken: string, limit = 20, lang?: string) {
     // Use user-specific client with RLS
@@ -20,7 +31,7 @@ export class UsersService {
     );
 
     if (rpcError) {
-      console.error('Failed to get recommendations:', rpcError);
+      this.logger.error('Failed to get recommendations:', rpcError);
       throw new InternalServerErrorException('Failed to get recommendations');
     }
 
@@ -45,7 +56,7 @@ export class UsersService {
       .in('id', contentIds);
 
     if (contentError) {
-      console.error('Failed to fetch content details:', contentError);
+      this.logger.error('Failed to fetch content details:', contentError);
       throw new InternalServerErrorException('Failed to fetch content details');
     }
 
@@ -62,5 +73,34 @@ export class UsersService {
       score: (2 - item.distance) / 2,
       contents: contentMap.get(item.content_id) || null,
     }));
+  }
+
+  async deleteUserContent(userId: string, contentId: string) {
+    // First check if the user_content link exists and belongs to the user
+    const userContent = await this.userContentsRepository.findByUserAndContent(
+      userId,
+      contentId,
+    );
+
+    if (!userContent) {
+      this.logger.error(
+        `No user_content link found for userId=${userId}, contentId=${contentId}`,
+      );
+      throw new NotFoundException(
+        `Content with ID ${contentId} not found for this user`,
+      );
+    }
+
+    // Delete the user_content link - now with user_id check
+    await this.userContentsRepository.deleteByUserAndContent(userId, contentId);
+    this.logger.log(
+      `Successfully deleted user_content link for userId=${userId}, contentId=${contentId}`,
+    );
+
+    return {
+      success: true,
+      message: 'User content link deleted successfully',
+      deletedContentId: contentId,
+    };
   }
 }

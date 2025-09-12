@@ -46,6 +46,21 @@ export class UserContentsRepository {
     }
   }
 
+  async deleteByUserAndContent(userId: string, contentId: string) {
+    const { error } = await this.client
+      .from('user_contents')
+      .delete()
+      .eq('user_id', userId)
+      .eq('content_id', contentId);
+
+    if (error) {
+      this.logger.error(
+        `Failed to delete user_content for user ${userId} and content ${contentId}: ${error.message}`,
+      );
+      throw error;
+    }
+  }
+
   async deleteByUserId(userId: string) {
     const { error } = await this.client
       .from('user_contents')

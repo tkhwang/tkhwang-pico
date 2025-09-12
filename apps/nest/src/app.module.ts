@@ -1,8 +1,9 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 
 import { CacheModule } from './cache/cache.module';
+import { LoggingMiddleware } from './common/middleware/logging.middleware';
 import { ContentsModule } from './contents/contents.module';
 import { IngestModule } from './ingest/ingest.module';
 import { SupabaseModule } from './supabase/supabase.module';
@@ -26,4 +27,8 @@ import { AppService } from './app.service';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggingMiddleware).forRoutes('*');
+  }
+}
