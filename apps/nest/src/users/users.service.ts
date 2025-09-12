@@ -1,6 +1,7 @@
 import {
   Injectable,
   InternalServerErrorException,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 
@@ -9,6 +10,8 @@ import { UserContentsRepository } from '../supabase/user-contents.repository';
 
 @Injectable()
 export class UsersService {
+  private readonly logger = new Logger(UsersService.name);
+
   constructor(
     private readonly supabaseService: SupabaseService,
     private readonly userContentsRepository: UserContentsRepository,
@@ -28,7 +31,7 @@ export class UsersService {
     );
 
     if (rpcError) {
-      console.error('Failed to get recommendations:', rpcError);
+      this.logger.error('Failed to get recommendations:', rpcError);
       throw new InternalServerErrorException('Failed to get recommendations');
     }
 
@@ -53,7 +56,7 @@ export class UsersService {
       .in('id', contentIds);
 
     if (contentError) {
-      console.error('Failed to fetch content details:', contentError);
+      this.logger.error('Failed to fetch content details:', contentError);
       throw new InternalServerErrorException('Failed to fetch content details');
     }
 
@@ -80,8 +83,8 @@ export class UsersService {
     );
 
     if (!userContent) {
-      console.error(
-        `❌ No user_content link found for userId=${userId}, contentId=${contentId}`,
+      this.logger.error(
+        `No user_content link found for userId=${userId}, contentId=${contentId}`,
       );
       throw new NotFoundException(
         `Content with ID ${contentId} not found for this user`,
@@ -90,8 +93,8 @@ export class UsersService {
 
     // Delete the user_content link - now with user_id check
     await this.userContentsRepository.deleteByUserAndContent(userId, contentId);
-    console.log(
-      `✅ Successfully deleted user_content link for contentId=${contentId}`,
+    this.logger.log(
+      `Successfully deleted user_content link for userId=${userId}, contentId=${contentId}`,
     );
 
     return {
