@@ -6,6 +6,7 @@ import { SwipeableContentItem } from './swipeable-content-item';
 import { useUserContents } from '@/hooks/queries/use-user-contents';
 import { ContentListSkeleton } from '@/components/content/content-list-skeleton';
 import { useToggleTodo } from '@/hooks/mutations/use-toggle-todo';
+import { useDeleteContent } from '@/hooks/mutations/use-delete-content';
 import type { TodoFilterType } from '@tkhwang-pico/common';
 
 interface ContentListProps {
@@ -16,6 +17,7 @@ export function ContentList({ todoFilter }: ContentListProps) {
   const { data: userContents = [], isLoading, error, refetch } = useUserContents(todoFilter);
   const [refreshing, setRefreshing] = useState(false);
   const toggleTodoMutation = useToggleTodo();
+  const deleteContentMutation = useDeleteContent();
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -31,6 +33,13 @@ export function ContentList({ todoFilter }: ContentListProps) {
       toggleTodoMutation.mutate(id);
     },
     [toggleTodoMutation]
+  );
+
+  const handleDelete = useCallback(
+    (id: string) => {
+      deleteContentMutation.mutate(id);
+    },
+    [deleteContentMutation]
   );
 
   if (isLoading && !refreshing) return <ContentListSkeleton />;
@@ -83,7 +92,13 @@ export function ContentList({ todoFilter }: ContentListProps) {
   }
 
   const renderItem = ({ item }: { item: (typeof userContents)[0] }) => {
-    return <SwipeableContentItem item={item} onToggleComplete={handleToggleComplete} />;
+    return (
+      <SwipeableContentItem
+        item={item}
+        onToggleComplete={handleToggleComplete}
+        onDelete={handleDelete}
+      />
+    );
   };
 
   return (

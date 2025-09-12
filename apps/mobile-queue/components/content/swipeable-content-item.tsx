@@ -17,13 +17,18 @@ import type { UserContentWithDetails } from '@tkhwang-pico/common';
 interface SwipeableContentItemProps {
   item: UserContentWithDetails;
   onToggleComplete?: (id: string) => void;
+  onDelete?: (id: string) => void;
 }
 
 const SWIPE_THRESHOLD = 60;
 const MAX_SWIPE_DISTANCE = 150;
 const SWIPE_DAMPING = 0.4; // Lower damping for much slower movement
 
-export function SwipeableContentItem({ item, onToggleComplete }: SwipeableContentItemProps) {
+export function SwipeableContentItem({
+  item,
+  onToggleComplete,
+  onDelete,
+}: SwipeableContentItemProps) {
   const translateX = useSharedValue(0);
   const itemHeight = useSharedValue(0);
 
@@ -37,6 +42,9 @@ export function SwipeableContentItem({ item, onToggleComplete }: SwipeableConten
   const triggerAction = (action: 'complete' | 'delete') => {
     if (action === 'complete' && onToggleComplete) {
       onToggleComplete(item.id);
+    }
+    if (action === 'delete' && onDelete) {
+      onDelete(item.content_id);
     }
     if (__DEV__) {
       // Keep useful trace in development; avoid noisy logs in production
