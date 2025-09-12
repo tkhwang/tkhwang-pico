@@ -36,8 +36,8 @@ export function ContentList({ todoFilter }: ContentListProps) {
   );
 
   const handleDelete = useCallback(
-    (id: string) => {
-      deleteContentMutation.mutate(id);
+    (contentId: string) => {
+      deleteContentMutation.mutate(contentId);
     },
     [deleteContentMutation]
   );

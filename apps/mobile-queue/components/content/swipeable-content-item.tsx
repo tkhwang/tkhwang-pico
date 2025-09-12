@@ -17,7 +17,7 @@ import type { UserContentWithDetails } from '@tkhwang-pico/common';
 interface SwipeableContentItemProps {
   item: UserContentWithDetails;
   onToggleComplete?: (id: string) => void;
-  onDelete?: (id: string) => void;
+  onDelete?: (contentId: string) => void;
 }
 
 const SWIPE_THRESHOLD = 60;
