@@ -79,11 +79,20 @@ export class UsersService {
       contentId,
     );
 
-    if (!userContent)
-      throw new NotFoundException('User content link not found');
+    if (!userContent) {
+      console.error(
+        `❌ No user_content link found for userId=${userId}, contentId=${contentId}`,
+      );
+      throw new NotFoundException(
+        `Content with ID ${contentId} not found for this user`,
+      );
+    }
 
-    // Delete the user_content link
-    await this.userContentsRepository.deleteByContentId(contentId);
+    // Delete the user_content link - now with user_id check
+    await this.userContentsRepository.deleteByUserAndContent(userId, contentId);
+    console.log(
+      `✅ Successfully deleted user_content link for contentId=${contentId}`,
+    );
 
     return {
       success: true,
