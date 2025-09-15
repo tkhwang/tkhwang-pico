@@ -11,7 +11,7 @@ DROP FUNCTION IF EXISTS public.similar_to_content_cf(uuid, int);
 
 -- 2. Modify recommend_feed function to remove user_content_interactions reference
 -- ============================================================================
-CREATE OR REPLACE FUNCTION public.recommend_feed(
+CREATE OR REPLACE FUNCTION public.recommend_feed( 
   p_limit int default 20,
   p_model text default null,
   p_lang text default null
@@ -31,7 +31,7 @@ LANGUAGE sql SECURITY DEFINER SET search_path=public AS $$
     FROM ue
     JOIN public.content_embeddings ce
       ON ce.scope='summary'
-     AND (p_model IS NULL OR ce.embedding_model = coalesce(p_model, ue.embedding_model))
+     AND ce.embedding_model = coalesce(p_model, ue.embedding_model)
     JOIN public.contents c ON c.id = ce.content_id
     WHERE c.status='ready'
       AND (p_lang IS NULL OR c.lang = p_lang)

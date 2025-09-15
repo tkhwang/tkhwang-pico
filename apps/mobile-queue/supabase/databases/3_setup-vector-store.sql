@@ -278,7 +278,7 @@ language sql security definer set search_path=public as $$
     from ue
     join public.content_embeddings ce
       on ce.scope='summary'
-     and (p_model is null or ce.embedding_model = coalesce(p_model, ue.embedding_model))
+     AND ce.embedding_model = coalesce(p_model, ue.embedding_model)
     join public.contents c on c.id = ce.content_id
     where c.status='ready'
       and (p_lang is null or c.lang = p_lang)
