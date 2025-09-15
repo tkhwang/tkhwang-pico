@@ -2,12 +2,13 @@ import React from 'react';
 import { View, TouchableOpacity, Image, Linking, Alert } from 'react-native';
 import { Text } from '../ui/text';
 import { Icon } from '../ui/icon';
-import { ExternalLinkIcon } from 'lucide-react-native';
+import { ExternalLinkIcon, Check, FileText } from 'lucide-react-native';
 import type { UserContentWithDetails } from '@tkhwang-pico/common';
 
 interface ContentItemProps {
   item: UserContentWithDetails;
   onToggleComplete?: (id: string) => void;
+  onPress?: (item: UserContentWithDetails) => void;
 }
 
 const formatDate = (dateString: string) => {
@@ -24,7 +25,7 @@ const formatDate = (dateString: string) => {
   return `${Math.floor(diffDays / 365)} years ago`;
 };
 
-export function ContentItem({ item, onToggleComplete }: ContentItemProps) {
+export function ContentItem({ item, onToggleComplete, onPress }: ContentItemProps) {
   // Ensure content exists
   const content = item.contents;
   if (!item || !content) {
@@ -59,8 +60,8 @@ export function ContentItem({ item, onToggleComplete }: ContentItemProps) {
   };
 
   const handlePress = () => {
-    // Regular tap can be used for other actions like selection or showing details
-    console.log('Item tapped:', content.title);
+    // Open detail modal
+    if (onPress) onPress(item);
   };
 
   const handleCheckboxPress = () => {
@@ -114,7 +115,7 @@ export function ContentItem({ item, onToggleComplete }: ContentItemProps) {
                 : 'border-blue-500 bg-transparent'
             }`}>
             {item.todo_status === 'completed' ? (
-              <Text className="text-xs text-white">✓</Text>
+              <Icon as={Check} className="h-3 w-3 text-white" />
             ) : null}
           </View>
         </TouchableOpacity>
@@ -168,7 +169,7 @@ export function ContentItem({ item, onToggleComplete }: ContentItemProps) {
           />
         ) : (
           <View className="h-16 w-16 items-center justify-center rounded-md bg-gray-100 dark:bg-gray-800">
-            <Text className="text-xl">📄</Text>
+            <Icon as={FileText} className="h-8 w-8 text-gray-400 dark:text-gray-600" />
           </View>
         )}
       </View>

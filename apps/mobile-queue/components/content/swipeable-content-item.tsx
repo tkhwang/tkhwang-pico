@@ -18,6 +18,7 @@ interface SwipeableContentItemProps {
   item: UserContentWithDetails;
   onToggleComplete?: (id: string) => void;
   onDelete?: (contentId: string) => void;
+  onPress?: (item: UserContentWithDetails) => void;
 }
 
 const SWIPE_THRESHOLD = 60;
@@ -28,6 +29,7 @@ export function SwipeableContentItem({
   item,
   onToggleComplete,
   onDelete,
+  onPress,
 }: SwipeableContentItemProps) {
   const translateX = useSharedValue(0);
   const itemHeight = useSharedValue(0);
@@ -171,7 +173,7 @@ export function SwipeableContentItem({
           onLayout={(event: any) => {
             itemHeight.value = event.nativeEvent.layout.height;
           }}>
-          <ContentItem item={item} onToggleComplete={onToggleComplete} />
+          <ContentItem item={item} onToggleComplete={onToggleComplete} onPress={onPress} />
         </AnimatedViewTyped>
       </GestureDetector>
     </View>
