@@ -1,13 +1,14 @@
 import React from 'react';
 import { View, TouchableOpacity, Image, Linking, Alert } from 'react-native';
-import { Text } from '../ui/text';
-import { Icon } from '../ui/icon';
-import { ExternalLinkIcon } from 'lucide-react-native';
+import { Text } from '@/components/ui/text';
+import { Icon } from '@/components/ui/icon';
+import { ExternalLinkIcon, Check, FileText } from 'lucide-react-native';
 import type { UserContentWithDetails } from '@tkhwang-pico/common';
 
 interface ContentItemProps {
   item: UserContentWithDetails;
   onToggleComplete?: (id: string) => void;
+  onPress?: (item: UserContentWithDetails) => void;
 }
 
 const formatDate = (dateString: string) => {
@@ -24,7 +25,7 @@ const formatDate = (dateString: string) => {
   return `${Math.floor(diffDays / 365)} years ago`;
 };
 
-export function ContentItem({ item, onToggleComplete }: ContentItemProps) {
+export function ContentItem({ item, onToggleComplete, onPress }: ContentItemProps) {
   // Ensure content exists
   const content = item.contents;
   if (!item || !content) {
@@ -59,8 +60,8 @@ export function ContentItem({ item, onToggleComplete }: ContentItemProps) {
   };
 
   const handlePress = () => {
-    // Regular tap can be used for other actions like selection or showing details
-    console.log('Item tapped:', content.title);
+    // Open detail modal
+    if (onPress) onPress(item);
   };
 
   const handleCheckboxPress = () => {
@@ -114,7 +115,7 @@ export function ContentItem({ item, onToggleComplete }: ContentItemProps) {
                 : 'border-blue-500 bg-transparent'
             }`}>
             {item.todo_status === 'completed' ? (
-              <Text className="text-xs text-white">✓</Text>
+              <Icon as={Check} className="h-3 w-3 text-white" />
             ) : null}
           </View>
         </TouchableOpacity>
@@ -141,13 +142,28 @@ export function ContentItem({ item, onToggleComplete }: ContentItemProps) {
               {item.note}
             </Text>
           ) : null}
+          {/* Tags from content */}
+          {content.tags && content.tags.length > 0 ? (
+            <View className="mt-1 flex-row flex-wrap">
+              {content.tags.slice(0, 3).map((tag, index) => (
+                <View
+                  key={`tag-${index}`}
+                  className="mr-1.5 mt-1 rounded-full bg-gray-100 px-1.5 py-0.5 dark:bg-gray-800">
+                  <Text className="text-[10px] text-gray-500 dark:text-gray-400">
+                    {String(tag)}
+                  </Text>
+                </View>
+              ))}
+            </View>
+          ) : null}
+          {/* User Labels */}
           {item.labels && item.labels.length > 0 ? (
             <View className="mt-1 flex-row flex-wrap">
               {item.labels.map((label, index) => (
                 <View
-                  key={index}
-                  className="mr-1.5 mt-1 rounded-full bg-gray-100 px-1.5 py-0.5 dark:bg-gray-700">
-                  <Text className="text-[10px] text-gray-600 dark:text-gray-400">
+                  key={`label-${index}`}
+                  className="mr-1.5 mt-1 rounded-full bg-purple-100 px-1.5 py-0.5 dark:bg-purple-900/30">
+                  <Text className="text-[10px] text-purple-600 dark:text-purple-400">
                     {String(label)}
                   </Text>
                 </View>
@@ -168,7 +184,7 @@ export function ContentItem({ item, onToggleComplete }: ContentItemProps) {
           />
         ) : (
           <View className="h-16 w-16 items-center justify-center rounded-md bg-gray-100 dark:bg-gray-800">
-            <Text className="text-xl">📄</Text>
+            <Icon as={FileText} className="h-8 w-8 text-gray-400 dark:text-gray-600" />
           </View>
         )}
       </View>

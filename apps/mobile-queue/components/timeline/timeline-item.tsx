@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, TouchableOpacity, Linking, Image, Alert } from 'react-native';
-import { Text } from '../ui/text';
-import { Icon } from '../ui/icon';
-import { ClockIcon, ExternalLinkIcon } from 'lucide-react-native';
+import { Text } from '@/components/ui/text';
+import { Icon } from '@/components/ui/icon';
+import { ClockIcon, ExternalLinkIcon, FileText } from 'lucide-react-native';
 import type { UserContentWithDetails } from '@tkhwang-pico/common';
 
 interface TimelineCardProps {
@@ -106,11 +106,20 @@ function TimelineCard({ item, isFirstOfDay = false }: TimelineCardProps) {
                 {content?.title || 'Untitled'}
               </Text>
 
+              {/* Summary */}
+              {content?.summary && (
+                <Text
+                  className="mb-2 mt-1 text-xs text-gray-600 dark:text-gray-400"
+                  numberOfLines={2}>
+                  {content.summary}
+                </Text>
+              )}
+
               {/* Spacer to push time to bottom */}
               <View className="flex-1" />
 
               {/* Completed Time - aligned with thumbnail bottom */}
-              <View className="flex-row items-center">
+              <View className="mt-2 flex-row items-center">
                 <Icon as={ClockIcon} size={12} className="mr-1 text-gray-500 dark:text-gray-500" />
                 <Text className="text-xs text-gray-500 dark:text-gray-500">{completedTime}</Text>
               </View>
@@ -129,7 +138,7 @@ function TimelineCard({ item, isFirstOfDay = false }: TimelineCardProps) {
                 />
               ) : (
                 <View className="h-20 w-20 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-700">
-                  <Text className="text-2xl">📄</Text>
+                  <Icon as={FileText} className="h-10 w-10 text-gray-400 dark:text-gray-600" />
                 </View>
               )}
             </View>
@@ -156,9 +165,11 @@ export function TimelineItem({ items }: TimelineItemProps) {
   return (
     <View className="mb-4">
       {/* Items for this date */}
-      <View className="space-y-3">
+      <View>
         {items.map((item, index) => (
-          <TimelineCard key={item.id} item={item} isFirstOfDay={index === 0} />
+          <View key={item.id} className={index > 0 ? 'mt-3' : ''}>
+            <TimelineCard item={item} isFirstOfDay={index === 0} />
+          </View>
         ))}
       </View>
 

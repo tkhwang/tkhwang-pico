@@ -73,11 +73,13 @@ function TimelineDateGroup() {
   return (
     <View className="mb-4">
       {/* Items for this date */}
-      <View className="space-y-3">
+      <View>
         {/* First item with date */}
         <TimelineCardSkeleton isFirstOfDay={true} />
         {/* Second item without date */}
-        <TimelineCardSkeleton isFirstOfDay={false} />
+        <View className="mt-3">
+          <TimelineCardSkeleton isFirstOfDay={false} />
+        </View>
       </View>
 
       {/* Date separator */}

@@ -1,5 +1,5 @@
 import { View, TouchableOpacity } from 'react-native';
-import { Text } from '../ui/text';
+import { Text } from '@/components/ui/text';
 import type { TodoFilterType } from '@tkhwang-pico/common';
 
 interface ContentHeaderProps {

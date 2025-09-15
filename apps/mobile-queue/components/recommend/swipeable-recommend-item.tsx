@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Alert } from 'react-native';
+import { View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   useAnimatedStyle,
@@ -9,28 +9,28 @@ import Animated, {
   interpolate,
   Extrapolation,
 } from 'react-native-reanimated';
-import { ContentItem } from './content-item';
+import { RecommendItem } from './recommend-item';
 import { Icon } from '@/components/ui/icon';
-import { Check, Trash2 } from 'lucide-react-native';
-import type { UserContentWithDetails } from '@tkhwang-pico/common';
+import { ThumbsUp, ThumbsDown } from 'lucide-react-native';
+import type { Recommendation } from '@tkhwang-pico/common';
 
-interface SwipeableContentItemProps {
-  item: UserContentWithDetails;
-  onToggleComplete?: (id: string) => void;
-  onDelete?: (contentId: string) => void;
-  onPress?: (item: UserContentWithDetails) => void;
+interface SwipeableRecommendItemProps {
+  recommendation: Recommendation;
+  onAddToQueue?: (url: string, contentId: string) => void;
+  onNotInterested?: (contentId: string) => void;
+  onPress?: (recommendation: Recommendation) => void;
 }
 
 const SWIPE_THRESHOLD = 60;
 const MAX_SWIPE_DISTANCE = 150;
 const SWIPE_DAMPING = 0.4; // Lower damping for much slower movement
 
-export function SwipeableContentItem({
-  item,
-  onToggleComplete,
-  onDelete,
+export function SwipeableRecommendItem({
+  recommendation,
+  onAddToQueue,
+  onNotInterested,
   onPress,
-}: SwipeableContentItemProps) {
+}: SwipeableRecommendItemProps) {
   const translateX = useSharedValue(0);
   const itemHeight = useSharedValue(0);
 
@@ -41,38 +41,25 @@ export function SwipeableContentItem({
     velocity: 0,
   };
 
-  const triggerAction = (action: 'complete' | 'delete') => {
-    if (action === 'complete' && onToggleComplete) {
-      onToggleComplete(item.id);
-      translateX.value = withSpring(0, springConfig);
+  const triggerAction = (action: 'addToQueue' | 'notInterested') => {
+    const content = recommendation.contents;
+    if (!content) return;
+
+    if (action === 'addToQueue' && onAddToQueue) {
+      const url = content.canonical_url || content.url;
+      if (url) {
+        onAddToQueue(url, recommendation.content_id);
+      }
     }
-    if (action === 'delete' && onDelete) {
-      // Show confirmation alert before deleting
-      Alert.alert('Delete Content', 'Are you sure you want to delete this content?', [
-        {
-          text: 'Cancel',
-          style: 'cancel',
-          onPress: () => {
-            // Spring back to center if cancelled
-            translateX.value = withSpring(0, springConfig);
-          },
-        },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: () => {
-            onDelete(item.content_id);
-            translateX.value = withSpring(0, springConfig);
-          },
-        },
-      ]);
-      return; // Don't spring back immediately, wait for alert response
+    if (action === 'notInterested' && onNotInterested) {
+      onNotInterested(recommendation.content_id);
     }
     if (__DEV__) {
       // Keep useful trace in development; avoid noisy logs in production
       // eslint-disable-next-line no-console
-      console.log(`Action triggered: ${action} for item ${item.id}`);
+      console.log(`Action triggered: ${action} for recommendation ${recommendation.content_id}`);
     }
+    translateX.value = withSpring(0, springConfig);
   };
 
   const panGesture = Gesture.Pan()
@@ -92,11 +79,11 @@ export function SwipeableContentItem({
     .onEnd(() => {
       // Check if swipe passes threshold
       if (translateX.value > SWIPE_THRESHOLD) {
-        // Right swipe - Complete action
-        runOnJS(triggerAction)('complete');
+        // Right swipe - Add to Queue action
+        runOnJS(triggerAction)('addToQueue');
       } else if (translateX.value < -SWIPE_THRESHOLD) {
-        // Left swipe - Delete action
-        runOnJS(triggerAction)('delete');
+        // Left swipe - Not Interested action
+        runOnJS(triggerAction)('notInterested');
       } else {
         // Return to center if not past threshold
         translateX.value = withSpring(0, springConfig);
@@ -109,7 +96,7 @@ export function SwipeableContentItem({
     };
   });
 
-  // Left background container style with dynamic height
+  // Left background container style with dynamic height (Add to Queue - Green)
   const leftContainerStyle = useAnimatedStyle(() => {
     const opacity = interpolate(
       translateX.value,
@@ -123,7 +110,7 @@ export function SwipeableContentItem({
     };
   });
 
-  // Right background container style with dynamic height
+  // Right background container style with dynamic height (Not Interested - Gray)
   const rightContainerStyle = useAnimatedStyle(() => {
     const opacity = interpolate(
       translateX.value,
@@ -166,22 +153,22 @@ export function SwipeableContentItem({
   const AnimatedViewTyped = Animated.View as any;
 
   return (
-    <View className="relative mb-2">
-      {/* Left Background - Complete (Green) - Only visible when swiping right */}
+    <View className="relative mb-4">
+      {/* Left Background - Add to Queue (Green) - Only visible when swiping right */}
       <AnimatedViewTyped
-        className="absolute left-0 top-0 w-24 items-center justify-center rounded-l-lg bg-green-500"
+        className="absolute left-0 top-0 w-24 items-center justify-center rounded-l-xl bg-green-500"
         style={leftContainerStyle}>
         <AnimatedViewTyped style={leftIconStyle}>
-          <Icon as={Check} className="h-6 w-6 text-white" />
+          <Icon as={ThumbsUp} className="h-6 w-6 text-white" />
         </AnimatedViewTyped>
       </AnimatedViewTyped>
 
-      {/* Right Background - Delete (Red) - Only visible when swiping left */}
+      {/* Right Background - Not Interested (Red) - Only visible when swiping left */}
       <AnimatedViewTyped
-        className="absolute right-0 top-0 w-24 items-center justify-center rounded-r-lg bg-red-500"
+        className="absolute right-0 top-0 w-24 items-center justify-center rounded-r-xl bg-red-500"
         style={rightContainerStyle}>
         <AnimatedViewTyped style={rightIconStyle}>
-          <Icon as={Trash2} className="h-6 w-6 text-white" />
+          <Icon as={ThumbsDown} className="h-6 w-6 text-white" />
         </AnimatedViewTyped>
       </AnimatedViewTyped>
 
@@ -192,7 +179,7 @@ export function SwipeableContentItem({
           onLayout={(event: any) => {
             itemHeight.value = event.nativeEvent.layout.height;
           }}>
-          <ContentItem item={item} onToggleComplete={onToggleComplete} onPress={onPress} />
+          <RecommendItem recommendation={recommendation} onPress={onPress || (() => {})} />
         </AnimatedViewTyped>
       </GestureDetector>
     </View>

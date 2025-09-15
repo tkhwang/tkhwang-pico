@@ -10,7 +10,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import { Text } from '../ui/text';
+import { Text } from '@/components/ui/text';
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';
 import { useSaveContent } from '@/hooks/mutations/use-save-content';

@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { View, RefreshControl, ScrollView } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
-import { Text } from '../ui/text';
+import { Text } from '@/components/ui/text';
 import { TimelineItem } from './timeline-item';
 import { useUserContents } from '@/hooks/queries/use-user-contents';
 import { ContentListSkeleton } from '@/components/content/content-list-skeleton';

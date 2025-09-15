@@ -1,13 +1,14 @@
 import React, { useState, useCallback } from 'react';
 import { View, TouchableOpacity, RefreshControl, ScrollView } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
-import { Text } from '../ui/text';
+import { Text } from '@/components/ui/text';
 import { SwipeableContentItem } from './swipeable-content-item';
+import { ContentDetailModal } from './detail/content-detail-modal';
 import { useUserContents } from '@/hooks/queries/use-user-contents';
 import { ContentListSkeleton } from '@/components/content/content-list-skeleton';
 import { useToggleTodo } from '@/hooks/mutations/use-toggle-todo';
 import { useDeleteContent } from '@/hooks/mutations/use-delete-content';
-import type { TodoFilterType } from '@tkhwang-pico/common';
+import type { TodoFilterType, UserContentWithDetails } from '@tkhwang-pico/common';
 
 interface ContentListProps {
   todoFilter: TodoFilterType;
@@ -15,7 +16,11 @@ interface ContentListProps {
 
 export function ContentList({ todoFilter }: ContentListProps) {
   const { data: userContents = [], isLoading, error, refetch } = useUserContents(todoFilter);
+
   const [refreshing, setRefreshing] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<UserContentWithDetails | null>(null);
+  const [modalVisible, setModalVisible] = useState(false);
+
   const toggleTodoMutation = useToggleTodo();
   const deleteContentMutation = useDeleteContent();
 
@@ -41,6 +46,16 @@ export function ContentList({ todoFilter }: ContentListProps) {
     },
     [deleteContentMutation]
   );
+
+  const handleItemPress = useCallback((item: UserContentWithDetails) => {
+    setSelectedItem(item);
+    setModalVisible(true);
+  }, []);
+
+  const handleModalClose = useCallback(() => {
+    setModalVisible(false);
+    setSelectedItem(null);
+  }, []);
 
   if (isLoading && !refreshing) return <ContentListSkeleton />;
 
@@ -97,6 +112,7 @@ export function ContentList({ todoFilter }: ContentListProps) {
         item={item}
         onToggleComplete={handleToggleComplete}
         onDelete={handleDelete}
+        onPress={handleItemPress}
       />
     );
   };
@@ -121,6 +137,15 @@ export function ContentList({ todoFilter }: ContentListProps) {
             progressBackgroundColor="#ffffff"
           />
         }
+      />
+
+      {/* Content Detail Modal */}
+      <ContentDetailModal
+        visible={modalVisible}
+        item={selectedItem}
+        onClose={handleModalClose}
+        onToggleComplete={handleToggleComplete}
+        onDelete={handleDelete}
       />
     </View>
   );
