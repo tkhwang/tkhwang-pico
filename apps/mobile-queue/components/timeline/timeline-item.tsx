@@ -2,7 +2,7 @@ import React from 'react';
 import { View, TouchableOpacity, Linking, Image, Alert } from 'react-native';
 import { Text } from '../ui/text';
 import { Icon } from '../ui/icon';
-import { ClockIcon, ExternalLinkIcon } from 'lucide-react-native';
+import { ClockIcon, ExternalLinkIcon, FileText } from 'lucide-react-native';
 import type { UserContentWithDetails } from '@tkhwang-pico/common';
 
 interface TimelineCardProps {
@@ -129,7 +129,7 @@ function TimelineCard({ item, isFirstOfDay = false }: TimelineCardProps) {
                 />
               ) : (
                 <View className="h-20 w-20 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-700">
-                  <Text className="text-2xl">📄</Text>
+                  <Icon as={FileText} className="h-10 w-10 text-gray-400 dark:text-gray-600" />
                 </View>
               )}
             </View>
@@ -156,9 +156,11 @@ export function TimelineItem({ items }: TimelineItemProps) {
   return (
     <View className="mb-4">
       {/* Items for this date */}
-      <View className="space-y-3">
+      <View>
         {items.map((item, index) => (
-          <TimelineCard key={item.id} item={item} isFirstOfDay={index === 0} />
+          <View key={item.id} className={index > 0 ? 'mt-3' : ''}>
+            <TimelineCard item={item} isFirstOfDay={index === 0} />
+          </View>
         ))}
       </View>
 
