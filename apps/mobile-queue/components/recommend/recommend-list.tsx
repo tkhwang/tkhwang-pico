@@ -3,7 +3,7 @@ import { View, RefreshControl, ScrollView, Alert } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { useQueryClient } from '@tanstack/react-query';
 import { useUser } from '@clerk/clerk-expo';
-import { Text } from '../ui/text';
+import { Text } from '@/components/ui/text';
 import { SwipeableRecommendItem } from './swipeable-recommend-item';
 import { RecommendListSkeleton } from './recommend-list-skeleton';
 import { ContentDetailModal } from '../content/detail/content-detail-modal';

@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { View, TouchableOpacity, RefreshControl, ScrollView } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
-import { Text } from '../ui/text';
+import { Text } from '@/components/ui/text';
 import { SwipeableContentItem } from './swipeable-content-item';
 import { ContentDetailModal } from './detail/content-detail-modal';
 import { useUserContents } from '@/hooks/queries/use-user-contents';

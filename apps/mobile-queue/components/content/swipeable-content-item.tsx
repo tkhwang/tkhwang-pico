@@ -10,7 +10,7 @@ import Animated, {
   Extrapolation,
 } from 'react-native-reanimated';
 import { ContentItem } from './content-item';
-import { Icon } from '../ui/icon';
+import { Icon } from '@/components/ui/icon';
 import { Check, Trash2 } from 'lucide-react-native';
 import type { UserContentWithDetails } from '@tkhwang-pico/common';
 

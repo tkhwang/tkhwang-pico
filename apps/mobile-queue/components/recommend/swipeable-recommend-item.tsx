@@ -10,7 +10,7 @@ import Animated, {
   Extrapolation,
 } from 'react-native-reanimated';
 import { RecommendItem } from './recommend-item';
-import { Icon } from '../ui/icon';
+import { Icon } from '@/components/ui/icon';
 import { ThumbsUp, ThumbsDown } from 'lucide-react-native';
 import type { Recommendation } from '@tkhwang-pico/common';
 

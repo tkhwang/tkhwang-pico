@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, TouchableOpacity, Image, Linking, Alert } from 'react-native';
-import { Text } from '../ui/text';
-import { Icon } from '../ui/icon';
+import { Text } from '@/components/ui/text';
+import { Icon } from '@/components/ui/icon';
 import { ExternalLinkIcon, Check, FileText } from 'lucide-react-native';
 import type { UserContentWithDetails } from '@tkhwang-pico/common';
 

@@ -9,8 +9,8 @@ import {
   Share,
   TouchableWithoutFeedback,
 } from 'react-native';
-import { Text } from '../../ui/text';
-import { Icon } from '../../ui/icon';
+import { Text } from '@/components/ui/text';
+import { Icon } from '@/components/ui/icon';
 import {
   X,
   ExternalLink,

@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, TouchableOpacity, Linking, Image, Alert } from 'react-native';
-import { Text } from '../ui/text';
-import { Icon } from '../ui/icon';
+import { Text } from '@/components/ui/text';
+import { Icon } from '@/components/ui/icon';
 import { ClockIcon, ExternalLinkIcon, FileText } from 'lucide-react-native';
 import type { UserContentWithDetails } from '@tkhwang-pico/common';
 
@@ -109,7 +109,7 @@ function TimelineCard({ item, isFirstOfDay = false }: TimelineCardProps) {
               {/* Summary */}
               {content?.summary && (
                 <Text
-                  className="mt-1 mb-2 text-xs text-gray-600 dark:text-gray-400"
+                  className="mb-2 mt-1 text-xs text-gray-600 dark:text-gray-400"
                   numberOfLines={2}>
                   {content.summary}
                 </Text>
