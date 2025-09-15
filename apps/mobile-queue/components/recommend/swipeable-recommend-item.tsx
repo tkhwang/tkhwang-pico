@@ -163,9 +163,9 @@ export function SwipeableRecommendItem({
         </AnimatedViewTyped>
       </AnimatedViewTyped>
 
-      {/* Right Background - Not Interested (Gray) - Only visible when swiping left */}
+      {/* Right Background - Not Interested (Red) - Only visible when swiping left */}
       <AnimatedViewTyped
-        className="absolute right-0 top-0 w-24 items-center justify-center rounded-r-xl bg-gray-500"
+        className="absolute right-0 top-0 w-24 items-center justify-center rounded-r-xl bg-red-500"
         style={rightContainerStyle}>
         <AnimatedViewTyped style={rightIconStyle}>
           <Icon as={ThumbsDown} className="h-6 w-6 text-white" />

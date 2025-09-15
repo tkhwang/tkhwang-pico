@@ -333,12 +333,12 @@ export function ContentDetailModal({
                           {/* Not Interested Button */}
                           <TouchableOpacity
                             onPress={handleNotInterested}
-                            className="flex-1 items-center justify-center rounded-lg bg-gray-100 px-2 py-3 dark:bg-gray-800">
+                            className="flex-1 items-center justify-center rounded-lg bg-red-100 px-2 py-3 dark:bg-red-900/30">
                             <Icon
                               as={ThumbsDown}
-                              className="mb-1 h-5 w-5 text-gray-600 dark:text-gray-400"
+                              className="mb-1 h-5 w-5 text-red-600 dark:text-red-400"
                             />
-                            <Text className="text-xs font-semibold text-gray-700 dark:text-gray-400">
+                            <Text className="text-xs font-semibold text-red-700 dark:text-red-400">
                               Not Interested
                             </Text>
                           </TouchableOpacity>
