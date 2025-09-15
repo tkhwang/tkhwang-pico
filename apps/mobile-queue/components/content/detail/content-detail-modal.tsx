@@ -160,12 +160,6 @@ export function ContentDetailModal({
                     </Text>
                   </View>
                   <View className="flex-row">
-                    <TouchableOpacity onPress={handleShare} className="p-2">
-                      <Icon as={Share2} className="h-5 w-5 text-gray-700 dark:text-gray-300" />
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={handleDelete} className="p-2">
-                      <Icon as={Trash2} className="h-5 w-5 text-red-500" />
-                    </TouchableOpacity>
                     <TouchableOpacity onPress={onClose} className="p-2">
                       <Icon as={X} className="h-5 w-5 text-gray-700 dark:text-gray-300" />
                     </TouchableOpacity>
@@ -316,36 +310,6 @@ export function ContentDetailModal({
                       </TouchableOpacity>
                     </View>
                   </View>
-
-                  {/* Additional Metadata */}
-                  {(content.author || content.published_at || content.lang) && (
-                    <View className="border-t border-gray-200 pt-3 dark:border-gray-700">
-                      <Text className="mb-2 text-xs font-semibold text-gray-700 dark:text-gray-300">
-                        Additional Information
-                      </Text>
-                      {content.author && (
-                        <View className="mb-1">
-                          <Text className="text-xs text-gray-600 dark:text-gray-400">
-                            Author: {content.author}
-                          </Text>
-                        </View>
-                      )}
-                      {content.published_at && (
-                        <View className="mb-1">
-                          <Text className="text-xs text-gray-600 dark:text-gray-400">
-                            Published: {formatDate(content.published_at)}
-                          </Text>
-                        </View>
-                      )}
-                      {content.lang && (
-                        <View className="mb-1">
-                          <Text className="text-xs text-gray-600 dark:text-gray-400">
-                            Language: {content.lang.toUpperCase()}
-                          </Text>
-                        </View>
-                      )}
-                    </View>
-                  )}
 
                   {/* Bottom padding for safe area */}
                   <View className="h-8" />
