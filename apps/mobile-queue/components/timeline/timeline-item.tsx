@@ -106,11 +106,20 @@ function TimelineCard({ item, isFirstOfDay = false }: TimelineCardProps) {
                 {content?.title || 'Untitled'}
               </Text>
 
+              {/* Summary */}
+              {content?.summary && (
+                <Text
+                  className="mt-1 mb-2 text-xs text-gray-600 dark:text-gray-400"
+                  numberOfLines={2}>
+                  {content.summary}
+                </Text>
+              )}
+
               {/* Spacer to push time to bottom */}
               <View className="flex-1" />
 
               {/* Completed Time - aligned with thumbnail bottom */}
-              <View className="flex-row items-center">
+              <View className="mt-2 flex-row items-center">
                 <Icon as={ClockIcon} size={12} className="mr-1 text-gray-500 dark:text-gray-500" />
                 <Text className="text-xs text-gray-500 dark:text-gray-500">{completedTime}</Text>
               </View>
