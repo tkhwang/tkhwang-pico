@@ -142,13 +142,28 @@ export function ContentItem({ item, onToggleComplete, onPress }: ContentItemProp
               {item.note}
             </Text>
           ) : null}
+          {/* Tags from content */}
+          {content.tags && content.tags.length > 0 ? (
+            <View className="mt-1 flex-row flex-wrap">
+              {content.tags.slice(0, 3).map((tag, index) => (
+                <View
+                  key={`tag-${index}`}
+                  className="mr-1.5 mt-1 rounded-full bg-gray-100 px-1.5 py-0.5 dark:bg-gray-800">
+                  <Text className="text-[10px] text-gray-500 dark:text-gray-400">
+                    {String(tag)}
+                  </Text>
+                </View>
+              ))}
+            </View>
+          ) : null}
+          {/* User Labels */}
           {item.labels && item.labels.length > 0 ? (
             <View className="mt-1 flex-row flex-wrap">
               {item.labels.map((label, index) => (
                 <View
-                  key={index}
-                  className="mr-1.5 mt-1 rounded-full bg-gray-100 px-1.5 py-0.5 dark:bg-gray-700">
-                  <Text className="text-[10px] text-gray-600 dark:text-gray-400">
+                  key={`label-${index}`}
+                  className="mr-1.5 mt-1 rounded-full bg-purple-100 px-1.5 py-0.5 dark:bg-purple-900/30">
+                  <Text className="text-[10px] text-purple-600 dark:text-purple-400">
                     {String(label)}
                   </Text>
                 </View>

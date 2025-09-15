@@ -46,7 +46,7 @@ const formatDate = (dateString: string) => {
 };
 
 const formatReadingTime = (wordCount: number | null) => {
-  if (!wordCount) return null;
+  if (!wordCount || wordCount === 0) return '0 min read';
   const minutes = Math.ceil(wordCount / 200);
   return `${minutes} min read`;
 };
@@ -191,7 +191,7 @@ export function ContentDetailModal({
                         </Text>
                       </View>
                     )}
-                    {content.word_count && (
+                    {content.word_count !== null && content.word_count !== undefined && content.word_count > 0 && (
                       <View className="mb-2 flex-row items-center">
                         <Icon as={Clock} className="mr-1 h-3.5 w-3.5 text-gray-400" />
                         <Text className="text-xs text-gray-600 dark:text-gray-400">
@@ -231,22 +231,22 @@ export function ContentDetailModal({
                     </View>
                   )}
 
-                  {/* Tags and Labels */}
-                  {item.labels && item.labels.length > 0 && (
+                  {/* Tags (from content) */}
+                  {content.tags && content.tags.length > 0 && (
                     <View className="mb-4">
                       <View className="mb-2 flex-row items-center">
                         <Icon as={Tag} className="mr-1 h-3.5 w-3.5 text-gray-400" />
                         <Text className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                          Labels
+                          Tags
                         </Text>
                       </View>
                       <View className="flex-row flex-wrap">
-                        {item.labels.map((label, index) => (
+                        {content.tags.map((tag, index) => (
                           <View
                             key={index}
-                            className="mb-2 mr-2 rounded-full bg-gray-100 px-2.5 py-1 dark:bg-gray-700">
-                            <Text className="text-xs text-gray-700 dark:text-gray-300">
-                              {String(label)}
+                            className="mb-2 mr-2 rounded-full bg-gray-100 px-2.5 py-1 dark:bg-gray-800">
+                            <Text className="text-xs text-gray-500 dark:text-gray-400">
+                              {String(tag)}
                             </Text>
                           </View>
                         ))}
