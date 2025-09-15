@@ -4,6 +4,7 @@ import { HomeIcon, SparklesIcon, CalendarDaysIcon, SettingsIcon } from 'lucide-r
 import { useColorScheme } from 'nativewind';
 import * as React from 'react';
 import * as SplashScreen from 'expo-splash-screen';
+import { Platform } from 'react-native';
 
 export default function TabLayout() {
   const { colorScheme } = useColorScheme();
@@ -11,7 +12,11 @@ export default function TabLayout() {
 
   // Ensure splash screen is hidden once the tabs layout mounts.
   React.useEffect(() => {
-    SplashScreen.hideAsync().catch(() => {});
+    if (Platform.OS !== 'web') {
+      SplashScreen.hideAsync().catch((error) => {
+        console.warn('Error hiding splash screen in tabs layout:', error);
+      });
+    }
   }, []);
 
   return (
