@@ -77,21 +77,18 @@ export function RecommendList() {
     [saveContentMutation]
   );
 
-  const handleNotInterested = useCallback(
-    (contentId: string) => {
-      dismissRecommendationMutation.mutate(contentId);
-
-      // Also remove from local cache immediately for better UX
-      if (user?.id) {
-        const key = queryKey.recommendations.byUserId(user.id);
-        queryClient.setQueryData(key, (oldData: Recommendation[] | undefined) => {
-          if (!oldData) return oldData;
-          return oldData.filter((rec) => rec.content_id !== contentId);
-        });
-      }
-    },
-    [dismissRecommendationMutation, user?.id, queryClient]
-  );
+  const handleNotInterested = useCallback((contentId: string) => {
+    // TODO: Future implementation - will dismiss recommendation and update cache
+    // dismissRecommendationMutation.mutate(contentId);
+    // Also remove from local cache immediately for better UX
+    // if (user?.id) {
+    //   const key = queryKey.recommendations.byUserId(user.id);
+    //   queryClient.setQueryData(key, (oldData: Recommendation[] | undefined) => {
+    //     if (!oldData) return oldData;
+    //     return oldData.filter((rec) => rec.content_id !== contentId);
+    //   });
+    // }
+  }, []);
 
   const renderItem = useCallback(
     ({ item }: { item: Recommendation }) => {
