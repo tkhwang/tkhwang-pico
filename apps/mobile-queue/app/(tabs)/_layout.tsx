@@ -2,10 +2,17 @@ import { Tabs } from 'expo-router';
 import { Icon } from '@/components/ui/icon';
 import { HomeIcon, SparklesIcon, CalendarDaysIcon, SettingsIcon } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
+import * as React from 'react';
+import * as SplashScreen from 'expo-splash-screen';
 
 export default function TabLayout() {
   const { colorScheme } = useColorScheme();
   const isDark = colorScheme === 'dark';
+
+  // Ensure splash screen is hidden once the tabs layout mounts.
+  React.useEffect(() => {
+    SplashScreen.hideAsync().catch(() => {});
+  }, []);
 
   return (
     <Tabs
