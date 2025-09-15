@@ -32,7 +32,6 @@ export function RecommendList() {
 
   const saveContentMutation = useSaveContent({
     onSuccess: () => {
-      Alert.alert('Success', 'Content added to your queue');
       // Remove the recommendation from the cache after successfully adding to queue
       if (user?.id && addingContentId) {
         const key = queryKey.recommendations.byUserId(user.id);
@@ -81,6 +80,7 @@ export function RecommendList() {
   const handleNotInterested = useCallback(
     (contentId: string) => {
       dismissRecommendationMutation.mutate(contentId);
+
       // Also remove from local cache immediately for better UX
       if (user?.id) {
         const key = queryKey.recommendations.byUserId(user.id);

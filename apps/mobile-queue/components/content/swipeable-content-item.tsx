@@ -1,5 +1,5 @@
 import React from 'react';
-import { View } from 'react-native';
+import { View, Alert } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   useAnimatedStyle,
@@ -44,16 +44,35 @@ export function SwipeableContentItem({
   const triggerAction = (action: 'complete' | 'delete') => {
     if (action === 'complete' && onToggleComplete) {
       onToggleComplete(item.id);
+      translateX.value = withSpring(0, springConfig);
     }
     if (action === 'delete' && onDelete) {
-      onDelete(item.content_id);
+      // Show confirmation alert before deleting
+      Alert.alert('Delete Content', 'Are you sure you want to delete this content?', [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+          onPress: () => {
+            // Spring back to center if cancelled
+            translateX.value = withSpring(0, springConfig);
+          },
+        },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => {
+            onDelete(item.content_id);
+            translateX.value = withSpring(0, springConfig);
+          },
+        },
+      ]);
+      return; // Don't spring back immediately, wait for alert response
     }
     if (__DEV__) {
       // Keep useful trace in development; avoid noisy logs in production
       // eslint-disable-next-line no-console
       console.log(`Action triggered: ${action} for item ${item.id}`);
     }
-    translateX.value = withSpring(0, springConfig);
   };
 
   const panGesture = Gesture.Pan()
