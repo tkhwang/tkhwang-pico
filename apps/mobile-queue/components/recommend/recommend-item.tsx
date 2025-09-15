@@ -1,15 +1,16 @@
 import React from 'react';
-import { View, TouchableOpacity, Linking, Image, Alert } from 'react-native';
+import { View, TouchableOpacity, Image } from 'react-native';
 import { Text } from '../ui/text';
 import { Icon } from '../ui/icon';
-import { ExternalLinkIcon, TrendingUpIcon, CalendarIcon, UserIcon } from 'lucide-react-native';
+import { TrendingUpIcon, CalendarIcon, UserIcon } from 'lucide-react-native';
 import type { Recommendation } from '@tkhwang-pico/common';
 
 interface RecommendItemProps {
   recommendation: Recommendation;
+  onPress: (recommendation: Recommendation) => void;
 }
 
-export function RecommendItem({ recommendation }: RecommendItemProps) {
+export function RecommendItem({ recommendation, onPress }: RecommendItemProps) {
   const content = recommendation.contents;
   if (!content) return null;
 
@@ -25,28 +26,8 @@ export function RecommendItem({ recommendation }: RecommendItemProps) {
   // Format score as percentage (0-100)
   const scorePercentage = Math.round(recommendation.score * 100);
 
-  const handlePress = async () => {
-    const url = content.canonical_url || content.url;
-    if (!url) {
-      Alert.alert('No URL', 'No URL available for this content');
-      return;
-    }
-    if (!/^https?:\/\//i.test(url)) {
-      Alert.alert('Unsafe URL', 'Only http(s) URLs are allowed.');
-      return;
-    }
-
-    try {
-      const isSupported = await Linking.canOpenURL(url);
-      if (isSupported) {
-        await Linking.openURL(url);
-      } else {
-        Alert.alert('Unable to open', `Cannot open URL: ${url}`);
-      }
-    } catch (error) {
-      Alert.alert('Error', 'Failed to open URL');
-      if (__DEV__) console.error('Error opening URL:', error);
-    }
+  const handlePress = () => {
+    onPress(recommendation);
   };
 
   // Get score color based on value
@@ -91,23 +72,14 @@ export function RecommendItem({ recommendation }: RecommendItemProps) {
           )}
         </View>
 
-        {/* Header Row - Domain and Link indicator */}
-        <View className="mb-2 flex-row items-center justify-between">
+        {/* Header Row - Domain */}
+        <View className="mb-2 flex-row items-center">
           {/* Domain */}
           {content.domain && (
             <View className="self-start rounded-full bg-gray-100 px-2 py-0.5 dark:bg-gray-700">
               <Text className="text-xs text-gray-600 dark:text-gray-400">{content.domain}</Text>
             </View>
           )}
-
-          {/* Open link indicator */}
-          <View className="flex-row items-center opacity-60">
-            <Icon
-              as={ExternalLinkIcon}
-              className="mr-0.5 h-3 w-3 text-gray-400 dark:text-gray-500"
-            />
-            <Text className="text-xs text-gray-400 dark:text-gray-500">Open</Text>
-          </View>
         </View>
 
         {/* Main Content Row */}

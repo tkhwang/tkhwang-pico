@@ -1,13 +1,21 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import { View, RefreshControl, ScrollView } from 'react-native';
+import { View, RefreshControl, ScrollView, Alert } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
+import { useQueryClient } from '@tanstack/react-query';
+import { useUser } from '@clerk/clerk-expo';
 import { Text } from '../ui/text';
 import { RecommendItem } from './recommend-item';
 import { RecommendListSkeleton } from './recommend-list-skeleton';
+import { ContentDetailModal } from '../content/detail/content-detail-modal';
 import { useRecommendations } from '@/hooks/queries/use-recommendations';
+import { useSaveContent } from '@/hooks/mutations/use-save-content';
+import { useDismissRecommendation } from '@/hooks/mutations/use-dismiss-recommendation';
+import { queryKey } from '@/hooks/keys/query-key';
 import type { Recommendation } from '@tkhwang-pico/common';
 
 export function RecommendList() {
+  const queryClient = useQueryClient();
+  const { user } = useUser();
   const {
     data: recommendations = [],
     isLoading,
@@ -16,6 +24,27 @@ export function RecommendList() {
     refetch,
   } = useRecommendations({ limit: 30 });
   const [refreshing, setRefreshing] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<Recommendation | null>(null);
+  const [modalVisible, setModalVisible] = useState(false);
+
+  // Store the content ID being added to queue
+  const [addingContentId, setAddingContentId] = useState<string | null>(null);
+
+  const saveContentMutation = useSaveContent({
+    onSuccess: () => {
+      Alert.alert('Success', 'Content added to your queue');
+      // Remove the recommendation from the cache after successfully adding to queue
+      if (user?.id && addingContentId) {
+        const key = queryKey.recommendations.byUserId(user.id);
+        queryClient.setQueryData(key, (oldData: Recommendation[] | undefined) => {
+          if (!oldData) return oldData;
+          return oldData.filter((rec) => rec.content_id !== addingContentId);
+        });
+        setAddingContentId(null); // Clear the stored content ID
+      }
+    },
+  });
+  const dismissRecommendationMutation = useDismissRecommendation();
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -31,9 +60,37 @@ export function RecommendList() {
     [recommendations]
   );
 
-  const renderItem = useCallback(({ item }: { item: Recommendation }) => {
-    return <RecommendItem recommendation={item} />;
+  const handleItemPress = useCallback((recommendation: Recommendation) => {
+    setSelectedItem(recommendation);
+    setModalVisible(true);
   }, []);
+
+  const handleModalClose = useCallback(() => {
+    setModalVisible(false);
+    setSelectedItem(null);
+  }, []);
+
+  const handleAddToQueue = useCallback(
+    (url: string, contentId: string) => {
+      setAddingContentId(contentId); // Store the content ID for the onSuccess callback
+      saveContentMutation.mutate(url);
+    },
+    [saveContentMutation]
+  );
+
+  const handleNotInterested = useCallback(
+    (contentId: string) => {
+      dismissRecommendationMutation.mutate(contentId);
+    },
+    [dismissRecommendationMutation]
+  );
+
+  const renderItem = useCallback(
+    ({ item }: { item: Recommendation }) => {
+      return <RecommendItem recommendation={item} onPress={handleItemPress} />;
+    },
+    [handleItemPress]
+  );
 
   if (isLoading && !refreshing) {
     return <RecommendListSkeleton />;
@@ -102,6 +159,16 @@ export function RecommendList() {
             progressBackgroundColor="#ffffff"
           />
         }
+      />
+
+      {/* Content Detail Modal */}
+      <ContentDetailModal
+        visible={modalVisible}
+        item={selectedItem}
+        onClose={handleModalClose}
+        mode="recommend"
+        onAddToQueue={handleAddToQueue}
+        onNotInterested={handleNotInterested}
       />
     </View>
   );

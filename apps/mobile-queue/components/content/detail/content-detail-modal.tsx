@@ -23,15 +23,22 @@ import {
   Tag,
   Globe,
   FileText,
+  ThumbsUp,
+  ThumbsDown,
 } from 'lucide-react-native';
-import type { UserContentWithDetails } from '@tkhwang-pico/common';
+import type { UserContentWithDetails, Recommendation } from '@tkhwang-pico/common';
 
 interface ContentDetailModalProps {
   visible: boolean;
-  item: UserContentWithDetails | null;
+  item: UserContentWithDetails | Recommendation | null;
   onClose: () => void;
+  mode?: 'home' | 'recommend';
+  // Home mode callbacks
   onToggleComplete?: (id: string) => void;
   onDelete?: (contentId: string) => void;
+  // Recommend mode callbacks
+  onAddToQueue?: (url: string, contentId: string) => void;
+  onNotInterested?: (contentId: string) => void;
 }
 
 const formatDate = (dateString: string) => {
@@ -55,18 +62,22 @@ export function ContentDetailModal({
   visible,
   item,
   onClose,
+  mode = 'home',
   onToggleComplete,
   onDelete,
+  onAddToQueue,
+  onNotInterested,
 }: ContentDetailModalProps) {
   if (!item || !item.contents) {
     return null;
   }
 
   const content = item.contents;
-  const isCompleted = item.todo_status === 'completed';
+  const isCompleted = 'todo_status' in item ? item.todo_status === 'completed' : false;
+  const isRecommendation = mode === 'recommend';
 
   const handleToggleComplete = () => {
-    if (onToggleComplete) {
+    if (onToggleComplete && 'id' in item) {
       onToggleComplete(item.id);
       onClose(); // Dismiss modal after action
     }
@@ -86,6 +97,25 @@ export function ContentDetailModal({
         },
       },
     ]);
+  };
+
+  const handleAddToQueue = () => {
+    if (onAddToQueue) {
+      const url = content.canonical_url || content.url;
+      if (url) {
+        onAddToQueue(url, item.content_id);
+        onClose();
+      } else {
+        Alert.alert('Error', 'No URL available for this content');
+      }
+    }
+  };
+
+  const handleNotInterested = () => {
+    if (onNotInterested) {
+      onNotInterested(item.content_id);
+      onClose();
+    }
   };
 
   const handleOpenURL = async () => {
@@ -148,17 +178,27 @@ export function ContentDetailModal({
 
                 {/* Header */}
                 <View className="flex-row items-center justify-between border-b border-gray-200 px-4 pb-3 dark:border-gray-700">
-                  <View className="flex-row items-center">
-                    <TouchableOpacity onPress={handleToggleComplete} className="mr-3 p-2">
-                      <Icon
-                        as={isCompleted ? CheckCircle : Circle}
-                        className={`h-5 w-5 ${isCompleted ? 'text-green-500' : 'text-blue-500'}`}
-                      />
-                    </TouchableOpacity>
-                    <Text className="text-sm text-gray-500 dark:text-gray-400">
-                      {isCompleted ? 'Completed' : 'Pending'}
-                    </Text>
-                  </View>
+                  {isRecommendation ? (
+                    // Recommendation mode header
+                    <View className="flex-row items-center">
+                      <Text className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Recommendation
+                      </Text>
+                    </View>
+                  ) : (
+                    // Home mode header with toggle complete
+                    <View className="flex-row items-center">
+                      <TouchableOpacity onPress={handleToggleComplete} className="mr-3 p-2">
+                        <Icon
+                          as={isCompleted ? CheckCircle : Circle}
+                          className={`h-5 w-5 ${isCompleted ? 'text-green-500' : 'text-blue-500'}`}
+                        />
+                      </TouchableOpacity>
+                      <Text className="text-sm text-gray-500 dark:text-gray-400">
+                        {isCompleted ? 'Completed' : 'Pending'}
+                      </Text>
+                    </View>
+                  )}
                   <View className="flex-row">
                     <TouchableOpacity onPress={onClose} className="p-2">
                       <Icon as={X} className="h-5 w-5 text-gray-700 dark:text-gray-300" />
@@ -183,7 +223,7 @@ export function ContentDetailModal({
                         </Text>
                       </View>
                     )}
-                    {item.saved_at && (
+                    {'saved_at' in item && item.saved_at && (
                       <View className="mb-2 mr-3 flex-row items-center">
                         <Icon as={Calendar} className="mr-1 h-3.5 w-3.5 text-gray-400" />
                         <Text className="text-xs text-gray-600 dark:text-gray-400">
@@ -191,14 +231,16 @@ export function ContentDetailModal({
                         </Text>
                       </View>
                     )}
-                    {content.word_count !== null && content.word_count !== undefined && content.word_count > 0 && (
-                      <View className="mb-2 flex-row items-center">
-                        <Icon as={Clock} className="mr-1 h-3.5 w-3.5 text-gray-400" />
-                        <Text className="text-xs text-gray-600 dark:text-gray-400">
-                          {formatReadingTime(content.word_count)}
-                        </Text>
-                      </View>
-                    )}
+                    {content.word_count !== null &&
+                      content.word_count !== undefined &&
+                      content.word_count > 0 && (
+                        <View className="mb-2 flex-row items-center">
+                          <Icon as={Clock} className="mr-1 h-3.5 w-3.5 text-gray-400" />
+                          <Text className="text-xs text-gray-600 dark:text-gray-400">
+                            {formatReadingTime(content.word_count)}
+                          </Text>
+                        </View>
+                      )}
                   </View>
 
                   {/* Summary */}
@@ -213,8 +255,8 @@ export function ContentDetailModal({
                     </View>
                   )}
 
-                  {/* Note */}
-                  {item.note && (
+                  {/* Note - only for UserContentWithDetails */}
+                  {'note' in item && item.note && (
                     <View className="mb-4 rounded-lg bg-blue-50 p-3 dark:bg-blue-900/20">
                       <View className="mb-1 flex-row items-center">
                         <Icon
@@ -260,54 +302,102 @@ export function ContentDetailModal({
                       Actions
                     </Text>
                     <View className="flex-row gap-2">
-                      {/* Toggle Complete Button */}
-                      <TouchableOpacity
-                        onPress={handleToggleComplete}
-                        className={`flex-1 items-center justify-center rounded-lg px-2 py-3 ${
-                          isCompleted
-                            ? 'bg-gray-100 dark:bg-gray-800'
-                            : 'bg-green-100 dark:bg-green-900/30'
-                        }`}>
-                        <Icon
-                          as={isCompleted ? Circle : CheckCircle}
-                          className={`mb-1 h-5 w-5 ${
-                            isCompleted
-                              ? 'text-gray-500 dark:text-gray-400'
-                              : 'text-green-600 dark:text-green-500'
-                          }`}
-                        />
-                        <Text
-                          className={`text-xs font-semibold ${
-                            isCompleted
-                              ? 'text-gray-600 dark:text-gray-400'
-                              : 'text-green-700 dark:text-green-400'
-                          }`}>
-                          {isCompleted ? 'Pending' : 'Complete'}
-                        </Text>
-                      </TouchableOpacity>
+                      {isRecommendation ? (
+                        <>
+                          {/* Add to Queue Button */}
+                          <TouchableOpacity
+                            onPress={handleAddToQueue}
+                            className="flex-1 items-center justify-center rounded-lg bg-green-100 px-2 py-3 dark:bg-green-900/30">
+                            <Icon
+                              as={ThumbsUp}
+                              className="mb-1 h-5 w-5 text-green-600 dark:text-green-400"
+                            />
+                            <Text className="text-xs font-semibold text-green-700 dark:text-green-400">
+                              Add to Queue
+                            </Text>
+                          </TouchableOpacity>
 
-                      {/* Open in Browser Button */}
-                      <TouchableOpacity
-                        onPress={handleOpenURL}
-                        className="flex-1 items-center justify-center rounded-lg bg-blue-100 px-2 py-3 dark:bg-blue-900/30">
-                        <Icon
-                          as={ExternalLink}
-                          className="mb-1 h-5 w-5 text-blue-600 dark:text-blue-400"
-                        />
-                        <Text className="text-xs font-semibold text-blue-700 dark:text-blue-400">
-                          Open
-                        </Text>
-                      </TouchableOpacity>
+                          {/* Open in Browser Button */}
+                          <TouchableOpacity
+                            onPress={handleOpenURL}
+                            className="flex-1 items-center justify-center rounded-lg bg-blue-100 px-2 py-3 dark:bg-blue-900/30">
+                            <Icon
+                              as={ExternalLink}
+                              className="mb-1 h-5 w-5 text-blue-600 dark:text-blue-400"
+                            />
+                            <Text className="text-xs font-semibold text-blue-700 dark:text-blue-400">
+                              Open
+                            </Text>
+                          </TouchableOpacity>
 
-                      {/* Delete Button */}
-                      <TouchableOpacity
-                        onPress={handleDelete}
-                        className="flex-1 items-center justify-center rounded-lg bg-red-100 px-2 py-3 dark:bg-red-900/30">
-                        <Icon as={Trash2} className="mb-1 h-5 w-5 text-red-600 dark:text-red-400" />
-                        <Text className="text-xs font-semibold text-red-700 dark:text-red-400">
-                          Delete
-                        </Text>
-                      </TouchableOpacity>
+                          {/* Not Interested Button */}
+                          <TouchableOpacity
+                            onPress={handleNotInterested}
+                            className="flex-1 items-center justify-center rounded-lg bg-gray-100 px-2 py-3 dark:bg-gray-800">
+                            <Icon
+                              as={ThumbsDown}
+                              className="mb-1 h-5 w-5 text-gray-600 dark:text-gray-400"
+                            />
+                            <Text className="text-xs font-semibold text-gray-700 dark:text-gray-400">
+                              Not Interested
+                            </Text>
+                          </TouchableOpacity>
+                        </>
+                      ) : (
+                        <>
+                          {/* Toggle Complete Button */}
+                          <TouchableOpacity
+                            onPress={handleToggleComplete}
+                            className={`flex-1 items-center justify-center rounded-lg px-2 py-3 ${
+                              isCompleted
+                                ? 'bg-gray-100 dark:bg-gray-800'
+                                : 'bg-green-100 dark:bg-green-900/30'
+                            }`}>
+                            <Icon
+                              as={isCompleted ? Circle : CheckCircle}
+                              className={`mb-1 h-5 w-5 ${
+                                isCompleted
+                                  ? 'text-gray-500 dark:text-gray-400'
+                                  : 'text-green-600 dark:text-green-500'
+                              }`}
+                            />
+                            <Text
+                              className={`text-xs font-semibold ${
+                                isCompleted
+                                  ? 'text-gray-600 dark:text-gray-400'
+                                  : 'text-green-700 dark:text-green-400'
+                              }`}>
+                              {isCompleted ? 'Pending' : 'Complete'}
+                            </Text>
+                          </TouchableOpacity>
+
+                          {/* Open in Browser Button */}
+                          <TouchableOpacity
+                            onPress={handleOpenURL}
+                            className="flex-1 items-center justify-center rounded-lg bg-blue-100 px-2 py-3 dark:bg-blue-900/30">
+                            <Icon
+                              as={ExternalLink}
+                              className="mb-1 h-5 w-5 text-blue-600 dark:text-blue-400"
+                            />
+                            <Text className="text-xs font-semibold text-blue-700 dark:text-blue-400">
+                              Open
+                            </Text>
+                          </TouchableOpacity>
+
+                          {/* Delete Button */}
+                          <TouchableOpacity
+                            onPress={handleDelete}
+                            className="flex-1 items-center justify-center rounded-lg bg-red-100 px-2 py-3 dark:bg-red-900/30">
+                            <Icon
+                              as={Trash2}
+                              className="mb-1 h-5 w-5 text-red-600 dark:text-red-400"
+                            />
+                            <Text className="text-xs font-semibold text-red-700 dark:text-red-400">
+                              Delete
+                            </Text>
+                          </TouchableOpacity>
+                        </>
+                      )}
                     </View>
                   </View>
 
