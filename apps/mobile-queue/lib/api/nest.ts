@@ -57,8 +57,18 @@ export async function nestApi<T = any>(endpoint: string, options: RequestOptions
       throw new Error(errorMessage);
     }
 
-    const data = await response.json();
-    return data;
+    if (response.status === 204) return undefined as unknown as T;
+
+    const contentType = response.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) {
+      const text = await response.text();
+      try {
+        return JSON.parse(text) as T;
+      } catch {
+        return undefined as unknown as T;
+      }
+    }
+    return (await response.json()) as T;
   } catch (error) {
     if (error instanceof Error) {
       // Provide more context for network errors
