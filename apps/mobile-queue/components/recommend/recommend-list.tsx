@@ -4,7 +4,7 @@ import { FlashList } from '@shopify/flash-list';
 import { useQueryClient } from '@tanstack/react-query';
 import { useUser } from '@clerk/clerk-expo';
 import { Text } from '../ui/text';
-import { RecommendItem } from './recommend-item';
+import { SwipeableRecommendItem } from './swipeable-recommend-item';
 import { RecommendListSkeleton } from './recommend-list-skeleton';
 import { ContentDetailModal } from '../content/detail/content-detail-modal';
 import { useRecommendations } from '@/hooks/queries/use-recommendations';
@@ -81,15 +81,30 @@ export function RecommendList() {
   const handleNotInterested = useCallback(
     (contentId: string) => {
       dismissRecommendationMutation.mutate(contentId);
+      // Also remove from local cache immediately for better UX
+      if (user?.id) {
+        const key = queryKey.recommendations.byUserId(user.id);
+        queryClient.setQueryData(key, (oldData: Recommendation[] | undefined) => {
+          if (!oldData) return oldData;
+          return oldData.filter((rec) => rec.content_id !== contentId);
+        });
+      }
     },
-    [dismissRecommendationMutation]
+    [dismissRecommendationMutation, user?.id, queryClient]
   );
 
   const renderItem = useCallback(
     ({ item }: { item: Recommendation }) => {
-      return <RecommendItem recommendation={item} onPress={handleItemPress} />;
+      return (
+        <SwipeableRecommendItem
+          recommendation={item}
+          onPress={handleItemPress}
+          onAddToQueue={handleAddToQueue}
+          onNotInterested={handleNotInterested}
+        />
+      );
     },
-    [handleItemPress]
+    [handleItemPress, handleAddToQueue, handleNotInterested]
   );
 
   if (isLoading && !refreshing) {

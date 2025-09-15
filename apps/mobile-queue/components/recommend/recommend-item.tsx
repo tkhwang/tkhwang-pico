@@ -42,7 +42,7 @@ export function RecommendItem({ recommendation, onPress }: RecommendItemProps) {
     <TouchableOpacity
       onPress={handlePress}
       activeOpacity={0.7}
-      className="mb-4 overflow-hidden rounded-xl bg-white shadow-sm dark:bg-gray-800">
+      className="overflow-hidden rounded-xl bg-white shadow-sm dark:bg-gray-800">
       <View className="p-4">
         {/* Score Indicator */}
         <View className="mb-2 flex-row items-center">
