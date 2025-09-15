@@ -14,8 +14,16 @@ import { StatusBar } from 'expo-status-bar';
 import { useColorScheme } from 'nativewind';
 import * as React from 'react';
 import Constants from 'expo-constants';
-import { View, Text } from 'react-native';
+import { View, Text, Platform } from 'react-native';
 import * as Sentry from '@sentry/react-native';
+
+// Prevent the splash screen from auto-hiding before our app is ready
+// Only call this on native platforms (iOS/Android)
+if (Platform.OS !== 'web') {
+  SplashScreen.preventAutoHideAsync().catch((error) => {
+    console.warn('Error preventing splash screen auto-hide:', error);
+  });
+}
 
 Sentry.init({
   dsn: process.env.EXPO_PUBLIC_SENTRY_DSN,
@@ -84,14 +92,14 @@ export default Sentry.wrap(function RootLayout() {
   );
 });
 
-SplashScreen.preventAutoHideAsync();
-
 function Routes() {
   const { isSignedIn, isLoaded } = useAuth();
 
   React.useEffect(() => {
-    if (isLoaded) {
-      SplashScreen.hideAsync();
+    if (isLoaded && Platform.OS !== 'web') {
+      SplashScreen.hideAsync().catch((error) => {
+        console.warn('Error hiding splash screen:', error);
+      });
     }
   }, [isLoaded]);
 
