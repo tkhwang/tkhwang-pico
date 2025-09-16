@@ -27,6 +27,7 @@ import {
 import { formatFullDate, formatReadingTimeWithSuffix } from '@/hooks/use-content-formatters';
 import { useContentActions } from '@/hooks/use-content-actions';
 import { ContentTags } from '@/components/content/sub/content-tags';
+import { ContentThumbnail } from '@/components/content/sub/content-thumbnail';
 import type { UserContentWithDetails, Recommendation } from '@tkhwang-pico/common';
 
 interface ContentDetailModalProps {
@@ -61,6 +62,12 @@ export function ContentDetailModal({
   const content = item.contents;
   const isCompleted = 'todo_status' in item ? item.todo_status === 'completed' : false;
   const isRecommendation = mode === 'recommend';
+
+  // Extract thumbnail URL from metadata
+  const thumbnailUrl =
+    content.metadata && typeof content.metadata === 'object' && 'image_url' in content.metadata
+      ? (content.metadata.image_url as string)
+      : null;
 
   const handleToggleComplete = () => {
     if (onToggleComplete && 'id' in item) {
@@ -146,7 +153,11 @@ export function ContentDetailModal({
                 </View>
 
                 {/* Content */}
-                <ScrollView className="px-4 py-4" showsVerticalScrollIndicator={false}>
+                <ScrollView
+                  className="px-4 py-4"
+                  showsVerticalScrollIndicator={false}
+                  bounces={true}
+                  contentContainerStyle={{ paddingBottom: 20 }}>
                   {/* Title */}
                   <Text
                     className="mb-3 text-xl font-bold text-gray-900 dark:text-gray-100"
@@ -154,6 +165,17 @@ export function ContentDetailModal({
                     adjustsFontSizeToFit={false}>
                     {content.title || 'Untitled'}
                   </Text>
+
+                  {/* Thumbnail */}
+                  {thumbnailUrl && (
+                    <View className="mb-4 items-center">
+                      <ContentThumbnail
+                        imageUrl={thumbnailUrl}
+                        size="large"
+                        className="h-48 w-full"
+                      />
+                    </View>
+                  )}
 
                   {/* Metadata */}
                   <View className="mb-4 flex-row flex-wrap">
@@ -337,9 +359,6 @@ export function ContentDetailModal({
                       )}
                     </View>
                   </View>
-
-                  {/* Bottom padding for safe area */}
-                  <View className="h-8" />
                 </ScrollView>
               </View>
             </TouchableWithoutFeedback>
