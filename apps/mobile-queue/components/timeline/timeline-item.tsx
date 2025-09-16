@@ -8,9 +8,10 @@ import type { UserContentWithDetails } from '@tkhwang-pico/common';
 interface TimelineCardProps {
   item: UserContentWithDetails;
   isFirstOfDay?: boolean;
+  onPress?: (item: UserContentWithDetails) => void;
 }
 
-function TimelineCard({ item, isFirstOfDay = false }: TimelineCardProps) {
+function TimelineCard({ item, isFirstOfDay = false, onPress }: TimelineCardProps) {
   const content = item.contents;
 
   // Parse completed date
@@ -53,6 +54,7 @@ function TimelineCard({ item, isFirstOfDay = false }: TimelineCardProps) {
 
   return (
     <TouchableOpacity
+      onPress={() => onPress?.(item)}
       onLongPress={handleLongPress}
       delayLongPress={500}
       activeOpacity={0.7}
@@ -159,16 +161,17 @@ function TimelineCard({ item, isFirstOfDay = false }: TimelineCardProps) {
 interface TimelineItemProps {
   date: string;
   items: UserContentWithDetails[];
+  onPress?: (item: UserContentWithDetails) => void;
 }
 
-export function TimelineItem({ items }: TimelineItemProps) {
+export function TimelineItem({ items, onPress }: TimelineItemProps) {
   return (
     <View className="mb-4">
       {/* Items for this date */}
       <View>
         {items.map((item, index) => (
           <View key={item.id} className={index > 0 ? 'mt-3' : ''}>
-            <TimelineCard item={item} isFirstOfDay={index === 0} />
+            <TimelineCard item={item} isFirstOfDay={index === 0} onPress={onPress} />
           </View>
         ))}
       </View>

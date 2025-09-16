@@ -7,6 +7,7 @@ import { useUserContents } from '@/hooks/queries/use-user-contents';
 import { ContentListSkeleton } from '@/components/content/content-list-skeleton';
 import type { UserContentWithDetails } from '@tkhwang-pico/common';
 import { TimelineListSkeleton } from '@/components/timeline/timeline-list-skeleton';
+import { ContentDetailModal } from '@/components/content/detail/content-detail-modal';
 
 interface GroupedContent {
   date: string;
@@ -16,6 +17,8 @@ interface GroupedContent {
 export function TimelineList() {
   const { data: contents = [], isLoading, error, refetch } = useUserContents('completed');
   const [refreshing, setRefreshing] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<UserContentWithDetails | null>(null);
+  const [modalVisible, setModalVisible] = useState(false);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -25,6 +28,16 @@ export function TimelineList() {
       setRefreshing(false);
     }
   }, [refetch]);
+
+  const handleItemPress = useCallback((item: UserContentWithDetails) => {
+    setSelectedItem(item);
+    setModalVisible(true);
+  }, []);
+
+  const handleModalClose = useCallback(() => {
+    setModalVisible(false);
+    setSelectedItem(null);
+  }, []);
 
   // Group contents by date
   const groupedContents = useMemo((): GroupedContent[] => {
@@ -97,7 +110,7 @@ export function TimelineList() {
   }
 
   const renderItem = ({ item }: { item: GroupedContent }) => {
-    return <TimelineItem date={item.date} items={item.items} />;
+    return <TimelineItem date={item.date} items={item.items} onPress={handleItemPress} />;
   };
 
   return (
@@ -119,6 +132,9 @@ export function TimelineList() {
           />
         }
       />
+      {selectedItem && (
+        <ContentDetailModal visible={modalVisible} item={selectedItem} onClose={handleModalClose} />
+      )}
     </View>
   );
 }
