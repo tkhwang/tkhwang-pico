@@ -23,12 +23,15 @@ export async function setContentPreference(
 
     const { data, error } = await supabase
       .from('user_content_preferences')
-      .upsert({
-        user_id: userId,
-        content_id: contentId,
-        preference_type: preferenceType,
-        reason: reason || null,
-      })
+      .upsert(
+        {
+          user_id: userId,
+          content_id: contentId,
+          preference_type: preferenceType,
+          reason: reason || null,
+        },
+        { onConflict: 'user_id,content_id' }
+      )
       .select()
       .single();
 
