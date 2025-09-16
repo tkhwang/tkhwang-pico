@@ -224,7 +224,12 @@ export function ContentDetailModal({
                           Tags
                         </Text>
                       </View>
-                      <ContentTags tags={content.tags} maxTags={0} className="flex-row flex-wrap" />
+                      <ContentTags
+                        tags={content.tags}
+                        expandable={true}
+                        initialMaxTags={6}
+                        className="flex-row flex-wrap"
+                      />
                     </View>
                   )}
 
