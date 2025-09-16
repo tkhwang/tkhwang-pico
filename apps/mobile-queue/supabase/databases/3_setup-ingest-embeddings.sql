@@ -121,7 +121,7 @@ create table if not exists public.user_content_preferences (
   id              uuid primary key default gen_random_uuid(),
   user_id         text not null,  -- Clerk ID
   content_id      uuid not null references public.contents(id) on delete cascade,
-  preference_type text not null default 'not_interested', -- 'not_interested', 'blocked', etc.
+  preference_type text not null default 'not_interested', -- 'liked', 'not_interested', 'blocked', etc.
   reason          text,           -- optional reason for the preference
   created_at      timestamptz not null default now(),
   unique (user_id, content_id)
