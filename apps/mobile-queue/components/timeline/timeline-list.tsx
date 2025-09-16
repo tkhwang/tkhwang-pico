@@ -2,9 +2,10 @@ import React, { useState, useCallback, useMemo } from 'react';
 import { View, RefreshControl, ScrollView } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { Text } from '@/components/ui/text';
-import { TimelineItem } from './timeline-item';
+import { SwipeableTimelineItem } from './swipeable-timeline-item';
 import { useUserContents } from '@/hooks/queries/use-user-contents';
-import { ContentListSkeleton } from '@/components/content/content-list-skeleton';
+import { useDeleteContent } from '@/hooks/mutations/use-delete-content';
+import { useUpdateUserContent } from '@/hooks/mutations/use-update-user-content';
 import type { UserContentWithDetails } from '@tkhwang-pico/common';
 import { TimelineListSkeleton } from '@/components/timeline/timeline-list-skeleton';
 import { ContentDetailModal } from '@/components/content/detail/content-detail-modal';
@@ -16,9 +17,13 @@ interface GroupedContent {
 
 export function TimelineList() {
   const { data: contents = [], isLoading, error, refetch } = useUserContents('completed');
+
   const [refreshing, setRefreshing] = useState(false);
   const [selectedItem, setSelectedItem] = useState<UserContentWithDetails | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
+
+  const deleteContentMutation = useDeleteContent();
+  const updateContentMutation = useUpdateUserContent();
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -38,6 +43,23 @@ export function TimelineList() {
     setModalVisible(false);
     setSelectedItem(null);
   }, []);
+
+  const handleReopen = useCallback(
+    (id: string) => {
+      updateContentMutation.mutate({
+        id,
+        todo_status: 'pending',
+      });
+    },
+    [updateContentMutation]
+  );
+
+  const handleDelete = useCallback(
+    (contentId: string) => {
+      deleteContentMutation.mutate(contentId);
+    },
+    [deleteContentMutation]
+  );
 
   // Group contents by date
   const groupedContents = useMemo((): GroupedContent[] => {
@@ -110,7 +132,36 @@ export function TimelineList() {
   }
 
   const renderItem = ({ item }: { item: GroupedContent }) => {
-    return <TimelineItem date={item.date} items={item.items} onPress={handleItemPress} />;
+    return (
+      <View className="mb-4">
+        {/* Date separator */}
+        {item.items.length > 0 && item.items[0].completed_at && (
+          <View className="mb-3">
+            <Text className="text-sm font-medium text-gray-500 dark:text-gray-400">
+              {new Date(item.items[0].completed_at).toLocaleDateString('en-US', {
+                weekday: 'long',
+                month: 'long',
+                day: 'numeric',
+                year: 'numeric',
+              })}
+            </Text>
+          </View>
+        )}
+        {/* Items for this date */}
+        {item.items.map((content, index) => (
+          <View key={content.id} className={index > 0 ? 'mt-3' : ''}>
+            <SwipeableTimelineItem
+              item={content}
+              isFirstOfDay={index === 0}
+              onPress={handleItemPress}
+              onReopen={handleReopen}
+              onDelete={handleDelete}
+            />
+          </View>
+        ))}
+        <View className="mt-4 h-px bg-gray-200 dark:bg-gray-700" />
+      </View>
+    );
   };
 
   return (

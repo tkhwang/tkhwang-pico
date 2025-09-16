@@ -11,7 +11,7 @@ interface TimelineCardProps {
   onPress?: (item: UserContentWithDetails) => void;
 }
 
-function TimelineCard({ item, isFirstOfDay = false, onPress }: TimelineCardProps) {
+export function TimelineCard({ item, isFirstOfDay = false, onPress }: TimelineCardProps) {
   const content = item.contents;
 
   // Parse completed date
