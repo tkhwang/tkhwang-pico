@@ -110,7 +110,7 @@ function TimelineCard({ item, isFirstOfDay = false }: TimelineCardProps) {
               {content?.summary && (
                 <Text
                   className="mb-2 mt-1 text-xs text-gray-600 dark:text-gray-400"
-                  numberOfLines={2}>
+                  numberOfLines={3}>
                   {content.summary}
                 </Text>
               )}

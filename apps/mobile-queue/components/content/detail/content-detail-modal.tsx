@@ -209,7 +209,10 @@ export function ContentDetailModal({
                 {/* Content */}
                 <ScrollView className="px-4 py-4" showsVerticalScrollIndicator={false}>
                   {/* Title */}
-                  <Text className="mb-3 text-xl font-bold text-gray-900 dark:text-gray-100">
+                  <Text
+                    className="mb-3 text-xl font-bold text-gray-900 dark:text-gray-100"
+                    numberOfLines={3}
+                    adjustsFontSizeToFit={false}>
                     {content.title || 'Untitled'}
                   </Text>
 
