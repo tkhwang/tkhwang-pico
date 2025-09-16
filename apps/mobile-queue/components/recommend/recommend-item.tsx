@@ -97,7 +97,7 @@ export function RecommendItem({ recommendation, onPress }: RecommendItemProps) {
 
           {/* Summary */}
           {content.summary ? (
-            <Text className="mb-1 text-xs text-gray-600 dark:text-gray-400" numberOfLines={2}>
+            <Text className="mb-1 text-xs text-gray-600 dark:text-gray-400" numberOfLines={3}>
               {content.summary}
             </Text>
           ) : null}

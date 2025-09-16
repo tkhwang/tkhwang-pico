@@ -131,7 +131,7 @@ export function ContentItem({ item, onToggleComplete, onPress }: ContentItemProp
             {content.title || 'Untitled'}
           </Text>
           {content.summary ? (
-            <Text className="mb-1 text-xs text-gray-600 dark:text-gray-400" numberOfLines={2}>
+            <Text className="mb-1 text-xs text-gray-600 dark:text-gray-400" numberOfLines={3}>
               {content.summary}
             </Text>
           ) : null}
