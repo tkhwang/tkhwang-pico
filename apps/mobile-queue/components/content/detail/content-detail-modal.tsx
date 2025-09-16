@@ -6,7 +6,9 @@ import {
   TouchableOpacity,
   Alert,
   TouchableWithoutFeedback,
+  Platform,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text } from '@/components/ui/text';
 import { Icon } from '@/components/ui/icon';
 import {
@@ -55,6 +57,7 @@ export function ContentDetailModal({
   onNotInterested,
 }: ContentDetailModalProps) {
   const { openURL, deleteContent } = useContentActions();
+  const insets = useSafeAreaInsets();
 
   if (!item || !item.contents) {
     return null;
@@ -111,13 +114,16 @@ export function ContentDetailModal({
       animationType="slide"
       transparent={true}
       onRequestClose={onClose}
-      statusBarTranslucent>
+      statusBarTranslucent
+      presentationStyle="overFullScreen">
       {/* Ensure Modal's direct child is a View to avoid stray text nodes */}
       <View className="flex-1">
         <TouchableWithoutFeedback onPress={onClose}>
           <View className="flex-1 justify-end bg-black/50">
             <TouchableWithoutFeedback>
-              <View className="max-h-[90%] rounded-t-2xl bg-white dark:bg-gray-800">
+              <View
+                className="max-h-[90%] rounded-t-2xl bg-white dark:bg-gray-800"
+                style={{ paddingBottom: insets.bottom }}>
                 {/* Modal Handle */}
                 <View className="items-center py-2">
                   <View className="h-1 w-12 rounded-full bg-gray-300 dark:bg-gray-600" />
@@ -159,7 +165,9 @@ export function ContentDetailModal({
                   className="px-4 py-4"
                   showsVerticalScrollIndicator={false}
                   bounces={true}
-                  contentContainerStyle={{ paddingBottom: 20 }}>
+                  contentContainerStyle={{
+                    paddingBottom: Platform.OS === 'android' ? 60 + insets.bottom : 40,
+                  }}>
                   {/* Title */}
                   <Text
                     className="mb-3 text-xl font-bold text-gray-900 dark:text-gray-100"
