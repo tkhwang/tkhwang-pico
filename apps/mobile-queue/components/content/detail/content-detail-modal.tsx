@@ -144,21 +144,6 @@ export function ContentDetailModal({
     }
   };
 
-  const handleShare = async () => {
-    const url = content.canonical_url || content.url;
-    const title = content.title || 'Shared Content';
-
-    try {
-      await Share.share({
-        message: `${title}\n${url}`,
-        url: url,
-        title: title,
-      });
-    } catch (error) {
-      Alert.alert('Error', 'Failed to share content');
-    }
-  };
-
   return (
     <Modal
       visible={visible}
@@ -324,12 +309,12 @@ export function ContentDetailModal({
                           {/* Open in Browser Button */}
                           <TouchableOpacity
                             onPress={handleOpenURL}
-                            className="flex-1 items-center justify-center rounded-lg bg-blue-100 px-2 py-3 dark:bg-blue-900/30">
+                            className="flex-1 items-center justify-center rounded-lg bg-gray-100 px-2 py-3 dark:bg-gray-800">
                             <Icon
                               as={ExternalLink}
-                              className="mb-1 h-5 w-5 text-blue-600 dark:text-blue-400"
+                              className="mb-1 h-5 w-5 text-gray-600 dark:text-gray-400"
                             />
-                            <Text className="text-xs font-semibold text-blue-700 dark:text-blue-400">
+                            <Text className="text-xs font-semibold text-gray-700 dark:text-gray-400">
                               Open
                             </Text>
                           </TouchableOpacity>
@@ -378,12 +363,12 @@ export function ContentDetailModal({
                           {/* Open in Browser Button */}
                           <TouchableOpacity
                             onPress={handleOpenURL}
-                            className="flex-1 items-center justify-center rounded-lg bg-blue-100 px-2 py-3 dark:bg-blue-900/30">
+                            className="flex-1 items-center justify-center rounded-lg bg-gray-100 px-2 py-3 dark:bg-gray-800">
                             <Icon
                               as={ExternalLink}
-                              className="mb-1 h-5 w-5 text-blue-600 dark:text-blue-400"
+                              className="mb-1 h-5 w-5 text-gray-600 dark:text-gray-400"
                             />
-                            <Text className="text-xs font-semibold text-blue-700 dark:text-blue-400">
+                            <Text className="text-xs font-semibold text-gray-700 dark:text-gray-400">
                               Open
                             </Text>
                           </TouchableOpacity>
