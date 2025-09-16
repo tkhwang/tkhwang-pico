@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import { View, RefreshControl, ScrollView, Alert } from 'react-native';
+import { View, RefreshControl, ScrollView } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { useQueryClient } from '@tanstack/react-query';
 import { useUser } from '@clerk/clerk-expo';
@@ -10,6 +10,7 @@ import { ContentDetailModal } from '../content/detail/content-detail-modal';
 import { useRecommendations } from '@/hooks/queries/use-recommendations';
 import { useSaveContent } from '@/hooks/mutations/use-save-content';
 import { useDismissRecommendation } from '@/hooks/mutations/use-dismiss-recommendation';
+import { useSetContentPreference } from '@/hooks/mutations/use-content-preference';
 import { queryKey } from '@/hooks/keys/query-key';
 import type { Recommendation } from '@tkhwang-pico/common';
 
@@ -43,6 +44,9 @@ export function RecommendList() {
       }
     },
   });
+
+  const setPreferenceMutation = useSetContentPreference();
+
   const dismissRecommendationMutation = useDismissRecommendation();
 
   const onRefresh = useCallback(async () => {
@@ -77,18 +81,15 @@ export function RecommendList() {
     [saveContentMutation]
   );
 
-  const handleNotInterested = useCallback((contentId: string) => {
-    // TODO: Future implementation - will dismiss recommendation and update cache
-    // dismissRecommendationMutation.mutate(contentId);
-    // Also remove from local cache immediately for better UX
-    // if (user?.id) {
-    //   const key = queryKey.recommendations.byUserId(user.id);
-    //   queryClient.setQueryData(key, (oldData: Recommendation[] | undefined) => {
-    //     if (!oldData) return oldData;
-    //     return oldData.filter((rec) => rec.content_id !== contentId);
-    //   });
-    // }
-  }, []);
+  const handleNotInterested = useCallback(
+    (contentId: string) => {
+      setPreferenceMutation.mutate({
+        contentId,
+        preferenceType: 'not_interested',
+      });
+    },
+    [setPreferenceMutation]
+  );
 
   const renderItem = useCallback(
     ({ item }: { item: Recommendation }) => {
