@@ -41,10 +41,10 @@ export class IngestSummaryService {
           { role: 'system', content: systemPrompt },
           {
             role: 'user',
-            content: `Please summarize the following content:\n\n${content.substring(0, 3000)}`,
+            content: `Please summarize the following content:\n\n${content.substring(0, 8000)}`,
           },
         ],
-        max_tokens: 200,
+        max_tokens: 500,
         temperature: 0.5,
       });
 
@@ -85,7 +85,7 @@ export class IngestSummaryService {
           },
           {
             role: 'user',
-            content: text.substring(0, 2000),
+            content: text.substring(0, 4000),
           },
         ],
         max_tokens: 50,
@@ -120,7 +120,7 @@ export class IngestSummaryService {
     const norm = (rawLang ?? 'en').toLowerCase();
     const isKO = norm === 'ko' || norm.startsWith('ko-') || norm === 'kor';
     return isKO
-      ? '당신은 웹 콘텐츠를 요약하는 전문가입니다. 주어진 텍스트의 핵심 내용을 2-3문장으로 간결하게 요약해주세요.'
-      : 'You are an expert at summarizing web content. Summarize the key points of the given text in 2-3 sentences.';
+      ? '당신은 웹 콘텐츠를 요약하는 전문가입니다. 다음 내용을 5-7문장으로 상세히 요약해주세요. 주제와 목적, 핵심 주장이나 발견, 중요한 세부사항과 예시, 결론이나 시사점을 포함해주세요.'
+      : 'You are an expert at summarizing web content. Provide a comprehensive summary in 5-7 sentences covering: main topic and purpose, key arguments or findings, important details and examples, conclusions or implications.';
   }
 }
