@@ -166,7 +166,7 @@ export function ContentDetailModal({
                   showsVerticalScrollIndicator={false}
                   bounces={true}
                   contentContainerStyle={{
-                    paddingBottom: Platform.OS === 'android' ? 60 + insets.bottom : 40,
+                    paddingBottom: Platform.OS === 'android' ? 60 : 40,
                   }}>
                   {/* Title */}
                   <Text
