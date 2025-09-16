@@ -1,4 +1,4 @@
-import { createSupabaseClientWithClerkAuth } from '../../utils/supabase';
+import { createSupabaseClientWithClerkAuth } from '@/utils/supabase';
 import {
   PreferenceType,
   UserContentPreferenceTyped as UserContentPreference,
