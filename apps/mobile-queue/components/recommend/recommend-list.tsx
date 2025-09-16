@@ -9,7 +9,6 @@ import { RecommendListSkeleton } from './recommend-list-skeleton';
 import { ContentDetailModal } from '../content/detail/content-detail-modal';
 import { useRecommendations } from '@/hooks/queries/use-recommendations';
 import { useSaveContent } from '@/hooks/mutations/use-save-content';
-import { useDismissRecommendation } from '@/hooks/mutations/use-dismiss-recommendation';
 import { useSetContentPreference } from '@/hooks/mutations/use-content-preference';
 import { queryKey } from '@/hooks/keys/query-key';
 import type { Recommendation } from '@tkhwang-pico/common';
@@ -46,8 +45,6 @@ export function RecommendList() {
   });
 
   const setPreferenceMutation = useSetContentPreference();
-
-  const dismissRecommendationMutation = useDismissRecommendation();
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
