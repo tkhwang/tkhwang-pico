@@ -23,6 +23,7 @@ import {
   ThumbsUp,
   ThumbsDown,
   RotateCcw,
+  Sparkles,
 } from 'lucide-react-native';
 import { formatFullDate, formatReadingTimeWithSuffix } from '@/hooks/use-content-formatters';
 import { useContentActions } from '@/hooks/use-content-actions';
@@ -127,6 +128,7 @@ export function ContentDetailModal({
                   {isRecommendation ? (
                     // Recommendation mode header
                     <View className="flex-row items-center">
+                      <Icon as={Sparkles} className="mr-2 h-4 w-4 text-purple-500" />
                       <Text className="text-sm font-medium text-gray-700 dark:text-gray-300">
                         Recommendation
                       </Text>
@@ -166,17 +168,6 @@ export function ContentDetailModal({
                     {content.title || 'Untitled'}
                   </Text>
 
-                  {/* Thumbnail */}
-                  {thumbnailUrl && (
-                    <View className="mb-4 items-center">
-                      <ContentThumbnail
-                        imageUrl={thumbnailUrl}
-                        size="large"
-                        className="h-48 w-full"
-                      />
-                    </View>
-                  )}
-
                   {/* Metadata */}
                   <View className="mb-4 flex-row flex-wrap">
                     {content.domain && (
@@ -206,6 +197,17 @@ export function ContentDetailModal({
                         </View>
                       )}
                   </View>
+
+                  {/* Thumbnail */}
+                  {thumbnailUrl && (
+                    <View className="mb-4 items-center">
+                      <ContentThumbnail
+                        imageUrl={thumbnailUrl}
+                        size="large"
+                        className="h-48 w-full"
+                      />
+                    </View>
+                  )}
 
                   {/* Summary */}
                   {content.summary && (
