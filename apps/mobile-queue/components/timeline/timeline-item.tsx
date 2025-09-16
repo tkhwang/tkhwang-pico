@@ -1,8 +1,11 @@
 import React from 'react';
-import { View, TouchableOpacity, Linking, Image, Alert } from 'react-native';
+import { View, TouchableOpacity } from 'react-native';
 import { Text } from '@/components/ui/text';
 import { Icon } from '@/components/ui/icon';
-import { ClockIcon, ExternalLinkIcon, FileText } from 'lucide-react-native';
+import { ClockIcon, ExternalLinkIcon } from 'lucide-react-native';
+import { ContentThumbnail } from '@/components/content/sub/content-thumbnail';
+import { formatTimelineDate } from '@/hooks/use-content-formatters';
+import { useContentActions } from '@/hooks/use-content-actions';
 import type { UserContentWithDetails } from '@tkhwang-pico/common';
 
 interface TimelineCardProps {
@@ -12,44 +15,15 @@ interface TimelineCardProps {
 }
 
 export function TimelineCard({ item, isFirstOfDay = false, onPress }: TimelineCardProps) {
+  const { openURL } = useContentActions();
   const content = item.contents;
 
   // Parse completed date
-  const completedDate = item.completed_at ? new Date(item.completed_at) : null;
-  const dayOfWeek = completedDate
-    ? completedDate.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase()
-    : '';
-  const dayOfMonth = completedDate ? completedDate.getDate() : '';
-  const completedTime = completedDate
-    ? completedDate.toLocaleTimeString('en-US', {
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true,
-      })
-    : '';
+  const dateInfo = item.completed_at ? formatTimelineDate(item.completed_at) : null;
 
-  const handleLongPress = async () => {
+  const handleLongPress = () => {
     const url = content?.canonical_url || content?.url;
-    if (!url) {
-      Alert.alert('No URL', 'No URL available for this content');
-      return;
-    }
-    if (!/^https?:\/\//i.test(url)) {
-      Alert.alert('Unsafe URL', 'Only http(s) URLs are allowed.');
-      return;
-    }
-
-    try {
-      const isSupported = await Linking.canOpenURL(url);
-      if (isSupported) {
-        await Linking.openURL(url);
-      } else {
-        Alert.alert('Unable to open', `Cannot open URL: ${url}`);
-      }
-    } catch (error) {
-      Alert.alert('Error', 'Failed to open URL');
-      if (__DEV__) console.error('Error opening URL:', error);
-    }
+    openURL(url);
   };
 
   return (
@@ -65,10 +39,10 @@ export function TimelineCard({ item, isFirstOfDay = false, onPress }: TimelineCa
           {isFirstOfDay ? (
             <>
               <Text className="text-[10px] font-medium text-gray-500 dark:text-gray-400">
-                {dayOfWeek}
+                {dateInfo?.dayOfWeek}
               </Text>
               <Text className="text-xl font-bold text-gray-900 dark:text-gray-100">
-                {dayOfMonth}
+                {dateInfo?.dayOfMonth}
               </Text>
             </>
           ) : (
@@ -123,26 +97,23 @@ export function TimelineCard({ item, isFirstOfDay = false, onPress }: TimelineCa
               {/* Completed Time - aligned with thumbnail bottom */}
               <View className="mt-2 flex-row items-center">
                 <Icon as={ClockIcon} size={12} className="mr-1 text-gray-500 dark:text-gray-500" />
-                <Text className="text-xs text-gray-500 dark:text-gray-500">{completedTime}</Text>
+                <Text className="text-xs text-gray-500 dark:text-gray-500">{dateInfo?.time}</Text>
               </View>
             </View>
 
             {/* Thumbnail */}
             <View className="ml-3">
-              {content?.metadata &&
-              typeof content.metadata === 'object' &&
-              'image_url' in content.metadata &&
-              content.metadata.image_url ? (
-                <Image
-                  source={{ uri: content.metadata.image_url as string }}
-                  className="h-20 w-20 rounded-lg bg-gray-200 dark:bg-gray-700"
-                  resizeMode="cover"
-                />
-              ) : (
-                <View className="h-20 w-20 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-700">
-                  <Icon as={FileText} className="h-10 w-10 text-gray-400 dark:text-gray-600" />
-                </View>
-              )}
+              <ContentThumbnail
+                imageUrl={
+                  content?.metadata &&
+                  typeof content.metadata === 'object' &&
+                  'image_url' in content.metadata
+                    ? (content.metadata.image_url as string)
+                    : undefined
+                }
+                size="large"
+                className="rounded-lg"
+              />
             </View>
           </View>
         </View>

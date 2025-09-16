@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { View } from 'react-native';
 import { FAB } from '../fab';
 import { FabModal } from './fab-modal';
-import { ContentList } from '../content/content-list';
-import { ContentHeader } from '@/components/content/content-header';
+import { ContentList } from '../content/list/content-list';
+import { ContentHeader } from '@/components/content/sub/content-header';
 import type { TodoFilterType } from '@tkhwang-pico/common';
 
 export function Home() {

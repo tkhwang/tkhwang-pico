@@ -5,8 +5,6 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
-  Linking,
-  Share,
   TouchableWithoutFeedback,
 } from 'react-native';
 import { Text } from '@/components/ui/text';
@@ -17,7 +15,6 @@ import {
   CheckCircle,
   Circle,
   Trash2,
-  Share2,
   Clock,
   Calendar,
   Tag,
@@ -27,6 +24,9 @@ import {
   ThumbsDown,
   RotateCcw,
 } from 'lucide-react-native';
+import { formatFullDate, formatReadingTimeWithSuffix } from '@/hooks/use-content-formatters';
+import { useContentActions } from '@/hooks/use-content-actions';
+import { ContentTags } from '@/components/content/sub/content-tags';
 import type { UserContentWithDetails, Recommendation } from '@tkhwang-pico/common';
 
 interface ContentDetailModalProps {
@@ -42,23 +42,6 @@ interface ContentDetailModalProps {
   onNotInterested?: (contentId: string) => void;
 }
 
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
-  return new Intl.DateTimeFormat('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(date);
-};
-
-const formatReadingTime = (wordCount: number | null) => {
-  if (!wordCount || wordCount === 0) return '0 min read';
-  const minutes = Math.ceil(wordCount / 200);
-  return `${minutes} min read`;
-};
-
 export function ContentDetailModal({
   visible,
   item,
@@ -69,6 +52,8 @@ export function ContentDetailModal({
   onAddToQueue,
   onNotInterested,
 }: ContentDetailModalProps) {
+  const { openURL, deleteContent } = useContentActions();
+
   if (!item || !item.contents) {
     return null;
   }
@@ -85,19 +70,7 @@ export function ContentDetailModal({
   };
 
   const handleDelete = () => {
-    Alert.alert('Delete Content', 'Are you sure you want to delete this content?', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Delete',
-        style: 'destructive',
-        onPress: () => {
-          if (onDelete) {
-            onDelete(item.content_id);
-            onClose();
-          }
-        },
-      },
-    ]);
+    deleteContent(item.content_id, onDelete, onClose);
   };
 
   const handleAddToQueue = () => {
@@ -119,29 +92,9 @@ export function ContentDetailModal({
     }
   };
 
-  const handleOpenURL = async () => {
+  const handleOpenURL = () => {
     const url = content.canonical_url || content.url;
-    if (!url) {
-      Alert.alert('No URL', 'No URL available for this content');
-      return;
-    }
-
-    if (!/^https?:\/\//i.test(url)) {
-      Alert.alert('Unsafe URL', 'Only http(s) URLs are allowed.');
-      return;
-    }
-
-    try {
-      const supported = await Linking.canOpenURL(url);
-      if (supported) {
-        await Linking.openURL(url);
-        onClose(); // Dismiss modal after successfully opening URL
-      } else {
-        Alert.alert('Unable to open', `Cannot open URL: ${url}`);
-      }
-    } catch (error) {
-      Alert.alert('Error', 'Failed to open URL');
-    }
+    openURL(url, onClose);
   };
 
   return (
@@ -216,7 +169,7 @@ export function ContentDetailModal({
                       <View className="mb-2 mr-3 flex-row items-center">
                         <Icon as={Calendar} className="mr-1 h-3.5 w-3.5 text-gray-400" />
                         <Text className="text-xs text-gray-600 dark:text-gray-400">
-                          {formatDate(item.saved_at)}
+                          {formatFullDate(item.saved_at)}
                         </Text>
                       </View>
                     )}
@@ -226,7 +179,7 @@ export function ContentDetailModal({
                         <View className="mb-2 flex-row items-center">
                           <Icon as={Clock} className="mr-1 h-3.5 w-3.5 text-gray-400" />
                           <Text className="text-xs text-gray-600 dark:text-gray-400">
-                            {formatReadingTime(content.word_count)}
+                            {formatReadingTimeWithSuffix(content.word_count)}
                           </Text>
                         </View>
                       )}
@@ -271,17 +224,7 @@ export function ContentDetailModal({
                           Tags
                         </Text>
                       </View>
-                      <View className="flex-row flex-wrap">
-                        {content.tags.map((tag, index) => (
-                          <View
-                            key={index}
-                            className="mb-2 mr-2 rounded-full bg-gray-100 px-2.5 py-1 dark:bg-gray-800">
-                            <Text className="text-xs text-gray-500 dark:text-gray-400">
-                              {String(tag)}
-                            </Text>
-                          </View>
-                        ))}
-                      </View>
+                      <ContentTags tags={content.tags} maxTags={0} className="flex-row flex-wrap" />
                     </View>
                   )}
 

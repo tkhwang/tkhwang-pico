@@ -9,7 +9,7 @@ import Animated, {
   interpolate,
   Extrapolation,
 } from 'react-native-reanimated';
-import { TimelineCard } from './timeline-item';
+import { TimelineCard } from '../timeline-item';
 import { Icon } from '@/components/ui/icon';
 import { RotateCcw, Trash2 } from 'lucide-react-native';
 import type { UserContentWithDetails } from '@tkhwang-pico/common';
