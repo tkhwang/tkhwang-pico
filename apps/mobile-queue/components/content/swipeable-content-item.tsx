@@ -11,7 +11,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { ContentItem } from './content-item';
 import { Icon } from '@/components/ui/icon';
-import { Check, Trash2 } from 'lucide-react-native';
+import { Check, Trash2, RotateCcw } from 'lucide-react-native';
 import type { UserContentWithDetails } from '@tkhwang-pico/common';
 
 interface SwipeableContentItemProps {
@@ -41,8 +41,8 @@ export function SwipeableContentItem({
     velocity: 0,
   };
 
-  const triggerAction = (action: 'complete' | 'delete') => {
-    if (action === 'complete' && onToggleComplete) {
+  const triggerAction = (action: 'toggle' | 'delete') => {
+    if (action === 'toggle' && onToggleComplete) {
       onToggleComplete(item.id);
       translateX.value = withSpring(0, springConfig);
     }
@@ -92,8 +92,8 @@ export function SwipeableContentItem({
     .onEnd(() => {
       // Check if swipe passes threshold
       if (translateX.value > SWIPE_THRESHOLD) {
-        // Right swipe - Complete action
-        runOnJS(triggerAction)('complete');
+        // Right swipe - Toggle action
+        runOnJS(triggerAction)('toggle');
       } else if (translateX.value < -SWIPE_THRESHOLD) {
         // Left swipe - Delete action
         runOnJS(triggerAction)('delete');
@@ -165,14 +165,19 @@ export function SwipeableContentItem({
   // Type assertion for React 19 compatibility
   const AnimatedViewTyped = Animated.View as any;
 
+  // Dynamic colors and icons based on todo_status
+  const isCompleted = item.todo_status === 'completed';
+  const leftBgColor = isCompleted ? 'bg-blue-500' : 'bg-green-500';
+  const LeftIcon = isCompleted ? RotateCcw : Check;
+
   return (
     <View className="relative mb-2">
-      {/* Left Background - Complete (Green) - Only visible when swiping right */}
+      {/* Left Background - Toggle (Green for complete, Blue for reopen) - Only visible when swiping right */}
       <AnimatedViewTyped
-        className="absolute left-0 top-0 w-24 items-center justify-center rounded-l-lg bg-green-500"
+        className={`absolute left-0 top-0 w-24 items-center justify-center rounded-l-lg ${leftBgColor}`}
         style={leftContainerStyle}>
         <AnimatedViewTyped style={leftIconStyle}>
-          <Icon as={Check} className="h-6 w-6 text-white" />
+          <Icon as={LeftIcon} className="h-6 w-6 text-white" />
         </AnimatedViewTyped>
       </AnimatedViewTyped>
 
