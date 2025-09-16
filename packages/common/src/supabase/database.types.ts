@@ -14,42 +14,6 @@ export type Database = {
   };
   public: {
     Tables: {
-      co_visitation: {
-        Row: {
-          dst_content_id: string;
-          score: number;
-          src_content_id: string;
-          updated_at: string;
-        };
-        Insert: {
-          dst_content_id: string;
-          score: number;
-          src_content_id: string;
-          updated_at?: string;
-        };
-        Update: {
-          dst_content_id?: string;
-          score?: number;
-          src_content_id?: string;
-          updated_at?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "co_visitation_dst_content_id_fkey";
-            columns: ["dst_content_id"];
-            isOneToOne: false;
-            referencedRelation: "contents";
-            referencedColumns: ["id"];
-          },
-          {
-            foreignKeyName: "co_visitation_src_content_id_fkey";
-            columns: ["src_content_id"];
-            isOneToOne: false;
-            referencedRelation: "contents";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
       content_embeddings: {
         Row: {
           chunk_index: number | null;
@@ -83,35 +47,6 @@ export type Database = {
             foreignKeyName: "content_embeddings_content_id_fkey";
             columns: ["content_id"];
             isOneToOne: false;
-            referencedRelation: "contents";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
-      content_factors: {
-        Row: {
-          bias: number | null;
-          content_id: string;
-          factors: string;
-          updated_at: string;
-        };
-        Insert: {
-          bias?: number | null;
-          content_id: string;
-          factors: string;
-          updated_at?: string;
-        };
-        Update: {
-          bias?: number | null;
-          content_id?: string;
-          factors?: string;
-          updated_at?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "content_factors_content_id_fkey";
-            columns: ["content_id"];
-            isOneToOne: true;
             referencedRelation: "contents";
             referencedColumns: ["id"];
           },
@@ -266,72 +201,6 @@ export type Database = {
         };
         Relationships: [];
       };
-      recommendation_logs: {
-        Row: {
-          algo: string;
-          clicked_id: string | null;
-          converted_id: string | null;
-          id: number;
-          request_ctx: Json;
-          results: Json;
-          served_at: string;
-          user_id: string;
-        };
-        Insert: {
-          algo: string;
-          clicked_id?: string | null;
-          converted_id?: string | null;
-          id?: number;
-          request_ctx?: Json;
-          results: Json;
-          served_at?: string;
-          user_id: string;
-        };
-        Update: {
-          algo?: string;
-          clicked_id?: string | null;
-          converted_id?: string | null;
-          id?: number;
-          request_ctx?: Json;
-          results?: Json;
-          served_at?: string;
-          user_id?: string;
-        };
-        Relationships: [];
-      };
-      similar_items_cf: {
-        Row: {
-          content_id: string;
-          neighbor_id: string;
-          score: number;
-        };
-        Insert: {
-          content_id: string;
-          neighbor_id: string;
-          score: number;
-        };
-        Update: {
-          content_id?: string;
-          neighbor_id?: string;
-          score?: number;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "similar_items_cf_content_id_fkey";
-            columns: ["content_id"];
-            isOneToOne: false;
-            referencedRelation: "contents";
-            referencedColumns: ["id"];
-          },
-          {
-            foreignKeyName: "similar_items_cf_neighbor_id_fkey";
-            columns: ["neighbor_id"];
-            isOneToOne: false;
-            referencedRelation: "contents";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
       threads: {
         Row: {
           created_at: string;
@@ -359,40 +228,34 @@ export type Database = {
         };
         Relationships: [];
       };
-      user_content_interactions: {
+      user_content_preferences: {
         Row: {
           content_id: string;
           created_at: string;
-          dwell_ms: number | null;
-          id: number;
-          type: Database["public"]["Enums"]["interaction_type"];
+          id: string;
+          preference_type: string;
+          reason: string | null;
           user_id: string;
-          value: number | null;
-          weight: number | null;
         };
         Insert: {
           content_id: string;
           created_at?: string;
-          dwell_ms?: number | null;
-          id?: number;
-          type: Database["public"]["Enums"]["interaction_type"];
+          id?: string;
+          preference_type?: string;
+          reason?: string | null;
           user_id: string;
-          value?: number | null;
-          weight?: number | null;
         };
         Update: {
           content_id?: string;
           created_at?: string;
-          dwell_ms?: number | null;
-          id?: number;
-          type?: Database["public"]["Enums"]["interaction_type"];
+          id?: string;
+          preference_type?: string;
+          reason?: string | null;
           user_id?: string;
-          value?: number | null;
-          weight?: number | null;
         };
         Relationships: [
           {
-            foreignKeyName: "user_content_interactions_content_id_fkey";
+            foreignKeyName: "user_content_preferences_content_id_fkey";
             columns: ["content_id"];
             isOneToOne: false;
             referencedRelation: "contents";
@@ -463,27 +326,6 @@ export type Database = {
           embedding?: string;
           embedding_model?: string;
           source?: string;
-          updated_at?: string;
-          user_id?: string;
-        };
-        Relationships: [];
-      };
-      user_factors: {
-        Row: {
-          bias: number | null;
-          factors: string;
-          updated_at: string;
-          user_id: string;
-        };
-        Insert: {
-          bias?: number | null;
-          factors: string;
-          updated_at?: string;
-          user_id: string;
-        };
-        Update: {
-          bias?: number | null;
-          factors?: string;
           updated_at?: string;
           user_id?: string;
         };
@@ -572,7 +414,7 @@ export type Database = {
       };
       l2_normalize: {
         Args: { "": string } | { "": unknown } | { "": unknown };
-        Returns: unknown;
+        Returns: string;
       };
       recommend_feed: {
         Args: { p_lang?: string; p_limit?: number; p_model?: string };
@@ -607,13 +449,6 @@ export type Database = {
         Returns: {
           content_id: string;
           distance: number;
-        }[];
-      };
-      similar_to_content_cf: {
-        Args: { p_content_id: string; p_limit?: number };
-        Returns: {
-          neighbor_id: string;
-          score: number;
         }[];
       };
       sparsevec_out: {
@@ -657,16 +492,6 @@ export type Database = {
       content_status: "pending" | "ready" | "failed" | "archived";
       content_todo_status: "pending" | "completed";
       embedding_scope: "summary" | "chunk" | "title" | "tags";
-      interaction_type:
-        | "save"
-        | "open"
-        | "click"
-        | "like"
-        | "complete"
-        | "share"
-        | "archive"
-        | "dismiss"
-        | "rating";
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -800,17 +625,6 @@ export const Constants = {
       content_status: ["pending", "ready", "failed", "archived"],
       content_todo_status: ["pending", "completed"],
       embedding_scope: ["summary", "chunk", "title", "tags"],
-      interaction_type: [
-        "save",
-        "open",
-        "click",
-        "like",
-        "complete",
-        "share",
-        "archive",
-        "dismiss",
-        "rating",
-      ],
     },
   },
 } as const;

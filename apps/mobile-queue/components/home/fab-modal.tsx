@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   ScrollView,
@@ -9,6 +9,8 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  Keyboard,
+  TextInput,
 } from 'react-native';
 import { Text } from '@/components/ui/text';
 import { Input } from '../ui/input';
@@ -23,10 +25,12 @@ interface FabModalProps {
 
 export function FabModal({ visible, onClose, onSuccess }: FabModalProps) {
   const [url, setUrl] = useState('');
+  const inputRef = useRef<TextInput>(null);
 
   const saveContentMutation = useSaveContent({
     onSuccess: () => {
       setUrl('');
+      Keyboard.dismiss(); // Only dismiss keyboard on success
       onSuccess?.();
       onClose();
     },
@@ -45,11 +49,16 @@ export function FabModal({ visible, onClose, onSuccess }: FabModalProps) {
     saveContentMutation.mutate(url.trim());
   };
 
-  // Reset form when modal closes
+  // Reset form when modal closes, auto-focus when opens
   useEffect(() => {
     if (!visible) {
       setUrl('');
       saveContentMutation.reset();
+    } else {
+      // Auto-focus input when modal opens
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 100);
     }
   }, [visible]);
 
@@ -92,12 +101,22 @@ export function FabModal({ visible, onClose, onSuccess }: FabModalProps) {
                       Content URL
                     </Text>
                     <Input
+                      ref={inputRef}
                       value={url}
-                      onChangeText={setUrl}
+                      onChangeText={(text) => {
+                        setUrl(text);
+                        // Keep keyboard visible after paste
+                        setTimeout(() => {
+                          inputRef.current?.focus();
+                        }, 10);
+                      }}
                       placeholder="https://example.com/article"
                       className="h-12 rounded-lg border-gray-300 bg-gray-50 px-4 dark:border-gray-600 dark:bg-gray-800"
                       keyboardType="url"
                       autoCapitalize="none"
+                      autoFocus={true}
+                      returnKeyType="done"
+                      onSubmitEditing={handleSubmitUrl}
                     />
                   </View>
 

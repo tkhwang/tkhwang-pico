@@ -9,6 +9,7 @@
 drop policy if exists contents_select on public.contents;
 drop policy if exists user_contents_rw on public.user_contents;
 drop policy if exists user_embeddings_rw on public.user_embeddings;
+drop policy if exists user_preferences_rw on public.user_content_preferences;
 drop policy if exists debug_failed_contents_select on public.debug_failed_contents;
 
 -- Drop triggers first (before functions they depend on)
@@ -24,6 +25,7 @@ drop function if exists public.current_clerk_user_id();
 
 -- Drop tables (order matters due to foreign key constraints)
 drop table if exists public.debug_failed_contents cascade;
+drop table if exists public.user_content_preferences cascade;
 drop table if exists public.user_embeddings cascade;
 drop table if exists public.content_embeddings cascade;
 drop table if exists public.user_contents cascade;

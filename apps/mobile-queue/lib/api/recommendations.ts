@@ -28,16 +28,3 @@ export async function getRecommendations(
     token,
   });
 }
-
-/**
- * Dismiss a recommendation as not interested
- * @param token - Clerk auth token
- * @param contentId - Content ID to dismiss
- * @returns Promise<void>
- */
-export async function dismissRecommendation(token: string, contentId: string): Promise<void> {
-  return nestApi(`/users/recommendations/${contentId}/dismiss`, {
-    method: 'POST',
-    token,
-  });
-}

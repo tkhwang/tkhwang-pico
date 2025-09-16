@@ -115,6 +115,25 @@ create table if not exists public.user_embeddings (
 );
 
 -- ============================================================================
+-- User Content Preferences (사용자 콘텐츠 선호도)
+-- ============================================================================
+create table if not exists public.user_content_preferences (
+  id              uuid primary key default gen_random_uuid(),
+  user_id         text not null,  -- Clerk ID
+  content_id      uuid not null references public.contents(id) on delete cascade,
+  preference_type text not null default 'not_interested', -- 'liked', 'not_interested', 'blocked', etc.
+  reason          text,           -- optional reason for the preference
+  created_at      timestamptz not null default now(),
+  unique (user_id, content_id)
+);
+
+-- Indexes for efficient filtering
+create index if not exists idx_user_preferences_user on public.user_content_preferences(user_id);
+create index if not exists idx_user_preferences_content on public.user_content_preferences(content_id);
+create index if not exists idx_user_preferences_type on public.user_content_preferences(preference_type);
+create index if not exists idx_user_preferences_user_created on public.user_content_preferences(user_id, created_at DESC);
+
+-- ============================================================================
 -- Debug Failed Contents (fetch 실패한 URL 정보)
 -- ============================================================================
 create table if not exists public.debug_failed_contents (
@@ -185,6 +204,7 @@ alter table public.contents enable row level security;
 alter table public.user_contents enable row level security;
 alter table public.content_embeddings enable row level security;
 alter table public.user_embeddings enable row level security;
+alter table public.user_content_preferences enable row level security;
 alter table public.debug_failed_contents enable row level security;
 
 -- 권한 최소화
@@ -192,12 +212,14 @@ revoke all on public.contents from anon, authenticated;
 revoke all on public.content_embeddings from anon, authenticated;
 revoke all on public.user_contents from anon, authenticated;
 revoke all on public.user_embeddings from anon, authenticated;
+revoke all on public.user_content_preferences from anon, authenticated;
 revoke all on public.debug_failed_contents from anon, authenticated;
 
 -- 필요한 최소 권한 (RLS가 최종 필터링)
 grant select on public.contents to authenticated, anon;         -- 전역 read only
 grant select, insert, update, delete on public.user_contents to authenticated;
 grant select, insert, update, delete on public.user_embeddings to authenticated;
+grant select, insert, update, delete on public.user_content_preferences to authenticated;
 grant select on public.debug_failed_contents to authenticated;
 
 -- RLS Policies
@@ -217,6 +239,13 @@ with check (user_id = public.current_clerk_user_id());
 -- user_embeddings: 본인만
 drop policy if exists user_embeddings_rw on public.user_embeddings;
 create policy user_embeddings_rw on public.user_embeddings
+for all to authenticated
+using (user_id = public.current_clerk_user_id())
+with check (user_id = public.current_clerk_user_id());
+
+-- user_content_preferences: 본인만 접근/수정
+drop policy if exists user_preferences_rw on public.user_content_preferences;
+create policy user_preferences_rw on public.user_content_preferences
 for all to authenticated
 using (user_id = public.current_clerk_user_id())
 with check (user_id = public.current_clerk_user_id());
@@ -257,7 +286,7 @@ $$;
 revoke all on function public.similar_to_content(uuid,int,text) from public;
 grant execute on function public.similar_to_content(uuid,int,text) to authenticated, anon;
 
--- 개인화 피드: 내가 저장한 것은 제외
+-- 개인화 피드: 내가 저장한 것과 관심 없는 것은 제외
 create or replace function public.recommend_feed(
   p_limit int default 20,
   p_model text default null,
@@ -287,7 +316,12 @@ language sql security definer set search_path=public as $$
   from base b
   left join public.user_contents uc
     on uc.content_id = b.content_id and uc.user_id = (select uid from me)
+  left join public.user_content_preferences ucp
+    on ucp.content_id = b.content_id
+    and ucp.user_id = (select uid from me)
+    and ucp.preference_type in ('not_interested', 'blocked')
   where uc.id is null  -- 이미 저장한 콘텐츠는 제외
+    and ucp.id is null  -- 관심 없음/차단된 콘텐츠도 제외
   order by b.distance
   limit greatest(1, p_limit);
 $$;
