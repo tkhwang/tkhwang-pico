@@ -69,7 +69,7 @@ export function ContentItem({ item, onToggleComplete, onPress }: ContentItemProp
 
   return (
     <BaseContentCard
-      title={content.title}
+      title={content.title ?? content.url}
       summary={content.summary || undefined}
       note={item.note || undefined}
       tags={content.tags || undefined}
