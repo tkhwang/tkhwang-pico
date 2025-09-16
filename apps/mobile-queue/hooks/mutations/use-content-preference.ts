@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth, useUser } from '@clerk/clerk-expo';
 import { Alert } from 'react-native';
-import { setContentPreference, togglePreference } from '@/lib/supabase/preferences';
+import { setContentPreference } from '@/lib/supabase/preferences';
 import { queryKey } from '@/hooks/keys/query-key';
 import type { PreferenceType, Recommendation } from '@tkhwang-pico/common';
 
@@ -75,7 +75,7 @@ export function useSetContentPreference(options?: UseSetContentPreferenceOptions
       options?.onError?.(error);
     },
 
-    onSuccess: (_data, variables) => {
+    onSuccess: () => {
       // Could invalidate related queries if needed
       // For now, the optimistic update handles the UI change
 
