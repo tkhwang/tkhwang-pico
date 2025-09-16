@@ -20,3 +20,18 @@ export interface Recommendation {
   score: number;
   contents?: Content;
 }
+
+// User Content Preferences types
+export type PreferenceType = "liked" | "not_interested" | "blocked";
+
+export type UserContentPreference =
+  Database["public"]["Tables"]["user_content_preferences"]["Row"];
+
+export type UserContentPreferenceInsert =
+  Database["public"]["Tables"]["user_content_preferences"]["Insert"];
+
+// Type-safe preference with proper enum
+export interface UserContentPreferenceTyped
+  extends Omit<UserContentPreference, "preference_type"> {
+  preference_type: PreferenceType;
+}
