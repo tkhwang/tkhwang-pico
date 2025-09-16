@@ -45,27 +45,8 @@ export function SwipeableTimelineItem({
 
   const triggerAction = (action: 'reopen' | 'delete') => {
     if (action === 'reopen' && onReopen) {
-      Alert.alert(
-        'Move to Reading List',
-        'Do you want to move this content back to your reading list?',
-        [
-          {
-            text: 'Cancel',
-            style: 'cancel',
-            onPress: () => {
-              translateX.value = withSpring(0, springConfig);
-            },
-          },
-          {
-            text: 'Move',
-            style: 'default',
-            onPress: () => {
-              onReopen(item.id);
-              translateX.value = withSpring(0, springConfig);
-            },
-          },
-        ]
-      );
+      onReopen(item.id);
+      translateX.value = withSpring(0, springConfig);
       return;
     }
     if (action === 'delete' && onDelete) {

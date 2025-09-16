@@ -5,7 +5,7 @@ import { Text } from '@/components/ui/text';
 import { SwipeableTimelineItem } from './swipeable-timeline-item';
 import { useUserContents } from '@/hooks/queries/use-user-contents';
 import { useDeleteContent } from '@/hooks/mutations/use-delete-content';
-import { useUpdateUserContent } from '@/hooks/mutations/use-update-user-content';
+import { useReopenContent } from '@/hooks/mutations/use-reopen-content';
 import type { UserContentWithDetails } from '@tkhwang-pico/common';
 import { TimelineListSkeleton } from '@/components/timeline/timeline-list-skeleton';
 import { ContentDetailModal } from '@/components/content/detail/content-detail-modal';
@@ -23,7 +23,7 @@ export function TimelineList() {
   const [modalVisible, setModalVisible] = useState(false);
 
   const deleteContentMutation = useDeleteContent();
-  const updateContentMutation = useUpdateUserContent();
+  const reopenContentMutation = useReopenContent();
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -46,12 +46,9 @@ export function TimelineList() {
 
   const handleReopen = useCallback(
     (id: string) => {
-      updateContentMutation.mutate({
-        id,
-        todo_status: 'pending',
-      });
+      reopenContentMutation.mutate(id);
     },
-    [updateContentMutation]
+    [reopenContentMutation]
   );
 
   const handleDelete = useCallback(
