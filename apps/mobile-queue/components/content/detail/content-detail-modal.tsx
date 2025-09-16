@@ -25,6 +25,7 @@ import {
   FileText,
   ThumbsUp,
   ThumbsDown,
+  RotateCcw,
 } from 'lucide-react-native';
 import type { UserContentWithDetails, Recommendation } from '@tkhwang-pico/common';
 
@@ -353,21 +354,21 @@ export function ContentDetailModal({
                             onPress={handleToggleComplete}
                             className={`flex-1 items-center justify-center rounded-lg px-2 py-3 ${
                               isCompleted
-                                ? 'bg-gray-100 dark:bg-gray-800'
+                                ? 'bg-blue-100 dark:bg-blue-900/30'
                                 : 'bg-green-100 dark:bg-green-900/30'
                             }`}>
                             <Icon
-                              as={isCompleted ? Circle : CheckCircle}
+                              as={isCompleted ? RotateCcw : CheckCircle}
                               className={`mb-1 h-5 w-5 ${
                                 isCompleted
-                                  ? 'text-gray-500 dark:text-gray-400'
+                                  ? 'text-blue-600 dark:text-blue-400'
                                   : 'text-green-600 dark:text-green-500'
                               }`}
                             />
                             <Text
                               className={`text-xs font-semibold ${
                                 isCompleted
-                                  ? 'text-gray-600 dark:text-gray-400'
+                                  ? 'text-blue-700 dark:text-blue-400'
                                   : 'text-green-700 dark:text-green-400'
                               }`}>
                               {isCompleted ? 'Pending' : 'Complete'}

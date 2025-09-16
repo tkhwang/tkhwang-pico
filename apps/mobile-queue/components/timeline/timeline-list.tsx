@@ -6,6 +6,7 @@ import { SwipeableTimelineItem } from './swipeable-timeline-item';
 import { useUserContents } from '@/hooks/queries/use-user-contents';
 import { useDeleteContent } from '@/hooks/mutations/use-delete-content';
 import { useReopenContent } from '@/hooks/mutations/use-reopen-content';
+import { useToggleContent } from '@/hooks/mutations/use-toggle-content';
 import type { UserContentWithDetails } from '@tkhwang-pico/common';
 import { TimelineListSkeleton } from '@/components/timeline/timeline-list-skeleton';
 import { ContentDetailModal } from '@/components/content/detail/content-detail-modal';
@@ -24,6 +25,7 @@ export function TimelineList() {
 
   const deleteContentMutation = useDeleteContent();
   const reopenContentMutation = useReopenContent();
+  const toggleContentMutation = useToggleContent();
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -56,6 +58,14 @@ export function TimelineList() {
       deleteContentMutation.mutate(contentId);
     },
     [deleteContentMutation]
+  );
+
+  const handleToggleComplete = useCallback(
+    (id: string) => {
+      toggleContentMutation.mutate(id);
+      handleModalClose(); // Close modal after toggle
+    },
+    [toggleContentMutation, handleModalClose]
   );
 
   // Group contents by date
@@ -181,7 +191,13 @@ export function TimelineList() {
         }
       />
       {selectedItem && (
-        <ContentDetailModal visible={modalVisible} item={selectedItem} onClose={handleModalClose} />
+        <ContentDetailModal
+          visible={modalVisible}
+          item={selectedItem}
+          onClose={handleModalClose}
+          onToggleComplete={handleToggleComplete}
+          onDelete={handleDelete}
+        />
       )}
     </View>
   );
