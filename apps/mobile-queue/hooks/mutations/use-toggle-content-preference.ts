@@ -31,7 +31,17 @@ export function useToggleContentPreference(options?: UseToggleContentPreferenceO
   const { getToken } = useAuth();
   const { user } = useUser();
 
-  return useMutation<TogglePreferenceResult, Error, ToggleContentPreferenceParams, { previousUserContents?: Array<{ queryKey: readonly unknown[]; data: UserContentWithDetails[] | undefined }> }>({
+  return useMutation<
+    TogglePreferenceResult,
+    Error,
+    ToggleContentPreferenceParams,
+    {
+      previousUserContents?: Array<{
+        queryKey: readonly unknown[];
+        data: UserContentWithDetails[] | undefined;
+      }>;
+    }
+  >({
     mutationFn: async ({ contentId, preferenceType, reason }) => {
       const token = await getToken();
       if (!token) throw new Error('Authentication token not available');
@@ -108,7 +118,7 @@ export function useToggleContentPreference(options?: UseToggleContentPreferenceO
 
     onError: (error, _variables, context) => {
       console.error('Failed to toggle content preference:', error);
-      Alert.alert('오류', '선호도 설정 중 문제가 발생했습니다.', [{ text: '확인' }]);
+      Alert.alert('Error', 'An error occurred while setting your preference.', [{ text: 'OK' }]);
 
       if (context?.previousUserContents) {
         context.previousUserContents.forEach(({ queryKey: key, data }) => {
