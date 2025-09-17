@@ -54,10 +54,19 @@ export const ACTION_STYLES = {
     label: 'Delete',
   },
   reopen: {
-    container: 'bg-purple-50 dark:bg-purple-950/20',
-    icon: 'text-purple-500 dark:text-purple-300',
-    text: 'text-purple-500 dark:text-purple-300',
-    label: 'Reopen',
+    default: {
+      container: 'bg-purple-50 dark:bg-purple-950/20',
+      icon: 'text-purple-500 dark:text-purple-300',
+      text: 'text-purple-500 dark:text-purple-300',
+      label: 'Reopen',
+    },
+    success: {
+      container: 'bg-purple-500',
+      wrapper: 'shadow-lg shadow-purple-500/20',
+      icon: 'text-white',
+      text: 'text-white',
+      label: 'Reopened!',
+    },
   },
   open: {
     container: 'bg-gray-100 dark:bg-gray-800',
@@ -142,9 +151,9 @@ export const DELETE_STYLES = {
 
 // Reopen action styles (for swipe components)
 export const REOPEN_STYLES = {
-  bg: ACTION_STYLES.reopen.container,
-  icon: ACTION_STYLES.reopen.icon,
-  text: ACTION_STYLES.reopen.text,
+  bg: ACTION_STYLES.reopen.default.container,
+  icon: ACTION_STYLES.reopen.default.icon,
+  text: ACTION_STYLES.reopen.default.text,
 } as const;
 
 // Recommend swipe action styles

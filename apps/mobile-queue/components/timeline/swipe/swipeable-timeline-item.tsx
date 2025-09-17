@@ -4,7 +4,7 @@ import { GestureDetector } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
 import { TimelineCard } from '../timeline-item';
 import { Icon } from '@/components/ui/icon';
-import { RotateCcw, Trash2, Heart } from 'lucide-react-native';
+import { RotateCcw, Trash2, Heart, Circle } from 'lucide-react-native';
 import type { UserContentWithDetails } from '@tkhwang-pico/common';
 import { Text } from '@/components/ui/text';
 import { useSwipeableItem } from '@/hooks/use-swipeable-item';
@@ -56,10 +56,9 @@ export function SwipeableTimelineItem({
     swipeDamping: SWIPE_MENU_DAMPING,
   });
 
-  const handleReopen = () => {
-    onReopen?.(item.id);
-    close();
-  };
+  const handleReopen = useCallback(() => {
+    executeWithFeedback('reopen', () => onReopen?.(item.id), close);
+  }, [executeWithFeedback, item.id, onReopen, close]);
 
   const handleLike = useCallback(() => {
     executeWithFeedback('like', () => onLike?.(item.content_id), close);
@@ -114,7 +113,20 @@ export function SwipeableTimelineItem({
             text: ACTION_STYLES.like.unliked.text,
             label: ACTION_STYLES.like.unliked.label,
           };
-  const leftReopenStyles = REOPEN_STYLES;
+  const leftReopenStyles =
+    actionCompleted === 'reopen'
+      ? {
+          bg: ACTION_STYLES.reopen.success.container,
+          icon: ACTION_STYLES.reopen.success.icon,
+          text: ACTION_STYLES.reopen.success.text,
+          label: ACTION_STYLES.reopen.success.label,
+        }
+      : {
+          bg: ACTION_STYLES.reopen.default.container,
+          icon: ACTION_STYLES.reopen.default.icon,
+          text: ACTION_STYLES.reopen.default.text,
+          label: ACTION_STYLES.reopen.default.label,
+        };
   const rightStyles = DELETE_STYLES;
 
   const AnimatedViewTyped = Animated.View as any;
@@ -144,12 +156,18 @@ export function SwipeableTimelineItem({
           <TouchableOpacity
             activeOpacity={0.8}
             onPress={handleReopen}
+            disabled={isProcessing}
             className={`items-center justify-center ${leftReopenStyles.bg}`}
             style={{ width: TIMELINE_LEFT_ACTION_WIDTH / 2 }}>
             <AnimatedViewTyped style={leftIconStyle}>
-              <Icon as={RotateCcw} className={`h-6 w-6 ${leftReopenStyles.icon}`} />
+              <Icon
+                as={actionCompleted === 'reopen' ? Circle : RotateCcw}
+                className={`h-6 w-6 ${leftReopenStyles.icon}`}
+              />
             </AnimatedViewTyped>
-            <Text className={`mt-1 text-xs font-semibold ${leftReopenStyles.text}`}>Reopen</Text>
+            <Text className={`mt-1 text-xs font-semibold ${leftReopenStyles.text}`}>
+              {leftReopenStyles.label}
+            </Text>
           </TouchableOpacity>
         </View>
       </AnimatedViewTyped>
