@@ -39,6 +39,13 @@ export const ACTION_STYLES = {
       text: 'text-purple-600 dark:text-purple-400',
       label: 'Complete',
     },
+    success: {
+      container: 'bg-purple-500',
+      wrapper: 'shadow-lg shadow-purple-500/20',
+      icon: 'text-white',
+      text: 'text-white',
+      label: 'Done!',
+    },
   },
   delete: {
     container: 'bg-red-100 dark:bg-red-900/30',
