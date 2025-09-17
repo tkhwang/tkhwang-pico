@@ -208,8 +208,8 @@ export const MODAL_ACTION_STYLES = {
     text: ACTION_STYLES.addToQueue.default.text,
   },
   notInterested: {
-    container: 'bg-orange-100 dark:bg-orange-900/30',
-    icon: 'text-orange-600 dark:text-orange-400',
-    text: 'text-orange-600 dark:text-orange-400',
+    container: ACTION_STYLES.notInterested.default.container,
+    icon: ACTION_STYLES.notInterested.default.icon,
+    text: ACTION_STYLES.notInterested.default.text,
   },
 } as const;
