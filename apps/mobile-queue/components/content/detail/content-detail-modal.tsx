@@ -63,10 +63,11 @@ export function ContentDetailModal({
   const isAndroid = Platform.OS === 'android';
   const sheetBottomOffset = 0;
   const desiredSheetHeight = screenHeight * 0.7;
-  const sheetHeight =
-    isAndroid ? Math.max(desiredSheetHeight - sheetBottomOffset, desiredSheetHeight * 0.5) : undefined;
+  const sheetHeight = isAndroid
+    ? Math.max(desiredSheetHeight - sheetBottomOffset, desiredSheetHeight * 0.5)
+    : undefined;
   const sheetPaddingBottom = insets.bottom + (isAndroid ? 24 : 16);
-  const scrollContentPaddingBottom = 40 + sheetPaddingBottom;
+  const scrollContentPaddingBottom = 16;
 
   if (!item || !item.contents) {
     return null;
@@ -131,7 +132,8 @@ export function ContentDetailModal({
         <Pressable
           onPress={onClose}
           style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
-          className="bg-black/50" />
+          className="bg-black/50"
+        />
 
         {/* Content Container */}
         <View
@@ -143,9 +145,7 @@ export function ContentDetailModal({
             maxHeight: desiredSheetHeight,
             height: sheetHeight,
           }}>
-          <View
-            className="flex-1 rounded-t-2xl bg-white dark:bg-gray-800"
-            style={{ paddingBottom: sheetPaddingBottom }}>
+          <View className="flex-1 rounded-t-2xl bg-white dark:bg-gray-800">
             {/* Modal Handle */}
             <View className="items-center py-2">
               <View className="h-1 w-12 rounded-full bg-gray-300 dark:bg-gray-600" />
@@ -191,210 +191,202 @@ export function ContentDetailModal({
               contentContainerStyle={{
                 paddingBottom: scrollContentPaddingBottom,
               }}>
-                  {/* Title */}
-                  <Text
-                    className="mb-3 text-xl font-bold text-gray-900 dark:text-gray-100"
-                    numberOfLines={3}
-                    adjustsFontSizeToFit={false}>
-                    {content.title || 'Untitled'}
-                  </Text>
+              {/* Title */}
+              <Text
+                className="mb-3 text-xl font-bold text-gray-900 dark:text-gray-100"
+                numberOfLines={3}
+                adjustsFontSizeToFit={false}>
+                {content.title || 'Untitled'}
+              </Text>
 
-                  {/* Metadata */}
-                  <View className="mb-4 flex-row flex-wrap">
-                    {content.domain && (
-                      <View className="mb-2 mr-3 flex-row items-center">
-                        <Icon as={Globe} className="mr-1 h-3.5 w-3.5 text-gray-400" />
-                        <Text className="text-xs text-gray-600 dark:text-gray-400">
-                          {content.domain}
-                        </Text>
-                      </View>
-                    )}
-                    {'saved_at' in item && item.saved_at && (
-                      <View className="mb-2 mr-3 flex-row items-center">
-                        <Icon as={Calendar} className="mr-1 h-3.5 w-3.5 text-gray-400" />
-                        <Text className="text-xs text-gray-600 dark:text-gray-400">
-                          {formatFullDate(item.saved_at)}
-                        </Text>
-                      </View>
-                    )}
-                    {content.word_count !== null &&
-                      content.word_count !== undefined &&
-                      content.word_count > 0 && (
-                        <View className="mb-2 flex-row items-center">
-                          <Icon as={Clock} className="mr-1 h-3.5 w-3.5 text-gray-400" />
-                          <Text className="text-xs text-gray-600 dark:text-gray-400">
-                            {formatReadingTimeWithSuffix(content.word_count)}
-                          </Text>
-                        </View>
-                      )}
-                  </View>
-
-                  {/* Thumbnail */}
-                  {thumbnailUrl && (
-                    <View className="mb-4 items-center">
-                      <ContentThumbnail
-                        imageUrl={thumbnailUrl}
-                        size="large"
-                        className="h-48 w-full"
-                      />
-                    </View>
-                  )}
-
-                  {/* Summary */}
-                  {content.summary && (
-                    <View className="mb-4">
-                      <Text className="mb-1.5 text-sm font-semibold text-gray-700 dark:text-gray-300">
-                        Summary
-                      </Text>
-                      <Text className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
-                        {content.summary}
-                      </Text>
-                    </View>
-                  )}
-
-                  {/* Note - only for UserContentWithDetails */}
-                  {'note' in item && item.note && (
-                    <View className="mb-4 rounded-lg bg-blue-50 p-3 dark:bg-blue-900/20">
-                      <View className="mb-1 flex-row items-center">
-                        <Icon
-                          as={FileText}
-                          className="mr-1 h-3.5 w-3.5 text-blue-600 dark:text-blue-400"
-                        />
-                        <Text className="text-xs font-semibold text-blue-600 dark:text-blue-400">
-                          Note
-                        </Text>
-                      </View>
-                      <Text className="text-sm italic text-gray-700 dark:text-gray-300">
-                        {item.note}
-                      </Text>
-                    </View>
-                  )}
-
-                  {/* Tags (from content) */}
-                  {content.tags && content.tags.length > 0 && (
-                    <View className="mb-4">
-                      <View className="mb-2 flex-row items-center">
-                        <Icon as={Tag} className="mr-1 h-3.5 w-3.5 text-gray-400" />
-                        <Text className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                          Tags
-                        </Text>
-                      </View>
-                      <ContentTags
-                        tags={content.tags}
-                        expandable={true}
-                        initialMaxTags={6}
-                        className="flex-row flex-wrap"
-                      />
-                    </View>
-                  )}
-
-                  {/* Actions Section */}
-                  <View className="mb-4">
-                    <Text className="mb-3 text-sm font-semibold text-gray-700 dark:text-gray-300">
-                      Actions
+              {/* Metadata */}
+              <View className="mb-4 flex-row flex-wrap">
+                {content.domain && (
+                  <View className="mb-2 mr-3 flex-row items-center">
+                    <Icon as={Globe} className="mr-1 h-3.5 w-3.5 text-gray-400" />
+                    <Text className="text-xs text-gray-600 dark:text-gray-400">
+                      {content.domain}
                     </Text>
-                    <View className="flex-row gap-2">
-                      {isRecommendation ? (
-                        <>
-                          {/* Add to Queue Button */}
-                          <TouchableOpacity
-                            onPress={handleAddToQueue}
-                            className="flex-1 items-center justify-center rounded-lg bg-green-100 px-2 py-3 dark:bg-green-900/30">
-                            <Icon
-                              as={ThumbsUp}
-                              className="mb-1 h-5 w-5 text-green-600 dark:text-green-400"
-                            />
-                            <Text className="text-xs font-semibold text-green-700 dark:text-green-400">
-                              Add to Queue
-                            </Text>
-                          </TouchableOpacity>
-
-                          {/* Open in Browser Button */}
-                          <TouchableOpacity
-                            onPress={handleOpenURL}
-                            className="flex-1 items-center justify-center rounded-lg bg-gray-100 px-2 py-3 dark:bg-gray-800">
-                            <Icon
-                              as={ExternalLink}
-                              className="mb-1 h-5 w-5 text-gray-600 dark:text-gray-400"
-                            />
-                            <Text className="text-xs font-semibold text-gray-700 dark:text-gray-400">
-                              Open
-                            </Text>
-                          </TouchableOpacity>
-
-                          {/* Not Interested Button */}
-                          <TouchableOpacity
-                            onPress={handleNotInterested}
-                            className="flex-1 items-center justify-center rounded-lg bg-red-100 px-2 py-3 dark:bg-red-900/30">
-                            <Icon
-                              as={ThumbsDown}
-                              className="mb-1 h-5 w-5 text-red-600 dark:text-red-400"
-                            />
-                            <Text className="text-xs font-semibold text-red-700 dark:text-red-400">
-                              Not Interested
-                            </Text>
-                          </TouchableOpacity>
-                        </>
-                      ) : (
-                        <>
-                          {/* Toggle Complete Button */}
-                          <TouchableOpacity
-                            onPress={handleToggleComplete}
-                            className={`flex-1 items-center justify-center rounded-lg px-2 py-3 ${
-                              isCompleted
-                                ? 'bg-blue-100 dark:bg-blue-900/30'
-                                : 'bg-green-100 dark:bg-green-900/30'
-                            }`}>
-                            <Icon
-                              as={isCompleted ? RotateCcw : CheckCircle}
-                              className={`mb-1 h-5 w-5 ${
-                                isCompleted
-                                  ? 'text-blue-600 dark:text-blue-400'
-                                  : 'text-green-600 dark:text-green-500'
-                              }`}
-                            />
-                            <Text
-                              className={`text-xs font-semibold ${
-                                isCompleted
-                                  ? 'text-blue-700 dark:text-blue-400'
-                                  : 'text-green-700 dark:text-green-400'
-                              }`}>
-                              {isCompleted ? 'Pending' : 'Complete'}
-                            </Text>
-                          </TouchableOpacity>
-
-                          {/* Open in Browser Button */}
-                          <TouchableOpacity
-                            onPress={handleOpenURL}
-                            className="flex-1 items-center justify-center rounded-lg bg-gray-100 px-2 py-3 dark:bg-gray-800">
-                            <Icon
-                              as={ExternalLink}
-                              className="mb-1 h-5 w-5 text-gray-600 dark:text-gray-400"
-                            />
-                            <Text className="text-xs font-semibold text-gray-700 dark:text-gray-400">
-                              Open
-                            </Text>
-                          </TouchableOpacity>
-
-                          {/* Delete Button */}
-                          <TouchableOpacity
-                            onPress={handleDelete}
-                            className="flex-1 items-center justify-center rounded-lg bg-red-100 px-2 py-3 dark:bg-red-900/30">
-                            <Icon
-                              as={Trash2}
-                              className="mb-1 h-5 w-5 text-red-600 dark:text-red-400"
-                            />
-                            <Text className="text-xs font-semibold text-red-700 dark:text-red-400">
-                              Delete
-                            </Text>
-                          </TouchableOpacity>
-                        </>
-                      )}
-                    </View>
                   </View>
-                </ScrollView>
+                )}
+                {'saved_at' in item && item.saved_at && (
+                  <View className="mb-2 mr-3 flex-row items-center">
+                    <Icon as={Calendar} className="mr-1 h-3.5 w-3.5 text-gray-400" />
+                    <Text className="text-xs text-gray-600 dark:text-gray-400">
+                      {formatFullDate(item.saved_at)}
+                    </Text>
+                  </View>
+                )}
+                {content.word_count !== null &&
+                  content.word_count !== undefined &&
+                  content.word_count > 0 && (
+                    <View className="mb-2 flex-row items-center">
+                      <Icon as={Clock} className="mr-1 h-3.5 w-3.5 text-gray-400" />
+                      <Text className="text-xs text-gray-600 dark:text-gray-400">
+                        {formatReadingTimeWithSuffix(content.word_count)}
+                      </Text>
+                    </View>
+                  )}
               </View>
+
+              {/* Thumbnail */}
+              {thumbnailUrl && (
+                <View className="mb-4 items-center">
+                  <ContentThumbnail imageUrl={thumbnailUrl} size="large" className="h-48 w-full" />
+                </View>
+              )}
+
+              {/* Summary */}
+              {content.summary && (
+                <View className="mb-4">
+                  <Text className="mb-1.5 text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    Summary
+                  </Text>
+                  <Text className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+                    {content.summary}
+                  </Text>
+                </View>
+              )}
+
+              {/* Note - only for UserContentWithDetails */}
+              {'note' in item && item.note && (
+                <View className="mb-4 rounded-lg bg-blue-50 p-3 dark:bg-blue-900/20">
+                  <View className="mb-1 flex-row items-center">
+                    <Icon
+                      as={FileText}
+                      className="mr-1 h-3.5 w-3.5 text-blue-600 dark:text-blue-400"
+                    />
+                    <Text className="text-xs font-semibold text-blue-600 dark:text-blue-400">
+                      Note
+                    </Text>
+                  </View>
+                  <Text className="text-sm italic text-gray-700 dark:text-gray-300">
+                    {item.note}
+                  </Text>
+                </View>
+              )}
+
+              {/* Tags (from content) */}
+              {content.tags && content.tags.length > 0 && (
+                <View className="mb-4">
+                  <View className="mb-2 flex-row items-center">
+                    <Icon as={Tag} className="mr-1 h-3.5 w-3.5 text-gray-400" />
+                    <Text className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                      Tags
+                    </Text>
+                  </View>
+                  <ContentTags
+                    tags={content.tags}
+                    expandable={true}
+                    initialMaxTags={6}
+                    className="flex-row flex-wrap"
+                  />
+                </View>
+              )}
+            </ScrollView>
+
+            {/* Fixed Action Bar */}
+            <View
+              className="border-t border-gray-200 bg-white px-4 pt-2 dark:border-gray-700 dark:bg-gray-800"
+              style={{ paddingBottom: sheetPaddingBottom }}>
+              <View className="flex-row gap-2">
+                {isRecommendation ? (
+                  <>
+                    {/* Add to Queue Button */}
+                    <TouchableOpacity
+                      onPress={handleAddToQueue}
+                      className="flex-1 items-center justify-center rounded-lg bg-green-100 px-2 py-3 dark:bg-green-900/30">
+                      <Icon
+                        as={ThumbsUp}
+                        className="mb-1 h-5 w-5 text-green-600 dark:text-green-400"
+                      />
+                      <Text className="text-xs font-semibold text-green-700 dark:text-green-400">
+                        Add to Queue
+                      </Text>
+                    </TouchableOpacity>
+
+                    {/* Open in Browser Button */}
+                    <TouchableOpacity
+                      onPress={handleOpenURL}
+                      className="flex-1 items-center justify-center rounded-lg bg-gray-100 px-2 py-3 dark:bg-gray-800">
+                      <Icon
+                        as={ExternalLink}
+                        className="mb-1 h-5 w-5 text-gray-600 dark:text-gray-400"
+                      />
+                      <Text className="text-xs font-semibold text-gray-700 dark:text-gray-400">
+                        Open
+                      </Text>
+                    </TouchableOpacity>
+
+                    {/* Not Interested Button */}
+                    <TouchableOpacity
+                      onPress={handleNotInterested}
+                      className="flex-1 items-center justify-center rounded-lg bg-red-100 px-2 py-3 dark:bg-red-900/30">
+                      <Icon
+                        as={ThumbsDown}
+                        className="mb-1 h-5 w-5 text-red-600 dark:text-red-400"
+                      />
+                      <Text className="text-xs font-semibold text-red-700 dark:text-red-400">
+                        Not Interested
+                      </Text>
+                    </TouchableOpacity>
+                  </>
+                ) : (
+                  <>
+                    {/* Toggle Complete Button */}
+                    <TouchableOpacity
+                      onPress={handleToggleComplete}
+                      className={`flex-1 items-center justify-center rounded-lg px-2 py-3 ${
+                        isCompleted
+                          ? 'bg-blue-100 dark:bg-blue-900/30'
+                          : 'bg-green-100 dark:bg-green-900/30'
+                      }`}>
+                      <Icon
+                        as={isCompleted ? RotateCcw : CheckCircle}
+                        className={`mb-1 h-5 w-5 ${
+                          isCompleted
+                            ? 'text-blue-600 dark:text-blue-400'
+                            : 'text-green-600 dark:text-green-500'
+                        }`}
+                      />
+                      <Text
+                        className={`text-xs font-semibold ${
+                          isCompleted
+                            ? 'text-blue-700 dark:text-blue-400'
+                            : 'text-green-700 dark:text-green-400'
+                        }`}>
+                        {isCompleted ? 'Pending' : 'Complete'}
+                      </Text>
+                    </TouchableOpacity>
+
+                    {/* Open in Browser Button */}
+                    <TouchableOpacity
+                      onPress={handleOpenURL}
+                      className="flex-1 items-center justify-center rounded-lg bg-gray-100 px-2 py-3 dark:bg-gray-800">
+                      <Icon
+                        as={ExternalLink}
+                        className="mb-1 h-5 w-5 text-gray-600 dark:text-gray-400"
+                      />
+                      <Text className="text-xs font-semibold text-gray-700 dark:text-gray-400">
+                        Open
+                      </Text>
+                    </TouchableOpacity>
+
+                    {/* Delete Button */}
+                    <TouchableOpacity
+                      onPress={handleDelete}
+                      className="flex-1 items-center justify-center rounded-lg bg-red-100 px-2 py-3 dark:bg-red-900/30">
+                      <Icon as={Trash2} className="mb-1 h-5 w-5 text-red-600 dark:text-red-400" />
+                      <Text className="text-xs font-semibold text-red-700 dark:text-red-400">
+                        Delete
+                      </Text>
+                    </TouchableOpacity>
+                  </>
+                )}
+              </View>
+            </View>
           </View>
+        </View>
       </View>
     </Modal>
   );
