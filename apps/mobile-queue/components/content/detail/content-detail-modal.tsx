@@ -134,9 +134,10 @@ export function ContentDetailModal({
             left: 0,
             right: 0,
             maxHeight: screenHeight * 0.7,
+            height: Platform.OS === 'android' ? screenHeight * 0.7 : undefined,
           }}>
           <View
-            className="rounded-t-2xl bg-white dark:bg-gray-800"
+            className="flex-1 rounded-t-2xl bg-white dark:bg-gray-800"
             style={{ paddingBottom: insets.bottom }}>
                 {/* Modal Handle */}
                 <View className="items-center py-2">
@@ -179,6 +180,7 @@ export function ContentDetailModal({
                   className="flex-1 px-4 py-4"
                   showsVerticalScrollIndicator={false}
                   bounces={true}
+                  nestedScrollEnabled={true}
                   contentContainerStyle={{
                     paddingBottom: Platform.OS === 'android' ? 60 : 40,
                   }}>
