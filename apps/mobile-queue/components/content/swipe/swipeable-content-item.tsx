@@ -8,6 +8,7 @@ import { useSwipeableItem } from '@/hooks/use-swipeable-item';
 import type { UserContentWithDetails } from '@tkhwang-pico/common';
 import { Text } from '@/components/ui/text';
 import { LEFT_ACTION_WIDTH, RIGHT_ACTION_WIDTH, SWIPE_MENU_DAMPING } from '@/consts/app-consts';
+import { LIKE_STYLES, COMPLETION_STYLES, DELETE_STYLES } from '@/consts/app-styles';
 import { ContentItem } from '@/components/content/content-item';
 
 // Type assertion for React 19 compatibility
@@ -55,39 +56,9 @@ export function SwipeableContentItem({
   const isCompleted = item.todo_status === 'completed';
   const LeftIcon = isCompleted ? RotateCcw : Check;
 
-  const likeStyles = isLiked
-    ? {
-        bg: 'bg-gray-200 dark:bg-gray-700',
-        icon: 'text-gray-700 dark:text-gray-200',
-        text: 'text-gray-700 dark:text-gray-200',
-        label: 'Unlike',
-      }
-    : {
-        bg: 'bg-gray-100 dark:bg-gray-800',
-        icon: 'text-gray-600 dark:text-gray-400',
-        text: 'text-gray-600 dark:text-gray-400',
-        label: 'Like',
-      };
-
-  const completionStyles = isCompleted
-    ? {
-        bg: 'bg-gray-100 dark:bg-gray-800',
-        icon: 'text-gray-600 dark:text-gray-400',
-        text: 'text-gray-600 dark:text-gray-400',
-        border: 'border-gray-200 dark:border-gray-700',
-      }
-    : {
-        bg: 'bg-gray-100 dark:bg-gray-800',
-        icon: 'text-gray-600 dark:text-gray-400',
-        text: 'text-gray-600 dark:text-gray-400',
-        border: 'border-gray-200 dark:border-gray-700',
-      };
-
-  const deleteStyles = {
-    bg: 'bg-gray-100 dark:bg-gray-800',
-    icon: 'text-gray-600 dark:text-gray-400',
-    text: 'text-gray-600 dark:text-gray-400',
-  } as const;
+  const likeStyles = isLiked ? LIKE_STYLES.liked : LIKE_STYLES.unliked;
+  const completionStyles = isCompleted ? COMPLETION_STYLES.completed : COMPLETION_STYLES.pending;
+  const deleteStyles = DELETE_STYLES;
 
   const handleLikePress = () => {
     onLike?.(item.content_id);

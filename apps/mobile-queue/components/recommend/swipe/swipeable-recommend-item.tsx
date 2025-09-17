@@ -20,6 +20,7 @@ import {
   RECOMMEND_RIGHT_ACTION_WIDTH,
   SWIPE_MENU_DAMPING,
 } from '@/consts/app-consts';
+import { RECOMMEND_ADD_STYLES, RECOMMEND_SKIP_STYLES } from '@/consts/app-styles';
 
 interface SwipeableRecommendItemProps {
   recommendation: Recommendation;
@@ -127,33 +128,13 @@ export function SwipeableRecommendItem({
   };
 
   // Dynamic styles based on action state
-  const leftStyles = actionCompleted === 'queue'
-    ? {
-        wrapper: 'shadow-lg shadow-green-500/20',
-        container: 'bg-green-500',
-        icon: 'text-white',
-        text: 'text-white',
-      }
-    : {
-        wrapper: '',
-        container: 'bg-green-200 dark:bg-green-900/30',
-        icon: 'text-green-700 dark:text-green-400',
-        text: 'text-green-700 dark:text-green-400',
-      };
+  const leftStyles =
+    actionCompleted === 'queue' ? RECOMMEND_ADD_STYLES.completed : RECOMMEND_ADD_STYLES.default;
 
-  const rightStyles = actionCompleted === 'notInterested'
-    ? {
-        wrapper: 'shadow-lg shadow-red-500/20',
-        container: 'bg-red-500',
-        icon: 'text-white',
-        text: 'text-white',
-      }
-    : {
-        wrapper: '',
-        container: 'bg-orange-200 dark:bg-orange-900/30',
-        icon: 'text-orange-700 dark:text-orange-400',
-        text: 'text-orange-700 dark:text-orange-400',
-      };
+  const rightStyles =
+    actionCompleted === 'notInterested'
+      ? RECOMMEND_SKIP_STYLES.completed
+      : RECOMMEND_SKIP_STYLES.default;
 
   // Animated scale styles for action feedback
   const leftActionScale = useAnimatedStyle(() => {

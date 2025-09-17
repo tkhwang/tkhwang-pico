@@ -13,6 +13,7 @@ import {
   TIMELINE_LEFT_ACTION_WIDTH,
   TIMELINE_RIGHT_ACTION_WIDTH,
 } from '@/consts/app-consts';
+import { LIKE_STYLES, DELETE_STYLES, REOPEN_STYLES } from '@/consts/app-styles';
 
 interface SwipeableTimelineItemProps {
   item: UserContentWithDetails;
@@ -90,31 +91,9 @@ export function SwipeableTimelineItem({
     onPress?.(content);
   };
 
-  const leftLikeStyles = isLiked
-    ? {
-        bg: 'bg-gray-200 dark:bg-gray-700',
-        icon: 'text-gray-700 dark:text-gray-200',
-        text: 'text-gray-700 dark:text-gray-200',
-        label: 'Unlike',
-      }
-    : {
-        bg: 'bg-gray-100 dark:bg-gray-800',
-        icon: 'text-gray-600 dark:text-gray-400',
-        text: 'text-gray-600 dark:text-gray-400',
-        label: 'Like',
-      };
-
-  const leftReopenStyles = {
-    bg: 'bg-gray-100 dark:bg-gray-800',
-    icon: 'text-gray-600 dark:text-gray-400',
-    text: 'text-gray-600 dark:text-gray-400',
-  } as const;
-
-  const rightStyles = {
-    bg: 'bg-gray-100 dark:bg-gray-800',
-    icon: 'text-gray-600 dark:text-gray-400',
-    text: 'text-gray-600 dark:text-gray-400',
-  } as const;
+  const leftLikeStyles = isLiked ? LIKE_STYLES.liked : LIKE_STYLES.unliked;
+  const leftReopenStyles = REOPEN_STYLES;
+  const rightStyles = DELETE_STYLES;
 
   const AnimatedViewTyped = Animated.View as any;
 
@@ -145,7 +124,7 @@ export function SwipeableTimelineItem({
           <TouchableOpacity
             activeOpacity={0.8}
             onPress={handleReopen}
-            className={`items-center justify-center border-l border-blue-100 ${leftReopenStyles.bg}`}
+            className={`items-center justify-center border-l ${leftReopenStyles.border} ${leftReopenStyles.bg}`}
             style={{ width: TIMELINE_LEFT_ACTION_WIDTH / 2 }}>
             <AnimatedViewTyped style={leftIconStyle}>
               <Icon as={RotateCcw} className={`h-6 w-6 ${leftReopenStyles.icon}`} />
