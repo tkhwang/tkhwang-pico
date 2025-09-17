@@ -132,54 +132,46 @@ export function SwipeableRecommendItem({
 
   return (
     <View className="relative mb-4">
-      {/* Left Background - Add to Queue */}
+      {/* Left Background - Add to Queue (structured like working components) */}
       <AnimatedViewTyped
-        className={`absolute left-0 top-0 overflow-hidden rounded-xl ${leftStyles.wrapper}`}
+        className="absolute left-0 top-0 flex-row overflow-hidden rounded-l-lg"
         style={[leftContainerStyle, { width: RECOMMEND_LEFT_ACTION_WIDTH }]}>
         <TouchableOpacity
           activeOpacity={0.8}
           onPress={handleAddToQueue}
           disabled={isProcessing}
-          className={`h-full items-center justify-center ${leftStyles.container}`}
-          style={{ width: RECOMMEND_LEFT_ACTION_WIDTH }}>
+          className={`flex-1 items-center justify-center ${leftStyles.container}`}>
           <AnimatedViewTyped style={leftIconStyle}>
-            <View className="relative">
-              <Icon
-                as={actionCompleted === 'queue' ? Plus : ThumbsUp}
-                className={`h-7 w-7 ${leftStyles.icon}`}
-              />
-              {actionCompleted === 'queue' && (
-                <View className="absolute -right-1 -top-1">
-                  <Icon as={Sparkles} className="h-3 w-3 text-yellow-300" />
-                </View>
-              )}
-            </View>
+            <Icon
+              as={actionCompleted === 'queue' ? Plus : ThumbsUp}
+              className={`h-6 w-6 ${leftStyles.icon}`}
+            />
           </AnimatedViewTyped>
-          <Text className={`mt-2 text-xs font-bold uppercase tracking-wider ${leftStyles.text}`}>
+          <Text className={`mt-1 text-xs font-semibold ${leftStyles.text}`}>
             {actionCompleted === 'queue' ? 'Added!' : 'Add Queue'}
           </Text>
         </TouchableOpacity>
       </AnimatedViewTyped>
 
-      {/* Right Background - Not Interested */}
+      {/* Right Background - Not Interested (structured like working components) */}
       <AnimatedViewTyped
-        className={`absolute right-0 top-0 overflow-hidden rounded-xl ${rightStyles.wrapper}`}
-        style={[rightContainerStyle, { width: RECOMMEND_RIGHT_ACTION_WIDTH }]}>
+        className="absolute right-0 top-0 overflow-hidden rounded-r-lg"
+        style={[
+          rightContainerStyle,
+          { width: RECOMMEND_RIGHT_ACTION_WIDTH, alignItems: 'center', justifyContent: 'center' },
+        ]}>
         <TouchableOpacity
           activeOpacity={0.8}
           onPress={handleNotInterested}
           disabled={isProcessing}
-          className={`h-full items-center justify-center ${rightStyles.container}`}
-          style={{ width: RECOMMEND_RIGHT_ACTION_WIDTH }}>
+          className={`h-full w-full items-center justify-center rounded-r-lg ${rightStyles.container}`}>
           <AnimatedViewTyped style={rightIconStyle}>
-            <View className="relative">
-              <Icon
-                as={actionCompleted === 'notInterested' ? X : ThumbsDown}
-                className={`h-7 w-7 ${rightStyles.icon}`}
-              />
-            </View>
+            <Icon
+              as={actionCompleted === 'notInterested' ? X : ThumbsDown}
+              className={`h-6 w-6 ${rightStyles.icon}`}
+            />
           </AnimatedViewTyped>
-          <Text className={`mt-2 text-xs font-bold uppercase tracking-wider ${rightStyles.text}`}>
+          <Text className={`mt-1 text-xs font-semibold ${rightStyles.text}`}>
             {actionCompleted === 'notInterested' ? 'Removed' : 'Skip'}
           </Text>
         </TouchableOpacity>
