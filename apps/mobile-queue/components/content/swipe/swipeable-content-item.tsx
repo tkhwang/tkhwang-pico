@@ -1,5 +1,5 @@
 import React from 'react';
-import { View } from 'react-native';
+import { View, LayoutChangeEvent } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
 import { ContentItem } from '../content-item';
@@ -68,7 +68,7 @@ export function SwipeableContentItem({
       <GestureDetector gesture={panGesture}>
         <AnimatedViewTyped
           style={animatedStyle}
-          onLayout={(event: import('react-native').LayoutChangeEvent) => {
+          onLayout={(event: LayoutChangeEvent) => {
             itemHeight.value = event.nativeEvent.layout.height;
           }}>
           <ContentItem item={item} onToggleComplete={onToggleComplete} onPress={onPress} />
