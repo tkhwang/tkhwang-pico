@@ -69,7 +69,7 @@ export function SwipeableRecommendItem({
     }
     const url = content.canonical_url || content.url;
     if (!url) {
-      Alert.alert('Unavailable', '이 콘텐츠는 추가할 URL이 없습니다.');
+      Alert.alert('Unavailable', 'This content does not have a URL to add.');
       close();
       return;
     }
@@ -157,7 +157,9 @@ export function SwipeableRecommendItem({
       Extrapolation.CLAMP
     );
     return {
-      transform: [{ scale: actionCompleted === 'notInterested' ? withSpring(1.2) : withSpring(scale) }],
+      transform: [
+        { scale: actionCompleted === 'notInterested' ? withSpring(1.2) : withSpring(scale) },
+      ],
     };
   });
 
