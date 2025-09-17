@@ -57,36 +57,36 @@ export function SwipeableContentItem({
 
   const likeStyles = isLiked
     ? {
-        bg: 'bg-rose-100',
-        icon: 'text-rose-500',
-        text: 'text-rose-500',
+        bg: 'bg-gray-200 dark:bg-gray-700',
+        icon: 'text-gray-700 dark:text-gray-200',
+        text: 'text-gray-700 dark:text-gray-200',
         label: 'Unlike',
       }
     : {
-        bg: 'bg-rose-200',
-        icon: 'text-rose-700',
-        text: 'text-rose-700',
+        bg: 'bg-gray-100 dark:bg-gray-800',
+        icon: 'text-gray-600 dark:text-gray-400',
+        text: 'text-gray-600 dark:text-gray-400',
         label: 'Like',
       };
 
   const completionStyles = isCompleted
     ? {
-        bg: 'bg-blue-200',
-        icon: 'text-blue-700',
-        text: 'text-blue-700',
-        border: 'border-blue-100',
+        bg: 'bg-gray-100 dark:bg-gray-800',
+        icon: 'text-gray-600 dark:text-gray-400',
+        text: 'text-gray-600 dark:text-gray-400',
+        border: 'border-gray-200 dark:border-gray-700',
       }
     : {
-        bg: 'bg-green-200',
-        icon: 'text-green-700',
-        text: 'text-green-700',
-        border: 'border-green-100',
+        bg: 'bg-gray-100 dark:bg-gray-800',
+        icon: 'text-gray-600 dark:text-gray-400',
+        text: 'text-gray-600 dark:text-gray-400',
+        border: 'border-gray-200 dark:border-gray-700',
       };
 
   const deleteStyles = {
-    bg: 'bg-red-200',
-    icon: 'text-red-700',
-    text: 'text-red-700',
+    bg: 'bg-gray-100 dark:bg-gray-800',
+    icon: 'text-gray-600 dark:text-gray-400',
+    text: 'text-gray-600 dark:text-gray-400',
   } as const;
 
   const handleLikePress = () => {
@@ -160,9 +160,9 @@ export function SwipeableContentItem({
         </TouchableOpacity>
       </AnimatedViewTyped>
 
-      {/* Right Background - Delete (Red) - Only visible when swiping left */}
+      {/* Right Background - Delete (Gray) - Only visible when swiping left */}
       <AnimatedViewTyped
-        className="absolute right-0 top-0 rounded-r-lg bg-red-500"
+        className="absolute right-0 top-0 rounded-r-lg bg-gray-200 dark:bg-gray-700"
         style={[
           rightContainerStyle,
           { width: RIGHT_ACTION_WIDTH, alignItems: 'center', justifyContent: 'center' },

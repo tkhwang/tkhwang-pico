@@ -92,28 +92,28 @@ export function SwipeableTimelineItem({
 
   const leftLikeStyles = isLiked
     ? {
-        bg: 'bg-rose-100',
-        icon: 'text-rose-500',
-        text: 'text-rose-500',
+        bg: 'bg-gray-200 dark:bg-gray-700',
+        icon: 'text-gray-700 dark:text-gray-200',
+        text: 'text-gray-700 dark:text-gray-200',
         label: 'Unlike',
       }
     : {
-        bg: 'bg-rose-200',
-        icon: 'text-rose-700',
-        text: 'text-rose-700',
+        bg: 'bg-gray-100 dark:bg-gray-800',
+        icon: 'text-gray-600 dark:text-gray-400',
+        text: 'text-gray-600 dark:text-gray-400',
         label: 'Like',
       };
 
   const leftReopenStyles = {
-    bg: 'bg-blue-200',
-    icon: 'text-blue-700',
-    text: 'text-blue-700',
+    bg: 'bg-gray-100 dark:bg-gray-800',
+    icon: 'text-gray-600 dark:text-gray-400',
+    text: 'text-gray-600 dark:text-gray-400',
   } as const;
 
   const rightStyles = {
-    bg: 'bg-red-200',
-    icon: 'text-red-700',
-    text: 'text-red-700',
+    bg: 'bg-gray-100 dark:bg-gray-800',
+    icon: 'text-gray-600 dark:text-gray-400',
+    text: 'text-gray-600 dark:text-gray-400',
   } as const;
 
   const AnimatedViewTyped = Animated.View as any;
@@ -123,7 +123,10 @@ export function SwipeableTimelineItem({
       {/* Left Background - Reopen (Blue) - Only visible when swiping right */}
       <AnimatedViewTyped
         className="absolute left-0 top-0 overflow-hidden rounded-l-xl"
-        style={[leftContainerStyle, { width: TIMELINE_LEFT_ACTION_WIDTH, height: itemHeight.value || undefined }]}>
+        style={[
+          leftContainerStyle,
+          { width: TIMELINE_LEFT_ACTION_WIDTH, height: itemHeight.value || undefined },
+        ]}>
         <View
           className="flex-row items-stretch"
           style={{ width: TIMELINE_LEFT_ACTION_WIDTH, height: '100%' }}>
@@ -155,7 +158,10 @@ export function SwipeableTimelineItem({
       {/* Right Background - Delete (Red) - Only visible when swiping left */}
       <AnimatedViewTyped
         className={`absolute right-0 top-0 overflow-hidden rounded-r-xl ${rightStyles.bg}`}
-        style={[rightContainerStyle, { width: TIMELINE_RIGHT_ACTION_WIDTH, height: itemHeight.value || undefined }]}>
+        style={[
+          rightContainerStyle,
+          { width: TIMELINE_RIGHT_ACTION_WIDTH, height: itemHeight.value || undefined },
+        ]}>
         <TouchableOpacity
           activeOpacity={0.8}
           onPress={handleDelete}

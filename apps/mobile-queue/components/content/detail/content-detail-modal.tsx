@@ -85,7 +85,7 @@ export function ContentDetailModal({
   const thumbnailUrl = getThumbnailUrl(content);
   const isLiked =
     'preferences' in item
-      ? item.preferences?.some((preference) => preference.preference_type === 'liked') ?? false
+      ? (item.preferences?.some((preference) => preference.preference_type === 'liked') ?? false)
       : false;
 
   const handleToggleComplete = () => {
@@ -348,23 +348,21 @@ export function ContentDetailModal({
                     <TouchableOpacity
                       onPress={handleLike}
                       className={`flex-1 items-center justify-center rounded-lg px-2 py-3 ${
-                        isLiked
-                          ? 'bg-rose-500 dark:bg-rose-600'
-                          : 'bg-rose-100 dark:bg-rose-900/30'
+                        isLiked ? 'bg-gray-200 dark:bg-gray-700' : 'bg-gray-100 dark:bg-gray-800'
                       }`}>
                       <Icon
                         as={Heart}
                         className={`mb-1 h-5 w-5 ${
                           isLiked
-                            ? 'fill-white text-white'
-                            : 'fill-rose-200 text-rose-500'
+                            ? 'fill-gray-700 text-gray-700 dark:fill-gray-200 dark:text-gray-200'
+                            : 'text-gray-500 dark:text-gray-400'
                         }`}
                       />
                       <Text
                         className={`text-xs font-semibold ${
                           isLiked
-                            ? 'text-white'
-                            : 'text-rose-600 dark:text-rose-400'
+                            ? 'text-gray-700 dark:text-gray-200'
+                            : 'text-gray-600 dark:text-gray-400'
                         }`}>
                         {isLiked ? 'Unlike' : 'Like'}
                       </Text>
@@ -373,25 +371,12 @@ export function ContentDetailModal({
                     {/* Toggle Complete Button */}
                     <TouchableOpacity
                       onPress={handleToggleComplete}
-                      className={`flex-1 items-center justify-center rounded-lg px-2 py-3 ${
-                        isCompleted
-                          ? 'bg-blue-100 dark:bg-blue-900/30'
-                          : 'bg-green-100 dark:bg-green-900/30'
-                      }`}>
+                      className="flex-1 items-center justify-center rounded-lg bg-gray-100 px-2 py-3 dark:bg-gray-800">
                       <Icon
                         as={isCompleted ? RotateCcw : CheckCircle}
-                        className={`mb-1 h-5 w-5 ${
-                          isCompleted
-                            ? 'text-blue-600 dark:text-blue-400'
-                            : 'text-green-600 dark:text-green-500'
-                        }`}
+                        className="mb-1 h-5 w-5 text-gray-600 dark:text-gray-400"
                       />
-                      <Text
-                        className={`text-xs font-semibold ${
-                          isCompleted
-                            ? 'text-blue-700 dark:text-blue-400'
-                            : 'text-green-700 dark:text-green-400'
-                        }`}>
+                      <Text className="text-xs font-semibold text-gray-700 dark:text-gray-300">
                         {isCompleted ? 'Pending' : 'Complete'}
                       </Text>
                     </TouchableOpacity>
@@ -412,9 +397,9 @@ export function ContentDetailModal({
                     {/* Delete Button */}
                     <TouchableOpacity
                       onPress={handleDelete}
-                      className="flex-1 items-center justify-center rounded-lg bg-red-100 px-2 py-3 dark:bg-red-900/30">
-                      <Icon as={Trash2} className="mb-1 h-5 w-5 text-red-600 dark:text-red-400" />
-                      <Text className="text-xs font-semibold text-red-700 dark:text-red-400">
+                      className="flex-1 items-center justify-center rounded-lg bg-gray-100 px-2 py-3 dark:bg-gray-800">
+                      <Icon as={Trash2} className="mb-1 h-5 w-5 text-gray-600 dark:text-gray-400" />
+                      <Text className="text-xs font-semibold text-gray-700 dark:text-gray-300">
                         Delete
                       </Text>
                     </TouchableOpacity>
