@@ -385,7 +385,9 @@ export function ContentDetailModal({
                         className={`mb-1 h-5 w-5 ${completeStyles.icon}`}
                       />
                       <Text className={`text-xs font-semibold ${completeStyles.text}`}>
-                        {isCompleted ? ACTION_STYLES.complete.completed.label : ACTION_STYLES.complete.pending.label}
+                        {isCompleted
+                          ? ACTION_STYLES.complete.completed.label
+                          : ACTION_STYLES.complete.pending.label}
                       </Text>
                     </TouchableOpacity>
 

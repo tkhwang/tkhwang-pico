@@ -56,7 +56,7 @@ export function TimelineList() {
     if (updated && updated !== selectedItem) {
       setSelectedItem(updated);
     }
-  }, [contents, modalVisible, selectedItem?.content_id]);
+  }, [contents, modalVisible, selectedItem]);
 
   const handleReopen = useCallback(
     (id: string) => {

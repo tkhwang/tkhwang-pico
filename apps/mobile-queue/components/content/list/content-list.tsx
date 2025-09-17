@@ -76,7 +76,7 @@ export function ContentList({ todoFilter }: ContentListProps) {
     if (updated && updated !== selectedItem) {
       setSelectedItem(updated);
     }
-  }, [userContents, modalVisible, selectedItem?.content_id]);
+  }, [userContents, modalVisible, selectedItem]);
 
   if (isLoading && !refreshing) return <ContentListSkeleton />;
 
