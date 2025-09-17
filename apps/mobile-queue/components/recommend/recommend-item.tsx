@@ -8,6 +8,7 @@ import {
   formatReadingTime,
   formatScorePercentage,
   getScoreColorClass,
+  getThumbnailUrl,
 } from '@/hooks/use-content-formatters';
 import type { Recommendation } from '@tkhwang-pico/common';
 
@@ -26,11 +27,7 @@ export function RecommendItem({ recommendation, onPress }: RecommendItemProps) {
     onPress(recommendation);
   };
 
-  // Extract thumbnail URL if exists
-  const thumbnailUrl =
-    content.metadata && typeof content.metadata === 'object' && 'image_url' in content.metadata
-      ? (content.metadata.image_url as string)
-      : null;
+  const thumbnailUrl = getThumbnailUrl(content);
 
   // Create icon slot for recommendation indicator
   const recommendIconSlot = (

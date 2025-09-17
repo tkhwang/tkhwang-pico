@@ -28,7 +28,7 @@ import {
   RotateCcw,
   Sparkles,
 } from 'lucide-react-native';
-import { formatFullDate, formatReadingTimeWithSuffix } from '@/hooks/use-content-formatters';
+import { formatFullDate, formatReadingTimeWithSuffix, getThumbnailUrl } from '@/hooks/use-content-formatters';
 import { useContentActions } from '@/hooks/use-content-actions';
 import { ContentTags } from '@/components/content/sub/content-tags';
 import { ContentThumbnail } from '@/components/content/sub/content-thumbnail';
@@ -76,13 +76,8 @@ export function ContentDetailModal({
   const content = item.contents;
   const isCompleted = 'todo_status' in item ? item.todo_status === 'completed' : false;
   const isRecommendation = mode === 'recommend';
-
-  // Extract thumbnail URL from metadata
-  const thumbnailUrl =
-    content.metadata && typeof content.metadata === 'object' && 'image_url' in content.metadata
-      ? (content.metadata.image_url as string)
-      : null;
-
+  const thumbnailUrl = getThumbnailUrl(content);
+  
   const handleToggleComplete = () => {
     if (onToggleComplete && 'id' in item) {
       onToggleComplete(item.id);

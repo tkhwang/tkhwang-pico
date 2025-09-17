@@ -98,3 +98,14 @@ export const formatTimelineDate = (dateString: string) => {
     }),
   };
 };
+
+export const getThumbnailUrl = (content: { metadata?: any } | null): string | null => {
+  if (
+    content?.metadata &&
+    typeof content.metadata === 'object' &&
+    'image_url' in content.metadata
+  ) {
+    return content.metadata.image_url as string;
+  }
+  return null;
+};
