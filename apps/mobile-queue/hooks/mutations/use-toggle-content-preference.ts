@@ -3,7 +3,11 @@ import { useAuth, useUser } from '@clerk/clerk-expo';
 import { Alert } from 'react-native';
 import { togglePreference } from '@/lib/supabase/preferences';
 import { queryKey } from '@/hooks/keys/query-key';
-import type { PreferenceType } from '@tkhwang-pico/common';
+import type {
+  PreferenceType,
+  UserContentPreferenceTyped,
+  UserContentWithDetails,
+} from '@tkhwang-pico/common';
 
 interface ToggleContentPreferenceParams {
   contentId: string;
@@ -27,7 +31,7 @@ export function useToggleContentPreference(options?: UseToggleContentPreferenceO
   const { getToken } = useAuth();
   const { user } = useUser();
 
-  return useMutation<TogglePreferenceResult, Error, ToggleContentPreferenceParams>({
+  return useMutation<TogglePreferenceResult, Error, ToggleContentPreferenceParams, { previousUserContents?: Array<{ queryKey: readonly unknown[]; data: UserContentWithDetails[] | undefined }> }>({
     mutationFn: async ({ contentId, preferenceType, reason }) => {
       const token = await getToken();
       if (!token) throw new Error('Authentication token not available');
@@ -36,9 +40,58 @@ export function useToggleContentPreference(options?: UseToggleContentPreferenceO
       return togglePreference(token, user.id, contentId, preferenceType, reason);
     },
 
-    onSuccess: (result) => {
+    onMutate: async ({ contentId, preferenceType, reason }) => {
+      if (!user?.id) return {};
+
+      const userContentsKey = queryKey.userContents.byUserId(user.id);
+
+      await queryClient.cancelQueries({ queryKey: userContentsKey, exact: false });
+
+      const previousUserContents = queryClient
+        .getQueriesData<UserContentWithDetails[]>({ queryKey: userContentsKey })
+        .map(([key, data]) => ({ queryKey: key, data }));
+
+      const optimisticPreference: UserContentPreferenceTyped = {
+        id: `temp-${preferenceType}-${contentId}`,
+        user_id: user.id,
+        content_id: contentId,
+        preference_type: preferenceType,
+        reason: reason ?? null,
+        created_at: new Date().toISOString(),
+      };
+
+      queryClient.setQueriesData<UserContentWithDetails[]>(
+        { queryKey: userContentsKey, exact: false },
+        (old) => updatePreferences(old, contentId, preferenceType, optimisticPreference, 'toggle')
+      );
+
+      return { previousUserContents };
+    },
+
+    onSuccess: (result, variables) => {
       if (user?.id) {
         // Invalidate cached content lists and recommendations to reflect preference changes
+        const userContentsKey = queryKey.userContents.byUserId(user.id);
+
+        const serverPreference = result.preference
+          ? {
+              ...result.preference,
+              preference_type: result.preference.preference_type as PreferenceType,
+            }
+          : undefined;
+
+        queryClient.setQueriesData<UserContentWithDetails[]>(
+          { queryKey: userContentsKey, exact: false },
+          (old) =>
+            updatePreferences(
+              old,
+              variables.contentId,
+              variables.preferenceType,
+              serverPreference,
+              result.action === 'set' ? 'set' : 'remove'
+            )
+        );
+
         queryClient.invalidateQueries({
           queryKey: queryKey.userContents.byUserId(user.id),
           exact: false,
@@ -53,11 +106,71 @@ export function useToggleContentPreference(options?: UseToggleContentPreferenceO
       options?.onSuccess?.(result);
     },
 
-    onError: (error) => {
+    onError: (error, _variables, context) => {
       console.error('Failed to toggle content preference:', error);
       Alert.alert('오류', '선호도 설정 중 문제가 발생했습니다.', [{ text: '확인' }]);
 
+      if (context?.previousUserContents) {
+        context.previousUserContents.forEach(({ queryKey: key, data }) => {
+          queryClient.setQueryData(key, data);
+        });
+      }
+
       options?.onError?.(error);
     },
+  });
+}
+
+type UpdateMode = 'toggle' | 'set' | 'remove';
+
+function updatePreferences(
+  items: UserContentWithDetails[] | undefined,
+  contentId: string,
+  preferenceType: PreferenceType,
+  preference: UserContentPreferenceTyped | undefined,
+  mode: UpdateMode
+): UserContentWithDetails[] | undefined {
+  if (!items) return items;
+
+  return items.map((item) => {
+    if (item.content_id !== contentId) return item;
+
+    const currentPreferences = item.preferences ?? [];
+
+    if (mode === 'toggle') {
+      const exists = currentPreferences.some((pref) => pref.preference_type === preferenceType);
+      if (exists) {
+        return {
+          ...item,
+          preferences: currentPreferences.filter((pref) => pref.preference_type !== preferenceType),
+        };
+      }
+
+      if (preference) {
+        return {
+          ...item,
+          preferences: [...currentPreferences, preference],
+        };
+      }
+
+      return item;
+    }
+
+    if (mode === 'set' && preference) {
+      const filtered = currentPreferences.filter((pref) => pref.preference_type !== preferenceType);
+      return {
+        ...item,
+        preferences: [...filtered, preference],
+      };
+    }
+
+    if (mode === 'remove') {
+      return {
+        ...item,
+        preferences: currentPreferences.filter((pref) => pref.preference_type !== preferenceType),
+      };
+    }
+
+    return item;
   });
 }
