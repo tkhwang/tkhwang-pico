@@ -60,6 +60,13 @@ export function ContentDetailModal({
   const { openURL, deleteContent } = useContentActions();
   const insets = useSafeAreaInsets();
   const screenHeight = Dimensions.get('window').height;
+  const isAndroid = Platform.OS === 'android';
+  const sheetBottomOffset = 0;
+  const desiredSheetHeight = screenHeight * 0.7;
+  const sheetHeight =
+    isAndroid ? Math.max(desiredSheetHeight - sheetBottomOffset, desiredSheetHeight * 0.5) : undefined;
+  const sheetPaddingBottom = insets.bottom + (isAndroid ? 24 : 16);
+  const scrollContentPaddingBottom = 40 + sheetPaddingBottom;
 
   if (!item || !item.contents) {
     return null;
@@ -130,60 +137,60 @@ export function ContentDetailModal({
         <View
           style={{
             position: 'absolute',
-            bottom: 0,
+            bottom: sheetBottomOffset,
             left: 0,
             right: 0,
-            maxHeight: screenHeight * 0.7,
-            height: Platform.OS === 'android' ? screenHeight * 0.7 : undefined,
+            maxHeight: desiredSheetHeight,
+            height: sheetHeight,
           }}>
           <View
             className="flex-1 rounded-t-2xl bg-white dark:bg-gray-800"
-            style={{ paddingBottom: insets.bottom }}>
-                {/* Modal Handle */}
-                <View className="items-center py-2">
-                  <View className="h-1 w-12 rounded-full bg-gray-300 dark:bg-gray-600" />
-                </View>
+            style={{ paddingBottom: sheetPaddingBottom }}>
+            {/* Modal Handle */}
+            <View className="items-center py-2">
+              <View className="h-1 w-12 rounded-full bg-gray-300 dark:bg-gray-600" />
+            </View>
 
-                {/* Header */}
-                <View className="flex-row items-center justify-between border-b border-gray-200 px-4 pb-3 dark:border-gray-700">
-                  {isRecommendation ? (
-                    // Recommendation mode header
-                    <View className="flex-row items-center">
-                      <Icon as={Sparkles} className="mr-2 h-4 w-4 text-purple-500" />
-                      <Text className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Recommendation
-                      </Text>
-                    </View>
-                  ) : (
-                    // Home mode header with toggle complete
-                    <View className="flex-row items-center">
-                      <TouchableOpacity onPress={handleToggleComplete} className="mr-3 p-2">
-                        <Icon
-                          as={isCompleted ? CheckCircle : Circle}
-                          className={`h-5 w-5 ${isCompleted ? 'text-green-500' : 'text-blue-500'}`}
-                        />
-                      </TouchableOpacity>
-                      <Text className="text-sm text-gray-500 dark:text-gray-400">
-                        {isCompleted ? 'Completed' : 'Pending'}
-                      </Text>
-                    </View>
-                  )}
-                  <View className="flex-row">
-                    <TouchableOpacity onPress={onClose} className="p-2">
-                      <Icon as={X} className="h-5 w-5 text-gray-700 dark:text-gray-300" />
-                    </TouchableOpacity>
-                  </View>
+            {/* Header */}
+            <View className="flex-row items-center justify-between border-b border-gray-200 px-4 pb-3 dark:border-gray-700">
+              {isRecommendation ? (
+                // Recommendation mode header
+                <View className="flex-row items-center">
+                  <Icon as={Sparkles} className="mr-2 h-4 w-4 text-purple-500" />
+                  <Text className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Recommendation
+                  </Text>
                 </View>
+              ) : (
+                // Home mode header with toggle complete
+                <View className="flex-row items-center">
+                  <TouchableOpacity onPress={handleToggleComplete} className="mr-3 p-2">
+                    <Icon
+                      as={isCompleted ? CheckCircle : Circle}
+                      className={`h-5 w-5 ${isCompleted ? 'text-green-500' : 'text-blue-500'}`}
+                    />
+                  </TouchableOpacity>
+                  <Text className="text-sm text-gray-500 dark:text-gray-400">
+                    {isCompleted ? 'Completed' : 'Pending'}
+                  </Text>
+                </View>
+              )}
+              <View className="flex-row">
+                <TouchableOpacity onPress={onClose} className="p-2">
+                  <Icon as={X} className="h-5 w-5 text-gray-700 dark:text-gray-300" />
+                </TouchableOpacity>
+              </View>
+            </View>
 
-                {/* Content */}
-                <ScrollView
-                  className="flex-1 px-4 py-4"
-                  showsVerticalScrollIndicator={false}
-                  bounces={true}
-                  nestedScrollEnabled={true}
-                  contentContainerStyle={{
-                    paddingBottom: Platform.OS === 'android' ? 100 : 40,
-                  }}>
+            {/* Content */}
+            <ScrollView
+              className="flex-1 px-4 py-4"
+              showsVerticalScrollIndicator={false}
+              bounces={true}
+              nestedScrollEnabled={true}
+              contentContainerStyle={{
+                paddingBottom: scrollContentPaddingBottom,
+              }}>
                   {/* Title */}
                   <Text
                     className="mb-3 text-xl font-bold text-gray-900 dark:text-gray-100"
