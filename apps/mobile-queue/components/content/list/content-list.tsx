@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { View, TouchableOpacity, RefreshControl, ScrollView } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { Text } from '@/components/ui/text';
@@ -68,6 +68,15 @@ export function ContentList({ todoFilter }: ContentListProps) {
     setModalVisible(false);
     setSelectedItem(null);
   }, []);
+
+  // Keep selectedItem in sync with latest cache while modal is open
+  useEffect(() => {
+    if (!modalVisible || !selectedItem) return;
+    const updated = userContents.find((c) => c.content_id === selectedItem.content_id);
+    if (updated && updated !== selectedItem) {
+      setSelectedItem(updated);
+    }
+  }, [userContents, modalVisible, selectedItem?.content_id]);
 
   if (isLoading && !refreshing) return <ContentListSkeleton />;
 

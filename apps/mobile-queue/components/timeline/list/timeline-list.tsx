@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { View, RefreshControl, ScrollView } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { Text } from '@/components/ui/text';
@@ -47,6 +47,15 @@ export function TimelineList() {
     setModalVisible(false);
     setSelectedItem(null);
   }, []);
+
+  // Keep selectedItem in sync with latest cache while modal is open
+  useEffect(() => {
+    if (!modalVisible || !selectedItem) return;
+    const updated = contents.find((c) => c.content_id === selectedItem.content_id);
+    if (updated && updated !== selectedItem) {
+      setSelectedItem(updated);
+    }
+  }, [contents, modalVisible, selectedItem?.content_id]);
 
   const handleReopen = useCallback(
     (id: string) => {
