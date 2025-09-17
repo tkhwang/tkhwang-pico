@@ -103,7 +103,7 @@ export function SwipeableTimelineItem({
         className="absolute left-0 top-0 overflow-hidden rounded-l-xl"
         style={[
           leftContainerStyle,
-          { width: TIMELINE_LEFT_ACTION_WIDTH, height: itemHeight.value || undefined },
+          { width: TIMELINE_LEFT_ACTION_WIDTH },
         ]}>
         <View
           className="flex-row items-stretch"
@@ -138,7 +138,7 @@ export function SwipeableTimelineItem({
         className={`absolute right-0 top-0 overflow-hidden rounded-r-xl ${rightStyles.bg}`}
         style={[
           rightContainerStyle,
-          { width: TIMELINE_RIGHT_ACTION_WIDTH, height: itemHeight.value || undefined },
+          { width: TIMELINE_RIGHT_ACTION_WIDTH },
         ]}>
         <TouchableOpacity
           activeOpacity={0.8}
