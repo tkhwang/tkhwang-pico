@@ -27,27 +27,35 @@ export function ContentMetadata({
   return (
     <View className={`mb-1.5 flex-row items-center justify-between ${className}`}>
       <View className="flex-1 flex-row items-center">
-        {score !== undefined && scoreColor && (
-          <>
-            <Text className={`text-xs font-medium ${scoreColor}`}>{score}% Match</Text>
-            <Text className="mx-1 text-xs text-gray-400">•</Text>
-          </>
-        )}
-        {domain && (
-          <>
-            <Text className="text-xs text-gray-400 dark:text-gray-500">{domain}</Text>
-            {(date || readingTime) && <Text className="mx-1 text-xs text-gray-400">•</Text>}
-          </>
-        )}
-        {date && (
-          <>
-            <Text className="text-xs text-gray-400 dark:text-gray-500">{date}</Text>
-            {readingTime && <Text className="mx-1 text-xs text-gray-400">•</Text>}
-          </>
-        )}
-        {readingTime && (
-          <Text className="text-xs text-gray-400 dark:text-gray-500">{readingTime}</Text>
-        )}
+        {[
+          score !== undefined && scoreColor && (
+            <Text key="score" className={`text-xs font-medium ${scoreColor}`}>
+              {score}% Match
+            </Text>
+          ),
+          domain && (
+            <Text key="domain" className="text-xs text-gray-400 dark:text-gray-500">
+              {domain}
+            </Text>
+          ),
+          date && (
+            <Text key="date" className="text-xs text-gray-400 dark:text-gray-500">
+              {date}
+            </Text>
+          ),
+          readingTime && (
+            <Text key="readingTime" className="text-xs text-gray-400 dark:text-gray-500">
+              {readingTime}
+            </Text>
+          ),
+        ]
+          .filter(Boolean)
+          .map((item, index, arr) => (
+            <React.Fragment key={index}>
+              {item}
+              {index < arr.length - 1 && <Text className="mx-1 text-xs text-gray-400">•</Text>}
+            </React.Fragment>
+          ))}
       </View>
       {rightElement && rightElement}
     </View>
