@@ -3,6 +3,7 @@ import type {
   UserContentWithDetails,
   TodoFilterType,
   UserContentPreference,
+  UserContentPreferenceTyped,
 } from '@tkhwang-pico/common';
 
 export async function getUserContents(
@@ -37,10 +38,7 @@ export async function getUserContents(
 
     const [{ data, error }, { data: preferenceData, error: preferencesError }] = await Promise.all([
       query,
-      supabase
-        .from('user_content_preferences')
-        .select('*')
-        .eq('user_id', userId),
+      supabase.from('user_content_preferences').select('*').eq('user_id', userId),
     ]);
 
     if (error) {
@@ -53,10 +51,15 @@ export async function getUserContents(
       throw preferencesError;
     }
 
-    const preferenceMap = new Map<string, UserContentPreference[]>();
+    const preferenceMap = new Map<string, UserContentPreferenceTyped[]>();
     preferenceData?.forEach((preference) => {
+      const typedPreference: UserContentPreferenceTyped = {
+        ...preference,
+        preference_type: preference.preference_type as UserContentPreferenceTyped['preference_type'],
+      };
+
       const contentPreferences = preferenceMap.get(preference.content_id) ?? [];
-      contentPreferences.push(preference);
+      contentPreferences.push(typedPreference);
       preferenceMap.set(preference.content_id, contentPreferences);
     });
 
