@@ -2,7 +2,7 @@ import React from 'react';
 import { View, TouchableOpacity } from 'react-native';
 import { Text } from '@/components/ui/text';
 import { Icon } from '@/components/ui/icon';
-import { ClockIcon, ExternalLinkIcon, Check } from 'lucide-react-native';
+import { ClockIcon, ExternalLinkIcon, Heart } from 'lucide-react-native';
 import { ContentThumbnail } from '@/components/content/sub/content-thumbnail';
 import { formatTimelineDate } from '@/hooks/use-content-formatters';
 import { useContentActions } from '@/hooks/use-content-actions';
@@ -17,6 +17,8 @@ interface TimelineCardProps {
 export function TimelineCard({ item, isFirstOfDay = false, onPress }: TimelineCardProps) {
   const { openURL } = useContentActions();
   const content = item.contents;
+  const isLiked =
+    item.preferences?.some((preference) => preference.preference_type === 'liked') ?? false;
 
   // Parse completed date
   const dateInfo = item.completed_at ? formatTimelineDate(item.completed_at) : null;
@@ -36,11 +38,6 @@ export function TimelineCard({ item, isFirstOfDay = false, onPress }: TimelineCa
       <View className="flex-row py-3 pl-1.5 pr-3">
         {/* Date Column - Left */}
         <View className="mr-2 w-12 items-center">
-          <View className="mb-2 rounded-full bg-green-500/15 p-2">
-            <View className="h-7 w-7 items-center justify-center rounded-full bg-green-500">
-              <Icon as={Check} className="h-3.5 w-3.5 text-white" />
-            </View>
-          </View>
           {isFirstOfDay ? (
             <View className="items-center">
               <Text className="text-[10px] font-medium text-gray-500 dark:text-gray-400">
@@ -57,14 +54,19 @@ export function TimelineCard({ item, isFirstOfDay = false, onPress }: TimelineCa
 
         {/* Content - Right */}
         <View className="flex-1">
-          {/* Top Header Row - Domain and Hold indicator */}
+          {/* Top Header Row - Domain, Like icon and Hold indicator */}
           <View className="mb-2 flex-row items-center justify-between">
-            {/* Domain - Left */}
-            {content?.domain && (
-              <View className="self-start rounded-full bg-gray-100 px-2 py-0.5 dark:bg-gray-700">
-                <Text className="text-xs text-gray-600 dark:text-gray-400">{content.domain}</Text>
-              </View>
-            )}
+            <View className="flex-row items-center gap-2">
+              {/* Like Icon - Separate */}
+              {isLiked && <Icon as={Heart} className="h-3.5 w-3.5 fill-rose-200 text-rose-500" />}
+
+              {/* Domain - Left */}
+              {content?.domain && (
+                <View className="flex-row items-center self-start rounded-full bg-gray-100 px-2 py-0.5 dark:bg-gray-700">
+                  <Text className="text-xs text-gray-600 dark:text-gray-400">{content.domain}</Text>
+                </View>
+              )}
+            </View>
 
             {/* Hold to open link indicator - Right */}
             <View className="flex-row items-center opacity-60">
