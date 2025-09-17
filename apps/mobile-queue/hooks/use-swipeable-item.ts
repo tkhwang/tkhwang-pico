@@ -1,5 +1,9 @@
 import { Alert } from 'react-native';
-import { Gesture, GestureUpdateEvent } from 'react-native-gesture-handler';
+import {
+  Gesture,
+  GestureUpdateEvent,
+  PanGestureHandlerEventPayload,
+} from 'react-native-gesture-handler';
 import {
   useAnimatedStyle,
   useSharedValue,
@@ -87,13 +91,17 @@ export function useSwipeableItem({
     .activeOffsetX([-10, 10])
     .failOffsetY([-5, 5])
     .shouldCancelWhenOutside(true)
-    .onUpdate((event: GestureUpdateEvent<any>) => {
-      // Apply damping factor for smoother movement
-      const dampedTranslation = event.translationX * swipeDamping;
+    .onUpdate((event: GestureUpdateEvent<PanGestureHandlerEventPayload>) => {
+        // Apply damping factor for smoother movement
+        const dampedTranslation = event.translationX * swipeDamping;
 
-      // Limit the swipe distance
-      translateX.value = Math.max(-maxSwipeDistance, Math.min(maxSwipeDistance, dampedTranslation));
-    })
+        // Limit the swipe distance
+        translateX.value = Math.max(
+          -maxSwipeDistance,
+          Math.min(maxSwipeDistance, dampedTranslation)
+        );
+      }
+    )
     .onEnd(() => {
       // Check if swipe passes threshold
       if (translateX.value > swipeThreshold) {
