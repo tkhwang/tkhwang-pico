@@ -88,6 +88,9 @@ export function ContentDetailModal({
     'preferences' in item
       ? (item.preferences?.some((preference) => preference.preference_type === 'liked') ?? false)
       : false;
+  const completeStyles = isCompleted
+    ? MODAL_ACTION_STYLES.complete.completed
+    : MODAL_ACTION_STYLES.complete.pending;
 
   const handleToggleComplete = () => {
     if (onToggleComplete && 'id' in item) {
@@ -312,7 +315,8 @@ export function ContentDetailModal({
                         as={ThumbsUp}
                         className={`mb-1 h-5 w-5 ${MODAL_ACTION_STYLES.addToQueue.icon}`}
                       />
-                      <Text className={`text-xs font-semibold ${MODAL_ACTION_STYLES.addToQueue.text}`}>
+                      <Text
+                        className={`text-xs font-semibold ${MODAL_ACTION_STYLES.addToQueue.text}`}>
                         Add to Queue
                       </Text>
                     </TouchableOpacity>
@@ -338,7 +342,8 @@ export function ContentDetailModal({
                         as={ThumbsDown}
                         className={`mb-1 h-5 w-5 ${MODAL_ACTION_STYLES.notInterested.icon}`}
                       />
-                      <Text className={`text-xs font-semibold ${MODAL_ACTION_STYLES.notInterested.text}`}>
+                      <Text
+                        className={`text-xs font-semibold ${MODAL_ACTION_STYLES.notInterested.text}`}>
                         Not Interested
                       </Text>
                     </TouchableOpacity>
@@ -349,17 +354,23 @@ export function ContentDetailModal({
                     <TouchableOpacity
                       onPress={handleLike}
                       className={`flex-1 items-center justify-center rounded-lg px-2 py-3 ${
-                        isLiked ? MODAL_ACTION_STYLES.like.liked.container : MODAL_ACTION_STYLES.like.unliked.container
+                        isLiked
+                          ? MODAL_ACTION_STYLES.like.liked.container
+                          : MODAL_ACTION_STYLES.like.unliked.container
                       }`}>
                       <Icon
                         as={Heart}
                         className={`mb-1 h-5 w-5 ${
-                          isLiked ? MODAL_ACTION_STYLES.like.liked.icon : MODAL_ACTION_STYLES.like.unliked.icon
+                          isLiked
+                            ? MODAL_ACTION_STYLES.like.liked.icon
+                            : MODAL_ACTION_STYLES.like.unliked.icon
                         }`}
                       />
                       <Text
                         className={`text-xs font-semibold ${
-                          isLiked ? MODAL_ACTION_STYLES.like.liked.text : MODAL_ACTION_STYLES.like.unliked.text
+                          isLiked
+                            ? MODAL_ACTION_STYLES.like.liked.text
+                            : MODAL_ACTION_STYLES.like.unliked.text
                         }`}>
                         {isLiked ? 'Unlike' : 'Like'}
                       </Text>
@@ -368,12 +379,12 @@ export function ContentDetailModal({
                     {/* Toggle Complete Button */}
                     <TouchableOpacity
                       onPress={handleToggleComplete}
-                      className={`flex-1 items-center justify-center rounded-lg px-2 py-3 ${MODAL_ACTION_STYLES.complete.container}`}>
+                      className={`flex-1 items-center justify-center rounded-lg px-2 py-3 ${completeStyles.container}`}>
                       <Icon
                         as={isCompleted ? RotateCcw : CheckCircle}
-                        className={`mb-1 h-5 w-5 ${MODAL_ACTION_STYLES.complete.icon}`}
+                        className={`mb-1 h-5 w-5 ${completeStyles.icon}`}
                       />
-                      <Text className={`text-xs font-semibold ${MODAL_ACTION_STYLES.complete.text}`}>
+                      <Text className={`text-xs font-semibold ${completeStyles.text}`}>
                         {isCompleted ? 'Pending' : 'Complete'}
                       </Text>
                     </TouchableOpacity>
@@ -395,7 +406,10 @@ export function ContentDetailModal({
                     <TouchableOpacity
                       onPress={handleDelete}
                       className={`flex-1 items-center justify-center rounded-lg px-2 py-3 ${MODAL_ACTION_STYLES.delete.container}`}>
-                      <Icon as={Trash2} className={`mb-1 h-5 w-5 ${MODAL_ACTION_STYLES.delete.icon}`} />
+                      <Icon
+                        as={Trash2}
+                        className={`mb-1 h-5 w-5 ${MODAL_ACTION_STYLES.delete.icon}`}
+                      />
                       <Text className={`text-xs font-semibold ${MODAL_ACTION_STYLES.delete.text}`}>
                         Delete
                       </Text>

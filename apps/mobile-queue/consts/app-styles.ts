@@ -181,9 +181,16 @@ export const MODAL_ACTION_STYLES = {
     },
   },
   complete: {
-    container: ACTION_STYLES.complete.pending.container,
-    icon: ACTION_STYLES.complete.pending.icon,
-    text: ACTION_STYLES.complete.pending.text,
+    completed: {
+      container: ACTION_STYLES.complete.completed.container,
+      icon: ACTION_STYLES.complete.completed.icon,
+      text: ACTION_STYLES.complete.completed.text,
+    },
+    pending: {
+      container: ACTION_STYLES.complete.pending.container,
+      icon: ACTION_STYLES.complete.pending.icon,
+      text: ACTION_STYLES.complete.pending.text,
+    },
   },
   open: {
     container: ACTION_STYLES.open.container,
