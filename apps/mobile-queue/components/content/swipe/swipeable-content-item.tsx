@@ -68,7 +68,7 @@ export function SwipeableContentItem({
       <GestureDetector gesture={panGesture}>
         <AnimatedViewTyped
           style={animatedStyle}
-          onLayout={(event: any) => {
+          onLayout={(event: import('react-native').LayoutChangeEvent) => {
             itemHeight.value = event.nativeEvent.layout.height;
           }}>
           <ContentItem item={item} onToggleComplete={onToggleComplete} onPress={onPress} />
