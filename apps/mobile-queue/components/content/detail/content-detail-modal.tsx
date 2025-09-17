@@ -37,6 +37,7 @@ import {
 import { useContentActions } from '@/hooks/use-content-actions';
 import { ContentTags } from '@/components/content/sub/content-tags';
 import { ContentThumbnail } from '@/components/content/sub/content-thumbnail';
+import { MODAL_ACTION_STYLES } from '@/consts/app-styles';
 import type { UserContentWithDetails, Recommendation } from '@tkhwang-pico/common';
 
 interface ContentDetailModalProps {
@@ -306,12 +307,12 @@ export function ContentDetailModal({
                     {/* Add to Queue Button */}
                     <TouchableOpacity
                       onPress={handleAddToQueue}
-                      className="flex-1 items-center justify-center rounded-lg bg-green-100 px-2 py-3 dark:bg-green-900/30">
+                      className={`flex-1 items-center justify-center rounded-lg px-2 py-3 ${MODAL_ACTION_STYLES.addToQueue.container}`}>
                       <Icon
                         as={ThumbsUp}
-                        className="mb-1 h-5 w-5 text-green-600 dark:text-green-400"
+                        className={`mb-1 h-5 w-5 ${MODAL_ACTION_STYLES.addToQueue.icon}`}
                       />
-                      <Text className="text-xs font-semibold text-green-700 dark:text-green-400">
+                      <Text className={`text-xs font-semibold ${MODAL_ACTION_STYLES.addToQueue.text}`}>
                         Add to Queue
                       </Text>
                     </TouchableOpacity>
@@ -319,12 +320,12 @@ export function ContentDetailModal({
                     {/* Open in Browser Button */}
                     <TouchableOpacity
                       onPress={handleOpenURL}
-                      className="flex-1 items-center justify-center rounded-lg bg-gray-100 px-2 py-3 dark:bg-gray-800">
+                      className={`flex-1 items-center justify-center rounded-lg px-2 py-3 ${MODAL_ACTION_STYLES.open.container}`}>
                       <Icon
                         as={ExternalLink}
-                        className="mb-1 h-5 w-5 text-gray-600 dark:text-gray-400"
+                        className={`mb-1 h-5 w-5 ${MODAL_ACTION_STYLES.open.icon}`}
                       />
-                      <Text className="text-xs font-semibold text-gray-700 dark:text-gray-400">
+                      <Text className={`text-xs font-semibold ${MODAL_ACTION_STYLES.open.text}`}>
                         Open
                       </Text>
                     </TouchableOpacity>
@@ -332,12 +333,12 @@ export function ContentDetailModal({
                     {/* Not Interested Button */}
                     <TouchableOpacity
                       onPress={handleNotInterested}
-                      className="flex-1 items-center justify-center rounded-lg bg-red-100 px-2 py-3 dark:bg-red-900/30">
+                      className={`flex-1 items-center justify-center rounded-lg px-2 py-3 ${MODAL_ACTION_STYLES.notInterested.container}`}>
                       <Icon
                         as={ThumbsDown}
-                        className="mb-1 h-5 w-5 text-red-600 dark:text-red-400"
+                        className={`mb-1 h-5 w-5 ${MODAL_ACTION_STYLES.notInterested.icon}`}
                       />
-                      <Text className="text-xs font-semibold text-red-700 dark:text-red-400">
+                      <Text className={`text-xs font-semibold ${MODAL_ACTION_STYLES.notInterested.text}`}>
                         Not Interested
                       </Text>
                     </TouchableOpacity>
@@ -348,21 +349,17 @@ export function ContentDetailModal({
                     <TouchableOpacity
                       onPress={handleLike}
                       className={`flex-1 items-center justify-center rounded-lg px-2 py-3 ${
-                        isLiked ? 'bg-gray-200 dark:bg-gray-700' : 'bg-gray-100 dark:bg-gray-800'
+                        isLiked ? MODAL_ACTION_STYLES.like.liked.container : MODAL_ACTION_STYLES.like.unliked.container
                       }`}>
                       <Icon
                         as={Heart}
                         className={`mb-1 h-5 w-5 ${
-                          isLiked
-                            ? 'fill-gray-700 text-gray-700 dark:fill-gray-200 dark:text-gray-200'
-                            : 'text-gray-500 dark:text-gray-400'
+                          isLiked ? MODAL_ACTION_STYLES.like.liked.icon : MODAL_ACTION_STYLES.like.unliked.icon
                         }`}
                       />
                       <Text
                         className={`text-xs font-semibold ${
-                          isLiked
-                            ? 'text-gray-700 dark:text-gray-200'
-                            : 'text-gray-600 dark:text-gray-400'
+                          isLiked ? MODAL_ACTION_STYLES.like.liked.text : MODAL_ACTION_STYLES.like.unliked.text
                         }`}>
                         {isLiked ? 'Unlike' : 'Like'}
                       </Text>
@@ -371,12 +368,12 @@ export function ContentDetailModal({
                     {/* Toggle Complete Button */}
                     <TouchableOpacity
                       onPress={handleToggleComplete}
-                      className="flex-1 items-center justify-center rounded-lg bg-gray-100 px-2 py-3 dark:bg-gray-800">
+                      className={`flex-1 items-center justify-center rounded-lg px-2 py-3 ${MODAL_ACTION_STYLES.complete.container}`}>
                       <Icon
                         as={isCompleted ? RotateCcw : CheckCircle}
-                        className="mb-1 h-5 w-5 text-gray-600 dark:text-gray-400"
+                        className={`mb-1 h-5 w-5 ${MODAL_ACTION_STYLES.complete.icon}`}
                       />
-                      <Text className="text-xs font-semibold text-gray-700 dark:text-gray-300">
+                      <Text className={`text-xs font-semibold ${MODAL_ACTION_STYLES.complete.text}`}>
                         {isCompleted ? 'Pending' : 'Complete'}
                       </Text>
                     </TouchableOpacity>
@@ -384,12 +381,12 @@ export function ContentDetailModal({
                     {/* Open in Browser Button */}
                     <TouchableOpacity
                       onPress={handleOpenURL}
-                      className="flex-1 items-center justify-center rounded-lg bg-gray-100 px-2 py-3 dark:bg-gray-800">
+                      className={`flex-1 items-center justify-center rounded-lg px-2 py-3 ${MODAL_ACTION_STYLES.open.container}`}>
                       <Icon
                         as={ExternalLink}
-                        className="mb-1 h-5 w-5 text-gray-600 dark:text-gray-400"
+                        className={`mb-1 h-5 w-5 ${MODAL_ACTION_STYLES.open.icon}`}
                       />
-                      <Text className="text-xs font-semibold text-gray-700 dark:text-gray-400">
+                      <Text className={`text-xs font-semibold ${MODAL_ACTION_STYLES.open.text}`}>
                         Open
                       </Text>
                     </TouchableOpacity>
@@ -397,9 +394,9 @@ export function ContentDetailModal({
                     {/* Delete Button */}
                     <TouchableOpacity
                       onPress={handleDelete}
-                      className="flex-1 items-center justify-center rounded-lg bg-gray-100 px-2 py-3 dark:bg-gray-800">
-                      <Icon as={Trash2} className="mb-1 h-5 w-5 text-gray-600 dark:text-gray-400" />
-                      <Text className="text-xs font-semibold text-gray-700 dark:text-gray-300">
+                      className={`flex-1 items-center justify-center rounded-lg px-2 py-3 ${MODAL_ACTION_STYLES.delete.container}`}>
+                      <Icon as={Trash2} className={`mb-1 h-5 w-5 ${MODAL_ACTION_STYLES.delete.icon}`} />
+                      <Text className={`text-xs font-semibold ${MODAL_ACTION_STYLES.delete.text}`}>
                         Delete
                       </Text>
                     </TouchableOpacity>
