@@ -121,7 +121,7 @@ export function SwipeableContentItem({
         <TouchableOpacity
           activeOpacity={0.8}
           onPress={handleCompletePress}
-          className={`flex-1 items-center justify-center border-l ${completionStyles.border} ${completionStyles.bg}`}>
+          className={`flex-1 items-center justify-center ${completionStyles.bg}`}>
           <AnimatedViewTyped style={leftIconStyle}>
             <Icon as={LeftIcon} className={`h-6 w-6 ${completionStyles.icon}`} />
           </AnimatedViewTyped>

@@ -124,7 +124,7 @@ export function SwipeableTimelineItem({
           <TouchableOpacity
             activeOpacity={0.8}
             onPress={handleReopen}
-            className={`items-center justify-center border-l ${leftReopenStyles.border} ${leftReopenStyles.bg}`}
+            className={`items-center justify-center ${leftReopenStyles.bg}`}
             style={{ width: TIMELINE_LEFT_ACTION_WIDTH / 2 }}>
             <AnimatedViewTyped style={leftIconStyle}>
               <Icon as={RotateCcw} className={`h-6 w-6 ${leftReopenStyles.icon}`} />

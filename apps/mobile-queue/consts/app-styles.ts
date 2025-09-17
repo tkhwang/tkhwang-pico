@@ -4,47 +4,44 @@
 export const ACTION_STYLES = {
   like: {
     liked: {
-      container: 'bg-gray-200 dark:bg-gray-700',
-      icon: 'text-gray-700 dark:text-gray-200',
-      text: 'text-gray-700 dark:text-gray-200',
-      fillIcon: 'fill-gray-700 text-gray-700 dark:fill-gray-200 dark:text-gray-200',
+      container: 'bg-pink-100 dark:bg-pink-900/30',
+      icon: 'text-pink-600 dark:text-pink-400',
+      text: 'text-pink-600 dark:text-pink-400',
+      fillIcon: 'fill-pink-600 text-pink-600 dark:fill-pink-400 dark:text-pink-400',
       label: 'Unlike',
     },
     unliked: {
-      container: 'bg-gray-100 dark:bg-gray-800',
-      icon: 'text-gray-600 dark:text-gray-400',
-      text: 'text-gray-600 dark:text-gray-400',
-      fillIcon: 'text-gray-500 dark:text-gray-400',
+      container: 'bg-pink-50 dark:bg-pink-950/20',
+      icon: 'text-pink-500 dark:text-pink-300',
+      text: 'text-pink-500 dark:text-pink-300',
+      fillIcon: 'text-pink-500 dark:text-pink-300',
       label: 'Like',
     },
   },
   complete: {
     completed: {
-      container: 'bg-gray-100 dark:bg-gray-800',
-      icon: 'text-gray-600 dark:text-gray-400',
-      text: 'text-gray-600 dark:text-gray-400',
-      border: 'border-gray-200 dark:border-gray-700',
+      container: 'bg-purple-50 dark:bg-purple-950/20',
+      icon: 'text-purple-500 dark:text-purple-300',
+      text: 'text-purple-500 dark:text-purple-300',
       label: 'Pending',
     },
     pending: {
-      container: 'bg-gray-100 dark:bg-gray-800',
-      icon: 'text-gray-600 dark:text-gray-400',
-      text: 'text-gray-600 dark:text-gray-400',
-      border: 'border-gray-200 dark:border-gray-700',
+      container: 'bg-purple-100 dark:bg-purple-900/30',
+      icon: 'text-purple-600 dark:text-purple-400',
+      text: 'text-purple-600 dark:text-purple-400',
       label: 'Complete',
     },
   },
   delete: {
-    container: 'bg-gray-100 dark:bg-gray-800',
-    icon: 'text-gray-600 dark:text-gray-400',
-    text: 'text-gray-600 dark:text-gray-400',
+    container: 'bg-red-100 dark:bg-red-900/30',
+    icon: 'text-red-600 dark:text-red-400',
+    text: 'text-red-600 dark:text-red-400',
     label: 'Delete',
   },
   reopen: {
-    container: 'bg-gray-100 dark:bg-gray-800',
-    icon: 'text-gray-600 dark:text-gray-400',
-    text: 'text-gray-600 dark:text-gray-400',
-    border: 'border-blue-100',
+    container: 'bg-purple-50 dark:bg-purple-950/20',
+    icon: 'text-purple-500 dark:text-purple-300',
+    text: 'text-purple-500 dark:text-purple-300',
     label: 'Reopen',
   },
   open: {
@@ -71,15 +68,15 @@ export const ACTION_STYLES = {
   },
   notInterested: {
     default: {
-      container: 'bg-orange-200 dark:bg-orange-900/30',
+      container: 'bg-orange-100 dark:bg-orange-900/30',
       wrapper: '',
-      icon: 'text-orange-700 dark:text-orange-400',
-      text: 'text-orange-700 dark:text-orange-400',
+      icon: 'text-orange-600 dark:text-orange-400',
+      text: 'text-orange-600 dark:text-orange-400',
       label: 'Skip',
     },
     completed: {
-      container: 'bg-red-500',
-      wrapper: 'shadow-lg shadow-red-500/20',
+      container: 'bg-orange-500',
+      wrapper: 'shadow-lg shadow-orange-500/20',
       icon: 'text-white',
       text: 'text-white',
       label: 'Removed',
@@ -113,13 +110,11 @@ export const COMPLETION_STYLES = {
     bg: ACTION_STYLES.complete.completed.container,
     icon: ACTION_STYLES.complete.completed.icon,
     text: ACTION_STYLES.complete.completed.text,
-    border: ACTION_STYLES.complete.completed.border,
   },
   pending: {
     bg: ACTION_STYLES.complete.pending.container,
     icon: ACTION_STYLES.complete.pending.icon,
     text: ACTION_STYLES.complete.pending.text,
-    border: ACTION_STYLES.complete.pending.border,
   },
 } as const;
 
@@ -135,7 +130,6 @@ export const REOPEN_STYLES = {
   bg: ACTION_STYLES.reopen.container,
   icon: ACTION_STYLES.reopen.icon,
   text: ACTION_STYLES.reopen.text,
-  border: ACTION_STYLES.reopen.border,
 } as const;
 
 // Recommend swipe action styles
@@ -207,8 +201,8 @@ export const MODAL_ACTION_STYLES = {
     text: ACTION_STYLES.addToQueue.default.text,
   },
   notInterested: {
-    container: 'bg-red-100 dark:bg-red-900/30',
-    icon: 'text-red-600 dark:text-red-400',
-    text: 'text-red-700 dark:text-red-400',
+    container: 'bg-orange-100 dark:bg-orange-900/30',
+    icon: 'text-orange-600 dark:text-orange-400',
+    text: 'text-orange-600 dark:text-orange-400',
   },
 } as const;
