@@ -8,6 +8,7 @@ import { useUserContents } from '@/hooks/queries/use-user-contents';
 import { ContentListSkeleton } from '@/components/content/list/content-list-skeleton';
 import { useToggleTodo } from '@/hooks/mutations/use-toggle-todo';
 import { useDeleteContent } from '@/hooks/mutations/use-delete-content';
+import { useToggleContentPreference } from '@/hooks/mutations/use-toggle-content-preference';
 import type { TodoFilterType, UserContentWithDetails } from '@tkhwang-pico/common';
 
 interface ContentListProps {
@@ -23,6 +24,7 @@ export function ContentList({ todoFilter }: ContentListProps) {
 
   const toggleTodoMutation = useToggleTodo();
   const deleteContentMutation = useDeleteContent();
+  const togglePreferenceMutation = useToggleContentPreference();
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -45,6 +47,16 @@ export function ContentList({ todoFilter }: ContentListProps) {
       deleteContentMutation.mutate(contentId);
     },
     [deleteContentMutation]
+  );
+
+  const handleLike = useCallback(
+    (contentId: string) => {
+      togglePreferenceMutation.mutate({
+        contentId,
+        preferenceType: 'liked',
+      });
+    },
+    [togglePreferenceMutation]
   );
 
   const handleItemPress = useCallback((item: UserContentWithDetails) => {
@@ -112,6 +124,7 @@ export function ContentList({ todoFilter }: ContentListProps) {
         item={item}
         onToggleComplete={handleToggleComplete}
         onDelete={handleDelete}
+        onLike={handleLike}
         onPress={handleItemPress}
       />
     );

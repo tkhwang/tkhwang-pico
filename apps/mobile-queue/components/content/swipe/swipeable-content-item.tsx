@@ -1,12 +1,14 @@
 import React from 'react';
-import { View, LayoutChangeEvent } from 'react-native';
+import { View, LayoutChangeEvent, TouchableOpacity, Alert } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
-import { ContentItem } from '../content-item';
 import { Icon } from '@/components/ui/icon';
-import { Check, Trash2, RotateCcw } from 'lucide-react-native';
+import { Check, Trash2, RotateCcw, Heart } from 'lucide-react-native';
 import { useSwipeableItem } from '@/hooks/use-swipeable-item';
 import type { UserContentWithDetails } from '@tkhwang-pico/common';
+import { Text } from '@/components/ui/text';
+import { LEFT_ACTION_WIDTH, RIGHT_ACTION_WIDTH, SWIPE_MENU_DAMPING } from '@/consts/app-consts';
+import { ContentItem } from '@/components/content/content-item';
 
 // Type assertion for React 19 compatibility
 const AnimatedViewTyped = Animated.View as any;
@@ -15,6 +17,7 @@ interface SwipeableContentItemProps {
   item: UserContentWithDetails;
   onToggleComplete?: (id: string) => void;
   onDelete?: (contentId: string) => void;
+  onLike?: (contentId: string) => void;
   onPress?: (item: UserContentWithDetails) => void;
 }
 
@@ -22,6 +25,7 @@ export function SwipeableContentItem({
   item,
   onToggleComplete,
   onDelete,
+  onLike,
   onPress,
 }: SwipeableContentItemProps) {
   const {
@@ -32,11 +36,16 @@ export function SwipeableContentItem({
     rightContainerStyle,
     leftIconStyle,
     rightIconStyle,
+    close,
+    isLeftOpen,
+    isRightOpen,
   } = useSwipeableItem({
-    onSwipeRight: () => onToggleComplete?.(item.id),
-    onSwipeLeft: () => onDelete?.(item.content_id),
-    confirmDelete: true,
-    deleteMessage: 'Are you sure you want to delete this content?',
+    actionMode: 'menu',
+    swipeThreshold: 60,
+    maxSwipeDistance: Math.max(LEFT_ACTION_WIDTH, RIGHT_ACTION_WIDTH),
+    leftOpenValue: LEFT_ACTION_WIDTH,
+    rightOpenValue: RIGHT_ACTION_WIDTH,
+    swipeDamping: SWIPE_MENU_DAMPING,
   });
 
   // Dynamic colors and icons based on todo_status
@@ -44,24 +53,91 @@ export function SwipeableContentItem({
   const leftBgColor = isCompleted ? 'bg-blue-500' : 'bg-green-500';
   const LeftIcon = isCompleted ? RotateCcw : Check;
 
+  const handleLikePress = () => {
+    onLike?.(item.content_id);
+    close();
+  };
+
+  const handleCompletePress = () => {
+    onToggleComplete?.(item.id);
+    close();
+  };
+
+  const handleDeletePress = () => {
+    if (!onDelete) {
+      close();
+      return;
+    }
+
+    Alert.alert('Delete Content', 'Are you sure you want to delete this content?', [
+      {
+        text: 'Cancel',
+        style: 'cancel',
+        onPress: close,
+      },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: () => {
+          onDelete(item.content_id);
+          close();
+        },
+      },
+    ]);
+  };
+
+  const handleContentPress = (contentItem: UserContentWithDetails) => {
+    if (isLeftOpen || isRightOpen) {
+      close();
+      return;
+    }
+    onPress?.(contentItem);
+  };
+
   return (
     <View className="relative mb-2">
-      {/* Left Background - Toggle (Green for complete, Blue for reopen) - Only visible when swiping right */}
+      {/* Left Background - Like + Complete (blue when reopening) - visible when swiping right */}
       <AnimatedViewTyped
-        className={`absolute left-0 top-0 w-24 items-center justify-center rounded-l-lg ${leftBgColor}`}
-        style={leftContainerStyle}>
-        <AnimatedViewTyped style={leftIconStyle}>
-          <Icon as={LeftIcon} className="h-6 w-6 text-white" />
-        </AnimatedViewTyped>
+        className="absolute left-0 top-0 flex-row overflow-hidden rounded-l-lg"
+        style={[leftContainerStyle, { width: LEFT_ACTION_WIDTH }]}>
+        <TouchableOpacity
+          activeOpacity={0.8}
+          onPress={handleLikePress}
+          className="flex-1 items-center justify-center bg-pink-500">
+          <AnimatedViewTyped style={leftIconStyle}>
+            <Icon as={Heart} className="h-6 w-6 text-white" />
+          </AnimatedViewTyped>
+          <Text className="mt-1 text-xs font-semibold text-white">Like</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          activeOpacity={0.8}
+          onPress={handleCompletePress}
+          className={`flex-1 items-center justify-center border-l border-white/30 ${leftBgColor}`}>
+          <AnimatedViewTyped style={leftIconStyle}>
+            <Icon as={LeftIcon} className="h-6 w-6 text-white" />
+          </AnimatedViewTyped>
+          <Text className="mt-1 text-xs font-semibold text-white">
+            {isCompleted ? 'Pending' : 'Complete'}
+          </Text>
+        </TouchableOpacity>
       </AnimatedViewTyped>
 
       {/* Right Background - Delete (Red) - Only visible when swiping left */}
       <AnimatedViewTyped
-        className="absolute right-0 top-0 w-24 items-center justify-center rounded-r-lg bg-red-500"
-        style={rightContainerStyle}>
-        <AnimatedViewTyped style={rightIconStyle}>
-          <Icon as={Trash2} className="h-6 w-6 text-white" />
-        </AnimatedViewTyped>
+        className="absolute right-0 top-0 rounded-r-lg bg-red-500"
+        style={[
+          rightContainerStyle,
+          { width: RIGHT_ACTION_WIDTH, alignItems: 'center', justifyContent: 'center' },
+        ]}>
+        <TouchableOpacity
+          activeOpacity={0.8}
+          onPress={handleDeletePress}
+          className="h-full w-full items-center justify-center">
+          <AnimatedViewTyped style={rightIconStyle}>
+            <Icon as={Trash2} className="h-6 w-6 text-white" />
+          </AnimatedViewTyped>
+          <Text className="mt-1 text-xs font-semibold text-white">Delete</Text>
+        </TouchableOpacity>
       </AnimatedViewTyped>
 
       {/* Swipeable Content */}
@@ -71,7 +147,11 @@ export function SwipeableContentItem({
           onLayout={(event: LayoutChangeEvent) => {
             itemHeight.value = event.nativeEvent.layout.height;
           }}>
-          <ContentItem item={item} onToggleComplete={onToggleComplete} onPress={onPress} />
+          <ContentItem
+            item={item}
+            onToggleComplete={onToggleComplete}
+            onPress={handleContentPress}
+          />
         </AnimatedViewTyped>
       </GestureDetector>
     </View>
