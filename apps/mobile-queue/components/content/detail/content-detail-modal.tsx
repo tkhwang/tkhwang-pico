@@ -37,7 +37,7 @@ import {
 import { useContentActions } from '@/hooks/use-content-actions';
 import { ContentTags } from '@/components/content/sub/content-tags';
 import { ContentThumbnail } from '@/components/content/sub/content-thumbnail';
-import { MODAL_ACTION_STYLES } from '@/consts/app-styles';
+import { MODAL_ACTION_STYLES, ACTION_STYLES } from '@/consts/app-styles';
 import type { UserContentWithDetails, Recommendation } from '@tkhwang-pico/common';
 
 interface ContentDetailModalProps {
@@ -385,7 +385,7 @@ export function ContentDetailModal({
                         className={`mb-1 h-5 w-5 ${completeStyles.icon}`}
                       />
                       <Text className={`text-xs font-semibold ${completeStyles.text}`}>
-                        {isCompleted ? 'Pending' : 'Complete'}
+                        {isCompleted ? ACTION_STYLES.complete.completed.label : ACTION_STYLES.complete.pending.label}
                       </Text>
                     </TouchableOpacity>
 

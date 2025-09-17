@@ -31,7 +31,7 @@ export const ACTION_STYLES = {
       container: 'bg-purple-50 dark:bg-purple-950/20',
       icon: 'text-purple-500 dark:text-purple-300',
       text: 'text-purple-500 dark:text-purple-300',
-      label: 'Pending',
+      label: 'Reopen',
     },
     pending: {
       container: 'bg-purple-100 dark:bg-purple-900/30',

@@ -12,7 +12,7 @@ import {
   RECOMMEND_RIGHT_ACTION_WIDTH,
   SWIPE_MENU_DAMPING,
 } from '@/consts/app-consts';
-import { RECOMMEND_ADD_STYLES, RECOMMEND_SKIP_STYLES } from '@/consts/app-styles';
+import { RECOMMEND_ADD_STYLES, RECOMMEND_SKIP_STYLES, ACTION_STYLES } from '@/consts/app-styles';
 import type { Recommendation } from '@tkhwang-pico/common';
 import { useSwipeActionFeedback } from '@/hooks/use-swipe-action-feedback';
 
@@ -107,7 +107,7 @@ export function SwipeableRecommendItem({
             />
           </AnimatedViewTyped>
           <Text className={`mt-1 text-xs font-semibold ${leftStyles.text}`}>
-            {actionCompleted === 'queue' ? 'Added!' : 'Add Queue'}
+            {actionCompleted === 'queue' ? ACTION_STYLES.addToQueue.completed.label : ACTION_STYLES.addToQueue.default.label}
           </Text>
         </TouchableOpacity>
       </AnimatedViewTyped>
@@ -131,7 +131,7 @@ export function SwipeableRecommendItem({
             />
           </AnimatedViewTyped>
           <Text className={`mt-1 text-xs font-semibold ${rightStyles.text}`}>
-            {actionCompleted === 'notInterested' ? 'Removed' : 'Skip'}
+            {actionCompleted === 'notInterested' ? ACTION_STYLES.notInterested.completed.label : ACTION_STYLES.notInterested.default.label}
           </Text>
         </TouchableOpacity>
       </AnimatedViewTyped>
