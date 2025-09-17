@@ -51,7 +51,6 @@ export function SwipeableRecommendItem({
     isRightOpen,
     translateX,
   } = useSwipeableItem({
-    actionMode: 'menu',
     swipeThreshold: 60,
     maxSwipeDistance: Math.max(RECOMMEND_LEFT_ACTION_WIDTH, RECOMMEND_RIGHT_ACTION_WIDTH),
     leftOpenValue: RECOMMEND_LEFT_ACTION_WIDTH,

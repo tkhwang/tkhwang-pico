@@ -46,7 +46,6 @@ export function SwipeableTimelineItem({
     isLeftOpen,
     isRightOpen,
   } = useSwipeableItem({
-    actionMode: 'menu',
     swipeThreshold: 60,
     maxSwipeDistance: Math.max(TIMELINE_LEFT_ACTION_WIDTH, TIMELINE_RIGHT_ACTION_WIDTH),
     leftOpenValue: TIMELINE_LEFT_ACTION_WIDTH,

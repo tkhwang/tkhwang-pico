@@ -42,7 +42,6 @@ export function SwipeableContentItem({
     isLeftOpen,
     isRightOpen,
   } = useSwipeableItem({
-    actionMode: 'menu',
     swipeThreshold: 60,
     maxSwipeDistance: Math.max(LEFT_ACTION_WIDTH, RIGHT_ACTION_WIDTH),
     leftOpenValue: LEFT_ACTION_WIDTH,
