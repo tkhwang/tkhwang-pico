@@ -8,10 +8,10 @@ import { useDeleteContent } from '@/hooks/mutations/use-delete-content';
 import { useReopenContent } from '@/hooks/mutations/use-reopen-content';
 import { useToggleContent } from '@/hooks/mutations/use-toggle-content';
 import { useToggleContentPreference } from '@/hooks/mutations/use-toggle-content-preference';
-import type { UserContentWithDetails } from '@tkhwang-pico/common';
 import { TimelineListSkeleton } from '@/components/timeline/list/timeline-list-skeleton';
 import { ContentDetailModal } from '@/components/content/detail/content-detail-modal';
 import { isContentLiked } from '@/utils/content-helpers';
+import type { UserContentWithDetails } from '@tkhwang-pico/common';
 
 interface GroupedContent {
   date: string;

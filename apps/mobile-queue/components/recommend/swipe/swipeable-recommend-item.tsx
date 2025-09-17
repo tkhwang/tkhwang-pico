@@ -12,7 +12,6 @@ import Animated, {
 import { RecommendItem } from '../recommend-item';
 import { Icon } from '@/components/ui/icon';
 import { ThumbsUp, ThumbsDown, Sparkles, Plus, X } from 'lucide-react-native';
-import type { Recommendation } from '@tkhwang-pico/common';
 import { Text } from '@/components/ui/text';
 import { useSwipeableItem } from '@/hooks/use-swipeable-item';
 import {
@@ -21,6 +20,7 @@ import {
   SWIPE_MENU_DAMPING,
 } from '@/consts/app-consts';
 import { RECOMMEND_ADD_STYLES, RECOMMEND_SKIP_STYLES } from '@/consts/app-styles';
+import type { Recommendation } from '@tkhwang-pico/common';
 
 interface SwipeableRecommendItemProps {
   recommendation: Recommendation;
