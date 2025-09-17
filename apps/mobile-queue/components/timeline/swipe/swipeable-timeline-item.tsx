@@ -1,18 +1,18 @@
 import React from 'react';
-import { View, Alert } from 'react-native';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-  runOnJS,
-  interpolate,
-  Extrapolation,
-} from 'react-native-reanimated';
+import { View, Alert, TouchableOpacity } from 'react-native';
+import { GestureDetector } from 'react-native-gesture-handler';
+import Animated from 'react-native-reanimated';
 import { TimelineCard } from '../timeline-item';
 import { Icon } from '@/components/ui/icon';
-import { RotateCcw, Trash2 } from 'lucide-react-native';
+import { RotateCcw, Trash2, Heart } from 'lucide-react-native';
 import type { UserContentWithDetails } from '@tkhwang-pico/common';
+import { Text } from '@/components/ui/text';
+import { useSwipeableItem } from '@/hooks/use-swipeable-item';
+import {
+  SWIPE_MENU_DAMPING,
+  TIMELINE_LEFT_ACTION_WIDTH,
+  TIMELINE_RIGHT_ACTION_WIDTH,
+} from '@/consts/app-consts';
 
 interface SwipeableTimelineItemProps {
   item: UserContentWithDetails;
@@ -20,11 +20,9 @@ interface SwipeableTimelineItemProps {
   onReopen?: (id: string) => void;
   onDelete?: (contentId: string) => void;
   onPress?: (item: UserContentWithDetails) => void;
+  onLike?: (contentId: string) => void;
+  isLiked?: boolean;
 }
-
-const SWIPE_THRESHOLD = 60;
-const MAX_SWIPE_DISTANCE = 150;
-const SWIPE_DAMPING = 0.4; // Lower damping for much slower movement
 
 export function SwipeableTimelineItem({
   item,
@@ -32,156 +30,142 @@ export function SwipeableTimelineItem({
   onReopen,
   onDelete,
   onPress,
+  onLike,
+  isLiked = false,
 }: SwipeableTimelineItemProps) {
-  const translateX = useSharedValue(0);
-  const itemHeight = useSharedValue(0);
+  const {
+    itemHeight,
+    panGesture,
+    animatedStyle,
+    leftContainerStyle,
+    rightContainerStyle,
+    leftIconStyle,
+    rightIconStyle,
+    close,
+    isLeftOpen,
+    isRightOpen,
+  } = useSwipeableItem({
+    actionMode: 'menu',
+    swipeThreshold: 60,
+    maxSwipeDistance: Math.max(TIMELINE_LEFT_ACTION_WIDTH, TIMELINE_RIGHT_ACTION_WIDTH),
+    leftOpenValue: TIMELINE_LEFT_ACTION_WIDTH,
+    rightOpenValue: TIMELINE_RIGHT_ACTION_WIDTH,
+    swipeDamping: SWIPE_MENU_DAMPING,
+  });
 
-  const springConfig = {
-    damping: 25, // Even higher damping for smoother animation
-    stiffness: 70, // Much lower stiffness for slower movement
-    mass: 1.5, // Higher mass for heavier feel
-    velocity: 0,
+  const handleReopen = () => {
+    onReopen?.(item.id);
+    close();
   };
 
-  const triggerAction = (action: 'reopen' | 'delete') => {
-    if (action === 'reopen' && onReopen) {
-      onReopen(item.id);
-      translateX.value = withSpring(0, springConfig);
-      return;
-    }
-    if (action === 'delete' && onDelete) {
-      Alert.alert('Delete Content', 'Are you sure you want to delete this content?', [
-        {
-          text: 'Cancel',
-          style: 'cancel',
-          onPress: () => {
-            translateX.value = withSpring(0, springConfig);
-          },
-        },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: () => {
-            onDelete(item.content_id);
-            translateX.value = withSpring(0, springConfig);
-          },
-        },
-      ]);
-      return;
-    }
-    if (__DEV__) {
-      console.log(`Action triggered: ${action} for item ${item.id}`);
-    }
+  const handleLike = () => {
+    onLike?.(item.content_id);
+    close();
   };
 
-  const panGesture = Gesture.Pan()
-    .activeOffsetX([-10, 10]) // Require 10px horizontal movement to activate
-    .failOffsetY([-5, 5]) // Cancel if vertical movement exceeds 5px
-    .onUpdate((e) => {
-      // Much slower, heavier swipe with more resistance
-      const dampedTranslation = e.translationX * SWIPE_DAMPING;
+  const handleDelete = () => {
+    if (!onDelete) {
+      close();
+      return;
+    }
 
-      // Apply even stronger resistance at edges for ultra-smooth feel
-      if (Math.abs(dampedTranslation) > MAX_SWIPE_DISTANCE * 0.7) {
-        const excess = Math.abs(dampedTranslation) - MAX_SWIPE_DISTANCE * 0.7;
-        const resistance = 1 - excess / (MAX_SWIPE_DISTANCE * 2);
-        translateX.value =
-          Math.sign(dampedTranslation) *
-          (MAX_SWIPE_DISTANCE * 0.7 + excess * Math.max(resistance, 0.1));
-      } else {
-        translateX.value = dampedTranslation;
+    Alert.alert('Delete Content', 'Are you sure you want to delete this content?', [
+      { text: 'Cancel', style: 'cancel', onPress: close },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: () => {
+          onDelete(item.content_id);
+          close();
+        },
+      },
+    ]);
+  };
+
+  const handlePress = (content: UserContentWithDetails) => {
+    if (isLeftOpen || isRightOpen) {
+      close();
+      return;
+    }
+    onPress?.(content);
+  };
+
+  const leftLikeStyles = isLiked
+    ? {
+        bg: 'bg-rose-100',
+        icon: 'text-rose-500',
+        text: 'text-rose-500',
+        label: 'Unlike',
       }
-    })
-    .onEnd(() => {
-      if (translateX.value > SWIPE_THRESHOLD) {
-        runOnJS(triggerAction)('reopen');
-      } else if (translateX.value < -SWIPE_THRESHOLD) {
-        runOnJS(triggerAction)('delete');
-      } else {
-        translateX.value = withSpring(0, springConfig);
-      }
-    });
+    : {
+        bg: 'bg-rose-200',
+        icon: 'text-rose-700',
+        text: 'text-rose-700',
+        label: 'Like',
+      };
 
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [{ translateX: translateX.value }],
-    };
-  });
+  const leftReopenStyles = {
+    bg: 'bg-blue-200',
+    icon: 'text-blue-700',
+    text: 'text-blue-700',
+  } as const;
 
-  // Left background container style with dynamic height
-  const leftContainerStyle = useAnimatedStyle(() => {
-    const opacity = interpolate(
-      translateX.value,
-      [0, 10, SWIPE_THRESHOLD],
-      [0, 0.3, 1],
-      Extrapolation.CLAMP
-    );
-    return {
-      height: itemHeight.value > 0 ? itemHeight.value : undefined,
-      opacity: translateX.value > 0 ? opacity : 0,
-    };
-  });
+  const rightStyles = {
+    bg: 'bg-red-200',
+    icon: 'text-red-700',
+    text: 'text-red-700',
+  } as const;
 
-  // Right background container style with dynamic height
-  const rightContainerStyle = useAnimatedStyle(() => {
-    const opacity = interpolate(
-      translateX.value,
-      [0, -10, -SWIPE_THRESHOLD],
-      [0, 0.3, 1],
-      Extrapolation.CLAMP
-    );
-    return {
-      height: itemHeight.value > 0 ? itemHeight.value : undefined,
-      opacity: translateX.value < 0 ? opacity : 0,
-    };
-  });
-
-  // Icon animations
-  const leftIconStyle = useAnimatedStyle(() => {
-    const scale = interpolate(
-      translateX.value,
-      [0, SWIPE_THRESHOLD, MAX_SWIPE_DISTANCE],
-      [0.8, 1, 1.2],
-      Extrapolation.CLAMP
-    );
-    return {
-      transform: [{ scale }],
-    };
-  });
-
-  const rightIconStyle = useAnimatedStyle(() => {
-    const scale = interpolate(
-      translateX.value,
-      [0, -SWIPE_THRESHOLD, -MAX_SWIPE_DISTANCE],
-      [0.8, 1, 1.2],
-      Extrapolation.CLAMP
-    );
-    return {
-      transform: [{ scale }],
-    };
-  });
-
-  // Type assertion for React 19 compatibility
   const AnimatedViewTyped = Animated.View as any;
 
   return (
     <View className="relative">
       {/* Left Background - Reopen (Blue) - Only visible when swiping right */}
       <AnimatedViewTyped
-        className="absolute left-0 top-0 w-24 items-center justify-center rounded-l-xl bg-blue-500"
-        style={leftContainerStyle}>
-        <AnimatedViewTyped style={leftIconStyle}>
-          <Icon as={RotateCcw} className="h-6 w-6 text-white" />
-        </AnimatedViewTyped>
+        className="absolute left-0 top-0 overflow-hidden rounded-l-xl"
+        style={[leftContainerStyle, { width: TIMELINE_LEFT_ACTION_WIDTH, height: itemHeight.value || undefined }]}>
+        <View
+          className="flex-row items-stretch"
+          style={{ width: TIMELINE_LEFT_ACTION_WIDTH, height: '100%' }}>
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={handleLike}
+            className={`items-center justify-center ${leftLikeStyles.bg}`}
+            style={{ width: TIMELINE_LEFT_ACTION_WIDTH / 2 }}>
+            <AnimatedViewTyped style={leftIconStyle}>
+              <Icon as={Heart} className={`h-6 w-6 ${leftLikeStyles.icon}`} />
+            </AnimatedViewTyped>
+            <Text className={`mt-1 text-xs font-semibold ${leftLikeStyles.text}`}>
+              {leftLikeStyles.label}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={handleReopen}
+            className={`items-center justify-center border-l border-blue-100 ${leftReopenStyles.bg}`}
+            style={{ width: TIMELINE_LEFT_ACTION_WIDTH / 2 }}>
+            <AnimatedViewTyped style={leftIconStyle}>
+              <Icon as={RotateCcw} className={`h-6 w-6 ${leftReopenStyles.icon}`} />
+            </AnimatedViewTyped>
+            <Text className={`mt-1 text-xs font-semibold ${leftReopenStyles.text}`}>Reopen</Text>
+          </TouchableOpacity>
+        </View>
       </AnimatedViewTyped>
 
       {/* Right Background - Delete (Red) - Only visible when swiping left */}
       <AnimatedViewTyped
-        className="absolute right-0 top-0 w-24 items-center justify-center rounded-r-xl bg-red-500"
-        style={rightContainerStyle}>
-        <AnimatedViewTyped style={rightIconStyle}>
-          <Icon as={Trash2} className="h-6 w-6 text-white" />
-        </AnimatedViewTyped>
+        className={`absolute right-0 top-0 overflow-hidden rounded-r-xl ${rightStyles.bg}`}
+        style={[rightContainerStyle, { width: TIMELINE_RIGHT_ACTION_WIDTH, height: itemHeight.value || undefined }]}>
+        <TouchableOpacity
+          activeOpacity={0.8}
+          onPress={handleDelete}
+          className="items-center justify-center"
+          style={{ width: TIMELINE_RIGHT_ACTION_WIDTH, height: '100%' }}>
+          <AnimatedViewTyped style={rightIconStyle}>
+            <Icon as={Trash2} className={`h-6 w-6 ${rightStyles.icon}`} />
+          </AnimatedViewTyped>
+          <Text className={`mt-1 text-xs font-semibold ${rightStyles.text}`}>Delete</Text>
+        </TouchableOpacity>
       </AnimatedViewTyped>
 
       {/* Swipeable Content */}
@@ -192,7 +176,7 @@ export function SwipeableTimelineItem({
           onLayout={(e: any) => {
             itemHeight.value = e.nativeEvent.layout.height;
           }}>
-          <TimelineCard item={item} isFirstOfDay={isFirstOfDay} onPress={onPress} />
+          <TimelineCard item={item} isFirstOfDay={isFirstOfDay} onPress={handlePress} />
         </AnimatedViewTyped>
       </GestureDetector>
     </View>

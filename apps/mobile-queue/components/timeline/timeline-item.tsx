@@ -2,7 +2,7 @@ import React from 'react';
 import { View, TouchableOpacity } from 'react-native';
 import { Text } from '@/components/ui/text';
 import { Icon } from '@/components/ui/icon';
-import { ClockIcon, ExternalLinkIcon } from 'lucide-react-native';
+import { ClockIcon, ExternalLinkIcon, Check } from 'lucide-react-native';
 import { ContentThumbnail } from '@/components/content/sub/content-thumbnail';
 import { formatTimelineDate } from '@/hooks/use-content-formatters';
 import { useContentActions } from '@/hooks/use-content-actions';
@@ -35,16 +35,21 @@ export function TimelineCard({ item, isFirstOfDay = false, onPress }: TimelineCa
       className="overflow-hidden rounded-xl bg-white shadow-sm dark:bg-gray-800">
       <View className="flex-row py-3 pl-1.5 pr-3">
         {/* Date Column - Left */}
-        <View className="mr-2 w-10 items-center justify-center">
+        <View className="mr-2 w-12 items-center">
+          <View className="mb-2 rounded-full bg-green-500/15 p-2">
+            <View className="h-7 w-7 items-center justify-center rounded-full bg-green-500">
+              <Icon as={Check} className="h-3.5 w-3.5 text-white" />
+            </View>
+          </View>
           {isFirstOfDay ? (
-            <>
+            <View className="items-center">
               <Text className="text-[10px] font-medium text-gray-500 dark:text-gray-400">
                 {dateInfo?.dayOfWeek}
               </Text>
               <Text className="text-xl font-bold text-gray-900 dark:text-gray-100">
                 {dateInfo?.dayOfMonth}
               </Text>
-            </>
+            </View>
           ) : (
             <View className="h-9" />
           )}
