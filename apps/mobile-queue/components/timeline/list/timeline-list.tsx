@@ -2,13 +2,13 @@ import React, { useState, useCallback, useMemo } from 'react';
 import { View, RefreshControl, ScrollView } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { Text } from '@/components/ui/text';
-import { SwipeableTimelineItem } from './swipeable-timeline-item';
+import { SwipeableTimelineItem } from '../swipe/swipeable-timeline-item';
 import { useUserContents } from '@/hooks/queries/use-user-contents';
 import { useDeleteContent } from '@/hooks/mutations/use-delete-content';
 import { useReopenContent } from '@/hooks/mutations/use-reopen-content';
 import { useToggleContent } from '@/hooks/mutations/use-toggle-content';
 import type { UserContentWithDetails } from '@tkhwang-pico/common';
-import { TimelineListSkeleton } from '@/components/timeline/timeline-list-skeleton';
+import { TimelineListSkeleton } from '@/components/timeline/list/timeline-list-skeleton';
 import { ContentDetailModal } from '@/components/content/detail/content-detail-modal';
 
 interface GroupedContent {

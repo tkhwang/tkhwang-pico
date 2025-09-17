@@ -1,6 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
-import { TimelineList } from './timeline-list';
+import { TimelineList } from './list/timeline-list';
 
 export function Timeline() {
   return (
