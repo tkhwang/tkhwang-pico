@@ -206,29 +206,19 @@ export function useSwipeableItem({
 
   // Left background container style
   const leftContainerStyle = useAnimatedStyle(() => {
-    const opacity = interpolate(
-      translateX.value,
-      [0, 10, swipeThreshold],
-      [0, 0.3, 1],
-      Extrapolation.CLAMP
-    );
+    const isRevealed = translateX.value > 0;
     return {
       height: itemHeight.value > 0 ? itemHeight.value : undefined,
-      opacity: translateX.value > 0 ? opacity : 0,
+      opacity: isRevealed ? 1 : 0,
     };
   });
 
   // Right background container style
   const rightContainerStyle = useAnimatedStyle(() => {
-    const opacity = interpolate(
-      translateX.value,
-      [0, -10, -swipeThreshold],
-      [0, 0.3, 1],
-      Extrapolation.CLAMP
-    );
+    const isRevealed = translateX.value < 0;
     return {
       height: itemHeight.value > 0 ? itemHeight.value : undefined,
-      opacity: translateX.value < 0 ? opacity : 0,
+      opacity: isRevealed ? 1 : 0,
     };
   });
 

@@ -131,9 +131,9 @@ export function SwipeableContentItem({
         </TouchableOpacity>
       </AnimatedViewTyped>
 
-      {/* Right Background - Delete (Gray) - Only visible when swiping left */}
+      {/* Right Background - Delete - Only visible when swiping left */}
       <AnimatedViewTyped
-        className="absolute right-0 top-0 rounded-r-lg bg-gray-200 dark:bg-gray-700"
+        className="absolute right-0 top-0 overflow-hidden rounded-r-lg"
         style={[
           rightContainerStyle,
           { width: RIGHT_ACTION_WIDTH, alignItems: 'center', justifyContent: 'center' },
@@ -141,7 +141,7 @@ export function SwipeableContentItem({
         <TouchableOpacity
           activeOpacity={0.8}
           onPress={handleDeletePress}
-          className={`h-full w-full items-center justify-center ${deleteStyles.bg}`}>
+          className={`h-full w-full items-center justify-center rounded-r-lg ${deleteStyles.bg}`}>
           <AnimatedViewTyped style={rightIconStyle}>
             <Icon as={Trash2} className={`h-6 w-6 ${deleteStyles.icon}`} />
           </AnimatedViewTyped>
