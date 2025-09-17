@@ -50,8 +50,33 @@ export function SwipeableContentItem({
 
   // Dynamic colors and icons based on todo_status
   const isCompleted = item.todo_status === 'completed';
-  const leftBgColor = isCompleted ? 'bg-blue-500' : 'bg-green-500';
   const LeftIcon = isCompleted ? RotateCcw : Check;
+
+  const likeStyles = {
+    bg: 'bg-rose-200',
+    icon: 'text-rose-700',
+    text: 'text-rose-700',
+  } as const;
+
+  const completionStyles = isCompleted
+    ? {
+        bg: 'bg-blue-200',
+        icon: 'text-blue-700',
+        text: 'text-blue-700',
+        border: 'border-blue-100',
+      }
+    : {
+        bg: 'bg-green-200',
+        icon: 'text-green-700',
+        text: 'text-green-700',
+        border: 'border-green-100',
+      };
+
+  const deleteStyles = {
+    bg: 'bg-red-200',
+    icon: 'text-red-700',
+    text: 'text-red-700',
+  } as const;
 
   const handleLikePress = () => {
     onLike?.(item.content_id);
@@ -103,20 +128,20 @@ export function SwipeableContentItem({
         <TouchableOpacity
           activeOpacity={0.8}
           onPress={handleLikePress}
-          className="flex-1 items-center justify-center bg-pink-500">
+          className={`flex-1 items-center justify-center ${likeStyles.bg}`}>
           <AnimatedViewTyped style={leftIconStyle}>
-            <Icon as={Heart} className="h-6 w-6 text-white" />
+            <Icon as={Heart} className={`h-6 w-6 ${likeStyles.icon}`} />
           </AnimatedViewTyped>
-          <Text className="mt-1 text-xs font-semibold text-white">Like</Text>
+          <Text className={`mt-1 text-xs font-semibold ${likeStyles.text}`}>Like</Text>
         </TouchableOpacity>
         <TouchableOpacity
           activeOpacity={0.8}
           onPress={handleCompletePress}
-          className={`flex-1 items-center justify-center border-l border-white/30 ${leftBgColor}`}>
+          className={`flex-1 items-center justify-center border-l ${completionStyles.border} ${completionStyles.bg}`}>
           <AnimatedViewTyped style={leftIconStyle}>
-            <Icon as={LeftIcon} className="h-6 w-6 text-white" />
+            <Icon as={LeftIcon} className={`h-6 w-6 ${completionStyles.icon}`} />
           </AnimatedViewTyped>
-          <Text className="mt-1 text-xs font-semibold text-white">
+          <Text className={`mt-1 text-xs font-semibold ${completionStyles.text}`}>
             {isCompleted ? 'Pending' : 'Complete'}
           </Text>
         </TouchableOpacity>
@@ -132,11 +157,11 @@ export function SwipeableContentItem({
         <TouchableOpacity
           activeOpacity={0.8}
           onPress={handleDeletePress}
-          className="h-full w-full items-center justify-center">
+          className={`h-full w-full items-center justify-center ${deleteStyles.bg}`}>
           <AnimatedViewTyped style={rightIconStyle}>
-            <Icon as={Trash2} className="h-6 w-6 text-white" />
+            <Icon as={Trash2} className={`h-6 w-6 ${deleteStyles.icon}`} />
           </AnimatedViewTyped>
-          <Text className="mt-1 text-xs font-semibold text-white">Delete</Text>
+          <Text className={`mt-1 text-xs font-semibold ${deleteStyles.text}`}>Delete</Text>
         </TouchableOpacity>
       </AnimatedViewTyped>
 
