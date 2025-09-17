@@ -32,7 +32,6 @@ interface BaseContentCardProps {
 
   // Style customization
   isCompleted?: boolean;
-  className?: string;
   containerClassName?: string;
 
   // Slot for custom left icon/checkbox
@@ -57,7 +56,6 @@ export function BaseContentCard({
   thumbnailSize = 'medium',
   metadataProps,
   isCompleted = false,
-  className = '',
   containerClassName = '',
   leftSlot,
   bottomSlot,
