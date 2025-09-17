@@ -120,10 +120,10 @@ export function ContentDetailModal({
       <View className="flex-1">
         <TouchableWithoutFeedback onPress={onClose}>
           <View className="flex-1 justify-end bg-black/50">
-            <TouchableWithoutFeedback>
-              <View
-                className="max-h-[90%] rounded-t-2xl bg-white dark:bg-gray-800"
-                style={{ paddingBottom: insets.bottom }}>
+            <View
+              className="max-h-[90%] rounded-t-2xl bg-white dark:bg-gray-800"
+              style={{ paddingBottom: insets.bottom }}
+              onStartShouldSetResponder={() => true}>
                 {/* Modal Handle */}
                 <View className="items-center py-2">
                   <View className="h-1 w-12 rounded-full bg-gray-300 dark:bg-gray-600" />
@@ -371,7 +371,6 @@ export function ContentDetailModal({
                   </View>
                 </ScrollView>
               </View>
-            </TouchableWithoutFeedback>
           </View>
         </TouchableWithoutFeedback>
       </View>
