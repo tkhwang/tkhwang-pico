@@ -17,6 +17,14 @@ export const ACTION_STYLES = {
       fillIcon: 'text-pink-500 dark:text-pink-300',
       label: 'Like',
     },
+    completed: {
+      container: 'bg-pink-500',
+      wrapper: 'shadow-lg shadow-pink-500/20',
+      icon: 'text-white',
+      text: 'text-white',
+      fillIcon: 'fill-white text-white',
+      label: 'Liked!',
+    },
   },
   complete: {
     completed: {

@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, LayoutChangeEvent, TouchableOpacity, Alert } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { View, LayoutChangeEvent, TouchableOpacity, Alert, Platform, Vibration } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
 import { Icon } from '@/components/ui/icon';
@@ -7,8 +7,13 @@ import { Check, Trash2, RotateCcw, Heart } from 'lucide-react-native';
 import { useSwipeableItem } from '@/hooks/use-swipeable-item';
 import type { UserContentWithDetails } from '@tkhwang-pico/common';
 import { Text } from '@/components/ui/text';
-import { LEFT_ACTION_WIDTH, RIGHT_ACTION_WIDTH, SWIPE_MENU_DAMPING } from '@/consts/app-consts';
-import { LIKE_STYLES, COMPLETION_STYLES, DELETE_STYLES } from '@/consts/app-styles';
+import {
+  LEFT_ACTION_WIDTH,
+  RIGHT_ACTION_WIDTH,
+  SWIPE_MENU_DAMPING,
+  SWIPE_ACTION_FEEDBACK_DURATION_MS,
+} from '@/consts/app-consts';
+import { ACTION_STYLES, COMPLETION_STYLES, DELETE_STYLES } from '@/consts/app-styles';
 import { ContentItem } from '@/components/content/content-item';
 import { isContentLiked } from '@/utils/content-helpers';
 
@@ -30,6 +35,9 @@ export function SwipeableContentItem({
   onLike,
   onPress,
 }: SwipeableContentItemProps) {
+  const [actionCompleted, setActionCompleted] = useState<'like' | 'complete' | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+
   const {
     itemHeight,
     panGesture,
@@ -55,14 +63,54 @@ export function SwipeableContentItem({
   const isCompleted = item.todo_status === 'completed';
   const LeftIcon = isCompleted ? RotateCcw : Check;
 
-  const likeStyles = isLiked ? LIKE_STYLES.liked : LIKE_STYLES.unliked;
+  // Dynamic styles based on action state
+  const likeStyles = actionCompleted === 'like'
+    ? {
+        bg: ACTION_STYLES.like.completed.container,
+        icon: ACTION_STYLES.like.completed.icon,
+        text: ACTION_STYLES.like.completed.text,
+        label: ACTION_STYLES.like.completed.label,
+      }
+    : isLiked
+      ? {
+          bg: ACTION_STYLES.like.liked.container,
+          icon: ACTION_STYLES.like.liked.icon,
+          text: ACTION_STYLES.like.liked.text,
+          label: ACTION_STYLES.like.liked.label,
+        }
+      : {
+          bg: ACTION_STYLES.like.unliked.container,
+          icon: ACTION_STYLES.like.unliked.icon,
+          text: ACTION_STYLES.like.unliked.text,
+          label: ACTION_STYLES.like.unliked.label,
+        };
+
   const completionStyles = isCompleted ? COMPLETION_STYLES.completed : COMPLETION_STYLES.pending;
   const deleteStyles = DELETE_STYLES;
 
-  const handleLikePress = () => {
+  const handleLikePress = useCallback(async () => {
+    if (isProcessing) return;
+
+    setIsProcessing(true);
+
+    // Haptic feedback on mobile
+    if (Platform.OS !== 'web') {
+      Vibration.vibrate(10);
+    }
+
+    // Animate success state
+    setActionCompleted('like');
+
+    // Execute action
     onLike?.(item.content_id);
-    close();
-  };
+
+    // Reset after animation
+    setTimeout(() => {
+      close();
+      setIsProcessing(false);
+      setActionCompleted(null);
+    }, SWIPE_ACTION_FEEDBACK_DURATION_MS);
+  }, [isProcessing, item.content_id, onLike, close]);
 
   const handleCompletePress = () => {
     onToggleComplete?.(item.id);
@@ -109,6 +157,7 @@ export function SwipeableContentItem({
         <TouchableOpacity
           activeOpacity={0.8}
           onPress={handleLikePress}
+          disabled={isProcessing}
           className={`flex-1 items-center justify-center ${likeStyles.bg}`}>
           <AnimatedViewTyped style={leftIconStyle}>
             <Icon as={Heart} className={`h-6 w-6 ${likeStyles.icon}`} />

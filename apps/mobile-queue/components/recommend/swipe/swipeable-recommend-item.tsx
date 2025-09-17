@@ -11,6 +11,7 @@ import {
   RECOMMEND_LEFT_ACTION_WIDTH,
   RECOMMEND_RIGHT_ACTION_WIDTH,
   SWIPE_MENU_DAMPING,
+  SWIPE_ACTION_FEEDBACK_DURATION_MS,
 } from '@/consts/app-consts';
 import { RECOMMEND_ADD_STYLES, RECOMMEND_SKIP_STYLES } from '@/consts/app-styles';
 import type { Recommendation } from '@tkhwang-pico/common';
@@ -83,7 +84,7 @@ export function SwipeableRecommendItem({
       close();
       setIsProcessing(false);
       setActionCompleted(null);
-    }, 500);
+    }, SWIPE_ACTION_FEEDBACK_DURATION_MS);
   }, [isProcessing, recommendation, onAddToQueue, close]);
 
   const handleNotInterested = useCallback(async () => {
@@ -107,7 +108,7 @@ export function SwipeableRecommendItem({
       close();
       setIsProcessing(false);
       setActionCompleted(null);
-    }, 500);
+    }, SWIPE_ACTION_FEEDBACK_DURATION_MS);
   }, [isProcessing, recommendation.content_id, onNotInterested, close]);
 
   const handleItemPress = (item: Recommendation) => {
