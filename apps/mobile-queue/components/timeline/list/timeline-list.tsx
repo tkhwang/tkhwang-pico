@@ -214,6 +214,7 @@ export function TimelineList() {
           onClose={handleModalClose}
           onToggleComplete={handleToggleComplete}
           onDelete={handleDelete}
+          onLike={handleLike}
         />
       )}
     </View>

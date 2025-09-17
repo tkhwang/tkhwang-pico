@@ -27,6 +27,7 @@ import {
   ThumbsDown,
   RotateCcw,
   Sparkles,
+  Heart,
 } from 'lucide-react-native';
 import {
   formatFullDate,
@@ -46,6 +47,7 @@ interface ContentDetailModalProps {
   // Home mode callbacks
   onToggleComplete?: (id: string) => void;
   onDelete?: (contentId: string) => void;
+  onLike?: (contentId: string) => void;
   // Recommend mode callbacks
   onAddToQueue?: (url: string, contentId: string) => void;
   onNotInterested?: (contentId: string) => void;
@@ -58,6 +60,7 @@ export function ContentDetailModal({
   mode = 'home',
   onToggleComplete,
   onDelete,
+  onLike,
   onAddToQueue,
   onNotInterested,
 }: ContentDetailModalProps) {
@@ -80,6 +83,10 @@ export function ContentDetailModal({
   const isCompleted = 'todo_status' in item ? item.todo_status === 'completed' : false;
   const isRecommendation = mode === 'recommend';
   const thumbnailUrl = getThumbnailUrl(content);
+  const isLiked =
+    'preferences' in item
+      ? item.preferences?.some((preference) => preference.preference_type === 'liked') ?? false
+      : false;
 
   const handleToggleComplete = () => {
     if (onToggleComplete && 'id' in item) {
@@ -90,6 +97,12 @@ export function ContentDetailModal({
 
   const handleDelete = () => {
     deleteContent(item.content_id, onDelete, onClose);
+  };
+
+  const handleLike = () => {
+    if (onLike) {
+      onLike(item.content_id);
+    }
   };
 
   const handleAddToQueue = () => {
@@ -331,6 +344,32 @@ export function ContentDetailModal({
                   </>
                 ) : (
                   <>
+                    {/* Like Button */}
+                    <TouchableOpacity
+                      onPress={handleLike}
+                      className={`flex-1 items-center justify-center rounded-lg px-2 py-3 ${
+                        isLiked
+                          ? 'bg-rose-500 dark:bg-rose-600'
+                          : 'bg-rose-100 dark:bg-rose-900/30'
+                      }`}>
+                      <Icon
+                        as={Heart}
+                        className={`mb-1 h-5 w-5 ${
+                          isLiked
+                            ? 'fill-white text-white'
+                            : 'fill-rose-200 text-rose-500'
+                        }`}
+                      />
+                      <Text
+                        className={`text-xs font-semibold ${
+                          isLiked
+                            ? 'text-white'
+                            : 'text-rose-600 dark:text-rose-400'
+                        }`}>
+                        {isLiked ? 'Unlike' : 'Like'}
+                      </Text>
+                    </TouchableOpacity>
+
                     {/* Toggle Complete Button */}
                     <TouchableOpacity
                       onPress={handleToggleComplete}
