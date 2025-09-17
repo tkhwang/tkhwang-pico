@@ -48,17 +48,26 @@ export function SwipeableContentItem({
     swipeDamping: SWIPE_MENU_DAMPING,
   });
 
-  const isLiked = item.preferences?.some((preference) => preference.preference_type === 'liked') ?? false;
+  const isLiked =
+    item.preferences?.some((preference) => preference.preference_type === 'liked') ?? false;
 
   // Dynamic colors and icons based on todo_status
   const isCompleted = item.todo_status === 'completed';
   const LeftIcon = isCompleted ? RotateCcw : Check;
 
-  const likeStyles = {
-    bg: 'bg-rose-200',
-    icon: 'text-rose-700',
-    text: 'text-rose-700',
-  } as const;
+  const likeStyles = isLiked
+    ? {
+        bg: 'bg-rose-100',
+        icon: 'text-rose-500',
+        text: 'text-rose-500',
+        label: 'Unlike',
+      }
+    : {
+        bg: 'bg-rose-200',
+        icon: 'text-rose-700',
+        text: 'text-rose-700',
+        label: 'Like',
+      };
 
   const completionStyles = isCompleted
     ? {
@@ -134,7 +143,9 @@ export function SwipeableContentItem({
           <AnimatedViewTyped style={leftIconStyle}>
             <Icon as={Heart} className={`h-6 w-6 ${likeStyles.icon}`} />
           </AnimatedViewTyped>
-          <Text className={`mt-1 text-xs font-semibold ${likeStyles.text}`}>Like</Text>
+          <Text className={`mt-1 text-xs font-semibold ${likeStyles.text}`}>
+            {likeStyles.label}
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
           activeOpacity={0.8}
