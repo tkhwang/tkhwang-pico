@@ -4,7 +4,7 @@ import { GestureDetector } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
 import { RecommendItem } from '../recommend-item';
 import { Icon } from '@/components/ui/icon';
-import { ThumbsUp, ThumbsDown, Sparkles, Plus, X } from 'lucide-react-native';
+import { ThumbsUp, ThumbsDown, Sparkles, X, Circle } from 'lucide-react-native';
 import { Text } from '@/components/ui/text';
 import { useSwipeableItem } from '@/hooks/use-swipeable-item';
 import {
@@ -102,7 +102,7 @@ export function SwipeableRecommendItem({
           className={`flex-1 items-center justify-center ${leftStyles.container}`}>
           <AnimatedViewTyped style={leftIconStyle}>
             <Icon
-              as={actionCompleted === 'queue' ? Plus : ThumbsUp}
+              as={actionCompleted === 'queue' ? Circle : ThumbsUp}
               className={`h-6 w-6 ${leftStyles.icon}`}
             />
           </AnimatedViewTyped>
