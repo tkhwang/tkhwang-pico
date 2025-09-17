@@ -1,14 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { View, TouchableOpacity, Alert, Platform, Vibration } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
-import Animated, {
-  useAnimatedStyle,
-  withSpring,
-  withSequence,
-  withTiming,
-  interpolate,
-  Extrapolation,
-} from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 import { RecommendItem } from '../recommend-item';
 import { Icon } from '@/components/ui/icon';
 import { ThumbsUp, ThumbsDown, Sparkles, Plus, X } from 'lucide-react-native';
@@ -49,7 +42,6 @@ export function SwipeableRecommendItem({
     close,
     isLeftOpen,
     isRightOpen,
-    translateX,
   } = useSwipeableItem({
     swipeThreshold: 60,
     maxSwipeDistance: Math.max(RECOMMEND_LEFT_ACTION_WIDTH, RECOMMEND_RIGHT_ACTION_WIDTH),
@@ -135,49 +127,6 @@ export function SwipeableRecommendItem({
       ? RECOMMEND_SKIP_STYLES.completed
       : RECOMMEND_SKIP_STYLES.default;
 
-  // Animated scale styles for action feedback
-  const leftActionScale = useAnimatedStyle(() => {
-    const scale = interpolate(
-      translateX.value,
-      [0, RECOMMEND_LEFT_ACTION_WIDTH / 2, RECOMMEND_LEFT_ACTION_WIDTH],
-      [0.8, 0.95, 1.1],
-      Extrapolation.CLAMP
-    );
-    return {
-      transform: [{ scale: actionCompleted === 'queue' ? withSpring(1.2) : withSpring(scale) }],
-    };
-  });
-
-  const rightActionScale = useAnimatedStyle(() => {
-    const scale = interpolate(
-      translateX.value,
-      [0, -RECOMMEND_RIGHT_ACTION_WIDTH / 2, -RECOMMEND_RIGHT_ACTION_WIDTH],
-      [0.8, 0.95, 1.1],
-      Extrapolation.CLAMP
-    );
-    return {
-      transform: [
-        { scale: actionCompleted === 'notInterested' ? withSpring(1.2) : withSpring(scale) },
-      ],
-    };
-  });
-
-  // Pulse animation for icons
-  const pulseAnimation = useAnimatedStyle(() => {
-    if (actionCompleted) {
-      return {
-        transform: [
-          {
-            scale: withSequence(
-              withTiming(1.3, { duration: 200 }),
-              withTiming(1, { duration: 200 })
-            ),
-          },
-        ],
-      };
-    }
-    return {};
-  });
 
   const AnimatedViewTyped = Animated.View as any;
 
@@ -188,12 +137,12 @@ export function SwipeableRecommendItem({
         className={`absolute left-0 top-0 overflow-hidden rounded-xl ${leftStyles.wrapper}`}
         style={[leftContainerStyle, { width: RECOMMEND_LEFT_ACTION_WIDTH }]}>
         <TouchableOpacity
-          activeOpacity={0.7}
+          activeOpacity={0.8}
           onPress={handleAddToQueue}
           disabled={isProcessing}
           className={`h-full items-center justify-center ${leftStyles.container}`}
           style={{ width: RECOMMEND_LEFT_ACTION_WIDTH }}>
-          <AnimatedViewTyped style={[leftIconStyle, leftActionScale, pulseAnimation]}>
+          <AnimatedViewTyped style={leftIconStyle}>
             <View className="relative">
               <Icon
                 as={actionCompleted === 'queue' ? Plus : ThumbsUp}
@@ -217,12 +166,12 @@ export function SwipeableRecommendItem({
         className={`absolute right-0 top-0 overflow-hidden rounded-xl ${rightStyles.wrapper}`}
         style={[rightContainerStyle, { width: RECOMMEND_RIGHT_ACTION_WIDTH }]}>
         <TouchableOpacity
-          activeOpacity={0.7}
+          activeOpacity={0.8}
           onPress={handleNotInterested}
           disabled={isProcessing}
           className={`h-full items-center justify-center ${rightStyles.container}`}
           style={{ width: RECOMMEND_RIGHT_ACTION_WIDTH }}>
-          <AnimatedViewTyped style={[rightIconStyle, rightActionScale, pulseAnimation]}>
+          <AnimatedViewTyped style={rightIconStyle}>
             <View className="relative">
               <Icon
                 as={actionCompleted === 'notInterested' ? X : ThumbsDown}
@@ -238,36 +187,11 @@ export function SwipeableRecommendItem({
 
       <GestureDetector gesture={panGesture}>
         <AnimatedViewTyped
-          style={[
-            animatedStyle,
-            {
-              opacity: actionCompleted ? withTiming(0.95, { duration: 300 }) : 1,
-            },
-          ]}
+          style={animatedStyle}
           onLayout={(event: any) => {
             itemHeight.value = event.nativeEvent.layout.height;
           }}>
-          <View className="relative">
-            <RecommendItem recommendation={recommendation} onPress={handleItemPress} />
-            {/* Processing overlay */}
-            {isProcessing && (
-              <View className="absolute inset-0 items-center justify-center rounded-xl bg-black/5">
-                <AnimatedViewTyped
-                  style={{
-                    transform: [
-                      {
-                        rotate: withSequence(
-                          withTiming('0deg', { duration: 0 }),
-                          withTiming('360deg', { duration: 1000 })
-                        ),
-                      },
-                    ],
-                  }}>
-                  <Icon as={Sparkles} className="h-6 w-6 text-purple-500" />
-                </AnimatedViewTyped>
-              </View>
-            )}
-          </View>
+          <RecommendItem recommendation={recommendation} onPress={handleItemPress} />
         </AnimatedViewTyped>
       </GestureDetector>
     </View>
