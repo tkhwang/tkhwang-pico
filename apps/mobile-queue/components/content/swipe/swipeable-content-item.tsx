@@ -48,6 +48,8 @@ export function SwipeableContentItem({
     swipeDamping: SWIPE_MENU_DAMPING,
   });
 
+  const isLiked = item.preferences?.some((preference) => preference.preference_type === 'liked') ?? false;
+
   // Dynamic colors and icons based on todo_status
   const isCompleted = item.todo_status === 'completed';
   const LeftIcon = isCompleted ? RotateCcw : Check;
@@ -176,6 +178,7 @@ export function SwipeableContentItem({
             item={item}
             onToggleComplete={onToggleComplete}
             onPress={handleContentPress}
+            isLiked={isLiked}
           />
         </AnimatedViewTyped>
       </GestureDetector>
