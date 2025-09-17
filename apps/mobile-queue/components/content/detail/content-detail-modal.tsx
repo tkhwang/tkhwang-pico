@@ -7,6 +7,7 @@ import {
   Alert,
   TouchableWithoutFeedback,
   Platform,
+  Dimensions,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text } from '@/components/ui/text';
@@ -58,6 +59,7 @@ export function ContentDetailModal({
 }: ContentDetailModalProps) {
   const { openURL, deleteContent } = useContentActions();
   const insets = useSafeAreaInsets();
+  const screenHeight = Dimensions.get('window').height;
 
   if (!item || !item.contents) {
     return null;
@@ -122,8 +124,11 @@ export function ContentDetailModal({
           <View className="flex-1 justify-end bg-black/50">
             <TouchableWithoutFeedback>
               <View
-                className="max-h-[90%] rounded-t-2xl bg-white dark:bg-gray-800"
-                style={{ paddingBottom: insets.bottom }}>
+                className="rounded-t-2xl bg-white dark:bg-gray-800"
+                style={{
+                  maxHeight: screenHeight * 0.7,
+                  paddingBottom: insets.bottom
+                }}>
                 {/* Modal Handle */}
                 <View className="items-center py-2">
                   <View className="h-1 w-12 rounded-full bg-gray-300 dark:bg-gray-600" />
