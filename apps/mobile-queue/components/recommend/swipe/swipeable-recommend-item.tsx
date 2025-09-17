@@ -4,7 +4,7 @@ import { GestureDetector } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
 import { RecommendItem } from '../recommend-item';
 import { Icon } from '@/components/ui/icon';
-import { ThumbsUp, ThumbsDown, Sparkles, X, Circle } from 'lucide-react-native';
+import { ThumbsUp, ThumbsDown, X, Circle } from 'lucide-react-native';
 import { Text } from '@/components/ui/text';
 import { useSwipeableItem } from '@/hooks/use-swipeable-item';
 import {
@@ -107,7 +107,9 @@ export function SwipeableRecommendItem({
             />
           </AnimatedViewTyped>
           <Text className={`mt-1 text-xs font-semibold ${leftStyles.text}`}>
-            {actionCompleted === 'queue' ? ACTION_STYLES.addToQueue.completed.label : ACTION_STYLES.addToQueue.default.label}
+            {actionCompleted === 'queue'
+              ? ACTION_STYLES.addToQueue.completed.label
+              : ACTION_STYLES.addToQueue.default.label}
           </Text>
         </TouchableOpacity>
       </AnimatedViewTyped>
@@ -131,7 +133,9 @@ export function SwipeableRecommendItem({
             />
           </AnimatedViewTyped>
           <Text className={`mt-1 text-xs font-semibold ${rightStyles.text}`}>
-            {actionCompleted === 'notInterested' ? ACTION_STYLES.notInterested.completed.label : ACTION_STYLES.notInterested.default.label}
+            {actionCompleted === 'notInterested'
+              ? ACTION_STYLES.notInterested.completed.label
+              : ACTION_STYLES.notInterested.default.label}
           </Text>
         </TouchableOpacity>
       </AnimatedViewTyped>
