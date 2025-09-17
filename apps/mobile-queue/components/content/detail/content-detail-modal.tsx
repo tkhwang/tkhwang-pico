@@ -28,7 +28,11 @@ import {
   RotateCcw,
   Sparkles,
 } from 'lucide-react-native';
-import { formatFullDate, formatReadingTimeWithSuffix, getThumbnailUrl } from '@/hooks/use-content-formatters';
+import {
+  formatFullDate,
+  formatReadingTimeWithSuffix,
+  getThumbnailUrl,
+} from '@/hooks/use-content-formatters';
 import { useContentActions } from '@/hooks/use-content-actions';
 import { ContentTags } from '@/components/content/sub/content-tags';
 import { ContentThumbnail } from '@/components/content/sub/content-thumbnail';
@@ -58,14 +62,13 @@ export function ContentDetailModal({
   onNotInterested,
 }: ContentDetailModalProps) {
   const { openURL, deleteContent } = useContentActions();
+
   const insets = useSafeAreaInsets();
   const screenHeight = Dimensions.get('window').height;
   const isAndroid = Platform.OS === 'android';
   const sheetBottomOffset = 0;
   const desiredSheetHeight = screenHeight * 0.7;
-  const sheetHeight = isAndroid
-    ? Math.max(desiredSheetHeight - sheetBottomOffset, desiredSheetHeight * 0.5)
-    : undefined;
+  const sheetHeight = isAndroid ? desiredSheetHeight : undefined;
   const sheetPaddingBottom = insets.bottom + (isAndroid ? 24 : 16);
   const scrollContentPaddingBottom = 16;
 
@@ -77,7 +80,7 @@ export function ContentDetailModal({
   const isCompleted = 'todo_status' in item ? item.todo_status === 'completed' : false;
   const isRecommendation = mode === 'recommend';
   const thumbnailUrl = getThumbnailUrl(content);
-  
+
   const handleToggleComplete = () => {
     if (onToggleComplete && 'id' in item) {
       onToggleComplete(item.id);
