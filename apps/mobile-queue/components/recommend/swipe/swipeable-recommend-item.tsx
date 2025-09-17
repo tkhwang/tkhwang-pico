@@ -1,5 +1,5 @@
-import React, { useCallback, useState } from 'react';
-import { View, TouchableOpacity, Alert, Platform, Vibration } from 'react-native';
+import React, { useCallback } from 'react';
+import { View, TouchableOpacity, Alert } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
 import { RecommendItem } from '../recommend-item';
@@ -11,10 +11,10 @@ import {
   RECOMMEND_LEFT_ACTION_WIDTH,
   RECOMMEND_RIGHT_ACTION_WIDTH,
   SWIPE_MENU_DAMPING,
-  SWIPE_ACTION_FEEDBACK_DURATION_MS,
 } from '@/consts/app-consts';
 import { RECOMMEND_ADD_STYLES, RECOMMEND_SKIP_STYLES } from '@/consts/app-styles';
 import type { Recommendation } from '@tkhwang-pico/common';
+import { useSwipeActionFeedback } from '@/hooks/use-swipe-action-feedback';
 
 interface SwipeableRecommendItemProps {
   recommendation: Recommendation;
@@ -29,8 +29,7 @@ export function SwipeableRecommendItem({
   onNotInterested,
   onPress,
 }: SwipeableRecommendItemProps) {
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [actionCompleted, setActionCompleted] = useState<'queue' | 'notInterested' | null>(null);
+  const { isProcessing, actionCompleted, executeWithFeedback } = useSwipeActionFeedback();
 
   const {
     itemHeight,
@@ -51,9 +50,7 @@ export function SwipeableRecommendItem({
     swipeDamping: SWIPE_MENU_DAMPING,
   });
 
-  const handleAddToQueue = useCallback(async () => {
-    if (isProcessing) return;
-
+  const handleAddToQueue = useCallback(() => {
     const content = recommendation.contents;
     if (!content) {
       close();
@@ -66,50 +63,12 @@ export function SwipeableRecommendItem({
       return;
     }
 
-    setIsProcessing(true);
+    executeWithFeedback('queue', () => onAddToQueue?.(url, recommendation.content_id), close);
+  }, [executeWithFeedback, recommendation, onAddToQueue, close]);
 
-    // Haptic feedback on mobile
-    if (Platform.OS !== 'web') {
-      Vibration.vibrate(10);
-    }
-
-    // Animate success state
-    setActionCompleted('queue');
-
-    // Execute action
-    onAddToQueue?.(url, recommendation.content_id);
-
-    // Reset after animation
-    setTimeout(() => {
-      close();
-      setIsProcessing(false);
-      setActionCompleted(null);
-    }, SWIPE_ACTION_FEEDBACK_DURATION_MS);
-  }, [isProcessing, recommendation, onAddToQueue, close]);
-
-  const handleNotInterested = useCallback(async () => {
-    if (isProcessing) return;
-
-    setIsProcessing(true);
-
-    // Haptic feedback on mobile
-    if (Platform.OS !== 'web') {
-      Vibration.vibrate(10);
-    }
-
-    // Animate success state
-    setActionCompleted('notInterested');
-
-    // Execute action
-    onNotInterested?.(recommendation.content_id);
-
-    // Reset after animation
-    setTimeout(() => {
-      close();
-      setIsProcessing(false);
-      setActionCompleted(null);
-    }, SWIPE_ACTION_FEEDBACK_DURATION_MS);
-  }, [isProcessing, recommendation.content_id, onNotInterested, close]);
+  const handleNotInterested = useCallback(() => {
+    executeWithFeedback('notInterested', () => onNotInterested?.(recommendation.content_id), close);
+  }, [executeWithFeedback, recommendation.content_id, onNotInterested, close]);
 
   const handleItemPress = (item: Recommendation) => {
     if (isLeftOpen || isRightOpen) {
@@ -127,7 +86,6 @@ export function SwipeableRecommendItem({
     actionCompleted === 'notInterested'
       ? RECOMMEND_SKIP_STYLES.completed
       : RECOMMEND_SKIP_STYLES.default;
-
 
   const AnimatedViewTyped = Animated.View as any;
 

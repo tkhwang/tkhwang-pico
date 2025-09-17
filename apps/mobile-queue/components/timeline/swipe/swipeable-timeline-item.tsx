@@ -1,5 +1,5 @@
-import React, { useState, useCallback } from 'react';
-import { View, Alert, TouchableOpacity, Platform, Vibration } from 'react-native';
+import React, { useCallback } from 'react';
+import { View, Alert, TouchableOpacity } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
 import { TimelineCard } from '../timeline-item';
@@ -12,9 +12,9 @@ import {
   SWIPE_MENU_DAMPING,
   TIMELINE_LEFT_ACTION_WIDTH,
   TIMELINE_RIGHT_ACTION_WIDTH,
-  SWIPE_ACTION_FEEDBACK_DURATION_MS,
 } from '@/consts/app-consts';
 import { ACTION_STYLES, DELETE_STYLES, REOPEN_STYLES } from '@/consts/app-styles';
+import { useSwipeActionFeedback } from '@/hooks/use-swipe-action-feedback';
 
 interface SwipeableTimelineItemProps {
   item: UserContentWithDetails;
@@ -35,8 +35,7 @@ export function SwipeableTimelineItem({
   onLike,
   isLiked = false,
 }: SwipeableTimelineItemProps) {
-  const [actionCompleted, setActionCompleted] = useState<'like' | null>(null);
-  const [isProcessing, setIsProcessing] = useState(false);
+  const { isProcessing, actionCompleted, executeWithFeedback } = useSwipeActionFeedback();
 
   const {
     itemHeight,
@@ -62,29 +61,9 @@ export function SwipeableTimelineItem({
     close();
   };
 
-  const handleLike = useCallback(async () => {
-    if (isProcessing) return;
-
-    setIsProcessing(true);
-
-    // Haptic feedback on mobile
-    if (Platform.OS !== 'web') {
-      Vibration.vibrate(10);
-    }
-
-    // Animate success state
-    setActionCompleted('like');
-
-    // Execute action
-    onLike?.(item.content_id);
-
-    // Reset after animation
-    setTimeout(() => {
-      close();
-      setIsProcessing(false);
-      setActionCompleted(null);
-    }, SWIPE_ACTION_FEEDBACK_DURATION_MS);
-  }, [isProcessing, item.content_id, onLike, close]);
+  const handleLike = useCallback(() => {
+    executeWithFeedback('like', () => onLike?.(item.content_id), close);
+  }, [executeWithFeedback, item.content_id, onLike, close]);
 
   const handleDelete = () => {
     if (!onDelete) {
@@ -114,26 +93,27 @@ export function SwipeableTimelineItem({
   };
 
   // Dynamic styles based on action state
-  const leftLikeStyles = actionCompleted === 'like'
-    ? {
-        bg: ACTION_STYLES.like.completed.container,
-        icon: ACTION_STYLES.like.completed.icon,
-        text: ACTION_STYLES.like.completed.text,
-        label: ACTION_STYLES.like.completed.label,
-      }
-    : isLiked
+  const leftLikeStyles =
+    actionCompleted === 'like'
       ? {
-          bg: ACTION_STYLES.like.liked.container,
-          icon: ACTION_STYLES.like.liked.icon,
-          text: ACTION_STYLES.like.liked.text,
-          label: ACTION_STYLES.like.liked.label,
+          bg: ACTION_STYLES.like.completed.container,
+          icon: ACTION_STYLES.like.completed.icon,
+          text: ACTION_STYLES.like.completed.text,
+          label: ACTION_STYLES.like.completed.label,
         }
-      : {
-          bg: ACTION_STYLES.like.unliked.container,
-          icon: ACTION_STYLES.like.unliked.icon,
-          text: ACTION_STYLES.like.unliked.text,
-          label: ACTION_STYLES.like.unliked.label,
-        };
+      : isLiked
+        ? {
+            bg: ACTION_STYLES.like.liked.container,
+            icon: ACTION_STYLES.like.liked.icon,
+            text: ACTION_STYLES.like.liked.text,
+            label: ACTION_STYLES.like.liked.label,
+          }
+        : {
+            bg: ACTION_STYLES.like.unliked.container,
+            icon: ACTION_STYLES.like.unliked.icon,
+            text: ACTION_STYLES.like.unliked.text,
+            label: ACTION_STYLES.like.unliked.label,
+          };
   const leftReopenStyles = REOPEN_STYLES;
   const rightStyles = DELETE_STYLES;
 
@@ -144,10 +124,7 @@ export function SwipeableTimelineItem({
       {/* Left Background - Reopen (Blue) - Only visible when swiping right */}
       <AnimatedViewTyped
         className="absolute left-0 top-0 overflow-hidden rounded-l-xl"
-        style={[
-          leftContainerStyle,
-          { width: TIMELINE_LEFT_ACTION_WIDTH },
-        ]}>
+        style={[leftContainerStyle, { width: TIMELINE_LEFT_ACTION_WIDTH }]}>
         <View
           className="flex-row items-stretch"
           style={{ width: TIMELINE_LEFT_ACTION_WIDTH, height: '100%' }}>
@@ -180,10 +157,7 @@ export function SwipeableTimelineItem({
       {/* Right Background - Delete (Red) - Only visible when swiping left */}
       <AnimatedViewTyped
         className={`absolute right-0 top-0 overflow-hidden rounded-r-xl ${rightStyles.bg}`}
-        style={[
-          rightContainerStyle,
-          { width: TIMELINE_RIGHT_ACTION_WIDTH },
-        ]}>
+        style={[rightContainerStyle, { width: TIMELINE_RIGHT_ACTION_WIDTH }]}>
         <TouchableOpacity
           activeOpacity={0.8}
           onPress={handleDelete}

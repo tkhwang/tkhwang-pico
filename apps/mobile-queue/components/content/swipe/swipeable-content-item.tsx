@@ -1,5 +1,5 @@
-import React, { useState, useCallback } from 'react';
-import { View, LayoutChangeEvent, TouchableOpacity, Alert, Platform, Vibration } from 'react-native';
+import React, { useCallback } from 'react';
+import { View, LayoutChangeEvent, TouchableOpacity, Alert } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
 import { Icon } from '@/components/ui/icon';
@@ -7,15 +7,11 @@ import { Check, Trash2, RotateCcw, Heart, CircleCheck } from 'lucide-react-nativ
 import { useSwipeableItem } from '@/hooks/use-swipeable-item';
 import type { UserContentWithDetails } from '@tkhwang-pico/common';
 import { Text } from '@/components/ui/text';
-import {
-  LEFT_ACTION_WIDTH,
-  RIGHT_ACTION_WIDTH,
-  SWIPE_MENU_DAMPING,
-  SWIPE_ACTION_FEEDBACK_DURATION_MS,
-} from '@/consts/app-consts';
+import { LEFT_ACTION_WIDTH, RIGHT_ACTION_WIDTH, SWIPE_MENU_DAMPING } from '@/consts/app-consts';
 import { ACTION_STYLES, COMPLETION_STYLES, DELETE_STYLES } from '@/consts/app-styles';
 import { ContentItem } from '@/components/content/content-item';
 import { isContentLiked } from '@/utils/content-helpers';
+import { useSwipeActionFeedback } from '@/hooks/use-swipe-action-feedback';
 
 // Type assertion for React 19 compatibility
 const AnimatedViewTyped = Animated.View as any;
@@ -35,8 +31,7 @@ export function SwipeableContentItem({
   onLike,
   onPress,
 }: SwipeableContentItemProps) {
-  const [actionCompleted, setActionCompleted] = useState<'like' | 'complete' | null>(null);
-  const [isProcessing, setIsProcessing] = useState(false);
+  const { isProcessing, actionCompleted, executeWithFeedback } = useSwipeActionFeedback();
 
   const {
     itemHeight,
@@ -64,97 +59,59 @@ export function SwipeableContentItem({
   const LeftIcon = actionCompleted === 'complete' ? CircleCheck : isCompleted ? RotateCcw : Check;
 
   // Dynamic styles based on action state
-  const likeStyles = actionCompleted === 'like'
-    ? {
-        bg: ACTION_STYLES.like.completed.container,
-        icon: ACTION_STYLES.like.completed.icon,
-        text: ACTION_STYLES.like.completed.text,
-        label: ACTION_STYLES.like.completed.label,
-      }
-    : isLiked
+  const likeStyles =
+    actionCompleted === 'like'
       ? {
-          bg: ACTION_STYLES.like.liked.container,
-          icon: ACTION_STYLES.like.liked.icon,
-          text: ACTION_STYLES.like.liked.text,
-          label: ACTION_STYLES.like.liked.label,
+          bg: ACTION_STYLES.like.completed.container,
+          icon: ACTION_STYLES.like.completed.icon,
+          text: ACTION_STYLES.like.completed.text,
+          label: ACTION_STYLES.like.completed.label,
         }
-      : {
-          bg: ACTION_STYLES.like.unliked.container,
-          icon: ACTION_STYLES.like.unliked.icon,
-          text: ACTION_STYLES.like.unliked.text,
-          label: ACTION_STYLES.like.unliked.label,
-        };
+      : isLiked
+        ? {
+            bg: ACTION_STYLES.like.liked.container,
+            icon: ACTION_STYLES.like.liked.icon,
+            text: ACTION_STYLES.like.liked.text,
+            label: ACTION_STYLES.like.liked.label,
+          }
+        : {
+            bg: ACTION_STYLES.like.unliked.container,
+            icon: ACTION_STYLES.like.unliked.icon,
+            text: ACTION_STYLES.like.unliked.text,
+            label: ACTION_STYLES.like.unliked.label,
+          };
 
-  const completionStyles = actionCompleted === 'complete'
-    ? {
-        bg: ACTION_STYLES.complete.success.container,
-        icon: ACTION_STYLES.complete.success.icon,
-        text: ACTION_STYLES.complete.success.text,
-        label: ACTION_STYLES.complete.success.label,
-      }
-    : isCompleted
+  const completionStyles =
+    actionCompleted === 'complete'
       ? {
-          bg: ACTION_STYLES.complete.completed.container,
-          icon: ACTION_STYLES.complete.completed.icon,
-          text: ACTION_STYLES.complete.completed.text,
-          label: ACTION_STYLES.complete.completed.label,
+          bg: ACTION_STYLES.complete.success.container,
+          icon: ACTION_STYLES.complete.success.icon,
+          text: ACTION_STYLES.complete.success.text,
+          label: ACTION_STYLES.complete.success.label,
         }
-      : {
-          bg: ACTION_STYLES.complete.pending.container,
-          icon: ACTION_STYLES.complete.pending.icon,
-          text: ACTION_STYLES.complete.pending.text,
-          label: ACTION_STYLES.complete.pending.label,
-        };
+      : isCompleted
+        ? {
+            bg: ACTION_STYLES.complete.completed.container,
+            icon: ACTION_STYLES.complete.completed.icon,
+            text: ACTION_STYLES.complete.completed.text,
+            label: ACTION_STYLES.complete.completed.label,
+          }
+        : {
+            bg: ACTION_STYLES.complete.pending.container,
+            icon: ACTION_STYLES.complete.pending.icon,
+            text: ACTION_STYLES.complete.pending.text,
+            label: ACTION_STYLES.complete.pending.label,
+          };
 
   const deleteStyles = DELETE_STYLES;
 
-  const handleLikePress = useCallback(async () => {
-    if (isProcessing) return;
+  const handleLikePress = useCallback(() => {
+    executeWithFeedback('like', () => onLike?.(item.content_id), close);
+  }, [executeWithFeedback, item.content_id, onLike, close]);
 
-    setIsProcessing(true);
-
-    // Haptic feedback on mobile
-    if (Platform.OS !== 'web') {
-      Vibration.vibrate(10);
-    }
-
-    // Animate success state
-    setActionCompleted('like');
-
-    // Execute action
-    onLike?.(item.content_id);
-
-    // Reset after animation
-    setTimeout(() => {
-      close();
-      setIsProcessing(false);
-      setActionCompleted(null);
-    }, SWIPE_ACTION_FEEDBACK_DURATION_MS);
-  }, [isProcessing, item.content_id, onLike, close]);
-
-  const handleCompletePress = useCallback(async () => {
-    if (isProcessing) return;
-
-    setIsProcessing(true);
-
-    // Haptic feedback on mobile
-    if (Platform.OS !== 'web') {
-      Vibration.vibrate(10);
-    }
-
-    // Animate success state
-    setActionCompleted('complete');
-
-    // Execute action
-    onToggleComplete?.(item.id);
-
-    // Reset after animation
-    setTimeout(() => {
-      close();
-      setIsProcessing(false);
-      setActionCompleted(null);
-    }, SWIPE_ACTION_FEEDBACK_DURATION_MS);
-  }, [isProcessing, item.id, onToggleComplete, close]);
+  const handleCompletePress = useCallback(() => {
+    executeWithFeedback('complete', () => onToggleComplete?.(item.id), close);
+  }, [executeWithFeedback, item.id, onToggleComplete, close]);
 
   const handleDeletePress = () => {
     if (!onDelete) {
