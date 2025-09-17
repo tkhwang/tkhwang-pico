@@ -11,6 +11,7 @@ import { useToggleContentPreference } from '@/hooks/mutations/use-toggle-content
 import type { UserContentWithDetails } from '@tkhwang-pico/common';
 import { TimelineListSkeleton } from '@/components/timeline/list/timeline-list-skeleton';
 import { ContentDetailModal } from '@/components/content/detail/content-detail-modal';
+import { isContentLiked } from '@/utils/content-helpers';
 
 interface GroupedContent {
   date: string;
@@ -185,10 +186,7 @@ export function TimelineList() {
               onReopen={handleReopen}
               onDelete={handleDelete}
               onLike={handleLike}
-              isLiked={
-                content.preferences?.some((preference) => preference.preference_type === 'liked') ??
-                false
-              }
+              isLiked={isContentLiked(content)}
             />
           </View>
         ))}

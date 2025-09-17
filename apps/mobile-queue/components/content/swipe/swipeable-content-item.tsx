@@ -10,6 +10,7 @@ import { Text } from '@/components/ui/text';
 import { LEFT_ACTION_WIDTH, RIGHT_ACTION_WIDTH, SWIPE_MENU_DAMPING } from '@/consts/app-consts';
 import { LIKE_STYLES, COMPLETION_STYLES, DELETE_STYLES } from '@/consts/app-styles';
 import { ContentItem } from '@/components/content/content-item';
+import { isContentLiked } from '@/utils/content-helpers';
 
 // Type assertion for React 19 compatibility
 const AnimatedViewTyped = Animated.View as any;
@@ -49,8 +50,7 @@ export function SwipeableContentItem({
     swipeDamping: SWIPE_MENU_DAMPING,
   });
 
-  const isLiked =
-    item.preferences?.some((preference) => preference.preference_type === 'liked') ?? false;
+  const isLiked = isContentLiked(item);
 
   // Dynamic colors and icons based on todo_status
   const isCompleted = item.todo_status === 'completed';
