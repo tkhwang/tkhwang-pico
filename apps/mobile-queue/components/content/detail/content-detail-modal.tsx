@@ -182,7 +182,7 @@ export function ContentDetailModal({
                   bounces={true}
                   nestedScrollEnabled={true}
                   contentContainerStyle={{
-                    paddingBottom: Platform.OS === 'android' ? 60 : 40,
+                    paddingBottom: Platform.OS === 'android' ? 100 : 40,
                   }}>
                   {/* Title */}
                   <Text
