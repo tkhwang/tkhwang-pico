@@ -15,7 +15,12 @@ interface ContentItemProps {
   isLiked?: boolean;
 }
 
-export function ContentItem({ item, onToggleComplete, onPress, isLiked = false }: ContentItemProps) {
+export function ContentItem({
+  item,
+  onToggleComplete,
+  onPress,
+  isLiked = false,
+}: ContentItemProps) {
   const { openURL } = useContentActions();
   const content = item.contents;
 
@@ -23,13 +28,13 @@ export function ContentItem({ item, onToggleComplete, onPress, isLiked = false }
     return null;
   }
 
+  const handlePress = () => {
+    if (onPress) onPress(item);
+  };
+
   const handleLongPress = () => {
     const url = content.canonical_url || content.url;
     openURL(url);
-  };
-
-  const handlePress = () => {
-    if (onPress) onPress(item);
   };
 
   const handleCheckboxPress = () => {

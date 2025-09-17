@@ -1,8 +1,10 @@
 import React from 'react';
 import { View } from 'react-native';
 import { Icon } from '@/components/ui/icon';
-import { Sparkles } from 'lucide-react-native';
+import { Text } from '@/components/ui/text';
+import { Sparkles, ExternalLink as ExternalLinkIcon } from 'lucide-react-native';
 import { BaseContentCard } from '@/components/content/base-content-card';
+import { useContentActions } from '@/hooks/use-content-actions';
 import {
   formatDate,
   formatReadingTime,
@@ -18,13 +20,20 @@ interface RecommendItemProps {
 }
 
 export function RecommendItem({ recommendation, onPress }: RecommendItemProps) {
+  const { openURL } = useContentActions();
   const content = recommendation.contents;
+
   if (!content) return null;
 
   const scorePercentage = formatScorePercentage(recommendation.score);
 
   const handlePress = () => {
-    onPress(recommendation);
+    if (onPress) onPress(recommendation);
+  };
+
+  const handleLongPress = () => {
+    const url = content.canonical_url || content.url;
+    openURL(url);
   };
 
   const thumbnailUrl = getThumbnailUrl(content);
@@ -38,6 +47,14 @@ export function RecommendItem({ recommendation, onPress }: RecommendItemProps) {
     </View>
   );
 
+  // Create hold indicator element
+  const holdIndicator = (
+    <View className="flex-row items-center opacity-60">
+      <Icon as={ExternalLinkIcon} className="mr-0.5 h-2.5 w-2.5 text-gray-400 dark:text-gray-500" />
+      <Text className="text-[10px] text-gray-400 dark:text-gray-500">Hold</Text>
+    </View>
+  );
+
   return (
     <BaseContentCard
       title={content.title || undefined}
@@ -46,6 +63,7 @@ export function RecommendItem({ recommendation, onPress }: RecommendItemProps) {
       tags={content.tags || undefined}
       thumbnailUrl={thumbnailUrl || undefined}
       onPress={handlePress}
+      onLongPress={handleLongPress}
       leftSlot={recommendIconSlot}
       metadataProps={{
         score: scorePercentage,
@@ -53,6 +71,7 @@ export function RecommendItem({ recommendation, onPress }: RecommendItemProps) {
         domain: content.domain || 'CONTENT',
         date: content.published_at ? formatDate(content.published_at) : undefined,
         readingTime: content.word_count ? formatReadingTime(content.word_count) : undefined,
+        rightElement: holdIndicator,
       }}
     />
   );
