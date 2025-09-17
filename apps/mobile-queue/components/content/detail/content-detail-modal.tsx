@@ -5,7 +5,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
-  TouchableWithoutFeedback,
+  Pressable,
   Platform,
   Dimensions,
 } from 'react-native';
@@ -120,15 +120,24 @@ export function ContentDetailModal({
       presentationStyle="overFullScreen">
       {/* Ensure Modal's direct child is a View to avoid stray text nodes */}
       <View className="flex-1">
-        <TouchableWithoutFeedback onPress={onClose}>
-          <View className="flex-1 justify-end bg-black/50">
-            <TouchableWithoutFeedback>
-              <View
-                className="rounded-t-2xl bg-white dark:bg-gray-800"
-                style={{
-                  maxHeight: screenHeight * 0.7,
-                  paddingBottom: insets.bottom
-                }}>
+        {/* Backdrop */}
+        <Pressable
+          onPress={onClose}
+          style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
+          className="bg-black/50" />
+
+        {/* Content Container */}
+        <View
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            maxHeight: screenHeight * 0.7,
+          }}>
+          <View
+            className="rounded-t-2xl bg-white dark:bg-gray-800"
+            style={{ paddingBottom: insets.bottom }}>
                 {/* Modal Handle */}
                 <View className="items-center py-2">
                   <View className="h-1 w-12 rounded-full bg-gray-300 dark:bg-gray-600" />
@@ -167,7 +176,7 @@ export function ContentDetailModal({
 
                 {/* Content */}
                 <ScrollView
-                  className="px-4 py-4"
+                  className="flex-1 px-4 py-4"
                   showsVerticalScrollIndicator={false}
                   bounces={true}
                   contentContainerStyle={{
@@ -376,9 +385,7 @@ export function ContentDetailModal({
                   </View>
                 </ScrollView>
               </View>
-            </TouchableWithoutFeedback>
           </View>
-        </TouchableWithoutFeedback>
       </View>
     </Modal>
   );
