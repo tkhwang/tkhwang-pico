@@ -48,10 +48,19 @@ export const ACTION_STYLES = {
     },
   },
   delete: {
-    container: 'bg-red-100 dark:bg-red-900/30',
-    icon: 'text-red-600 dark:text-red-400',
-    text: 'text-red-600 dark:text-red-400',
-    label: 'Delete',
+    default: {
+      container: 'bg-red-100 dark:bg-red-900/30',
+      icon: 'text-red-600 dark:text-red-400',
+      text: 'text-red-600 dark:text-red-400',
+      label: 'Delete',
+    },
+    completed: {
+      container: 'bg-red-500',
+      wrapper: 'shadow-lg shadow-red-500/20',
+      icon: 'text-white',
+      text: 'text-white',
+      label: 'Deleted!',
+    },
   },
   reopen: {
     default: {
@@ -144,9 +153,9 @@ export const COMPLETION_STYLES = {
 
 // Delete action styles (for swipe components)
 export const DELETE_STYLES = {
-  bg: ACTION_STYLES.delete.container,
-  icon: ACTION_STYLES.delete.icon,
-  text: ACTION_STYLES.delete.text,
+  bg: ACTION_STYLES.delete.default.container,
+  icon: ACTION_STYLES.delete.default.icon,
+  text: ACTION_STYLES.delete.default.text,
 } as const;
 
 // Reopen action styles (for swipe components)
@@ -222,9 +231,9 @@ export const MODAL_ACTION_STYLES = {
     text: ACTION_STYLES.open.text,
   },
   delete: {
-    container: ACTION_STYLES.delete.container,
-    icon: ACTION_STYLES.delete.icon,
-    text: ACTION_STYLES.delete.text,
+    container: ACTION_STYLES.delete.default.container,
+    icon: ACTION_STYLES.delete.default.icon,
+    text: ACTION_STYLES.delete.default.text,
   },
   addToQueue: {
     container: ACTION_STYLES.addToQueue.default.container,

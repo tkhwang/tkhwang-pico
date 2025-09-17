@@ -3,7 +3,7 @@ import { View, LayoutChangeEvent, TouchableOpacity, Alert } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
 import { Icon } from '@/components/ui/icon';
-import { Check, Trash2, RotateCcw, Heart, CircleCheck } from 'lucide-react-native';
+import { Check, Trash2, RotateCcw, Heart, CircleCheck, X } from 'lucide-react-native';
 import { useSwipeableItem } from '@/hooks/use-swipeable-item';
 import type { UserContentWithDetails } from '@tkhwang-pico/common';
 import { Text } from '@/components/ui/text';
@@ -103,7 +103,20 @@ export function SwipeableContentItem({
             label: ACTION_STYLES.complete.pending.label,
           };
 
-  const deleteStyles = DELETE_STYLES;
+  const deleteStyles =
+    actionCompleted === 'delete'
+      ? {
+          bg: ACTION_STYLES.delete.completed.container,
+          icon: ACTION_STYLES.delete.completed.icon,
+          text: ACTION_STYLES.delete.completed.text,
+          label: ACTION_STYLES.delete.completed.label,
+        }
+      : {
+          bg: ACTION_STYLES.delete.default.container,
+          icon: ACTION_STYLES.delete.default.icon,
+          text: ACTION_STYLES.delete.default.text,
+          label: ACTION_STYLES.delete.default.label,
+        };
 
   const handleLikePress = useCallback(() => {
     executeWithFeedback('like', () => onLike?.(item.content_id), close);
@@ -113,7 +126,7 @@ export function SwipeableContentItem({
     executeWithFeedback('complete', () => onToggleComplete?.(item.id), close);
   }, [executeWithFeedback, item.id, onToggleComplete, close]);
 
-  const handleDeletePress = () => {
+  const handleDeletePress = useCallback(() => {
     if (!onDelete) {
       close();
       return;
@@ -129,12 +142,11 @@ export function SwipeableContentItem({
         text: 'Delete',
         style: 'destructive',
         onPress: () => {
-          onDelete(item.content_id);
-          close();
+          executeWithFeedback('delete', () => onDelete(item.content_id), close);
         },
       },
     ]);
-  };
+  }, [executeWithFeedback, item.content_id, onDelete, close]);
 
   const handleContentPress = (contentItem: UserContentWithDetails) => {
     if (isLeftOpen || isRightOpen) {
@@ -186,11 +198,17 @@ export function SwipeableContentItem({
         <TouchableOpacity
           activeOpacity={0.8}
           onPress={handleDeletePress}
+          disabled={isProcessing}
           className={`h-full w-full items-center justify-center rounded-r-lg ${deleteStyles.bg}`}>
           <AnimatedViewTyped style={rightIconStyle}>
-            <Icon as={Trash2} className={`h-6 w-6 ${deleteStyles.icon}`} />
+            <Icon
+              as={actionCompleted === 'delete' ? X : Trash2}
+              className={`h-6 w-6 ${deleteStyles.icon}`}
+            />
           </AnimatedViewTyped>
-          <Text className={`mt-1 text-xs font-semibold ${deleteStyles.text}`}>Delete</Text>
+          <Text className={`mt-1 text-xs font-semibold ${deleteStyles.text}`}>
+            {deleteStyles.label}
+          </Text>
         </TouchableOpacity>
       </AnimatedViewTyped>
 

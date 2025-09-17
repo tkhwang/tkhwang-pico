@@ -4,7 +4,7 @@ import { GestureDetector } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
 import { TimelineCard } from '../timeline-item';
 import { Icon } from '@/components/ui/icon';
-import { RotateCcw, Trash2, Heart, Circle } from 'lucide-react-native';
+import { RotateCcw, Trash2, Heart, Circle, X } from 'lucide-react-native';
 import type { UserContentWithDetails } from '@tkhwang-pico/common';
 import { Text } from '@/components/ui/text';
 import { useSwipeableItem } from '@/hooks/use-swipeable-item';
@@ -64,7 +64,7 @@ export function SwipeableTimelineItem({
     executeWithFeedback('like', () => onLike?.(item.content_id), close);
   }, [executeWithFeedback, item.content_id, onLike, close]);
 
-  const handleDelete = () => {
+  const handleDelete = useCallback(() => {
     if (!onDelete) {
       close();
       return;
@@ -76,12 +76,11 @@ export function SwipeableTimelineItem({
         text: 'Delete',
         style: 'destructive',
         onPress: () => {
-          onDelete(item.content_id);
-          close();
+          executeWithFeedback('delete', () => onDelete(item.content_id), close);
         },
       },
     ]);
-  };
+  }, [executeWithFeedback, item.content_id, onDelete, close]);
 
   const handlePress = (content: UserContentWithDetails) => {
     if (isLeftOpen || isRightOpen) {
@@ -127,7 +126,20 @@ export function SwipeableTimelineItem({
           text: ACTION_STYLES.reopen.default.text,
           label: ACTION_STYLES.reopen.default.label,
         };
-  const rightStyles = DELETE_STYLES;
+  const rightStyles =
+    actionCompleted === 'delete'
+      ? {
+          bg: ACTION_STYLES.delete.completed.container,
+          icon: ACTION_STYLES.delete.completed.icon,
+          text: ACTION_STYLES.delete.completed.text,
+          label: ACTION_STYLES.delete.completed.label,
+        }
+      : {
+          bg: ACTION_STYLES.delete.default.container,
+          icon: ACTION_STYLES.delete.default.icon,
+          text: ACTION_STYLES.delete.default.text,
+          label: ACTION_STYLES.delete.default.label,
+        };
 
   const AnimatedViewTyped = Animated.View as any;
 
@@ -179,12 +191,18 @@ export function SwipeableTimelineItem({
         <TouchableOpacity
           activeOpacity={0.8}
           onPress={handleDelete}
+          disabled={isProcessing}
           className="items-center justify-center"
           style={{ width: TIMELINE_RIGHT_ACTION_WIDTH, height: '100%' }}>
           <AnimatedViewTyped style={rightIconStyle}>
-            <Icon as={Trash2} className={`h-6 w-6 ${rightStyles.icon}`} />
+            <Icon
+              as={actionCompleted === 'delete' ? X : Trash2}
+              className={`h-6 w-6 ${rightStyles.icon}`}
+            />
           </AnimatedViewTyped>
-          <Text className={`mt-1 text-xs font-semibold ${rightStyles.text}`}>Delete</Text>
+          <Text className={`mt-1 text-xs font-semibold ${rightStyles.text}`}>
+            {rightStyles.label}
+          </Text>
         </TouchableOpacity>
       </AnimatedViewTyped>
 
