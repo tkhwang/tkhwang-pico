@@ -175,19 +175,31 @@ export class Url {
     domain?: string | null,
   ): string | null {
     if (!imageUrl) return null;
+    const trimmed = imageUrl.trim();
+    const lower = trimmed.toLowerCase();
 
-    // Check if it's already an absolute URL or data URL
+    // Disallow dangerous schemes outright
     if (
-      imageUrl.startsWith('http://') ||
-      imageUrl.startsWith('https://') ||
-      imageUrl.startsWith('data:') ||
-      imageUrl.startsWith('//')
+      /^(javascript|vbscript|file|filesystem|about|chrome|chrome-extension):/.test(
+        lower,
+      )
     ) {
-      // Handle protocol-relative URLs
-      if (imageUrl.startsWith('//')) {
-        return `https:${imageUrl}`;
-      }
-      return imageUrl;
+      return null;
+    }
+
+    // Allow only image data URLs
+    if (lower.startsWith('data:')) {
+      return lower.startsWith('data:image/') ? trimmed : null;
+    }
+
+    // Already absolute HTTP(S)
+    if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+      return trimmed;
+    }
+
+    // Protocol-relative URLs
+    if (trimmed.startsWith('//')) {
+      return `${baseUrl ? baseUrl.protocol : 'https:'}${trimmed}`;
     }
 
     // Try to resolve using baseUrl
