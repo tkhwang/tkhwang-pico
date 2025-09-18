@@ -3,7 +3,7 @@ import { View, LayoutChangeEvent, TouchableOpacity, Alert } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
 import { Icon } from '@/components/ui/icon';
-import { Check, Trash2, RotateCcw, Heart, X, CircleCheck } from 'lucide-react-native';
+import { Check, Trash2, RotateCcw, Heart, X, CircleCheckBig } from 'lucide-react-native';
 import { useSwipeableItem } from '@/hooks/use-swipeable-item';
 import type { UserContentWithDetails } from '@tkhwang-pico/common';
 import { Text } from '@/components/ui/text';
@@ -56,7 +56,7 @@ export function SwipeableContentItem({
 
   // Dynamic colors and icons based on todo_status
   const isCompleted = item.todo_status === 'completed';
-  const LeftIcon = actionCompleted === 'complete' ? CircleCheck : isCompleted ? RotateCcw : Check;
+  const LeftIcon = actionCompleted === 'complete' ? CircleCheckBig : isCompleted ? RotateCcw : Check;
 
   // Dynamic styles based on action state
   const likeStyles =

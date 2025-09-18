@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, TouchableOpacity } from 'react-native';
 import { Icon } from '@/components/ui/icon';
-import { ExternalLinkIcon, Heart, CircleCheck } from 'lucide-react-native';
+import { ExternalLinkIcon, Heart, CircleCheckBig } from 'lucide-react-native';
 import { BaseContentCard } from '@/components/content/base-content-card';
 import { formatDate, formatReadingTime, getThumbnailUrl } from '@/utils/content-formatters';
 import { useContentActions } from '@/hooks/use-content-actions';
@@ -50,7 +50,7 @@ export function ContentItem({
     <TouchableOpacity onPress={handleCheckboxPress} className="mr-2 mt-0.5">
       <View className="relative">
         {item.todo_status === 'completed' ? (
-          <Icon as={CircleCheck} className="h-5 w-5 text-green-500" />
+          <Icon as={CircleCheckBig} className="h-5 w-5 text-green-500" />
         ) : (
           <View className="h-5 w-5 items-center justify-center rounded-full border-2 border-blue-500 bg-transparent" />
         )}
