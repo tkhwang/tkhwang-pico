@@ -445,7 +445,14 @@ export type Database = {
         Returns: string[];
       };
       similar_to_content: {
-        Args: { p_content_id: string; p_limit?: number; p_model?: string };
+        Args:
+          | { p_content_id: string; p_limit?: number; p_model?: string }
+          | {
+              p_content_id: string;
+              p_limit?: number;
+              p_model?: string;
+              p_user_id?: string;
+            };
         Returns: {
           content_id: string;
           distance: number;
