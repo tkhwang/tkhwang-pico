@@ -151,7 +151,7 @@ export class ContentsRepository {
 
     const contentIds = results
       .map((item) => item.content_id)
-      .filter((id) => id && id !== contentId);
+      .filter((id) => id);
 
     const uniqueContentIds = Array.from(new Set(contentIds));
 
@@ -177,14 +177,12 @@ export class ContentsRepository {
         [],
     );
 
-    return results
-      .filter((item) => item.content_id !== contentId)
-      .map((item) => ({
-        content_id: item.content_id,
-        distance: item.distance,
-        // cosine distance ∈ [0,2] → score ∈ [0,1]
-        score: (2 - item.distance) / 2,
-        contents: contentMap.get(item.content_id) ?? null,
-      }));
+    return results.map((item) => ({
+      content_id: item.content_id,
+      distance: item.distance,
+      // cosine distance ∈ [0,2] → score ∈ [0,1]
+      score: (2 - item.distance) / 2,
+      contents: contentMap.get(item.content_id) ?? null,
+    }));
   }
 }
