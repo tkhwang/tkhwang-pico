@@ -7,6 +7,10 @@ import * as SplashScreen from 'expo-splash-screen';
 import { Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+const ANDROID_TAB_BAR_HEIGHT = 60;
+const IOS_TAB_BAR_HEIGHT = 80;
+const IOS_TAB_BAR_PADDING_BOTTOM = 20;
+
 export default function TabLayout() {
   const { colorScheme } = useColorScheme();
   const isDark = colorScheme === 'dark';
@@ -28,8 +32,9 @@ export default function TabLayout() {
         tabBarStyle: {
           backgroundColor: isDark ? '#1f2937' : '#ffffff',
           borderTopColor: isDark ? '#374151' : '#e5e7eb',
-          height: Platform.OS === 'android' ? 60 + insets.bottom : 80,
-          paddingBottom: Platform.OS === 'android' ? insets.bottom : 20,
+          height:
+            Platform.OS === 'android' ? ANDROID_TAB_BAR_HEIGHT + insets.bottom : IOS_TAB_BAR_HEIGHT,
+          paddingBottom: Platform.OS === 'android' ? insets.bottom : IOS_TAB_BAR_PADDING_BOTTOM,
           paddingTop: 8,
         },
         tabBarActiveTintColor: isDark ? '#ffffff' : '#1f2937',
