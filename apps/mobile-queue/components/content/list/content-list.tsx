@@ -11,14 +11,10 @@ import { useDeleteContent } from '@/hooks/mutations/use-delete-content';
 import { useToggleContentPreference } from '@/hooks/mutations/use-toggle-content-preference';
 import { useSaveContent } from '@/hooks/mutations/use-save-content';
 import { useSetContentPreference } from '@/hooks/mutations/use-content-preference';
-import type { TodoFilterType, UserContentWithDetails } from '@tkhwang-pico/common';
+import type { UserContentWithDetails } from '@tkhwang-pico/common';
 
-interface ContentListProps {
-  todoFilter: TodoFilterType;
-}
-
-export function ContentList({ todoFilter }: ContentListProps) {
-  const { data: userContents = [], isLoading, error, refetch } = useUserContents(todoFilter);
+export function ContentList() {
+  const { data: userContents = [], isLoading, error, refetch } = useUserContents('pending');
 
   const [refreshing, setRefreshing] = useState(false);
   const [selectedItem, setSelectedItem] = useState<UserContentWithDetails | null>(null);
@@ -168,7 +164,7 @@ export function ContentList({ todoFilter }: ContentListProps) {
         keyExtractor={(item) => item.id}
         estimatedItemSize={120}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: 16 }}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 16 }}
         removeClippedSubviews={true}
         drawDistance={200}
         refreshControl={
