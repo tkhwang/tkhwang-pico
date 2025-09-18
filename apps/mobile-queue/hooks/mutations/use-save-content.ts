@@ -163,11 +163,6 @@ export function useSaveContent(options?: UseSaveContentOptions) {
         setTimeout(() => {
           queryClient.invalidateQueries({ queryKey: key });
         }, SAVE_CONTENT_DELAY_MS);
-
-        queryClient.invalidateQueries({
-          queryKey: queryKey.similarContents.byUserId(user.id),
-          exact: false,
-        });
       }
 
       options?.onSuccess?.();

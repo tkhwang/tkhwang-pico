@@ -40,7 +40,6 @@ import { ContentThumbnail } from '@/components/content/sub/content-thumbnail';
 import { MODAL_ACTION_STYLES, ACTION_STYLES } from '@/consts/app-styles';
 import type { UserContentWithDetails, Recommendation } from '@tkhwang-pico/common';
 import { useHapticFeedback } from '@/hooks/use-haptic-feedback';
-import { useSimilarContents } from '@/hooks/queries/use-similar-contents';
 
 interface ContentDetailModalProps {
   visible: boolean;
@@ -79,14 +78,6 @@ export function ContentDetailModal({
   const scrollContentPaddingBottom = 16;
   const { executeWithHapticFeedback } = useHapticFeedback();
   const contentId = item?.content_id;
-  const {
-    data: similarContents = [],
-    isLoading: isSimilarLoading,
-    removeFromCache: removeSimilarFromCache,
-  } = useSimilarContents(visible ? contentId : undefined, {
-    enabled: visible && !!contentId,
-    limit: 5,
-  });
 
   if (!item || !item.contents) {
     return null;
@@ -150,15 +141,6 @@ export function ContentDetailModal({
       const url = content.canonical_url || content.url;
       openURL(url, onClose);
     });
-
-  const filteredSimilarContents = similarContents.filter((similar) => {
-    if (!similar || similar.content_id === item.content_id) return false;
-    const similarContent = similar.contents;
-    const url = similarContent?.canonical_url || similarContent?.url;
-    return Boolean(similarContent && url);
-  });
-
-  const hasSimilarContents = filteredSimilarContents.length > 0;
 
   return (
     <Modal
