@@ -8,7 +8,6 @@ import type { TriggerRef } from '@rn-primitives/popover';
 import { LogOut, Plus, Settings } from 'lucide-react-native';
 import * as React from 'react';
 import { View } from 'react-native';
-import { router } from 'expo-router';
 
 // Properly type Popover components for React 19 compatibility
 const PopoverExtended = Popover as any;
@@ -25,8 +24,7 @@ export function UserMenu() {
 
     await signOut();
 
-    // Force navigation to sign-in page after signing out
-    router.replace('/sign-in');
+    // Navigation will be handled automatically by auth state change in _layout.tsx
   }
 
   return (

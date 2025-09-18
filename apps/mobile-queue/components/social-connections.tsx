@@ -57,30 +57,40 @@ export function SocialConnections() {
     return async () => {
       try {
         // Start the authentication process by calling `startSSOFlow()`
-        const { createdSessionId, setActive } = await startSSOFlow({
+        const { createdSessionId, setActive, signIn, signUp } = await startSSOFlow({
           strategy,
           // For web, defaults to current path
           // For native, you must pass a scheme, like AuthSession.makeRedirectUri({ scheme, path })
           // For more info, see https://docs.expo.dev/versions/latest/sdk/auth-session/#authsessionmakeredirecturioptions
-          redirectUrl: AuthSession.makeRedirectUri(),
+          redirectUrl: AuthSession.makeRedirectUri({
+            scheme: 'tkhwang-pico-mobile-queue',
+            path: 'oauth-native-callback',
+          }),
         });
 
         // If sign in was successful, set the active session
         if (createdSessionId && setActive) {
           await setActive({ session: createdSessionId });
-          // Force navigation to home screen after successful authentication
-          router.replace('/');
+          // Navigation will be handled by the auth state change in _layout.tsx
           return;
         }
 
-        // TODO: Handle other statuses
-        // If there is no `createdSessionId`,
-        // there are missing requirements, such as MFA
-        // Use the `signIn` or `signUp` returned from `startSSOFlow`
-        // to handle next steps
-      } catch (err) {
+        // Handle cases where additional steps are required
+        if (signIn || signUp) {
+          // Check if the user has completed the flow but needs to be activated
+          const sessionToActivate = signIn?.createdSessionId || signUp?.createdSessionId;
+          if (sessionToActivate && setActive) {
+            await setActive({ session: sessionToActivate });
+          }
+        }
+      } catch (err: any) {
         // See https://go.clerk.com/mRUDrIe for more info on error handling
-        console.error(JSON.stringify(err, null, 2));
+        console.error('Authentication error:', err);
+        // If the error is due to user cancellation, handle it gracefully
+        if (err?.errors?.[0]?.code === 'session_exists') {
+          // Session already exists, just navigate
+          router.replace('/');
+        }
       }
     };
   }
