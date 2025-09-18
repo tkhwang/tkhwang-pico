@@ -4,7 +4,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text } from '@/components/ui/text';
 import { Icon } from '@/components/ui/icon';
 import {
-  X,
   CheckCircle,
   Circle,
   Clock,
@@ -190,34 +189,29 @@ export function ContentDetail({
       android_keyboardInputMode="adjustResize">
       <View className="flex-1 rounded-t-2xl bg-white dark:bg-gray-800">
         {/* Header */}
-        <View className="flex-row items-center justify-between border-b border-gray-200 px-4 pb-3 dark:border-gray-700">
+        <View className="flex-row items-center justify-center border-b border-gray-200 px-4 pb-3 pt-4 dark:border-gray-700">
           {isRecommendation ? (
             // Recommendation mode header
-            <View className="flex-row items-center">
-              <Icon as={Sparkles} className="mr-2 h-4 w-4 text-purple-500" />
-              <Text className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            <View className="flex-row items-center gap-2">
+              <Icon as={Sparkles} className="h-5 w-5 text-purple-500" />
+              <Text className="text-base font-medium text-gray-700 dark:text-gray-300">
                 Recommendation
               </Text>
             </View>
           ) : (
             // Home mode header with toggle complete
-            <View className="flex-row items-center">
-              <TouchableOpacity onPress={handleToggleComplete} className="mr-3 p-2">
+            <View className="flex-row items-center gap-2">
+              <TouchableOpacity onPress={handleToggleComplete} className="p-1">
                 <Icon
                   as={isCompleted ? CheckCircle : Circle}
-                  className={`h-5 w-5 ${isCompleted ? 'text-green-500' : 'text-blue-500'}`}
+                  className={`h-6 w-6 ${isCompleted ? 'text-green-500' : 'text-blue-500'}`}
                 />
               </TouchableOpacity>
-              <Text className="text-sm text-gray-500 dark:text-gray-400">
+              <Text className="text-base font-medium text-gray-700 dark:text-gray-300">
                 {isCompleted ? 'Completed' : 'Pending'}
               </Text>
             </View>
           )}
-          <View className="flex-row">
-            <TouchableOpacity onPress={onClose} className="p-2">
-              <Icon as={X} className="h-5 w-5 text-gray-700 dark:text-gray-300" />
-            </TouchableOpacity>
-          </View>
         </View>
 
         {/* Content */}
