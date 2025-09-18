@@ -19,11 +19,11 @@ export function useSimilarContents(contentId?: string, options?: UseSimilarConte
 
   const activeKey =
     contentId && user?.id
-      ? queryKey.similarContents.byUserAndContent(user.id, contentId)
+      ? queryKey.similarContents.byUserIdAndContentId(user.id, contentId)
       : null;
 
   const queryResult = useSupabaseQuery<SimilarContentRecommendation[]>(
-    activeKey ?? ['similar_contents', 'no-user'],
+    activeKey ?? queryKey.similarContents.noUser(),
     async (clerkToken) => {
       if (!contentId) {
         return [];

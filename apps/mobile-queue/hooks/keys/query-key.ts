@@ -13,7 +13,11 @@ export const queryKey = {
     },
   },
   similarContents: {
-    byUserAndContent: (userId: string, contentId: string) => {
+    noUser: () => ['similar_contents', 'no-user'] as const,
+    byUserId: (userId: string) => {
+      return ['similar_contents', userId] as const;
+    },
+    byUserIdAndContentId: (userId: string, contentId: string) => {
       return ['similar_contents', userId, contentId] as const;
     },
   },
