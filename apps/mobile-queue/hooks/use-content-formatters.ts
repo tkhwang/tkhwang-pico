@@ -99,13 +99,47 @@ export const formatTimelineDate = (dateString: string) => {
   };
 };
 
-export const getThumbnailUrl = (content: { metadata?: any } | null): string | null => {
+export const getThumbnailUrl = (content: {
+  metadata?: any,
+  canonical_url?: string | null,
+  url?: string | null,
+  domain?: string | null
+} | null): string | null => {
   if (
-    content?.metadata &&
-    typeof content.metadata === 'object' &&
-    'image_url' in content.metadata
+    !content?.metadata ||
+    typeof content.metadata !== 'object' ||
+    !('image_url' in content.metadata)
   ) {
-    return content.metadata.image_url as string;
+    return null;
   }
-  return null;
+
+  const imageUrl = content.metadata.image_url as string;
+
+  // Handle relative paths by converting to absolute URLs
+  if (imageUrl && imageUrl.startsWith('/')) {
+    // Priority: metadata.original_url > canonical_url > url
+    const baseUrl =
+      content.metadata?.original_url ||
+      content.canonical_url ||
+      content.url;
+
+    if (baseUrl) {
+      try {
+        const url = new URL(baseUrl);
+        return `${url.origin}${imageUrl}`;
+      } catch (error) {
+        // If URL parsing fails, fall through to return original
+      }
+    }
+
+    // Fallback to domain field if available
+    if (content.domain) {
+      // Use https by default, http for localhost
+      const protocol = content.domain.includes('localhost') ? 'http' : 'https';
+      return `${protocol}://${content.domain}${imageUrl}`;
+    }
+  }
+
+  // Return as-is for absolute URLs or data URLs
+  return imageUrl;
 };
