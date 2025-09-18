@@ -12,8 +12,10 @@ interface MatchSpectrumProps {
 export function ContentMatchSpectrum({ score }: MatchSpectrumProps) {
   const colorScheme = useColorScheme();
 
-  const hasScore = typeof score === 'number' && !Number.isNaN(score);
-  const clampedScore = hasScore ? Math.max(0, Math.min(100, score ?? 0)) : 0;
+  const hasScore = typeof score === 'number' && Number.isFinite(score);
+  const normalized = hasScore ? (score! <= 1 ? score! * 100 : score!) : 0;
+  const clampedScore = Math.max(0, Math.min(100, normalized));
+
   const baseBorderColor = colorScheme === 'dark' ? '#374151' : '#d1d5db';
   const activePalette =
     colorScheme === 'dark'
