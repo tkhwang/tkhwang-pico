@@ -9,6 +9,8 @@ import { ContentListSkeleton } from '@/components/content/list/content-list-skel
 import { useToggleTodo } from '@/hooks/mutations/use-toggle-todo';
 import { useDeleteContent } from '@/hooks/mutations/use-delete-content';
 import { useToggleContentPreference } from '@/hooks/mutations/use-toggle-content-preference';
+import { useSaveContent } from '@/hooks/mutations/use-save-content';
+import { useSetContentPreference } from '@/hooks/mutations/use-content-preference';
 import type { TodoFilterType, UserContentWithDetails } from '@tkhwang-pico/common';
 
 interface ContentListProps {
@@ -25,6 +27,8 @@ export function ContentList({ todoFilter }: ContentListProps) {
   const toggleTodoMutation = useToggleTodo();
   const deleteContentMutation = useDeleteContent();
   const togglePreferenceMutation = useToggleContentPreference();
+  const saveContentMutation = useSaveContent();
+  const setPreferenceMutation = useSetContentPreference();
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -57,6 +61,23 @@ export function ContentList({ todoFilter }: ContentListProps) {
       });
     },
     [togglePreferenceMutation]
+  );
+
+  const handleAddToQueue = useCallback(
+    (url: string, _contentId: string) => {
+      saveContentMutation.mutate(url);
+    },
+    [saveContentMutation]
+  );
+
+  const handleNotInterested = useCallback(
+    (contentId: string) => {
+      setPreferenceMutation.mutate({
+        contentId,
+        preferenceType: 'not_interested',
+      });
+    },
+    [setPreferenceMutation]
   );
 
   const handleItemPress = useCallback((item: UserContentWithDetails) => {
@@ -169,6 +190,8 @@ export function ContentList({ todoFilter }: ContentListProps) {
         onToggleComplete={handleToggleComplete}
         onDelete={handleDelete}
         onLike={handleLike}
+        onAddToQueue={handleAddToQueue}
+        onNotInterested={handleNotInterested}
       />
     </View>
   );

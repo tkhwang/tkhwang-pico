@@ -1,4 +1,6 @@
+import { useCallback } from 'react';
 import { useUser } from '@clerk/clerk-expo';
+import { useQueryClient } from '@tanstack/react-query';
 import type { SimilarContentRecommendation } from '@tkhwang-pico/common';
 
 import { queryKey } from '@/hooks/keys/query-key';
@@ -12,12 +14,16 @@ interface UseSimilarContentsOptions {
 
 export function useSimilarContents(contentId?: string, options?: UseSimilarContentsOptions) {
   const { user } = useUser();
+  const queryClient = useQueryClient();
   const { limit = 5, enabled = true } = options ?? {};
 
-  return useSupabaseQuery<SimilarContentRecommendation[]>(
+  const activeKey =
     contentId && user?.id
       ? queryKey.similarContents.byUserAndContent(user.id, contentId)
-      : ['similar_contents', 'no-user'],
+      : null;
+
+  const queryResult = useSupabaseQuery<SimilarContentRecommendation[]>(
+    activeKey ?? ['similar_contents', 'no-user'],
     async (clerkToken) => {
       if (!contentId) {
         return [];
@@ -33,4 +39,21 @@ export function useSimilarContents(contentId?: string, options?: UseSimilarConte
       retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
     }
   );
+
+  const removeFromCache = useCallback(
+    (similarContentId: string) => {
+      if (!activeKey) return;
+
+      queryClient.setQueryData<SimilarContentRecommendation[]>(activeKey, (current) => {
+        if (!current) return current;
+        return current.filter((item) => item.content_id !== similarContentId);
+      });
+    },
+    [activeKey, queryClient]
+  );
+
+  return {
+    ...queryResult,
+    removeFromCache,
+  };
 }

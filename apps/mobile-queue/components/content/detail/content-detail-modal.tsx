@@ -42,7 +42,7 @@ import { MODAL_ACTION_STYLES, ACTION_STYLES } from '@/consts/app-styles';
 import type { UserContentWithDetails, Recommendation } from '@tkhwang-pico/common';
 import { useHapticFeedback } from '@/hooks/use-haptic-feedback';
 import { useSimilarContents } from '@/hooks/queries/use-similar-contents';
-import { RecommendItem } from '@/components/recommend/recommend-item';
+import { SwipeableRecommendItem } from '@/components/recommend/swipe/swipeable-recommend-item';
 
 interface ContentDetailModalProps {
   visible: boolean;
@@ -81,13 +81,14 @@ export function ContentDetailModal({
   const scrollContentPaddingBottom = 16;
   const { executeWithHapticFeedback } = useHapticFeedback();
   const contentId = item?.content_id;
-  const { data: similarContents = [], isLoading: isSimilarLoading } = useSimilarContents(
-    visible ? contentId : undefined,
-    {
-      enabled: visible && !!contentId,
-      limit: 5,
-    }
-  );
+  const {
+    data: similarContents = [],
+    isLoading: isSimilarLoading,
+    removeFromCache: removeSimilarFromCache,
+  } = useSimilarContents(visible ? contentId : undefined, {
+    enabled: visible && !!contentId,
+    limit: 5,
+  });
 
   if (!item || !item.contents) {
     return null;
@@ -340,10 +341,10 @@ export function ContentDetailModal({
                     {isSimilarLoading && <ActivityIndicator size="small" color="#a855f7" />}
                   </View>
 
-                  {hasSimilarContents ? (
-                    filteredSimilarContents.map((similar) => (
-                      <View key={similar.content_id} className="mb-3">
-                        <RecommendItem
+                  {hasSimilarContents
+                    ? filteredSimilarContents.map((similar) => (
+                        <SwipeableRecommendItem
+                          key={similar.content_id}
                           recommendation={similar}
                           onPress={(recommendation) =>
                             executeWithHapticFeedback(() => {
@@ -354,16 +355,29 @@ export function ContentDetailModal({
                               }
                             })
                           }
+                          onAddToQueue={
+                            onAddToQueue
+                              ? (url, similarContentId) => {
+                                  onAddToQueue(url, similarContentId);
+                                  removeSimilarFromCache(similarContentId);
+                                }
+                              : undefined
+                          }
+                          onNotInterested={
+                            onNotInterested
+                              ? (similarContentId) => {
+                                  onNotInterested(similarContentId);
+                                  removeSimilarFromCache(similarContentId);
+                                }
+                              : undefined
+                          }
                         />
-                      </View>
-                    ))
-                  ) : (
-                    !isSimilarLoading && (
-                      <Text className="text-xs text-gray-500 dark:text-gray-400">
-                        We couldn't find similar contents yet.
-                      </Text>
-                    )
-                  )}
+                      ))
+                    : !isSimilarLoading && (
+                        <Text className="text-xs text-gray-500 dark:text-gray-400">
+                          Add more content to get personalized recommendations.
+                        </Text>
+                      )}
                 </View>
               )}
             </ScrollView>
