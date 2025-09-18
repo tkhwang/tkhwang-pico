@@ -16,6 +16,7 @@ import * as React from 'react';
 import Constants from 'expo-constants';
 import { View, Text, Platform } from 'react-native';
 import * as Sentry from '@sentry/react-native';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 
 // Prevent the splash screen from auto-hiding before our app is ready
 // Only call this on native platforms (iOS/Android)
@@ -81,9 +82,11 @@ export default Sentry.wrap(function RootLayout() {
         <ClerkLoadedExtended>
           <QueryProvider>
             <ThemeProvider value={NAV_THEME[colorScheme ?? 'light']}>
-              <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
-              <Routes />
-              <PortalHost />
+              <BottomSheetModalProvider>
+                <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
+                <Routes />
+                <PortalHost />
+              </BottomSheetModalProvider>
             </ThemeProvider>
           </QueryProvider>
         </ClerkLoadedExtended>
