@@ -72,6 +72,7 @@ export function RecommendItem({ recommendation, onPress }: RecommendItemProps) {
         date: content.published_at ? formatDate(content.published_at) : undefined,
         readingTime: content.word_count ? formatReadingTime(content.word_count) : undefined,
         rightElement: holdIndicator,
+        showMatchSpectrum: true,
       }}
     />
   );

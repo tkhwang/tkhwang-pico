@@ -28,6 +28,7 @@ interface BaseContentCardProps {
     score?: number;
     scoreColor?: string;
     rightElement?: React.ReactNode;
+    showMatchSpectrum?: boolean;
   };
 
   // Style customization
