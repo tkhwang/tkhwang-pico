@@ -91,7 +91,11 @@ export class Url {
   }
 
   isLocalhost(): boolean {
-    return this.hostname === 'localhost' || this.hostname === '127.0.0.1';
+    return (
+      this.hostname === 'localhost' ||
+      this.hostname === '127.0.0.1' ||
+      this.hostname === '::1'
+    );
   }
 
   // ===== URL Transformations =====
