@@ -86,7 +86,7 @@ export function SocialConnections() {
       } catch (err: any) {
         // See https://go.clerk.com/mRUDrIe for more info on error handling
         console.error('Authentication error:', err);
-        // If the error is due to user cancellation, handle it gracefully
+        // If the error indicates a session already exists, handle it gracefully
         if (err?.errors?.[0]?.code === 'session_exists') {
           // Session already exists, just navigate
           router.replace('/');
