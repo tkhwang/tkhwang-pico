@@ -18,7 +18,7 @@ drop trigger if exists trg_set_content_domain on public.contents;
 
 -- Drop functions
 drop function if exists public.recommend_feed(int, text, text);
-drop function if exists public.similar_to_content(uuid, int, text);
+drop function if exists public.similar_to_content(uuid, int, text, text);
 drop function if exists public.auto_set_completed_timestamp();
 drop function if exists public.set_content_domain();
 drop function if exists public.current_clerk_user_id();
