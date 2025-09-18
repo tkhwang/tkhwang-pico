@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { View, RefreshControl, ScrollView } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { Text } from '@/components/ui/text';
@@ -7,9 +7,11 @@ import { useUserContents } from '@/hooks/queries/use-user-contents';
 import { useDeleteContent } from '@/hooks/mutations/use-delete-content';
 import { useReopenContent } from '@/hooks/mutations/use-reopen-content';
 import { useToggleContent } from '@/hooks/mutations/use-toggle-content';
-import type { UserContentWithDetails } from '@tkhwang-pico/common';
+import { useToggleContentPreference } from '@/hooks/mutations/use-toggle-content-preference';
 import { TimelineListSkeleton } from '@/components/timeline/list/timeline-list-skeleton';
 import { ContentDetailModal } from '@/components/content/detail/content-detail-modal';
+import { isContentLiked } from '@/utils/content-helpers';
+import type { UserContentWithDetails } from '@tkhwang-pico/common';
 
 interface GroupedContent {
   date: string;
@@ -26,6 +28,7 @@ export function TimelineList() {
   const deleteContentMutation = useDeleteContent();
   const reopenContentMutation = useReopenContent();
   const toggleContentMutation = useToggleContent();
+  const togglePreferenceMutation = useToggleContentPreference();
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -46,6 +49,15 @@ export function TimelineList() {
     setSelectedItem(null);
   }, []);
 
+  // Keep selectedItem in sync with latest cache while modal is open
+  useEffect(() => {
+    if (!modalVisible || !selectedItem) return;
+    const updated = contents.find((c) => c.content_id === selectedItem.content_id);
+    if (updated && updated !== selectedItem) {
+      setSelectedItem(updated);
+    }
+  }, [contents, modalVisible, selectedItem]);
+
   const handleReopen = useCallback(
     (id: string) => {
       reopenContentMutation.mutate(id);
@@ -58,6 +70,16 @@ export function TimelineList() {
       deleteContentMutation.mutate(contentId);
     },
     [deleteContentMutation]
+  );
+
+  const handleLike = useCallback(
+    (contentId: string) => {
+      togglePreferenceMutation.mutate({
+        contentId,
+        preferenceType: 'liked',
+      });
+    },
+    [togglePreferenceMutation]
   );
 
   const handleToggleComplete = useCallback(
@@ -163,6 +185,8 @@ export function TimelineList() {
               onPress={handleItemPress}
               onReopen={handleReopen}
               onDelete={handleDelete}
+              onLike={handleLike}
+              isLiked={isContentLiked(content)}
             />
           </View>
         ))}
@@ -197,6 +221,7 @@ export function TimelineList() {
           onClose={handleModalClose}
           onToggleComplete={handleToggleComplete}
           onDelete={handleDelete}
+          onLike={handleLike}
         />
       )}
     </View>

@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { View, TouchableOpacity, RefreshControl, ScrollView } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { Text } from '@/components/ui/text';
@@ -8,6 +8,7 @@ import { useUserContents } from '@/hooks/queries/use-user-contents';
 import { ContentListSkeleton } from '@/components/content/list/content-list-skeleton';
 import { useToggleTodo } from '@/hooks/mutations/use-toggle-todo';
 import { useDeleteContent } from '@/hooks/mutations/use-delete-content';
+import { useToggleContentPreference } from '@/hooks/mutations/use-toggle-content-preference';
 import type { TodoFilterType, UserContentWithDetails } from '@tkhwang-pico/common';
 
 interface ContentListProps {
@@ -23,6 +24,7 @@ export function ContentList({ todoFilter }: ContentListProps) {
 
   const toggleTodoMutation = useToggleTodo();
   const deleteContentMutation = useDeleteContent();
+  const togglePreferenceMutation = useToggleContentPreference();
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -47,6 +49,16 @@ export function ContentList({ todoFilter }: ContentListProps) {
     [deleteContentMutation]
   );
 
+  const handleLike = useCallback(
+    (contentId: string) => {
+      togglePreferenceMutation.mutate({
+        contentId,
+        preferenceType: 'liked',
+      });
+    },
+    [togglePreferenceMutation]
+  );
+
   const handleItemPress = useCallback((item: UserContentWithDetails) => {
     setSelectedItem(item);
     setModalVisible(true);
@@ -56,6 +68,15 @@ export function ContentList({ todoFilter }: ContentListProps) {
     setModalVisible(false);
     setSelectedItem(null);
   }, []);
+
+  // Keep selectedItem in sync with latest cache while modal is open
+  useEffect(() => {
+    if (!modalVisible || !selectedItem) return;
+    const updated = userContents.find((c) => c.content_id === selectedItem.content_id);
+    if (updated && updated !== selectedItem) {
+      setSelectedItem(updated);
+    }
+  }, [userContents, modalVisible, selectedItem]);
 
   if (isLoading && !refreshing) return <ContentListSkeleton />;
 
@@ -112,6 +133,7 @@ export function ContentList({ todoFilter }: ContentListProps) {
         item={item}
         onToggleComplete={handleToggleComplete}
         onDelete={handleDelete}
+        onLike={handleLike}
         onPress={handleItemPress}
       />
     );
@@ -146,6 +168,7 @@ export function ContentList({ todoFilter }: ContentListProps) {
         onClose={handleModalClose}
         onToggleComplete={handleToggleComplete}
         onDelete={handleDelete}
+        onLike={handleLike}
       />
     </View>
   );

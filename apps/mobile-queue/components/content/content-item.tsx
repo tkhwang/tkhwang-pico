@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, TouchableOpacity } from 'react-native';
 import { Icon } from '@/components/ui/icon';
-import { ExternalLinkIcon, Check } from 'lucide-react-native';
+import { ExternalLinkIcon, Heart, CircleCheck } from 'lucide-react-native';
 import { BaseContentCard } from '@/components/content/base-content-card';
 import { formatDate, formatReadingTime, getThumbnailUrl } from '@/hooks/use-content-formatters';
 import { useContentActions } from '@/hooks/use-content-actions';
@@ -12,9 +12,15 @@ interface ContentItemProps {
   item: UserContentWithDetails;
   onToggleComplete?: (id: string) => void;
   onPress?: (item: UserContentWithDetails) => void;
+  isLiked?: boolean;
 }
 
-export function ContentItem({ item, onToggleComplete, onPress }: ContentItemProps) {
+export function ContentItem({
+  item,
+  onToggleComplete,
+  onPress,
+  isLiked = false,
+}: ContentItemProps) {
   const { openURL } = useContentActions();
   const content = item.contents;
 
@@ -22,13 +28,13 @@ export function ContentItem({ item, onToggleComplete, onPress }: ContentItemProp
     return null;
   }
 
+  const handlePress = () => {
+    if (onPress) onPress(item);
+  };
+
   const handleLongPress = () => {
     const url = content.canonical_url || content.url;
     openURL(url);
-  };
-
-  const handlePress = () => {
-    if (onPress) onPress(item);
   };
 
   const handleCheckboxPress = () => {
@@ -42,14 +48,16 @@ export function ContentItem({ item, onToggleComplete, onPress }: ContentItemProp
   // Create checkbox slot
   const checkboxSlot = (
     <TouchableOpacity onPress={handleCheckboxPress} className="mr-2 mt-0.5">
-      <View
-        className={`h-5 w-5 items-center justify-center rounded-full border-2 ${
-          item.todo_status === 'completed'
-            ? 'border-green-500 bg-green-500'
-            : 'border-blue-500 bg-transparent'
-        }`}>
+      <View className="relative">
         {item.todo_status === 'completed' ? (
-          <Icon as={Check} className="h-3 w-3 text-white" />
+          <Icon as={CircleCheck} className="h-5 w-5 text-green-500" />
+        ) : (
+          <View className="h-5 w-5 items-center justify-center rounded-full border-2 border-blue-500 bg-transparent" />
+        )}
+        {isLiked ? (
+          <View className="absolute -bottom-1 -right-1 h-3.5 w-3.5 items-center justify-center rounded-full bg-rose-200">
+            <Icon as={Heart} className="h-2 w-2 text-rose-600" />
+          </View>
         ) : null}
       </View>
     </TouchableOpacity>

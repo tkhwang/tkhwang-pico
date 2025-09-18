@@ -1,18 +1,20 @@
-import React from 'react';
-import { View } from 'react-native';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-  runOnJS,
-  interpolate,
-  Extrapolation,
-} from 'react-native-reanimated';
+import React, { useCallback } from 'react';
+import { View, TouchableOpacity, Alert } from 'react-native';
+import { GestureDetector } from 'react-native-gesture-handler';
+import Animated from 'react-native-reanimated';
 import { RecommendItem } from '../recommend-item';
 import { Icon } from '@/components/ui/icon';
-import { ThumbsUp, ThumbsDown } from 'lucide-react-native';
+import { ThumbsUp, ThumbsDown, X, Circle } from 'lucide-react-native';
+import { Text } from '@/components/ui/text';
+import { useSwipeableItem } from '@/hooks/use-swipeable-item';
+import {
+  RECOMMEND_LEFT_ACTION_WIDTH,
+  RECOMMEND_RIGHT_ACTION_WIDTH,
+  SWIPE_MENU_DAMPING,
+} from '@/consts/app-consts';
+import { RECOMMEND_ADD_STYLES, RECOMMEND_SKIP_STYLES, ACTION_STYLES } from '@/consts/app-styles';
 import type { Recommendation } from '@tkhwang-pico/common';
+import { useSwipeActionFeedback } from '@/hooks/use-swipe-action-feedback';
 
 interface SwipeableRecommendItemProps {
   recommendation: Recommendation;
@@ -21,165 +23,130 @@ interface SwipeableRecommendItemProps {
   onPress?: (recommendation: Recommendation) => void;
 }
 
-const SWIPE_THRESHOLD = 60;
-const MAX_SWIPE_DISTANCE = 150;
-const SWIPE_DAMPING = 0.4; // Lower damping for much slower movement
-
 export function SwipeableRecommendItem({
   recommendation,
   onAddToQueue,
   onNotInterested,
   onPress,
 }: SwipeableRecommendItemProps) {
-  const translateX = useSharedValue(0);
-  const itemHeight = useSharedValue(0);
+  const { isProcessing, actionCompleted, executeWithFeedback } = useSwipeActionFeedback();
 
-  const springConfig = {
-    damping: 25, // Even higher damping for smoother animation
-    stiffness: 70, // Much lower stiffness for slower movement
-    mass: 1.5, // Higher mass for heavier feel
-    velocity: 0,
-  };
+  const {
+    itemHeight,
+    panGesture,
+    animatedStyle,
+    leftContainerStyle,
+    rightContainerStyle,
+    leftIconStyle,
+    rightIconStyle,
+    close,
+    isLeftOpen,
+    isRightOpen,
+  } = useSwipeableItem({
+    swipeThreshold: 60,
+    maxSwipeDistance: Math.max(RECOMMEND_LEFT_ACTION_WIDTH, RECOMMEND_RIGHT_ACTION_WIDTH),
+    leftOpenValue: RECOMMEND_LEFT_ACTION_WIDTH,
+    rightOpenValue: RECOMMEND_RIGHT_ACTION_WIDTH,
+    swipeDamping: SWIPE_MENU_DAMPING,
+  });
 
-  const triggerAction = (action: 'addToQueue' | 'notInterested') => {
+  const handleAddToQueue = useCallback(() => {
     const content = recommendation.contents;
-    if (!content) return;
+    if (!content) {
+      close();
+      return;
+    }
+    const url = content.canonical_url || content.url;
+    if (!url) {
+      Alert.alert('Unavailable', 'This content does not have a URL to add.');
+      close();
+      return;
+    }
 
-    if (action === 'addToQueue' && onAddToQueue) {
-      const url = content.canonical_url || content.url;
-      if (url) {
-        onAddToQueue(url, recommendation.content_id);
-      }
+    executeWithFeedback('queue', () => onAddToQueue?.(url, recommendation.content_id), close);
+  }, [executeWithFeedback, recommendation, onAddToQueue, close]);
+
+  const handleNotInterested = useCallback(() => {
+    executeWithFeedback('notInterested', () => onNotInterested?.(recommendation.content_id), close);
+  }, [executeWithFeedback, recommendation.content_id, onNotInterested, close]);
+
+  const handleItemPress = (item: Recommendation) => {
+    if (isLeftOpen || isRightOpen) {
+      close();
+      return;
     }
-    if (action === 'notInterested' && onNotInterested) {
-      onNotInterested(recommendation.content_id);
-    }
-    if (__DEV__) {
-      // Keep useful trace in development; avoid noisy logs in production
-      // eslint-disable-next-line no-console
-      console.log(`Action triggered: ${action} for recommendation ${recommendation.content_id}`);
-    }
-    translateX.value = withSpring(0, springConfig);
+    onPress?.(item);
   };
 
-  const panGesture = Gesture.Pan()
-    .activeOffsetX([-10, 10]) // Require 10px horizontal movement to activate
-    .failOffsetY([-5, 5]) // Cancel if vertical movement exceeds 5px
-    .shouldCancelWhenOutside(true)
-    .onUpdate((event) => {
-      // Apply damping factor for smoother movement
-      const dampedTranslation = event.translationX * SWIPE_DAMPING;
+  // Dynamic styles based on action state
+  const leftStyles =
+    actionCompleted === 'queue' ? RECOMMEND_ADD_STYLES.completed : RECOMMEND_ADD_STYLES.default;
 
-      // Limit the swipe distance
-      translateX.value = Math.max(
-        -MAX_SWIPE_DISTANCE,
-        Math.min(MAX_SWIPE_DISTANCE, dampedTranslation)
-      );
-    })
-    .onEnd(() => {
-      // Check if swipe passes threshold
-      if (translateX.value > SWIPE_THRESHOLD) {
-        // Right swipe - Add to Queue action
-        runOnJS(triggerAction)('addToQueue');
-      } else if (translateX.value < -SWIPE_THRESHOLD) {
-        // Left swipe - Not Interested action
-        runOnJS(triggerAction)('notInterested');
-      } else {
-        // Return to center if not past threshold
-        translateX.value = withSpring(0, springConfig);
-      }
-    });
+  const rightStyles =
+    actionCompleted === 'notInterested'
+      ? RECOMMEND_SKIP_STYLES.completed
+      : RECOMMEND_SKIP_STYLES.default;
 
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [{ translateX: translateX.value }],
-    };
-  });
-
-  // Left background container style with dynamic height (Add to Queue - Green)
-  const leftContainerStyle = useAnimatedStyle(() => {
-    const opacity = interpolate(
-      translateX.value,
-      [0, 10, SWIPE_THRESHOLD],
-      [0, 0.3, 1],
-      Extrapolation.CLAMP
-    );
-    return {
-      height: itemHeight.value > 0 ? itemHeight.value : undefined,
-      opacity: translateX.value > 0 ? opacity : 0,
-    };
-  });
-
-  // Right background container style with dynamic height (Not Interested - Gray)
-  const rightContainerStyle = useAnimatedStyle(() => {
-    const opacity = interpolate(
-      translateX.value,
-      [0, -10, -SWIPE_THRESHOLD],
-      [0, 0.3, 1],
-      Extrapolation.CLAMP
-    );
-    return {
-      height: itemHeight.value > 0 ? itemHeight.value : undefined,
-      opacity: translateX.value < 0 ? opacity : 0,
-    };
-  });
-
-  // Icon animations
-  const leftIconStyle = useAnimatedStyle(() => {
-    const scale = interpolate(
-      translateX.value,
-      [0, SWIPE_THRESHOLD, MAX_SWIPE_DISTANCE],
-      [0.8, 1, 1.2],
-      Extrapolation.CLAMP
-    );
-    return {
-      transform: [{ scale }],
-    };
-  });
-
-  const rightIconStyle = useAnimatedStyle(() => {
-    const scale = interpolate(
-      translateX.value,
-      [0, -SWIPE_THRESHOLD, -MAX_SWIPE_DISTANCE],
-      [0.8, 1, 1.2],
-      Extrapolation.CLAMP
-    );
-    return {
-      transform: [{ scale }],
-    };
-  });
-
-  // Type assertion for React 19 compatibility
   const AnimatedViewTyped = Animated.View as any;
 
   return (
     <View className="relative mb-4">
-      {/* Left Background - Add to Queue (Green) - Only visible when swiping right */}
+      {/* Left Background - Add to Queue (structured like working components) */}
       <AnimatedViewTyped
-        className="absolute left-0 top-0 w-24 items-center justify-center rounded-l-xl bg-green-500"
-        style={leftContainerStyle}>
-        <AnimatedViewTyped style={leftIconStyle}>
-          <Icon as={ThumbsUp} className="h-6 w-6 text-white" />
-        </AnimatedViewTyped>
+        className="absolute left-0 top-0 flex-row overflow-hidden rounded-l-lg"
+        style={[leftContainerStyle, { width: RECOMMEND_LEFT_ACTION_WIDTH }]}>
+        <TouchableOpacity
+          activeOpacity={0.8}
+          onPress={handleAddToQueue}
+          disabled={isProcessing}
+          className={`flex-1 items-center justify-center ${leftStyles.container}`}>
+          <AnimatedViewTyped style={leftIconStyle}>
+            <Icon
+              as={actionCompleted === 'queue' ? Circle : ThumbsUp}
+              className={`h-6 w-6 ${leftStyles.icon}`}
+            />
+          </AnimatedViewTyped>
+          <Text className={`mt-1 text-xs font-semibold ${leftStyles.text}`}>
+            {actionCompleted === 'queue'
+              ? ACTION_STYLES.addToQueue.completed.label
+              : ACTION_STYLES.addToQueue.default.label}
+          </Text>
+        </TouchableOpacity>
       </AnimatedViewTyped>
 
-      {/* Right Background - Not Interested (Red) - Only visible when swiping left */}
+      {/* Right Background - Not Interested (structured like working components) */}
       <AnimatedViewTyped
-        className="absolute right-0 top-0 w-24 items-center justify-center rounded-r-xl bg-red-500"
-        style={rightContainerStyle}>
-        <AnimatedViewTyped style={rightIconStyle}>
-          <Icon as={ThumbsDown} className="h-6 w-6 text-white" />
-        </AnimatedViewTyped>
+        className="absolute right-0 top-0 overflow-hidden rounded-r-lg"
+        style={[
+          rightContainerStyle,
+          { width: RECOMMEND_RIGHT_ACTION_WIDTH, alignItems: 'center', justifyContent: 'center' },
+        ]}>
+        <TouchableOpacity
+          activeOpacity={0.8}
+          onPress={handleNotInterested}
+          disabled={isProcessing}
+          className={`h-full w-full items-center justify-center rounded-r-lg ${rightStyles.container}`}>
+          <AnimatedViewTyped style={rightIconStyle}>
+            <Icon
+              as={actionCompleted === 'notInterested' ? X : ThumbsDown}
+              className={`h-6 w-6 ${rightStyles.icon}`}
+            />
+          </AnimatedViewTyped>
+          <Text className={`mt-1 text-xs font-semibold ${rightStyles.text}`}>
+            {actionCompleted === 'notInterested'
+              ? ACTION_STYLES.notInterested.completed.label
+              : ACTION_STYLES.notInterested.default.label}
+          </Text>
+        </TouchableOpacity>
       </AnimatedViewTyped>
 
-      {/* Swipeable Content */}
       <GestureDetector gesture={panGesture}>
         <AnimatedViewTyped
           style={animatedStyle}
           onLayout={(event: any) => {
             itemHeight.value = event.nativeEvent.layout.height;
           }}>
-          <RecommendItem recommendation={recommendation} onPress={onPress || (() => {})} />
+          <RecommendItem recommendation={recommendation} onPress={handleItemPress} />
         </AnimatedViewTyped>
       </GestureDetector>
     </View>

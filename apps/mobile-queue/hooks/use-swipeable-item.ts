@@ -1,4 +1,4 @@
-import { Alert } from 'react-native';
+import { useCallback, useState } from 'react';
 import {
   Gesture,
   GestureUpdateEvent,
@@ -15,13 +15,11 @@ import {
 } from 'react-native-reanimated';
 
 interface UseSwipeableItemProps {
-  onSwipeRight?: () => void;
-  onSwipeLeft?: () => void;
-  confirmDelete?: boolean;
-  deleteMessage?: string;
   swipeThreshold?: number;
   maxSwipeDistance?: number;
   swipeDamping?: number;
+  leftOpenValue?: number;
+  rightOpenValue?: number;
 }
 
 interface SwipeableItemReturn {
@@ -33,6 +31,9 @@ interface SwipeableItemReturn {
   rightContainerStyle: ReturnType<typeof useAnimatedStyle>;
   leftIconStyle: ReturnType<typeof useAnimatedStyle>;
   rightIconStyle: ReturnType<typeof useAnimatedStyle>;
+  close: () => void;
+  isLeftOpen: boolean;
+  isRightOpen: boolean;
 }
 
 const defaultSpringConfig = {
@@ -43,76 +44,82 @@ const defaultSpringConfig = {
 };
 
 /**
- * Hook for creating swipeable item behavior
+ * Hook for creating swipeable menu item behavior
  */
 export function useSwipeableItem({
-  onSwipeRight,
-  onSwipeLeft,
-  confirmDelete = true,
-  deleteMessage = 'Are you sure you want to delete this item?',
   swipeThreshold = 60,
   maxSwipeDistance = 150,
-  swipeDamping = 0.4,
-}: UseSwipeableItemProps): SwipeableItemReturn {
+  swipeDamping = 1,
+  leftOpenValue,
+  rightOpenValue,
+}: UseSwipeableItemProps = {}): SwipeableItemReturn {
   const translateX = useSharedValue(0);
   const itemHeight = useSharedValue(0);
+  const startX = useSharedValue(0);
+  const [openDirection, setOpenDirection] = useState<'left' | 'right' | null>(null);
 
-  const handleSwipeRight = () => {
-    onSwipeRight?.();
+  const updateOpenDirection = useCallback((direction: 'left' | 'right' | null) => {
+    setOpenDirection(direction);
+  }, []);
+
+  const normalizedLeftOpenValue = Math.max(leftOpenValue ?? maxSwipeDistance, swipeThreshold);
+  const normalizedRightOpenValue = Math.max(rightOpenValue ?? maxSwipeDistance, swipeThreshold);
+
+  const distanceLimit = Math.max(
+    maxSwipeDistance,
+    normalizedLeftOpenValue,
+    normalizedRightOpenValue
+  );
+
+  const closingThreshold = swipeThreshold / 2;
+
+  const close = useCallback(() => {
+    updateOpenDirection(null);
     translateX.value = withSpring(0, defaultSpringConfig);
-  };
-
-  const handleSwipeLeft = () => {
-    if (confirmDelete) {
-      Alert.alert('Delete', deleteMessage, [
-        {
-          text: 'Cancel',
-          style: 'cancel',
-          onPress: () => {
-            translateX.value = withSpring(0, defaultSpringConfig);
-          },
-        },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: () => {
-            onSwipeLeft?.();
-            translateX.value = withSpring(0, defaultSpringConfig);
-          },
-        },
-      ]);
-    } else {
-      onSwipeLeft?.();
-      translateX.value = withSpring(0, defaultSpringConfig);
-    }
-  };
+  }, [translateX, updateOpenDirection]);
 
   const panGesture = Gesture.Pan()
     .activeOffsetX([-10, 10])
     .failOffsetY([-5, 5])
     .shouldCancelWhenOutside(true)
+    .onBegin(() => {
+      startX.value = translateX.value;
+    })
     .onUpdate((event: GestureUpdateEvent<PanGestureHandlerEventPayload>) => {
-        // Apply damping factor for smoother movement
-        const dampedTranslation = event.translationX * swipeDamping;
+      // Apply damping factor for smoother movement
+      const dampedTranslation = event.translationX * swipeDamping;
 
-        // Limit the swipe distance
-        translateX.value = Math.max(
-          -maxSwipeDistance,
-          Math.min(maxSwipeDistance, dampedTranslation)
-        );
-      }
-    )
+      // Limit the swipe distance
+      const nextValue = startX.value + dampedTranslation;
+      translateX.value = Math.max(-distanceLimit, Math.min(distanceLimit, nextValue));
+    })
     .onEnd(() => {
-      // Check if swipe passes threshold
-      if (translateX.value > swipeThreshold) {
-        // Right swipe
-        runOnJS(handleSwipeRight)();
-      } else if (translateX.value < -swipeThreshold) {
-        // Left swipe
-        runOnJS(handleSwipeLeft)();
-      } else {
-        // Return to center if not past threshold
+      const startedLeftOpen = startX.value > 0;
+      const startedRightOpen = startX.value < 0;
+
+      // Handle closing gesture from open state
+      if (startedLeftOpen && translateX.value < startX.value - closingThreshold) {
         translateX.value = withSpring(0, defaultSpringConfig);
+        runOnJS(updateOpenDirection)(null);
+        return;
+      }
+
+      if (startedRightOpen && translateX.value > startX.value + closingThreshold) {
+        translateX.value = withSpring(0, defaultSpringConfig);
+        runOnJS(updateOpenDirection)(null);
+        return;
+      }
+
+      // Handle opening gesture
+      if (translateX.value > swipeThreshold) {
+        translateX.value = withSpring(normalizedLeftOpenValue, defaultSpringConfig);
+        runOnJS(updateOpenDirection)('left');
+      } else if (translateX.value < -swipeThreshold) {
+        translateX.value = withSpring(-normalizedRightOpenValue, defaultSpringConfig);
+        runOnJS(updateOpenDirection)('right');
+      } else {
+        translateX.value = withSpring(0, defaultSpringConfig);
+        runOnJS(updateOpenDirection)(null);
       }
     });
 
@@ -124,29 +131,19 @@ export function useSwipeableItem({
 
   // Left background container style
   const leftContainerStyle = useAnimatedStyle(() => {
-    const opacity = interpolate(
-      translateX.value,
-      [0, 10, swipeThreshold],
-      [0, 0.3, 1],
-      Extrapolation.CLAMP
-    );
+    const isRevealed = translateX.value > 0;
     return {
       height: itemHeight.value > 0 ? itemHeight.value : undefined,
-      opacity: translateX.value > 0 ? opacity : 0,
+      opacity: isRevealed ? 1 : 0,
     };
   });
 
   // Right background container style
   const rightContainerStyle = useAnimatedStyle(() => {
-    const opacity = interpolate(
-      translateX.value,
-      [0, -10, -swipeThreshold],
-      [0, 0.3, 1],
-      Extrapolation.CLAMP
-    );
+    const isRevealed = translateX.value < 0;
     return {
       height: itemHeight.value > 0 ? itemHeight.value : undefined,
-      opacity: translateX.value < 0 ? opacity : 0,
+      opacity: isRevealed ? 1 : 0,
     };
   });
 
@@ -154,7 +151,7 @@ export function useSwipeableItem({
   const leftIconStyle = useAnimatedStyle(() => {
     const scale = interpolate(
       translateX.value,
-      [0, swipeThreshold, maxSwipeDistance],
+      [0, swipeThreshold, distanceLimit],
       [0.8, 1, 1.2],
       Extrapolation.CLAMP
     );
@@ -166,7 +163,7 @@ export function useSwipeableItem({
   const rightIconStyle = useAnimatedStyle(() => {
     const scale = interpolate(
       translateX.value,
-      [0, -swipeThreshold, -maxSwipeDistance],
+      [0, -swipeThreshold, -distanceLimit],
       [0.8, 1, 1.2],
       Extrapolation.CLAMP
     );
@@ -184,5 +181,8 @@ export function useSwipeableItem({
     rightContainerStyle,
     leftIconStyle,
     rightIconStyle,
+    close,
+    isLeftOpen: openDirection === 'left',
+    isRightOpen: openDirection === 'right',
   };
 }

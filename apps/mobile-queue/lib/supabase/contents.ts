@@ -1,5 +1,10 @@
 import { createSupabaseClientWithClerkAuth } from '../../utils/supabase';
-import type { UserContentWithDetails, TodoFilterType } from '@tkhwang-pico/common';
+import type {
+  UserContentWithDetails,
+  TodoFilterType,
+  UserContentPreference,
+  UserContentPreferenceTyped,
+} from '@tkhwang-pico/common';
 
 export async function getUserContents(
   clerkToken: string,
@@ -31,14 +36,41 @@ export async function getUserContents(
       query = query.order('saved_at', { ascending: false });
     }
 
-    const { data, error } = await query;
+    const [{ data, error }, { data: preferenceData, error: preferencesError }] = await Promise.all([
+      query,
+      supabase.from('user_content_preferences').select('*').eq('user_id', userId),
+    ]);
 
     if (error) {
       console.error('Error fetching user contents:', error);
       throw error;
     }
 
-    return data || [];
+    if (preferencesError) {
+      console.error('Error fetching content preferences:', preferencesError);
+      throw preferencesError;
+    }
+
+    const preferenceMap = new Map<string, UserContentPreferenceTyped[]>();
+    preferenceData?.forEach((preference) => {
+      const typedPreference: UserContentPreferenceTyped = {
+        ...preference,
+        preference_type: preference.preference_type as UserContentPreferenceTyped['preference_type'],
+      };
+
+      const contentPreferences = preferenceMap.get(preference.content_id) ?? [];
+      contentPreferences.push(typedPreference);
+      preferenceMap.set(preference.content_id, contentPreferences);
+    });
+
+    const enrichedData = (data || []).map((item) => {
+      return {
+        ...item,
+        preferences: preferenceMap.get(item.content_id) ?? [],
+      };
+    });
+
+    return enrichedData;
   } catch (error) {
     console.error('Failed to fetch user contents:', error);
     throw error;

@@ -27,11 +27,11 @@ export function ContentTags({
   if (!tags || tags.length === 0) return null;
 
   const bgColor =
-    variant === 'purple' ? 'bg-purple-100 dark:bg-purple-900/30' : 'bg-gray-100 dark:bg-gray-800';
+    variant === 'purple' ? 'bg-purple-100 dark:bg-purple-900/50' : 'bg-gray-100 dark:bg-gray-600';
   const textColor =
     variant === 'purple'
       ? 'text-purple-600 dark:text-purple-400'
-      : 'text-gray-500 dark:text-gray-400';
+      : 'text-gray-500 dark:text-gray-300';
 
   // Determine which tags to display
   let displayTags = tags;
@@ -59,7 +59,7 @@ export function ContentTags({
         {showToggle && (
           <TouchableOpacity
             onPress={() => setIsExpanded(!isExpanded)}
-            className="mr-1.5 mt-1 rounded-full border border-gray-300 bg-transparent px-2 py-0.5 dark:border-gray-600"
+            className="mr-1.5 mt-1 rounded-full border border-gray-300 bg-transparent px-2 py-0.5 dark:border-gray-500"
             activeOpacity={0.7}>
             <Text className="text-[10px] font-medium text-gray-600 dark:text-gray-400">
               {isExpanded ? 'Show less' : `+${remainingCount} more`}

@@ -23,6 +23,7 @@ export function RecommendList() {
     error,
     refetch,
   } = useRecommendations({ limit: 30 });
+
   const [refreshing, setRefreshing] = useState(false);
   const [selectedItem, setSelectedItem] = useState<Recommendation | null>(null);
   const [modalVisible, setModalVisible] = useState(false);

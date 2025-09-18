@@ -1,10 +1,10 @@
-import { Timeline } from '@/components/timeline';
 import { MainLayout } from '@/components/main-layout';
+import { TimelineList } from '@/components/timeline/list/timeline-list';
 
 export default function TimelineScreen() {
   return (
     <MainLayout>
-      <Timeline />
+      <TimelineList />
     </MainLayout>
   );
 }
