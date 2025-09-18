@@ -209,11 +209,15 @@ export class Url {
     }
 
     // Fallback to domain if available
-    if (domain && imageUrl.startsWith('/')) {
-      const protocol = domain.includes('localhost') ? 'http' : 'https';
-      const domainUrl = Url.tryCreate(`${protocol}://${domain}`);
+    if (domain && trimmed.startsWith('/')) {
+      const host =
+        domain.includes(':') && !domain.startsWith('[')
+          ? `[${domain}]`
+          : domain;
+      const domainUrl =
+        Url.tryCreate(`https://${host}`) ?? Url.tryCreate(`http://${host}`);
       if (domainUrl) {
-        const resolved = domainUrl.resolveRelative(imageUrl);
+        const resolved = domainUrl.resolveRelative(trimmed);
         if (resolved) return resolved.href;
       }
     }
