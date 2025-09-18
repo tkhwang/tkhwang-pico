@@ -4,7 +4,7 @@ import { Text } from '@/components/ui/text';
 import { Icon } from '@/components/ui/icon';
 import { ClockIcon, ExternalLinkIcon, Heart } from 'lucide-react-native';
 import { ContentThumbnail } from '@/components/content/sub/content-thumbnail';
-import { formatTimelineDate } from '@/hooks/use-content-formatters';
+import { formatTimelineDate } from '@/utils/content-formatters';
 import { useContentActions } from '@/hooks/use-content-actions';
 import type { UserContentWithDetails } from '@tkhwang-pico/common';
 

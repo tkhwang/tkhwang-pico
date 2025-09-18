@@ -11,7 +11,7 @@ import {
   formatScorePercentage,
   getScoreColorClass,
   getThumbnailUrl,
-} from '@/hooks/use-content-formatters';
+} from '@/utils/content-formatters';
 import type { Recommendation } from '@tkhwang-pico/common';
 
 interface RecommendItemProps {

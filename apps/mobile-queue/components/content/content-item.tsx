@@ -3,7 +3,7 @@ import { View, TouchableOpacity } from 'react-native';
 import { Icon } from '@/components/ui/icon';
 import { ExternalLinkIcon, Heart, CircleCheck } from 'lucide-react-native';
 import { BaseContentCard } from '@/components/content/base-content-card';
-import { formatDate, formatReadingTime, getThumbnailUrl } from '@/hooks/use-content-formatters';
+import { formatDate, formatReadingTime, getThumbnailUrl } from '@/utils/content-formatters';
 import { useContentActions } from '@/hooks/use-content-actions';
 import type { UserContentWithDetails } from '@tkhwang-pico/common';
 import { Text } from '@/components/ui/text';

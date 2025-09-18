@@ -17,7 +17,7 @@ import {
   formatFullDate,
   formatReadingTimeWithSuffix,
   getThumbnailUrl,
-} from '@/hooks/use-content-formatters';
+} from '@/utils/content-formatters';
 import { useContentActions } from '@/hooks/use-content-actions';
 import { ContentTags } from '@/components/content/sub/content-tags';
 import { ContentThumbnail } from '@/components/content/sub/content-thumbnail';
