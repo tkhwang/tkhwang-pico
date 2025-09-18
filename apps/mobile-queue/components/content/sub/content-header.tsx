@@ -18,9 +18,7 @@ export function ContentHeader({ filter, onFilterChange }: ContentHeaderProps) {
     {
       value: 'pending',
       accessibilityLabel: 'Pending items',
-      renderIcon: (colorClassName) => (
-        <Icon as={Circle} className={`h-4 w-4 ${colorClassName}`} />
-      ),
+      renderIcon: (colorClassName) => <Icon as={Circle} className={`h-4 w-4 ${colorClassName}`} />,
     },
     {
       value: 'completed',
@@ -57,7 +55,7 @@ export function ContentHeader({ filter, onFilterChange }: ContentHeaderProps) {
               accessibilityLabel={accessibilityLabel}
               accessibilityRole="button"
               accessibilityState={{ selected: filter === value }}
-              className={`flex-1 items-center justify-center rounded-full px-2 py-2 ${
+              className={`flex-1 items-center justify-center rounded-xl px-2 py-2 ${
                 filter === value
                   ? 'bg-gray-200 dark:bg-gray-700'
                   : 'border border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-900/50'
