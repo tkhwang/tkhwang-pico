@@ -99,12 +99,14 @@ export const formatTimelineDate = (dateString: string) => {
   };
 };
 
-export const getThumbnailUrl = (content: {
-  metadata?: any,
-  canonical_url?: string | null,
-  url?: string | null,
-  domain?: string | null
-} | null): string | null => {
+export const getThumbnailUrl = (
+  content: {
+    metadata?: any;
+    canonical_url?: string | null;
+    url?: string | null;
+    domain?: string | null;
+  } | null
+): string | null => {
   if (
     !content?.metadata ||
     typeof content.metadata !== 'object' ||
@@ -115,18 +117,26 @@ export const getThumbnailUrl = (content: {
 
   const imageUrl = content.metadata.image_url as string;
 
-  // Handle relative paths by converting to absolute URLs
-  if (imageUrl && imageUrl.startsWith('/')) {
+  // Normalize and early-return for absolute/data/blob URLs
+  if (!imageUrl) return null;
+  const trimmed = imageUrl.trim();
+  if (/^(https?:|data:|blob:)/i.test(trimmed)) {
+    return trimmed;
+  }
+  // Handle protocol-relative URLs: //cdn.example.com/...
+  if (trimmed.startsWith('//')) {
+    return `https:${trimmed}`;
+  }
+
+  // Handle relative paths by converting to absolute URLs using a base
+  if (trimmed.startsWith('/') || !/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(trimmed)) {
     // Priority: metadata.original_url > canonical_url > url
-    const baseUrl =
-      content.metadata?.original_url ||
-      content.canonical_url ||
-      content.url;
+    const baseUrl = content.metadata?.original_url || content.canonical_url || content.url;
 
     if (baseUrl) {
       try {
-        const url = new URL(baseUrl);
-        return `${url.origin}${imageUrl}`;
+        // new URL(relative, base) resolves both '/foo' and 'images/foo'
+        return new URL(trimmed, baseUrl).toString();
       } catch (error) {
         // If URL parsing fails, fall through to return original
       }
@@ -136,10 +146,14 @@ export const getThumbnailUrl = (content: {
     if (content.domain) {
       // Use https by default, http for localhost
       const protocol = content.domain.includes('localhost') ? 'http' : 'https';
-      return `${protocol}://${content.domain}${imageUrl}`;
+      try {
+        return new URL(trimmed, `${protocol}://${content.domain}`).toString();
+      } catch {
+        // ignore
+      }
     }
   }
 
-  // Return as-is for absolute URLs or data URLs
-  return imageUrl;
+  // As-is for anything else (last resort)
+  return trimmed;
 };
