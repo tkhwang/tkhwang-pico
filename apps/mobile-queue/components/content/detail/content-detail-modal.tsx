@@ -8,7 +8,6 @@ import {
   Pressable,
   Platform,
   Dimensions,
-  ActivityIndicator,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text } from '@/components/ui/text';
@@ -43,6 +42,7 @@ import type { UserContentWithDetails, Recommendation } from '@tkhwang-pico/commo
 import { useHapticFeedback } from '@/hooks/use-haptic-feedback';
 import { useSimilarContents } from '@/hooks/queries/use-similar-contents';
 import { SwipeableRecommendItem } from '@/components/recommend/swipe/swipeable-recommend-item';
+import { ContentItemSkeleton } from '@/components/content/content-item-skeleton';
 
 interface ContentDetailModalProps {
   visible: boolean;
@@ -331,18 +331,24 @@ export function ContentDetailModal({
               {/* Similar Contents */}
               {(isSimilarLoading || hasSimilarContents) && (
                 <View className="mb-5">
-                  <View className="mb-2 flex-row items-center justify-between">
-                    <View className="flex-row items-center">
-                      <Icon as={Sparkles} className="mr-1 h-3.5 w-3.5 text-purple-500" />
-                      <Text className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                        Similar Contents
-                      </Text>
-                    </View>
-                    {isSimilarLoading && <ActivityIndicator size="small" color="#a855f7" />}
+                  <View className="mb-2 flex-row items-center">
+                    <Icon as={Sparkles} className="mr-1 h-3.5 w-3.5 text-purple-500" />
+                    <Text className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                      Similar Contents
+                    </Text>
                   </View>
 
-                  {hasSimilarContents
-                    ? filteredSimilarContents.map((similar) => (
+                  {isSimilarLoading && (
+                    <View className="space-y-3">
+                      {[...Array(3)].map((_, index) => (
+                        <ContentItemSkeleton key={`similar-skeleton-${index}`} />
+                      ))}
+                    </View>
+                  )}
+
+                  {hasSimilarContents && (
+                    <View className="mt-2 space-y-3">
+                      {filteredSimilarContents.map((similar) => (
                         <SwipeableRecommendItem
                           key={similar.content_id}
                           recommendation={similar}
@@ -372,12 +378,15 @@ export function ContentDetailModal({
                               : undefined
                           }
                         />
-                      ))
-                    : !isSimilarLoading && (
-                        <Text className="text-xs text-gray-500 dark:text-gray-400">
-                          Add more content to get personalized recommendations.
-                        </Text>
-                      )}
+                      ))}
+                    </View>
+                  )}
+
+                  {!isSimilarLoading && !hasSimilarContents && (
+                    <Text className="text-xs text-gray-500 dark:text-gray-400">
+                      Add more content to get personalized recommendations.
+                    </Text>
+                  )}
                 </View>
               )}
             </ScrollView>
