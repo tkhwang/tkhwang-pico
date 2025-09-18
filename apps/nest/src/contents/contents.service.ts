@@ -6,10 +6,7 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import {
-  QUERY_SIMIAR_CONTENTS_DEFAULT_LIMIT,
-  QUERY_SIMIAR_CONTENTS_MAX_QUERY_LIMIT,
-} from 'src/consts/app-consts';
+import { QUERY_SIMIAR_CONTENTS_DEFAULT_LIMIT } from 'src/consts/app-consts';
 
 import type { SimilarContentRecommendation } from '@tkhwang-pico/common';
 
@@ -108,15 +105,7 @@ export class ContentsService {
     contentId: string,
     limit = QUERY_SIMIAR_CONTENTS_DEFAULT_LIMIT,
   ): Promise<SimilarContentRecommendation[]> {
-    const safeLimit = Math.max(
-      1,
-      Math.min(QUERY_SIMIAR_CONTENTS_MAX_QUERY_LIMIT, limit),
-    );
-    return this.contentsRepository.getSimilarContents(
-      userId,
-      contentId,
-      safeLimit,
-    );
+    return this.contentsRepository.getSimilarContents(userId, contentId, limit);
   }
 
   /*
