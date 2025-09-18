@@ -1,3 +1,5 @@
+import type { SimilarContentRecommendation } from '@tkhwang-pico/common';
+
 import { nestApi } from './nest';
 
 interface SaveContentRequest {
@@ -20,4 +22,31 @@ export async function saveContent(url: string, token: string): Promise<SaveConte
   });
 
   return response;
+}
+
+interface SimilarContentsOptions {
+  limit?: number;
+}
+
+/**
+ * Fetch contents that are similar to the provided content ID.
+ */
+export async function getSimilarContents(
+  token: string,
+  contentId: string,
+  options?: SimilarContentsOptions
+): Promise<SimilarContentRecommendation[]> {
+  const params = new URLSearchParams();
+
+  if (options?.limit) {
+    params.set('limit', String(options.limit));
+  }
+
+  const endpoint = params.size
+    ? `/contents/${contentId}/similar?${params.toString()}`
+    : `/contents/${contentId}/similar`;
+
+  return nestApi<SimilarContentRecommendation[]>(endpoint, {
+    token,
+  });
 }

@@ -12,4 +12,9 @@ export const queryKey = {
       return ['recommendations', userId] as const;
     },
   },
+  similarContents: {
+    byUserAndContent: (userId: string, contentId: string) => {
+      return ['similar_contents', userId, contentId] as const;
+    },
+  },
 } as const;
