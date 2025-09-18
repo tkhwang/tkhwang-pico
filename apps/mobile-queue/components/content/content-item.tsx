@@ -1,26 +1,20 @@
 import React from 'react';
-import { View, TouchableOpacity } from 'react-native';
+import { View } from 'react-native';
 import { Icon } from '@/components/ui/icon';
-import { ExternalLinkIcon, Heart, CircleCheck } from 'lucide-react-native';
+import { ExternalLink, Heart, CircleCheckBig } from 'lucide-react-native';
 import { BaseContentCard } from '@/components/content/base-content-card';
-import { formatDate, formatReadingTime, getThumbnailUrl } from '@/hooks/use-content-formatters';
+import { formatDate, formatReadingTime, getThumbnailUrl } from '@/utils/content-formatters';
 import { useContentActions } from '@/hooks/use-content-actions';
 import type { UserContentWithDetails } from '@tkhwang-pico/common';
 import { Text } from '@/components/ui/text';
 
 interface ContentItemProps {
   item: UserContentWithDetails;
-  onToggleComplete?: (id: string) => void;
   onPress?: (item: UserContentWithDetails) => void;
   isLiked?: boolean;
 }
 
-export function ContentItem({
-  item,
-  onToggleComplete,
-  onPress,
-  isLiked = false,
-}: ContentItemProps) {
+export function ContentItem({ item, onPress, isLiked = false }: ContentItemProps) {
   const { openURL } = useContentActions();
   const content = item.contents;
 
@@ -37,20 +31,14 @@ export function ContentItem({
     openURL(url);
   };
 
-  const handleCheckboxPress = () => {
-    if (onToggleComplete) {
-      onToggleComplete(item.id);
-    }
-  };
-
   const thumbnailUrl = getThumbnailUrl(content);
 
   // Create checkbox slot
   const checkboxSlot = (
-    <TouchableOpacity onPress={handleCheckboxPress} className="mr-2 mt-0.5">
+    <View className="mr-2 mt-0.5">
       <View className="relative">
         {item.todo_status === 'completed' ? (
-          <Icon as={CircleCheck} className="h-5 w-5 text-green-500" />
+          <Icon as={CircleCheckBig} className="h-5 w-5 text-green-500" />
         ) : (
           <View className="h-5 w-5 items-center justify-center rounded-full border-2 border-blue-500 bg-transparent" />
         )}
@@ -60,13 +48,13 @@ export function ContentItem({
           </View>
         ) : null}
       </View>
-    </TouchableOpacity>
+    </View>
   );
 
   // Create long press hint element
   const longPressHint = (
     <View className="flex-row items-center opacity-60">
-      <Icon as={ExternalLinkIcon} className="mr-0.5 h-2.5 w-2.5 text-gray-400 dark:text-gray-500" />
+      <Icon as={ExternalLink} className="mr-0.5 h-2.5 w-2.5 text-gray-400 dark:text-gray-500" />
       <Text className="text-[10px] text-gray-400 dark:text-gray-500">Hold</Text>
     </View>
   );

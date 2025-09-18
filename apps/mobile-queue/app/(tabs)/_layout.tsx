@@ -1,6 +1,6 @@
 import { Tabs } from 'expo-router';
 import { Icon } from '@/components/ui/icon';
-import { HomeIcon, SparklesIcon, CalendarDaysIcon, SettingsIcon } from 'lucide-react-native';
+import { Circle, Star, CircleCheckBig, Settings } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import * as React from 'react';
 import * as SplashScreen from 'expo-splash-screen';
@@ -42,7 +42,7 @@ export default function TabLayout() {
         options={{
           title: 'Home',
           headerShown: false,
-          tabBarIcon: ({ color, size }) => <Icon as={HomeIcon} size={size} color={color} />,
+          tabBarIcon: ({ color, size }) => <Icon as={Circle} color={color} size={size} />,
         }}
       />
       <Tabs.Screen
@@ -50,7 +50,7 @@ export default function TabLayout() {
         options={{
           title: 'Recommend',
           headerShown: false,
-          tabBarIcon: ({ color, size }) => <Icon as={SparklesIcon} size={size} color={color} />,
+          tabBarIcon: ({ color, size }) => <Icon as={Star} color={color} size={size} />,
         }}
       />
       <Tabs.Screen
@@ -58,7 +58,7 @@ export default function TabLayout() {
         options={{
           title: 'Timeline',
           headerShown: false,
-          tabBarIcon: ({ color, size }) => <Icon as={CalendarDaysIcon} size={size} color={color} />,
+          tabBarIcon: ({ color, size }) => <Icon as={CircleCheckBig} color={color} size={size} />,
         }}
       />
       <Tabs.Screen
@@ -66,7 +66,7 @@ export default function TabLayout() {
         options={{
           title: 'Settings',
           headerShown: false,
-          tabBarIcon: ({ color, size }) => <Icon as={SettingsIcon} size={size} color={color} />,
+          tabBarIcon: ({ color, size }) => <Icon as={Settings} color={color} size={size} />,
         }}
       />
     </Tabs>

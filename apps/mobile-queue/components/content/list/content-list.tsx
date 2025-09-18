@@ -3,7 +3,7 @@ import { View, TouchableOpacity, RefreshControl, ScrollView } from 'react-native
 import { FlashList } from '@shopify/flash-list';
 import { Text } from '@/components/ui/text';
 import { SwipeableContentItem } from '../swipe/swipeable-content-item';
-import { ContentDetailModal } from '../detail/content-detail-modal';
+import { ContentDetail } from '../detail/content-detail';
 import { useUserContents } from '@/hooks/queries/use-user-contents';
 import { ContentListSkeleton } from '@/components/content/list/content-list-skeleton';
 import { useToggleTodo } from '@/hooks/mutations/use-toggle-todo';
@@ -11,14 +11,10 @@ import { useDeleteContent } from '@/hooks/mutations/use-delete-content';
 import { useToggleContentPreference } from '@/hooks/mutations/use-toggle-content-preference';
 import { useSaveContent } from '@/hooks/mutations/use-save-content';
 import { useSetContentPreference } from '@/hooks/mutations/use-content-preference';
-import type { TodoFilterType, UserContentWithDetails } from '@tkhwang-pico/common';
+import type { UserContentWithDetails } from '@tkhwang-pico/common';
 
-interface ContentListProps {
-  todoFilter: TodoFilterType;
-}
-
-export function ContentList({ todoFilter }: ContentListProps) {
-  const { data: userContents = [], isLoading, error, refetch } = useUserContents(todoFilter);
+export function ContentList() {
+  const { data: userContents = [], isLoading, error, refetch } = useUserContents('pending');
 
   const [refreshing, setRefreshing] = useState(false);
   const [selectedItem, setSelectedItem] = useState<UserContentWithDetails | null>(null);
@@ -168,7 +164,7 @@ export function ContentList({ todoFilter }: ContentListProps) {
         keyExtractor={(item) => item.id}
         estimatedItemSize={120}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: 16 }}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 16 }}
         removeClippedSubviews={true}
         drawDistance={200}
         refreshControl={
@@ -183,7 +179,7 @@ export function ContentList({ todoFilter }: ContentListProps) {
       />
 
       {/* Content Detail Modal */}
-      <ContentDetailModal
+      <ContentDetail
         visible={modalVisible}
         item={selectedItem}
         onClose={handleModalClose}

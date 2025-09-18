@@ -1,6 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
 import { Text } from '@/components/ui/text';
+import { ContentMatchSpectrum } from '@/components/content/sub/content-match-spectrum';
 
 interface ContentMetadataProps {
   domain?: string;
@@ -10,6 +11,7 @@ interface ContentMetadataProps {
   scoreColor?: string;
   className?: string;
   rightElement?: React.ReactNode;
+  showMatchSpectrum?: boolean;
 }
 
 /**
@@ -20,44 +22,51 @@ export function ContentMetadata({
   date,
   readingTime,
   score,
-  scoreColor,
+  scoreColor: _scoreColor,
   className = '',
   rightElement,
+  showMatchSpectrum = false,
 }: ContentMetadataProps) {
+  const metadataItems = [
+    domain && (
+      <Text key="domain" className="text-xs text-gray-400 dark:text-gray-500">
+        {domain}
+      </Text>
+    ),
+    date && (
+      <Text key="date" className="text-xs text-gray-400 dark:text-gray-500">
+        {date}
+      </Text>
+    ),
+    readingTime && (
+      <Text key="readingTime" className="text-xs text-gray-400 dark:text-gray-500">
+        {readingTime}
+      </Text>
+    ),
+  ].filter(Boolean) as React.ReactNode[];
+
   return (
-    <View className={`mb-1.5 flex-row items-center justify-between ${className}`}>
-      <View className="flex-1 flex-row items-center">
-        {[
-          score !== undefined && scoreColor && (
-            <Text key="score" className={`text-xs font-medium ${scoreColor}`}>
-              {score}% Match
-            </Text>
-          ),
-          domain && (
-            <Text key="domain" className="text-xs text-gray-400 dark:text-gray-500">
-              {domain}
-            </Text>
-          ),
-          date && (
-            <Text key="date" className="text-xs text-gray-400 dark:text-gray-500">
-              {date}
-            </Text>
-          ),
-          readingTime && (
-            <Text key="readingTime" className="text-xs text-gray-400 dark:text-gray-500">
-              {readingTime}
-            </Text>
-          ),
-        ]
-          .filter(Boolean)
-          .map((item, index, arr) => (
-            <React.Fragment key={index}>
-              {item}
-              {index < arr.length - 1 && <Text className="mx-1 text-xs text-gray-400">•</Text>}
-            </React.Fragment>
-          ))}
+    <View className={`mb-1.5 ${className}`}>
+      <View className="flex-row items-start justify-between">
+        <View className="flex-1 pr-2">
+          {showMatchSpectrum && <ContentMatchSpectrum score={score} />}
+
+          {metadataItems.length > 0 && (
+            <View className="flex-row flex-wrap items-center">
+              {metadataItems.map((item, index) => (
+                <React.Fragment key={index}>
+                  {item}
+                  {index < metadataItems.length - 1 && (
+                    <Text className="mx-1 text-xs text-gray-400">•</Text>
+                  )}
+                </React.Fragment>
+              ))}
+            </View>
+          )}
+        </View>
+
+        {rightElement && <View className="ml-2 flex-shrink-0">{rightElement}</View>}
       </View>
-      {rightElement && rightElement}
     </View>
   );
 }

@@ -8,8 +8,9 @@ import { ThumbsUp, ThumbsDown, X, Circle } from 'lucide-react-native';
 import { Text } from '@/components/ui/text';
 import { useSwipeableItem } from '@/hooks/use-swipeable-item';
 import {
-  RECOMMEND_LEFT_ACTION_WIDTH,
-  RECOMMEND_RIGHT_ACTION_WIDTH,
+  RECOMMEND_TAB_LEFT_ACTION_WIDTH,
+  RECOMMEND_TAB_RIGHT_ACTION_WIDTH,
+  SWIPE_ACTION_BUTTON_WIDTH,
   SWIPE_MENU_DAMPING,
 } from '@/consts/app-consts';
 import { RECOMMEND_ADD_STYLES, RECOMMEND_SKIP_STYLES, ACTION_STYLES } from '@/consts/app-styles';
@@ -44,9 +45,9 @@ export function SwipeableRecommendItem({
     isRightOpen,
   } = useSwipeableItem({
     swipeThreshold: 60,
-    maxSwipeDistance: Math.max(RECOMMEND_LEFT_ACTION_WIDTH, RECOMMEND_RIGHT_ACTION_WIDTH),
-    leftOpenValue: RECOMMEND_LEFT_ACTION_WIDTH,
-    rightOpenValue: RECOMMEND_RIGHT_ACTION_WIDTH,
+    maxSwipeDistance: Math.max(RECOMMEND_TAB_LEFT_ACTION_WIDTH, RECOMMEND_TAB_RIGHT_ACTION_WIDTH),
+    leftOpenValue: RECOMMEND_TAB_LEFT_ACTION_WIDTH,
+    rightOpenValue: RECOMMEND_TAB_RIGHT_ACTION_WIDTH,
     swipeDamping: SWIPE_MENU_DAMPING,
   });
 
@@ -94,12 +95,13 @@ export function SwipeableRecommendItem({
       {/* Left Background - Add to Queue (structured like working components) */}
       <AnimatedViewTyped
         className="absolute left-0 top-0 flex-row overflow-hidden rounded-l-lg"
-        style={[leftContainerStyle, { width: RECOMMEND_LEFT_ACTION_WIDTH }]}>
+        style={[leftContainerStyle, { width: RECOMMEND_TAB_LEFT_ACTION_WIDTH }]}>
         <TouchableOpacity
           activeOpacity={0.8}
           onPress={handleAddToQueue}
           disabled={isProcessing}
-          className={`flex-1 items-center justify-center ${leftStyles.container}`}>
+          className={`items-center justify-center ${leftStyles.container}`}
+          style={{ width: SWIPE_ACTION_BUTTON_WIDTH }}>
           <AnimatedViewTyped style={leftIconStyle}>
             <Icon
               as={actionCompleted === 'queue' ? Circle : ThumbsUp}
@@ -119,13 +121,18 @@ export function SwipeableRecommendItem({
         className="absolute right-0 top-0 overflow-hidden rounded-r-lg"
         style={[
           rightContainerStyle,
-          { width: RECOMMEND_RIGHT_ACTION_WIDTH, alignItems: 'center', justifyContent: 'center' },
+          {
+            width: RECOMMEND_TAB_RIGHT_ACTION_WIDTH,
+            alignItems: 'center',
+            justifyContent: 'center',
+          },
         ]}>
         <TouchableOpacity
           activeOpacity={0.8}
           onPress={handleNotInterested}
           disabled={isProcessing}
-          className={`h-full w-full items-center justify-center rounded-r-lg ${rightStyles.container}`}>
+          className={`h-full items-center justify-center rounded-r-lg ${rightStyles.container}`}
+          style={{ width: SWIPE_ACTION_BUTTON_WIDTH }}>
           <AnimatedViewTyped style={rightIconStyle}>
             <Icon
               as={actionCompleted === 'notInterested' ? X : ThumbsDown}

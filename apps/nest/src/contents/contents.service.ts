@@ -13,10 +13,10 @@ import type { SimilarContentRecommendation } from '@tkhwang-pico/common';
 import { HtmlCacheService } from '../cache/html-cache.service';
 import { EVENTS } from '../common/constants/events';
 import { IngestExtractService } from '../ingest/ingest-extract.service';
+import { Url } from '../shared/domain/value-objects/url.value-object';
 import { ContentsRepository } from '../supabase/contents.repository';
 import { DebugRepository } from '../supabase/debug.repository';
 import { UserContentsRepository } from '../supabase/user-contents.repository';
-import { redactUrl, toCanonicalUrl } from '../utils/url';
 
 @Injectable()
 export class ContentsService {
@@ -31,8 +31,11 @@ export class ContentsService {
 
   async saveUrl({ url, userId }: { url: string; userId: string }) {
     let canonicalUrl: string;
+    let redactedOriginalUrl: string;
     try {
-      canonicalUrl = toCanonicalUrl(url);
+      const urlValueObject = Url.create(url);
+      canonicalUrl = urlValueObject.toCanonical().href;
+      redactedOriginalUrl = urlValueObject.redact().href;
     } catch (error) {
       throw new BadRequestException(
         `Invalid URL: ${error instanceof Error ? error.message : 'Unknown error'}`,
@@ -53,7 +56,7 @@ export class ContentsService {
             ? fetchError.message
             : 'Failed to fetch URL',
         error_type: this.ingestExtractService.getErrorType(fetchError),
-        metadata: { original_url: redactUrl(url) },
+        metadata: { original_url: redactedOriginalUrl },
       });
 
       // Determine appropriate error response based on error type
@@ -67,7 +70,7 @@ export class ContentsService {
     const contents = await this.contentsRepository.upsertContent({
       url: canonicalUrl, // 유니크 키로 사용
       canonical_url: canonicalUrl, // 보조 컬럼
-      metadata: { original_url: redactUrl(url) }, // 원본 URL(민감 파라미터 제거)
+      metadata: { original_url: redactedOriginalUrl }, // 원본 URL(민감 파라미터 제거)
     });
 
     // 3) Cache the HTML for later use by IngestService

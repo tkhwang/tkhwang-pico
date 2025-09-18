@@ -3,11 +3,16 @@ import { View, LayoutChangeEvent, TouchableOpacity, Alert } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
 import { Icon } from '@/components/ui/icon';
-import { Check, Trash2, RotateCcw, Heart, X, CircleCheck } from 'lucide-react-native';
+import { Check, Trash2, RotateCcw, Heart, X, CircleCheckBig } from 'lucide-react-native';
 import { useSwipeableItem } from '@/hooks/use-swipeable-item';
 import type { UserContentWithDetails } from '@tkhwang-pico/common';
 import { Text } from '@/components/ui/text';
-import { LEFT_ACTION_WIDTH, RIGHT_ACTION_WIDTH, SWIPE_MENU_DAMPING } from '@/consts/app-consts';
+import {
+  HOME_TAB_LEFT_ACTION_WIDTH,
+  HOME_TAB_RIGHT_ACTION_WIDTH,
+  SWIPE_ACTION_BUTTON_WIDTH,
+  SWIPE_MENU_DAMPING,
+} from '@/consts/app-consts';
 import { ACTION_STYLES, COMPLETION_STYLES, DELETE_STYLES } from '@/consts/app-styles';
 import { ContentItem } from '@/components/content/content-item';
 import { isContentLiked } from '@/utils/content-helpers';
@@ -46,9 +51,9 @@ export function SwipeableContentItem({
     isRightOpen,
   } = useSwipeableItem({
     swipeThreshold: 60,
-    maxSwipeDistance: Math.max(LEFT_ACTION_WIDTH, RIGHT_ACTION_WIDTH),
-    leftOpenValue: LEFT_ACTION_WIDTH,
-    rightOpenValue: RIGHT_ACTION_WIDTH,
+    maxSwipeDistance: Math.max(HOME_TAB_LEFT_ACTION_WIDTH, HOME_TAB_RIGHT_ACTION_WIDTH),
+    leftOpenValue: HOME_TAB_LEFT_ACTION_WIDTH,
+    rightOpenValue: HOME_TAB_RIGHT_ACTION_WIDTH,
     swipeDamping: SWIPE_MENU_DAMPING,
   });
 
@@ -56,7 +61,8 @@ export function SwipeableContentItem({
 
   // Dynamic colors and icons based on todo_status
   const isCompleted = item.todo_status === 'completed';
-  const LeftIcon = actionCompleted === 'complete' ? CircleCheck : isCompleted ? RotateCcw : Check;
+  const LeftIcon =
+    actionCompleted === 'complete' ? CircleCheckBig : isCompleted ? RotateCcw : Check;
 
   // Dynamic styles based on action state
   const likeStyles =
@@ -161,12 +167,13 @@ export function SwipeableContentItem({
       {/* Left Background - Like + Complete (blue when reopening) - visible when swiping right */}
       <AnimatedViewTyped
         className="absolute left-0 top-0 flex-row overflow-hidden rounded-l-lg"
-        style={[leftContainerStyle, { width: LEFT_ACTION_WIDTH }]}>
+        style={[leftContainerStyle, { width: HOME_TAB_LEFT_ACTION_WIDTH }]}>
         <TouchableOpacity
           activeOpacity={0.8}
           onPress={handleLikePress}
           disabled={isProcessing}
-          className={`flex-1 items-center justify-center ${likeStyles.bg}`}>
+          className={`items-center justify-center ${likeStyles.bg}`}
+          style={{ width: SWIPE_ACTION_BUTTON_WIDTH }}>
           <AnimatedViewTyped style={leftIconStyle}>
             <Icon
               as={Heart}
@@ -182,7 +189,8 @@ export function SwipeableContentItem({
           activeOpacity={0.8}
           onPress={handleCompletePress}
           disabled={isProcessing}
-          className={`flex-1 items-center justify-center ${completionStyles.bg}`}>
+          className={`items-center justify-center ${completionStyles.bg}`}
+          style={{ width: SWIPE_ACTION_BUTTON_WIDTH }}>
           <AnimatedViewTyped style={leftIconStyle}>
             <Icon as={LeftIcon} className={`h-6 w-6 ${completionStyles.icon}`} />
           </AnimatedViewTyped>
@@ -197,7 +205,7 @@ export function SwipeableContentItem({
         className="absolute right-0 top-0 overflow-hidden rounded-r-lg"
         style={[
           rightContainerStyle,
-          { width: RIGHT_ACTION_WIDTH, alignItems: 'center', justifyContent: 'center' },
+          { width: HOME_TAB_RIGHT_ACTION_WIDTH, alignItems: 'center', justifyContent: 'center' },
         ]}>
         <TouchableOpacity
           activeOpacity={0.8}
@@ -225,7 +233,6 @@ export function SwipeableContentItem({
           }}>
           <ContentItem
             item={item}
-            onToggleComplete={onToggleComplete}
             onPress={handleContentPress}
             isLiked={isLiked}
           />

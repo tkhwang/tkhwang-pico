@@ -11,7 +11,7 @@ import { useToggleContentPreference } from '@/hooks/mutations/use-toggle-content
 import { useSaveContent } from '@/hooks/mutations/use-save-content';
 import { useSetContentPreference } from '@/hooks/mutations/use-content-preference';
 import { TimelineListSkeleton } from '@/components/timeline/list/timeline-list-skeleton';
-import { ContentDetailModal } from '@/components/content/detail/content-detail-modal';
+import { ContentDetail } from '@/components/content/detail/content-detail';
 import { isContentLiked } from '@/utils/content-helpers';
 import type { UserContentWithDetails } from '@tkhwang-pico/common';
 
@@ -236,7 +236,7 @@ export function TimelineList() {
         }
       />
       {selectedItem && (
-        <ContentDetailModal
+        <ContentDetail
           visible={modalVisible}
           item={selectedItem}
           onClose={handleModalClose}

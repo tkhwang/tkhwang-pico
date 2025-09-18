@@ -2,7 +2,7 @@ import React from 'react';
 import { View } from 'react-native';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
-import { Sparkles, ExternalLink as ExternalLinkIcon } from 'lucide-react-native';
+import { Sparkles, ExternalLink } from 'lucide-react-native';
 import { BaseContentCard } from '@/components/content/base-content-card';
 import { useContentActions } from '@/hooks/use-content-actions';
 import {
@@ -11,7 +11,7 @@ import {
   formatScorePercentage,
   getScoreColorClass,
   getThumbnailUrl,
-} from '@/hooks/use-content-formatters';
+} from '@/utils/content-formatters';
 import type { Recommendation } from '@tkhwang-pico/common';
 
 interface RecommendItemProps {
@@ -50,7 +50,7 @@ export function RecommendItem({ recommendation, onPress }: RecommendItemProps) {
   // Create hold indicator element
   const holdIndicator = (
     <View className="flex-row items-center opacity-60">
-      <Icon as={ExternalLinkIcon} className="mr-0.5 h-2.5 w-2.5 text-gray-400 dark:text-gray-500" />
+      <Icon as={ExternalLink} className="mr-0.5 h-2.5 w-2.5 text-gray-400 dark:text-gray-500" />
       <Text className="text-[10px] text-gray-400 dark:text-gray-500">Hold</Text>
     </View>
   );
@@ -72,6 +72,7 @@ export function RecommendItem({ recommendation, onPress }: RecommendItemProps) {
         date: content.published_at ? formatDate(content.published_at) : undefined,
         readingTime: content.word_count ? formatReadingTime(content.word_count) : undefined,
         rightElement: holdIndicator,
+        showMatchSpectrum: true,
       }}
     />
   );

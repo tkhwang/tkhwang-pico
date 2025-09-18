@@ -2,9 +2,9 @@ import React from 'react';
 import { View, TouchableOpacity } from 'react-native';
 import { Text } from '@/components/ui/text';
 import { Icon } from '@/components/ui/icon';
-import { ClockIcon, ExternalLinkIcon, Heart } from 'lucide-react-native';
+import { Clock, ExternalLink, Heart } from 'lucide-react-native';
 import { ContentThumbnail } from '@/components/content/sub/content-thumbnail';
-import { formatTimelineDate } from '@/hooks/use-content-formatters';
+import { formatTimelineDate } from '@/utils/content-formatters';
 import { useContentActions } from '@/hooks/use-content-actions';
 import type { UserContentWithDetails } from '@tkhwang-pico/common';
 
@@ -71,7 +71,7 @@ export function TimelineCard({ item, isFirstOfDay = false, onPress }: TimelineCa
             {/* Hold to open link indicator - Right */}
             <View className="flex-row items-center opacity-60">
               <Icon
-                as={ExternalLinkIcon}
+                as={ExternalLink}
                 className="mr-0.5 h-2.5 w-2.5 text-gray-400 dark:text-gray-500"
               />
               <Text className="text-[10px] text-gray-400 dark:text-gray-500">Hold</Text>
@@ -103,7 +103,7 @@ export function TimelineCard({ item, isFirstOfDay = false, onPress }: TimelineCa
 
               {/* Completed Time - aligned with thumbnail bottom */}
               <View className="mt-2 flex-row items-center">
-                <Icon as={ClockIcon} size={12} className="mr-1 text-gray-500 dark:text-gray-500" />
+                <Icon as={Clock} size={12} className="mr-1 text-gray-500 dark:text-gray-500" />
                 <Text className="text-xs text-gray-500 dark:text-gray-500">{dateInfo?.time}</Text>
               </View>
             </View>

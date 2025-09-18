@@ -5,14 +5,7 @@ import { Text } from '@/components/ui/text';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
-import {
-  ChevronRightIcon,
-  UserIcon,
-  BellIcon,
-  ShieldIcon,
-  HelpCircleIcon,
-  LogOutIcon,
-} from 'lucide-react-native';
+import { ChevronRight, User, Bell, Shield, HelpCircle, LogOut } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 
 const settingsOptions = [
@@ -20,25 +13,25 @@ const settingsOptions = [
     id: 'profile',
     title: 'Profile',
     description: 'Manage your account information',
-    icon: UserIcon,
+    icon: User,
   },
   {
     id: 'notifications',
     title: 'Notifications',
     description: 'Configure notification preferences',
-    icon: BellIcon,
+    icon: Bell,
   },
   {
     id: 'privacy',
     title: 'Privacy & Security',
     description: 'Privacy settings and security options',
-    icon: ShieldIcon,
+    icon: Shield,
   },
   {
     id: 'help',
     title: 'Help & Support',
     description: 'Get help and contact support',
-    icon: HelpCircleIcon,
+    icon: HelpCircle,
   },
 ];
 
@@ -90,10 +83,7 @@ export default function SettingsScreen() {
                       {option.description}
                     </Text>
                   </View>
-                  <Icon
-                    as={ChevronRightIcon}
-                    className="h-5 w-5 text-gray-400 dark:text-gray-500"
-                  />
+                  <Icon as={ChevronRight} className="h-5 w-5 text-gray-400 dark:text-gray-500" />
                 </View>
               </Card>
             </TouchableOpacity>
@@ -104,7 +94,7 @@ export default function SettingsScreen() {
             <Card className="border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
               <View className="flex-row items-center p-4">
                 <View className="mr-3 h-10 w-10 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30">
-                  <Icon as={LogOutIcon} className="h-5 w-5 text-red-600 dark:text-red-400" />
+                  <Icon as={LogOut} className="h-5 w-5 text-red-600 dark:text-red-400" />
                 </View>
                 <View className="flex-1">
                   <Text className="text-base font-semibold text-red-600 dark:text-red-400">
@@ -114,7 +104,7 @@ export default function SettingsScreen() {
                     Sign out of your account
                   </Text>
                 </View>
-                <Icon as={ChevronRightIcon} className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                <Icon as={ChevronRight} className="h-5 w-5 text-gray-400 dark:text-gray-500" />
               </View>
             </Card>
           </TouchableOpacity>

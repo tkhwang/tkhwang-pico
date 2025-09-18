@@ -99,13 +99,41 @@ export const formatTimelineDate = (dateString: string) => {
   };
 };
 
-export const getThumbnailUrl = (content: { metadata?: any } | null): string | null => {
-  if (
-    content?.metadata &&
-    typeof content.metadata === 'object' &&
-    'image_url' in content.metadata
-  ) {
-    return content.metadata.image_url as string;
+type ContentLike = {
+  metadata?: unknown;
+  canonical_url?: string | null;
+  url?: string | null;
+} | null;
+
+export const getThumbnailUrl = (content: ContentLike): string | null => {
+  const metadata = content?.metadata;
+  const metadataRecord =
+    metadata && typeof metadata === 'object' && !Array.isArray(metadata)
+      ? (metadata as Record<string, unknown>)
+      : null;
+
+  const raw = metadataRecord?.image_url;
+  if (typeof raw !== 'string') return null;
+
+  const trimmed = raw.trim();
+  if (!trimmed) return null;
+
+  if (/^(https?:|data:|blob:)/i.test(trimmed)) {
+    return trimmed;
   }
-  return null;
+
+  if (trimmed.startsWith('//')) {
+    return `https:${trimmed}`;
+  }
+
+  const originalUrl = metadataRecord?.original_url;
+  const baseUrl =
+    (typeof originalUrl === 'string' && originalUrl) || content?.canonical_url || content?.url;
+  if (!baseUrl) return null;
+
+  try {
+    return new URL(trimmed, baseUrl).toString();
+  } catch {
+    return null;
+  }
 };

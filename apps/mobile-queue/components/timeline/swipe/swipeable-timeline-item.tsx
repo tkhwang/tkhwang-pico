@@ -9,9 +9,10 @@ import type { UserContentWithDetails } from '@tkhwang-pico/common';
 import { Text } from '@/components/ui/text';
 import { useSwipeableItem } from '@/hooks/use-swipeable-item';
 import {
+  SWIPE_ACTION_BUTTON_WIDTH,
   SWIPE_MENU_DAMPING,
-  TIMELINE_LEFT_ACTION_WIDTH,
-  TIMELINE_RIGHT_ACTION_WIDTH,
+  TIMELINE_TAB_LEFT_ACTION_WIDTH,
+  TIMELINE_TAB_RIGHT_ACTION_WIDTH,
 } from '@/consts/app-consts';
 import { ACTION_STYLES, DELETE_STYLES, REOPEN_STYLES } from '@/consts/app-styles';
 import { useSwipeActionFeedback } from '@/hooks/use-swipe-action-feedback';
@@ -50,9 +51,9 @@ export function SwipeableTimelineItem({
     isRightOpen,
   } = useSwipeableItem({
     swipeThreshold: 60,
-    maxSwipeDistance: Math.max(TIMELINE_LEFT_ACTION_WIDTH, TIMELINE_RIGHT_ACTION_WIDTH),
-    leftOpenValue: TIMELINE_LEFT_ACTION_WIDTH,
-    rightOpenValue: TIMELINE_RIGHT_ACTION_WIDTH,
+    maxSwipeDistance: Math.max(TIMELINE_TAB_LEFT_ACTION_WIDTH, TIMELINE_TAB_RIGHT_ACTION_WIDTH),
+    leftOpenValue: TIMELINE_TAB_LEFT_ACTION_WIDTH,
+    rightOpenValue: TIMELINE_TAB_RIGHT_ACTION_WIDTH,
     swipeDamping: SWIPE_MENU_DAMPING,
   });
 
@@ -148,16 +149,16 @@ export function SwipeableTimelineItem({
       {/* Left Background - Reopen (Blue) - Only visible when swiping right */}
       <AnimatedViewTyped
         className="absolute left-0 top-0 overflow-hidden rounded-l-xl"
-        style={[leftContainerStyle, { width: TIMELINE_LEFT_ACTION_WIDTH }]}>
+        style={[leftContainerStyle, { width: TIMELINE_TAB_LEFT_ACTION_WIDTH }]}>
         <View
           className="flex-row items-stretch"
-          style={{ width: TIMELINE_LEFT_ACTION_WIDTH, height: '100%' }}>
+          style={{ width: TIMELINE_TAB_LEFT_ACTION_WIDTH, height: '100%' }}>
           <TouchableOpacity
             activeOpacity={0.8}
             onPress={handleLike}
             disabled={isProcessing}
             className={`items-center justify-center ${leftLikeStyles.bg}`}
-            style={{ width: TIMELINE_LEFT_ACTION_WIDTH / 2 }}>
+            style={{ width: SWIPE_ACTION_BUTTON_WIDTH }}>
             <AnimatedViewTyped style={leftIconStyle}>
               <Icon
                 as={Heart}
@@ -174,7 +175,7 @@ export function SwipeableTimelineItem({
             onPress={handleReopen}
             disabled={isProcessing}
             className={`items-center justify-center ${leftReopenStyles.bg}`}
-            style={{ width: TIMELINE_LEFT_ACTION_WIDTH / 2 }}>
+            style={{ width: SWIPE_ACTION_BUTTON_WIDTH }}>
             <AnimatedViewTyped style={leftIconStyle}>
               <Icon
                 as={actionCompleted === 'reopen' ? Circle : RotateCcw}
@@ -191,13 +192,13 @@ export function SwipeableTimelineItem({
       {/* Right Background - Delete (Red) - Only visible when swiping left */}
       <AnimatedViewTyped
         className={`absolute right-0 top-0 overflow-hidden rounded-r-xl ${rightStyles.bg}`}
-        style={[rightContainerStyle, { width: TIMELINE_RIGHT_ACTION_WIDTH }]}>
+        style={[rightContainerStyle, { width: TIMELINE_TAB_RIGHT_ACTION_WIDTH }]}>
         <TouchableOpacity
           activeOpacity={0.8}
           onPress={handleDelete}
           disabled={isProcessing}
           className="items-center justify-center"
-          style={{ width: TIMELINE_RIGHT_ACTION_WIDTH, height: '100%' }}>
+          style={{ width: TIMELINE_TAB_RIGHT_ACTION_WIDTH, height: '100%' }}>
           <AnimatedViewTyped style={rightIconStyle}>
             <Icon
               as={actionCompleted === 'delete' ? X : Trash2}
