@@ -8,7 +8,7 @@ import { QueryProvider } from '@/providers/query-provider';
 import { ThemeProvider } from '@react-navigation/native';
 import { PortalHost } from '@rn-primitives/portal';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { Stack } from 'expo-router';
+import { Stack, router } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useColorScheme } from 'nativewind';
@@ -106,18 +106,26 @@ function Routes() {
     }
   }, [isLoaded]);
 
+  React.useEffect(() => {
+    // Navigate based on auth state changes
+    if (isLoaded) {
+      if (!isSignedIn) {
+        // User is not signed in, navigate to sign-in screen
+        router.replace('/sign-in');
+      } else {
+        // User is signed in, navigate to main app
+        router.replace('/');
+      }
+    }
+  }, [isSignedIn, isLoaded]);
+
   if (!isLoaded) return null;
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
-      {isSignedIn ? (
-        <>
-          <Stack.Screen name="index" />
-          <Stack.Screen name="(tabs)" />
-        </>
-      ) : (
-        <Stack.Screen name="sign-in" />
-      )}
+      <Stack.Screen name="index" />
+      <Stack.Screen name="(tabs)" />
+      <Stack.Screen name="sign-in" />
     </Stack>
   );
 }
