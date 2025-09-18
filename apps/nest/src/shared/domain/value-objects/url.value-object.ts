@@ -146,7 +146,7 @@ export class Url {
 
     // Protocol-relative URL
     if (relativePath.startsWith('//')) {
-      return Url.tryCreate(`https:${relativePath}`);
+      return Url.tryCreate(`${this.protocol}${relativePath}`);
     }
 
     // Absolute path (starts with /)
