@@ -1,14 +1,6 @@
+import { DEFAULT_HAPTIC_DURATION_MS } from '@/consts/app-consts';
 import { useCallback } from 'react';
 import { Platform, Vibration } from 'react-native';
-
-const DEFAULT_HAPTIC_DURATION_MS = 10;
-
-type AnyFn = (...args: unknown[]) => unknown;
-
-type WrapWithHaptics = <T extends AnyFn>(
-  fn: T,
-  duration?: number
-) => (...args: Parameters<T>) => ReturnType<T>;
 
 export function useHapticFeedback(defaultDuration = DEFAULT_HAPTIC_DURATION_MS) {
   const triggerFeedback = useCallback(
@@ -20,9 +12,9 @@ export function useHapticFeedback(defaultDuration = DEFAULT_HAPTIC_DURATION_MS) 
     [defaultDuration]
   );
 
-  const withHapticFeedback = useCallback<WrapWithHaptics>(
-    (fn, duration) => {
-      return (...args) => {
+  const withHapticFeedback = useCallback(
+    <TArgs extends unknown[], TResult>(fn: (...args: TArgs) => TResult, duration?: number) => {
+      return (...args: TArgs): TResult => {
         triggerFeedback(duration);
         return fn(...args);
       };

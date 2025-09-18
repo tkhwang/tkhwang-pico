@@ -1,6 +1,9 @@
+// delay
 export const SAVE_CONTENT_DELAY_MS = 5_000;
 export const SWIPE_ACTION_FEEDBACK_DURATION_MS = 500;
+export const DEFAULT_HAPTIC_DURATION_MS = 10;
 
+// action width
 export const LEFT_ACTION_WIDTH = 160;
 export const RIGHT_ACTION_WIDTH = 80;
 export const SWIPE_MENU_DAMPING = 0.65;
