@@ -9,6 +9,10 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
+import {
+  QUERY_SIMIAR_CONTENTS_DEFAULT_LIMIT,
+  QUERY_SIMIAR_CONTENTS_MAX_QUERY_LIMIT,
+} from 'src/consts/app-consts';
 import { SaveContentDto } from 'src/contents/contents.dto';
 
 import { UserId } from '../auth/decorators/current-user.decorator';
@@ -32,10 +36,19 @@ export class ContentsController {
   @Get(':id/similar')
   @UseGuards(JwtAuthGuard)
   async getSimilarContents(
+    @UserId() userId: string,
     @Param('id') id: string,
-    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+    @Query(
+      'limit',
+      new DefaultValuePipe(QUERY_SIMIAR_CONTENTS_DEFAULT_LIMIT),
+      ParseIntPipe,
+    )
+    limit: number,
   ) {
-    const safeLimit = Math.max(1, Math.min(50, limit));
-    return this.contentsService.getSimilarContents(id, safeLimit);
+    const safeLimit = Math.max(
+      1,
+      Math.min(QUERY_SIMIAR_CONTENTS_MAX_QUERY_LIMIT, limit),
+    );
+    return this.contentsService.getSimilarContents(userId, id, safeLimit);
   }
 }
