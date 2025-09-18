@@ -76,7 +76,7 @@ export function ContentDetailModal({
   const sheetHeight = isAndroid ? desiredSheetHeight : undefined;
   const sheetPaddingBottom = insets.bottom + (isAndroid ? 24 : 16);
   const scrollContentPaddingBottom = 16;
-  const { withHapticFeedback } = useHapticFeedback();
+  const { executeWithHapticFeedback } = useHapticFeedback();
 
   if (!item || !item.contents) {
     return null;
@@ -94,46 +94,51 @@ export function ContentDetailModal({
     ? MODAL_ACTION_STYLES.complete.completed
     : MODAL_ACTION_STYLES.complete.pending;
 
-  const handleToggleComplete = withHapticFeedback(() => {
-    if (onToggleComplete && 'id' in item) {
-      onToggleComplete(item.id);
-      onClose(); // Dismiss modal after action
-    }
-  });
+  const handleToggleComplete = () =>
+    executeWithHapticFeedback(() => {
+      if (onToggleComplete && 'id' in item) {
+        onToggleComplete(item.id);
+        onClose(); // Dismiss modal after action
+      }
+    });
 
-  const handleDelete = withHapticFeedback(() => {
+  const handleDelete = () => executeWithHapticFeedback(() => {
     deleteContent(item.content_id, onDelete, onClose);
   });
 
-  const handleLike = withHapticFeedback(() => {
-    if (onLike) {
-      onLike(item.content_id);
-    }
-  });
-
-  const handleAddToQueue = withHapticFeedback(() => {
-    if (onAddToQueue) {
-      const url = content.canonical_url || content.url;
-      if (url) {
-        onAddToQueue(url, item.content_id);
-        onClose();
-      } else {
-        Alert.alert('Error', 'No URL available for this content');
+  const handleLike = () =>
+    executeWithHapticFeedback(() => {
+      if (onLike) {
+        onLike(item.content_id);
       }
-    }
-  });
+    });
 
-  const handleNotInterested = withHapticFeedback(() => {
-    if (onNotInterested) {
-      onNotInterested(item.content_id);
-      onClose();
-    }
-  });
+  const handleAddToQueue = () =>
+    executeWithHapticFeedback(() => {
+      if (onAddToQueue) {
+        const url = content.canonical_url || content.url;
+        if (url) {
+          onAddToQueue(url, item.content_id);
+          onClose();
+        } else {
+          Alert.alert('Error', 'No URL available for this content');
+        }
+      }
+    });
 
-  const handleOpenURL = withHapticFeedback(() => {
-    const url = content.canonical_url || content.url;
-    openURL(url, onClose);
-  });
+  const handleNotInterested = () =>
+    executeWithHapticFeedback(() => {
+      if (onNotInterested) {
+        onNotInterested(item.content_id);
+        onClose();
+      }
+    });
+
+  const handleOpenURL = () =>
+    executeWithHapticFeedback(() => {
+      const url = content.canonical_url || content.url;
+      openURL(url, onClose);
+    });
 
   return (
     <Modal

@@ -12,18 +12,16 @@ export function useHapticFeedback(defaultDuration = DEFAULT_HAPTIC_DURATION_MS) 
     [defaultDuration]
   );
 
-  const withHapticFeedback = useCallback(
-    <TArgs extends unknown[], TResult>(fn: (...args: TArgs) => TResult, duration?: number) => {
-      return (...args: TArgs): TResult => {
-        triggerFeedback(duration);
-        return fn(...args);
-      };
+  const executeWithHapticFeedback = useCallback(
+    <TResult>(fn: () => TResult, duration?: number): TResult => {
+      triggerFeedback(duration);
+      return fn();
     },
     [triggerFeedback]
   );
 
   return {
     triggerFeedback,
-    withHapticFeedback,
+    executeWithHapticFeedback,
   };
 }
