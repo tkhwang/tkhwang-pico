@@ -5,10 +5,12 @@ import { useColorScheme } from 'nativewind';
 import * as React from 'react';
 import * as SplashScreen from 'expo-splash-screen';
 import { Platform } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function TabLayout() {
   const { colorScheme } = useColorScheme();
   const isDark = colorScheme === 'dark';
+  const insets = useSafeAreaInsets();
 
   // Ensure splash screen is hidden once the tabs layout mounts.
   React.useEffect(() => {
@@ -26,8 +28,8 @@ export default function TabLayout() {
         tabBarStyle: {
           backgroundColor: isDark ? '#1f2937' : '#ffffff',
           borderTopColor: isDark ? '#374151' : '#e5e7eb',
-          height: 80,
-          paddingBottom: 20,
+          height: Platform.OS === 'android' ? 60 + insets.bottom : 80,
+          paddingBottom: Platform.OS === 'android' ? insets.bottom : 20,
           paddingTop: 8,
         },
         tabBarActiveTintColor: isDark ? '#ffffff' : '#1f2937',
