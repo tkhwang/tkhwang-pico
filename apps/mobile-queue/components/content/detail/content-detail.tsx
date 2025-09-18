@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, TouchableOpacity, Alert, Platform } from 'react-native';
+import { View, Alert, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text } from '@/components/ui/text';
 import { Icon } from '@/components/ui/icon';
@@ -201,12 +201,12 @@ export function ContentDetail({
           ) : (
             // Home mode header with toggle complete
             <View className="flex-row items-center gap-2">
-              <TouchableOpacity onPress={handleToggleComplete} className="p-1">
+              <View className="p-1">
                 <Icon
                   as={isCompleted ? CheckCircle : Circle}
                   className={`h-6 w-6 ${isCompleted ? 'text-green-500' : 'text-blue-500'}`}
                 />
-              </TouchableOpacity>
+              </View>
               <Text className="text-base font-medium text-gray-700 dark:text-gray-300">
                 {isCompleted ? 'Completed' : 'Pending'}
               </Text>

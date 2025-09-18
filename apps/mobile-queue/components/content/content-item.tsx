@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, TouchableOpacity } from 'react-native';
+import { View } from 'react-native';
 import { Icon } from '@/components/ui/icon';
 import { ExternalLinkIcon, Heart, CircleCheckBig } from 'lucide-react-native';
 import { BaseContentCard } from '@/components/content/base-content-card';
@@ -10,14 +10,12 @@ import { Text } from '@/components/ui/text';
 
 interface ContentItemProps {
   item: UserContentWithDetails;
-  onToggleComplete?: (id: string) => void;
   onPress?: (item: UserContentWithDetails) => void;
   isLiked?: boolean;
 }
 
 export function ContentItem({
   item,
-  onToggleComplete,
   onPress,
   isLiked = false,
 }: ContentItemProps) {
@@ -37,17 +35,11 @@ export function ContentItem({
     openURL(url);
   };
 
-  const handleCheckboxPress = () => {
-    if (onToggleComplete) {
-      onToggleComplete(item.id);
-    }
-  };
-
   const thumbnailUrl = getThumbnailUrl(content);
 
   // Create checkbox slot
   const checkboxSlot = (
-    <TouchableOpacity onPress={handleCheckboxPress} className="mr-2 mt-0.5">
+    <View className="mr-2 mt-0.5">
       <View className="relative">
         {item.todo_status === 'completed' ? (
           <Icon as={CircleCheckBig} className="h-5 w-5 text-green-500" />
@@ -60,7 +52,7 @@ export function ContentItem({
           </View>
         ) : null}
       </View>
-    </TouchableOpacity>
+    </View>
   );
 
   // Create long press hint element

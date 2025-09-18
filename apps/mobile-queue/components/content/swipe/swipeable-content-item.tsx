@@ -233,7 +233,6 @@ export function SwipeableContentItem({
           }}>
           <ContentItem
             item={item}
-            onToggleComplete={onToggleComplete}
             onPress={handleContentPress}
             isLiked={isLiked}
           />
