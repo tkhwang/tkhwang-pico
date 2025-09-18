@@ -6,7 +6,7 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { QUERY_SIMIAR_CONTENTS_DEFAULT_LIMIT } from 'src/consts/app-consts';
+import { QUERY_SIMILAR_CONTENTS_DEFAULT_LIMIT } from 'src/consts/app-consts';
 
 import type { SimilarContentRecommendation } from '@tkhwang-pico/common';
 
@@ -103,7 +103,7 @@ export class ContentsService {
   async getSimilarContents(
     userId: string,
     contentId: string,
-    limit = QUERY_SIMIAR_CONTENTS_DEFAULT_LIMIT,
+    limit = QUERY_SIMILAR_CONTENTS_DEFAULT_LIMIT,
   ): Promise<SimilarContentRecommendation[]> {
     return this.contentsRepository.getSimilarContents(userId, contentId, limit);
   }

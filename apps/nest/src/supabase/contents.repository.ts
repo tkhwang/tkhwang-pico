@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { QUERY_SIMIAR_CONTENTS_DEFAULT_LIMIT } from 'src/consts/app-consts';
+import { QUERY_SIMILAR_CONTENTS_DEFAULT_LIMIT } from 'src/consts/app-consts';
 
 import type {
   Content,
@@ -131,7 +131,7 @@ export class ContentsRepository {
   async getSimilarContents(
     userId: string,
     contentId: string,
-    limit = QUERY_SIMIAR_CONTENTS_DEFAULT_LIMIT,
+    limit = QUERY_SIMILAR_CONTENTS_DEFAULT_LIMIT,
   ): Promise<SimilarContentRecommendation[]> {
     const { data, error } = await this.client.rpc('similar_to_content', {
       p_content_id: contentId,

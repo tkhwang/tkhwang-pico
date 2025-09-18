@@ -8,7 +8,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { QUERY_SIMIAR_CONTENTS_MAX_QUERY_LIMIT } from 'src/consts/app-consts';
+import { QUERY_SIMILAR_CONTENTS_MAX_QUERY_LIMIT } from 'src/consts/app-consts';
 
 import { UserId, UserToken } from '../auth/decorators/current-user.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -28,7 +28,7 @@ export class UsersController {
   ) {
     const safeLimit = Math.max(
       1,
-      Math.min(QUERY_SIMIAR_CONTENTS_MAX_QUERY_LIMIT, limit),
+      Math.min(QUERY_SIMILAR_CONTENTS_MAX_QUERY_LIMIT, limit),
     );
     return this.usersService.getRecommendations(token, safeLimit, lang);
   }
