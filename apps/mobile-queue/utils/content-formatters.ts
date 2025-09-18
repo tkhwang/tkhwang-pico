@@ -101,59 +101,31 @@ export const formatTimelineDate = (dateString: string) => {
 
 export const getThumbnailUrl = (
   content: {
-    metadata?: any;
+    metadata?: { image_url?: unknown; original_url?: string | null } | null;
     canonical_url?: string | null;
     url?: string | null;
-    domain?: string | null;
   } | null
 ): string | null => {
-  if (
-    !content?.metadata ||
-    typeof content.metadata !== 'object' ||
-    !('image_url' in content.metadata)
-  ) {
-    return null;
-  }
+  const raw = typeof content?.metadata === 'object' ? content?.metadata?.image_url : null;
+  if (typeof raw !== 'string') return null;
 
-  const imageUrl = content.metadata.image_url as string;
+  const trimmed = raw.trim();
+  if (!trimmed) return null;
 
-  // Normalize and early-return for absolute/data/blob URLs
-  if (!imageUrl) return null;
-  const trimmed = imageUrl.trim();
   if (/^(https?:|data:|blob:)/i.test(trimmed)) {
     return trimmed;
   }
-  // Handle protocol-relative URLs: //cdn.example.com/...
+
   if (trimmed.startsWith('//')) {
     return `https:${trimmed}`;
   }
 
-  // Handle relative paths by converting to absolute URLs using a base
-  if (trimmed.startsWith('/') || !/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(trimmed)) {
-    // Priority: metadata.original_url > canonical_url > url
-    const baseUrl = content.metadata?.original_url || content.canonical_url || content.url;
+  const baseUrl = content?.metadata?.original_url || content?.canonical_url || content?.url;
+  if (!baseUrl) return null;
 
-    if (baseUrl) {
-      try {
-        // new URL(relative, base) resolves both '/foo' and 'images/foo'
-        return new URL(trimmed, baseUrl).toString();
-      } catch (error) {
-        // If URL parsing fails, fall through to return original
-      }
-    }
-
-    // Fallback to domain field if available
-    if (content.domain) {
-      // Use https by default, http for localhost
-      const protocol = content.domain.includes('localhost') ? 'http' : 'https';
-      try {
-        return new URL(trimmed, `${protocol}://${content.domain}`).toString();
-      } catch {
-        // ignore
-      }
-    }
+  try {
+    return new URL(trimmed, baseUrl).toString();
+  } catch {
+    return null;
   }
-
-  // As-is for anything else (last resort)
-  return trimmed;
 };
