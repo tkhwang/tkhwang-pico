@@ -44,6 +44,8 @@ export function ContentDetailBottomActions({
     ? MODAL_ACTION_STYLES.complete.completed
     : MODAL_ACTION_STYLES.complete.pending;
 
+  const likeStyles = isLiked ? MODAL_ACTION_STYLES.like.liked : MODAL_ACTION_STYLES.like.unliked;
+
   return (
     <View
       className="border-t border-gray-200 bg-white px-4 pt-2 dark:border-gray-700 dark:bg-gray-800"
@@ -90,26 +92,13 @@ export function ContentDetailBottomActions({
             {/* Like Button */}
             <TouchableOpacity
               onPress={onLike}
-              className={`flex-1 items-center justify-center rounded-lg px-2 py-3 ${
-                isLiked
-                  ? MODAL_ACTION_STYLES.like.liked.container
-                  : MODAL_ACTION_STYLES.like.unliked.container
-              }`}>
+              className={`flex-1 items-center justify-center rounded-lg px-2 py-3 ${likeStyles.container}`}>
               <Icon
                 as={Heart}
-                className={`mb-1 h-5 w-5 ${
-                  isLiked
-                    ? MODAL_ACTION_STYLES.like.liked.icon
-                    : MODAL_ACTION_STYLES.like.unliked.icon
-                }`}
+                className={`mb-1 h-5 w-5 ${likeStyles.icon}`}
                 fill={isLiked ? 'currentColor' : 'none'}
               />
-              <Text
-                className={`text-xs font-semibold ${
-                  isLiked
-                    ? MODAL_ACTION_STYLES.like.liked.text
-                    : MODAL_ACTION_STYLES.like.unliked.text
-                }`}>
+              <Text className={`text-xs font-semibold ${likeStyles.text}`}>
                 {isLiked ? 'Unlike' : 'Like'}
               </Text>
             </TouchableOpacity>
