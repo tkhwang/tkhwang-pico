@@ -329,66 +329,60 @@ export function ContentDetailModal({
               )}
 
               {/* Similar Contents */}
-              {(isSimilarLoading || hasSimilarContents) && (
-                <View className="mb-5">
-                  <View className="mb-2 flex-row items-center">
-                    <Icon as={Sparkles} className="mr-1 h-3.5 w-3.5 text-purple-500" />
-                    <Text className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                      Similar Contents
-                    </Text>
-                  </View>
-
-                  {isSimilarLoading && (
-                    <View className="space-y-3">
-                      {[...Array(3)].map((_, index) => (
-                        <ContentItemSkeleton key={`similar-skeleton-${index}`} />
-                      ))}
-                    </View>
-                  )}
-
-                  {hasSimilarContents && (
-                    <View className="mt-2 space-y-3">
-                      {filteredSimilarContents.map((similar) => (
-                        <SwipeableRecommendItem
-                          key={similar.content_id}
-                          recommendation={similar}
-                          onPress={(recommendation) =>
-                            executeWithHapticFeedback(() => {
-                              const target = recommendation.contents;
-                              const url = target?.canonical_url || target?.url;
-                              if (url) {
-                                openURL(url, onClose);
-                              }
-                            })
-                          }
-                          onAddToQueue={
-                            onAddToQueue
-                              ? (url, similarContentId) => {
-                                  onAddToQueue(url, similarContentId);
-                                  removeSimilarFromCache(similarContentId);
-                                }
-                              : undefined
-                          }
-                          onNotInterested={
-                            onNotInterested
-                              ? (similarContentId) => {
-                                  onNotInterested(similarContentId);
-                                  removeSimilarFromCache(similarContentId);
-                                }
-                              : undefined
-                          }
-                        />
-                      ))}
-                    </View>
-                  )}
-
-                  {!isSimilarLoading && !hasSimilarContents && (
-                    <Text className="text-xs text-gray-500 dark:text-gray-400">
-                      Add more content to get personalized recommendations.
-                    </Text>
-                  )}
+              <View className="mb-5">
+                <View className="mb-2 flex-row items-center">
+                  <Icon as={Sparkles} className="mr-1 h-3.5 w-3.5 text-purple-500" />
+                  <Text className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    Similar Contents
+                  </Text>
                 </View>
-              )}
+
+                {isSimilarLoading ? (
+                  <View className="space-y-3">
+                    {[...Array(3)].map((_, index) => (
+                      <ContentItemSkeleton key={`similar-skeleton-${index}`} />
+                    ))}
+                  </View>
+                ) : hasSimilarContents ? (
+                  <View className="mt-2 space-y-3">
+                    {filteredSimilarContents.map((similar) => (
+                      <SwipeableRecommendItem
+                        key={similar.content_id}
+                        recommendation={similar}
+                        onPress={(recommendation) =>
+                          executeWithHapticFeedback(() => {
+                            const target = recommendation.contents;
+                            const url = target?.canonical_url || target?.url;
+                            if (url) {
+                              openURL(url, onClose);
+                            }
+                          })
+                        }
+                        onAddToQueue={
+                          onAddToQueue
+                            ? (url, similarContentId) => {
+                                onAddToQueue(url, similarContentId);
+                                removeSimilarFromCache(similarContentId);
+                              }
+                            : undefined
+                        }
+                        onNotInterested={
+                          onNotInterested
+                            ? (similarContentId) => {
+                                onNotInterested(similarContentId);
+                                removeSimilarFromCache(similarContentId);
+                              }
+                            : undefined
+                        }
+                      />
+                    ))}
+                  </View>
+                ) : (
+                  <Text className="text-xs text-gray-500 dark:text-gray-400">
+                    Add more content to get personalized recommendations.
+                  </Text>
+                )}
+              </View>
             </ScrollView>
 
             {/* Fixed Action Bar */}
