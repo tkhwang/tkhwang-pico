@@ -39,6 +39,7 @@ import { ContentTags } from '@/components/content/sub/content-tags';
 import { ContentThumbnail } from '@/components/content/sub/content-thumbnail';
 import { MODAL_ACTION_STYLES, ACTION_STYLES } from '@/consts/app-styles';
 import type { UserContentWithDetails, Recommendation } from '@tkhwang-pico/common';
+import { useHapticFeedback } from '@/hooks/use-haptic-feedback';
 
 interface ContentDetailModalProps {
   visible: boolean;
@@ -75,6 +76,7 @@ export function ContentDetailModal({
   const sheetHeight = isAndroid ? desiredSheetHeight : undefined;
   const sheetPaddingBottom = insets.bottom + (isAndroid ? 24 : 16);
   const scrollContentPaddingBottom = 16;
+  const { withHapticFeedback } = useHapticFeedback();
 
   if (!item || !item.contents) {
     return null;
@@ -92,24 +94,24 @@ export function ContentDetailModal({
     ? MODAL_ACTION_STYLES.complete.completed
     : MODAL_ACTION_STYLES.complete.pending;
 
-  const handleToggleComplete = () => {
+  const handleToggleComplete = withHapticFeedback(() => {
     if (onToggleComplete && 'id' in item) {
       onToggleComplete(item.id);
       onClose(); // Dismiss modal after action
     }
-  };
+  });
 
-  const handleDelete = () => {
+  const handleDelete = withHapticFeedback(() => {
     deleteContent(item.content_id, onDelete, onClose);
-  };
+  });
 
-  const handleLike = () => {
+  const handleLike = withHapticFeedback(() => {
     if (onLike) {
       onLike(item.content_id);
     }
-  };
+  });
 
-  const handleAddToQueue = () => {
+  const handleAddToQueue = withHapticFeedback(() => {
     if (onAddToQueue) {
       const url = content.canonical_url || content.url;
       if (url) {
@@ -119,19 +121,19 @@ export function ContentDetailModal({
         Alert.alert('Error', 'No URL available for this content');
       }
     }
-  };
+  });
 
-  const handleNotInterested = () => {
+  const handleNotInterested = withHapticFeedback(() => {
     if (onNotInterested) {
       onNotInterested(item.content_id);
       onClose();
     }
-  };
+  });
 
-  const handleOpenURL = () => {
+  const handleOpenURL = withHapticFeedback(() => {
     const url = content.canonical_url || content.url;
     openURL(url, onClose);
-  };
+  });
 
   return (
     <Modal
