@@ -5,13 +5,13 @@ import normalizeUrl from 'normalize-url';
  * Encapsulates all URL-related operations following DDD principles
  */
 export class Url {
-  private readonly _value: URL;
+  private readonly _href: string;
   private readonly _originalString: string;
 
-  private constructor(value: URL, originalString: string) {
-    // Freeze to ensure immutability
-    this._value = Object.freeze(value);
+  private constructor(href: string, originalString: string) {
+    this._href = href;
     this._originalString = originalString;
+    Object.freeze(this);
   }
 
   /**
@@ -19,8 +19,8 @@ export class Url {
    * @throws Error if the URL string is invalid
    */
   static create(url: string): Url {
-    const urlObject = new URL(url);
-    return new Url(urlObject, url);
+    const urlObject = Url.parse(url);
+    return new Url(urlObject.href, url);
   }
 
   /**
@@ -34,6 +34,14 @@ export class Url {
     }
   }
 
+  private static parse(url: string): URL {
+    return new URL(url);
+  }
+
+  private get parsed(): URL {
+    return new URL(this._href);
+  }
+
   // ===== Getters (from native URL object) =====
 
   /**
@@ -41,7 +49,8 @@ export class Url {
    * Migrated from: utils/url.ts hostname()
    */
   get hostname(): string {
-    return this._value.hostname.replace(/^www\./, '');
+    const { hostname } = this.parsed;
+    return hostname.replace(/^www\./, '');
   }
 
   /**
@@ -52,23 +61,23 @@ export class Url {
   }
 
   get origin(): string {
-    return this._value.origin;
+    return this.parsed.origin;
   }
 
   get pathname(): string {
-    return this._value.pathname;
+    return this.parsed.pathname;
   }
 
   get protocol(): string {
-    return this._value.protocol;
+    return this.parsed.protocol;
   }
 
   get href(): string {
-    return this._value.href;
+    return this._href;
   }
 
   get searchParams(): URLSearchParams {
-    return this._value.searchParams;
+    return new URLSearchParams(this.parsed.searchParams);
   }
 
   // ===== URL Type Checks =====
@@ -107,11 +116,10 @@ export class Url {
    */
   redact(): Url {
     if (this.isHttp()) {
-      // For HTTP(S), keep only origin and pathname
-      const redacted = new URL(this.origin + this.pathname);
-      return new Url(redacted, redacted.toString());
+      const parsed = this.parsed;
+      return Url.create(`${parsed.origin}${parsed.pathname}`);
     }
-    // For other protocols, strip query and hash
+
     const cleanUrl = this._originalString.split(/[?#]/)[0];
     return Url.create(cleanUrl);
   }
@@ -145,7 +153,7 @@ export class Url {
     // Other relative paths (e.g., 'images/photo.jpg', '../images/photo.jpg')
     try {
       const absoluteUrl = new URL(relativePath, this.href);
-      return new Url(absoluteUrl, absoluteUrl.href);
+      return Url.create(absoluteUrl.href);
     } catch {
       return null;
     }
