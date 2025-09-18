@@ -1,4 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { QUERY_SIMILAR_CONTENTS_DEFAULT_LIMIT } from 'src/consts/app-consts';
+
+import type {
+  Content,
+  SimilarContentRecommendation,
+} from '@tkhwang-pico/common';
 
 import { SupabaseService } from './supabase.service';
 
@@ -23,8 +29,8 @@ interface ContentUpdateData {
 }
 
 interface SimilarContentResult {
+  content_id: string;
   distance: number;
-  [key: string]: any;
 }
 
 @Injectable()
@@ -122,10 +128,15 @@ export class ContentsRepository {
     return data?.metadata;
   }
 
-  async getSimilarContents(contentId: string, limit = 10) {
+  async getSimilarContents(
+    userId: string,
+    contentId: string,
+    limit = QUERY_SIMILAR_CONTENTS_DEFAULT_LIMIT,
+  ): Promise<SimilarContentRecommendation[]> {
     const { data, error } = await this.client.rpc('similar_to_content', {
       p_content_id: contentId,
       p_limit: limit,
+      p_user_id: userId,
     });
 
     if (error) {
@@ -133,11 +144,45 @@ export class ContentsRepository {
       throw error;
     }
 
-    const results = data as SimilarContentResult[] | null;
-    return (results ?? []).map((item) => ({
-      ...item,
+    const results = (data as SimilarContentResult[] | null) ?? [];
+    if (results.length === 0) {
+      return [];
+    }
+
+    const contentIds = results
+      .map((item) => item.content_id)
+      .filter((id) => id);
+
+    const uniqueContentIds = Array.from(new Set(contentIds));
+
+    if (uniqueContentIds.length === 0) {
+      return [];
+    }
+
+    const { data: contents, error: contentError } = await this.client
+      .from('contents')
+      .select('*')
+      .in('id', uniqueContentIds)
+      .eq('status', 'ready');
+
+    if (contentError) {
+      this.logger.error(
+        `Failed to fetch similar content details: ${contentError.message}`,
+      );
+      throw contentError;
+    }
+
+    const contentMap = new Map<string, Content>(
+      (contents as Content[] | null)?.map((content) => [content.id, content]) ??
+        [],
+    );
+
+    return results.map((item) => ({
+      content_id: item.content_id,
+      distance: item.distance,
       // cosine distance ∈ [0,2] → score ∈ [0,1]
       score: (2 - item.distance) / 2,
+      contents: contentMap.get(item.content_id) ?? null,
     }));
   }
 }

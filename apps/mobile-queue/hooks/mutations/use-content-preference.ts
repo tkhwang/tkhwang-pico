@@ -80,6 +80,12 @@ export function useSetContentPreference(options?: UseSetContentPreferenceOptions
       // For now, the optimistic update handles the UI change
 
       // Optional: Show success feedback
+      if (user?.id) {
+        queryClient.invalidateQueries({
+          queryKey: queryKey.similarContents.byUserId(user.id),
+          exact: false,
+        });
+      }
       options?.onSuccess?.();
     },
   });

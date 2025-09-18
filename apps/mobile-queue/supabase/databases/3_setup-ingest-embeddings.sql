@@ -259,32 +259,64 @@ using (user_id = public.current_clerk_user_id());
 -- ============================================================================
 -- RPC (JWT 기반)
 -- ============================================================================
--- 유사 콘텐츠: 전역 ready 코퍼스에서만
+-- 유사 콘텐츠: 전역 ready 코퍼스에서만, 개인 라이브러리/선호도 고려
 create or replace function public.similar_to_content(
   p_content_id uuid,
   p_limit int default 20,
-  p_model text default null
+  p_model text default null,
+  p_user_id text default null
 )
 returns table (content_id uuid, distance float4)
 language sql security definer set search_path=public as $$
-  select ce2.content_id,
-         (ce2.embedding <=> ce.embedding)::float4 as distance
-  from public.content_embeddings ce
-  join public.content_embeddings ce2
-    on ce2.scope='summary'
-   and (p_model is null or ce2.embedding_model = coalesce(p_model, ce.embedding_model))
-   and ce2.content_id <> ce.content_id
-  join public.contents c2 on c2.id = ce2.content_id
-  where ce.content_id = p_content_id
-    and ce.scope = 'summary'
-    and (p_model is null or ce.embedding_model = p_model)
-    and c2.status = 'ready'
-  order by ce2.embedding <=> ce.embedding
+  with me as (
+    select case
+             when auth.role() = 'service_role'
+               then coalesce(p_user_id, public.current_clerk_user_id())
+             else public.current_clerk_user_id()
+           end as uid
+  ),
+  seed as (
+    select ce.embedding, ce.embedding_model
+    from public.content_embeddings ce
+    where ce.content_id = p_content_id
+      and ce.scope = 'summary'
+      and (p_model is null or ce.embedding_model = p_model)
+      and ce.embedding_model is not null
+    limit 1
+  ),
+  base as (
+    select ce2.content_id,
+           (ce2.embedding <=> seed.embedding)::float4 as distance
+    from seed
+    join public.content_embeddings ce2
+      on ce2.scope = 'summary'
+     and ce2.content_id <> p_content_id
+     and ce2.embedding_model = coalesce(p_model, seed.embedding_model)
+    join public.contents c2 on c2.id = ce2.content_id
+    where c2.status = 'ready'
+  )
+  select b.content_id, b.distance
+  from base b
+  join me on me.uid is not null
+  where not exists (
+          select 1
+          from public.user_contents uc
+          where uc.content_id = b.content_id
+            and uc.user_id = me.uid
+        )
+    and not exists (
+          select 1
+          from public.user_content_preferences ucp
+          where ucp.content_id = b.content_id
+            and ucp.user_id = me.uid
+            and ucp.preference_type in ('not_interested', 'blocked')
+        )
+  order by b.distance
   limit greatest(1, p_limit);
 $$;
 
-revoke all on function public.similar_to_content(uuid,int,text) from public;
-grant execute on function public.similar_to_content(uuid,int,text) to authenticated, anon;
+revoke all on function public.similar_to_content(uuid,int,text,text) from public;
+grant execute on function public.similar_to_content(uuid,int,text,text) to authenticated;
 
 -- 개인화 피드: 내가 저장한 것과 관심 없는 것은 제외
 create or replace function public.recommend_feed(

@@ -19,8 +19,11 @@ export interface Recommendation {
   content_id: string;
   distance: number;
   score: number;
-  contents?: Content;
+  contents: Content | null;
 }
+
+// Similar content payload returned by Nest `/contents/:id/similar`
+export type SimilarContentRecommendation = Recommendation;
 
 // User Content Preferences types
 export type PreferenceType = "liked" | "not_interested" | "blocked";

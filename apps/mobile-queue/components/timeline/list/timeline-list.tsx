@@ -8,6 +8,8 @@ import { useDeleteContent } from '@/hooks/mutations/use-delete-content';
 import { useReopenContent } from '@/hooks/mutations/use-reopen-content';
 import { useToggleContent } from '@/hooks/mutations/use-toggle-content';
 import { useToggleContentPreference } from '@/hooks/mutations/use-toggle-content-preference';
+import { useSaveContent } from '@/hooks/mutations/use-save-content';
+import { useSetContentPreference } from '@/hooks/mutations/use-content-preference';
 import { TimelineListSkeleton } from '@/components/timeline/list/timeline-list-skeleton';
 import { ContentDetailModal } from '@/components/content/detail/content-detail-modal';
 import { isContentLiked } from '@/utils/content-helpers';
@@ -29,6 +31,8 @@ export function TimelineList() {
   const reopenContentMutation = useReopenContent();
   const toggleContentMutation = useToggleContent();
   const togglePreferenceMutation = useToggleContentPreference();
+  const saveContentMutation = useSaveContent();
+  const setPreferenceMutation = useSetContentPreference();
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -80,6 +84,23 @@ export function TimelineList() {
       });
     },
     [togglePreferenceMutation]
+  );
+
+  const handleAddToQueue = useCallback(
+    (url: string, _contentId: string) => {
+      saveContentMutation.mutate(url);
+    },
+    [saveContentMutation]
+  );
+
+  const handleNotInterested = useCallback(
+    (contentId: string) => {
+      setPreferenceMutation.mutate({
+        contentId,
+        preferenceType: 'not_interested',
+      });
+    },
+    [setPreferenceMutation]
   );
 
   const handleToggleComplete = useCallback(
@@ -222,6 +243,8 @@ export function TimelineList() {
           onToggleComplete={handleToggleComplete}
           onDelete={handleDelete}
           onLike={handleLike}
+          onAddToQueue={handleAddToQueue}
+          onNotInterested={handleNotInterested}
         />
       )}
     </View>

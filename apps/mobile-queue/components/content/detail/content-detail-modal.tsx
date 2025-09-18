@@ -40,6 +40,9 @@ import { ContentThumbnail } from '@/components/content/sub/content-thumbnail';
 import { MODAL_ACTION_STYLES, ACTION_STYLES } from '@/consts/app-styles';
 import type { UserContentWithDetails, Recommendation } from '@tkhwang-pico/common';
 import { useHapticFeedback } from '@/hooks/use-haptic-feedback';
+import { useSimilarContents } from '@/hooks/queries/use-similar-contents';
+import { SwipeableRecommendItem } from '@/components/recommend/swipe/swipeable-recommend-item';
+import { ContentItemSkeleton } from '@/components/content/content-item-skeleton';
 
 interface ContentDetailModalProps {
   visible: boolean;
@@ -77,6 +80,15 @@ export function ContentDetailModal({
   const sheetPaddingBottom = insets.bottom + (isAndroid ? 24 : 16);
   const scrollContentPaddingBottom = 16;
   const { executeWithHapticFeedback } = useHapticFeedback();
+  const contentId = item?.content_id;
+  const {
+    data: similarContents = [],
+    isLoading: isSimilarLoading,
+    removeFromCache: removeSimilarFromCache,
+  } = useSimilarContents(visible ? contentId : undefined, {
+    enabled: visible && !!contentId,
+    limit: 5,
+  });
 
   if (!item || !item.contents) {
     return null;
@@ -102,9 +114,10 @@ export function ContentDetailModal({
       }
     });
 
-  const handleDelete = () => executeWithHapticFeedback(() => {
-    deleteContent(item.content_id, onDelete, onClose);
-  });
+  const handleDelete = () =>
+    executeWithHapticFeedback(() => {
+      deleteContent(item.content_id, onDelete, onClose);
+    });
 
   const handleLike = () =>
     executeWithHapticFeedback(() => {
@@ -139,6 +152,15 @@ export function ContentDetailModal({
       const url = content.canonical_url || content.url;
       openURL(url, onClose);
     });
+
+  const filteredSimilarContents = similarContents.filter((similar) => {
+    if (!similar || similar.content_id === item.content_id) return false;
+    const similarContent = similar.contents;
+    const url = similarContent?.canonical_url || similarContent?.url;
+    return Boolean(similarContent && url);
+  });
+
+  const hasSimilarContents = filteredSimilarContents.length > 0;
 
   return (
     <Modal
@@ -305,6 +327,62 @@ export function ContentDetailModal({
                   />
                 </View>
               )}
+
+              {/* Similar Contents */}
+              <View className="mb-5">
+                <View className="mb-2 flex-row items-center">
+                  <Icon as={Sparkles} className="mr-1 h-3.5 w-3.5 text-purple-500" />
+                  <Text className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    Similar Contents
+                  </Text>
+                </View>
+
+                {isSimilarLoading ? (
+                  <View className="space-y-3">
+                    {[...Array(3)].map((_, index) => (
+                      <ContentItemSkeleton key={`similar-skeleton-${index}`} />
+                    ))}
+                  </View>
+                ) : hasSimilarContents ? (
+                  <View className="mt-2 space-y-3">
+                    {filteredSimilarContents.map((similar) => (
+                      <SwipeableRecommendItem
+                        key={similar.content_id}
+                        recommendation={similar}
+                        onPress={(recommendation) =>
+                          executeWithHapticFeedback(() => {
+                            const target = recommendation.contents;
+                            const url = target?.canonical_url || target?.url;
+                            if (url) {
+                              openURL(url, onClose);
+                            }
+                          })
+                        }
+                        onAddToQueue={
+                          onAddToQueue
+                            ? (url, similarContentId) => {
+                                onAddToQueue(url, similarContentId);
+                                removeSimilarFromCache(similarContentId);
+                              }
+                            : undefined
+                        }
+                        onNotInterested={
+                          onNotInterested
+                            ? (similarContentId) => {
+                                onNotInterested(similarContentId);
+                                removeSimilarFromCache(similarContentId);
+                              }
+                            : undefined
+                        }
+                      />
+                    ))}
+                  </View>
+                ) : (
+                  <Text className="text-xs text-gray-500 dark:text-gray-400">
+                    Add more content to get personalized recommendations.
+                  </Text>
+                )}
+              </View>
             </ScrollView>
 
             {/* Fixed Action Bar */}
