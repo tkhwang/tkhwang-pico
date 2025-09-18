@@ -99,14 +99,20 @@ export const formatTimelineDate = (dateString: string) => {
   };
 };
 
-export const getThumbnailUrl = (
-  content: {
-    metadata?: { image_url?: unknown; original_url?: string | null } | null;
-    canonical_url?: string | null;
-    url?: string | null;
-  } | null
-): string | null => {
-  const raw = typeof content?.metadata === 'object' ? content?.metadata?.image_url : null;
+type ContentLike = {
+  metadata?: unknown;
+  canonical_url?: string | null;
+  url?: string | null;
+} | null;
+
+export const getThumbnailUrl = (content: ContentLike): string | null => {
+  const metadata = content?.metadata;
+  const metadataRecord =
+    metadata && typeof metadata === 'object' && !Array.isArray(metadata)
+      ? (metadata as Record<string, unknown>)
+      : null;
+
+  const raw = metadataRecord?.image_url;
   if (typeof raw !== 'string') return null;
 
   const trimmed = raw.trim();
@@ -120,7 +126,9 @@ export const getThumbnailUrl = (
     return `https:${trimmed}`;
   }
 
-  const baseUrl = content?.metadata?.original_url || content?.canonical_url || content?.url;
+  const originalUrl = metadataRecord?.original_url;
+  const baseUrl =
+    (typeof originalUrl === 'string' && originalUrl) || content?.canonical_url || content?.url;
   if (!baseUrl) return null;
 
   try {

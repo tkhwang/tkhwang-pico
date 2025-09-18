@@ -1,7 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
 import { Icon } from '@/components/ui/icon';
-import { ExternalLinkIcon, Heart, CircleCheckBig } from 'lucide-react-native';
+import { ExternalLink, Heart, CircleCheckBig } from 'lucide-react-native';
 import { BaseContentCard } from '@/components/content/base-content-card';
 import { formatDate, formatReadingTime, getThumbnailUrl } from '@/utils/content-formatters';
 import { useContentActions } from '@/hooks/use-content-actions';
@@ -14,11 +14,7 @@ interface ContentItemProps {
   isLiked?: boolean;
 }
 
-export function ContentItem({
-  item,
-  onPress,
-  isLiked = false,
-}: ContentItemProps) {
+export function ContentItem({ item, onPress, isLiked = false }: ContentItemProps) {
   const { openURL } = useContentActions();
   const content = item.contents;
 
@@ -58,7 +54,7 @@ export function ContentItem({
   // Create long press hint element
   const longPressHint = (
     <View className="flex-row items-center opacity-60">
-      <Icon as={ExternalLinkIcon} className="mr-0.5 h-2.5 w-2.5 text-gray-400 dark:text-gray-500" />
+      <Icon as={ExternalLink} className="mr-0.5 h-2.5 w-2.5 text-gray-400 dark:text-gray-500" />
       <Text className="text-[10px] text-gray-400 dark:text-gray-500">Hold</Text>
     </View>
   );

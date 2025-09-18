@@ -2,14 +2,14 @@ import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
 import { UserMenu } from '@/components/user-menu';
-import { MoonStarIcon, SunIcon } from 'lucide-react-native';
+import { MoonStar, Sun } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import * as React from 'react';
 import { View } from 'react-native';
 
 const THEME_ICONS = {
-  light: SunIcon,
-  dark: MoonStarIcon,
+  light: Sun,
+  dark: MoonStar,
 };
 
 function ThemeToggle() {
