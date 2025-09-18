@@ -6,7 +6,7 @@ import { useUser } from '@clerk/clerk-expo';
 import { Text } from '@/components/ui/text';
 import { SwipeableRecommendItem } from '../swipe/swipeable-recommend-item';
 import { RecommendListSkeleton } from './recommend-list-skeleton';
-import { ContentDetailModal } from '../../content/detail/content-detail-modal';
+import { ContentDetail } from '../../content/detail/content-detail';
 import { useRecommendations } from '@/hooks/queries/use-recommendations';
 import { useSaveContent } from '@/hooks/mutations/use-save-content';
 import { useSetContentPreference } from '@/hooks/mutations/use-content-preference';
@@ -173,7 +173,7 @@ export function RecommendList() {
       />
 
       {/* Content Detail Modal */}
-      <ContentDetailModal
+      <ContentDetail
         visible={modalVisible}
         item={selectedItem}
         onClose={handleModalClose}

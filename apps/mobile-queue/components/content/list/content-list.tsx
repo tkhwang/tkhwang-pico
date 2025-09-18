@@ -3,7 +3,7 @@ import { View, TouchableOpacity, RefreshControl, ScrollView } from 'react-native
 import { FlashList } from '@shopify/flash-list';
 import { Text } from '@/components/ui/text';
 import { SwipeableContentItem } from '../swipe/swipeable-content-item';
-import { ContentDetailModal } from '../detail/content-detail-modal';
+import { ContentDetail } from '../detail/content-detail';
 import { useUserContents } from '@/hooks/queries/use-user-contents';
 import { ContentListSkeleton } from '@/components/content/list/content-list-skeleton';
 import { useToggleTodo } from '@/hooks/mutations/use-toggle-todo';
@@ -183,7 +183,7 @@ export function ContentList({ todoFilter }: ContentListProps) {
       />
 
       {/* Content Detail Modal */}
-      <ContentDetailModal
+      <ContentDetail
         visible={modalVisible}
         item={selectedItem}
         onClose={handleModalClose}

@@ -38,7 +38,7 @@ import {
   type BottomSheetBackdropProps,
 } from '@gorhom/bottom-sheet';
 
-interface ContentDetailModalProps {
+interface ContentDetailProps {
   visible: boolean;
   item: UserContentWithDetails | Recommendation | null;
   onClose: () => void;
@@ -52,7 +52,7 @@ interface ContentDetailModalProps {
   onNotInterested?: (contentId: string) => void;
 }
 
-export function ContentDetailModal({
+export function ContentDetail({
   visible,
   item,
   onClose,
@@ -62,7 +62,7 @@ export function ContentDetailModal({
   onLike,
   onAddToQueue,
   onNotInterested,
-}: ContentDetailModalProps) {
+}: ContentDetailProps) {
   const { openURL, deleteContent } = useContentActions();
 
   const insets = useSafeAreaInsets();
