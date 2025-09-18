@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { Platform, Vibration } from 'react-native';
 import { SWIPE_ACTION_FEEDBACK_DURATION_MS } from '@/consts/app-consts';
+import { useHapticFeedback } from '@/hooks/use-haptic-feedback';
 
 type SwipeActionType = 'like' | 'complete' | 'delete' | 'queue' | 'notInterested' | 'reopen';
 
@@ -24,6 +24,7 @@ export function useSwipeActionFeedback() {
   const [actionCompleted, setActionCompleted] = useState<string | null>(null);
 
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { triggerFeedback } = useHapticFeedback();
 
   const executeWithFeedback = useCallback(
     async (
@@ -36,7 +37,7 @@ export function useSwipeActionFeedback() {
       setIsProcessing(true);
 
       // Haptic feedback on mobile
-      if (Platform.OS !== 'web') Vibration.vibrate(10);
+      triggerFeedback();
 
       try {
         await onAction();
@@ -59,7 +60,7 @@ export function useSwipeActionFeedback() {
         throw err;
       }
     },
-    [isProcessing]
+    [isProcessing, triggerFeedback]
   );
 
   useEffect(() => {

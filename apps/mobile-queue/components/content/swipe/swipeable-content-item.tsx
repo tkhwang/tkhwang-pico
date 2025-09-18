@@ -168,7 +168,11 @@ export function SwipeableContentItem({
           disabled={isProcessing}
           className={`flex-1 items-center justify-center ${likeStyles.bg}`}>
           <AnimatedViewTyped style={leftIconStyle}>
-            <Icon as={Heart} className={`h-6 w-6 ${likeStyles.icon}`} />
+            <Icon
+              as={Heart}
+              className={`h-6 w-6 ${likeStyles.icon}`}
+              fill={isLiked ? 'currentColor' : 'none'}
+            />
           </AnimatedViewTyped>
           <Text className={`mt-1 text-xs font-semibold ${likeStyles.text}`}>
             {likeStyles.label}

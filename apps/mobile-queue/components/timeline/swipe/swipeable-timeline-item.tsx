@@ -159,7 +159,11 @@ export function SwipeableTimelineItem({
             className={`items-center justify-center ${leftLikeStyles.bg}`}
             style={{ width: TIMELINE_LEFT_ACTION_WIDTH / 2 }}>
             <AnimatedViewTyped style={leftIconStyle}>
-              <Icon as={Heart} className={`h-6 w-6 ${leftLikeStyles.icon}`} />
+              <Icon
+                as={Heart}
+                className={`h-6 w-6 ${leftLikeStyles.icon}`}
+                fill={isLiked ? 'currentColor' : 'none'}
+              />
             </AnimatedViewTyped>
             <Text className={`mt-1 text-xs font-semibold ${leftLikeStyles.text}`}>
               {leftLikeStyles.label}

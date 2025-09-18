@@ -39,6 +39,7 @@ import { ContentTags } from '@/components/content/sub/content-tags';
 import { ContentThumbnail } from '@/components/content/sub/content-thumbnail';
 import { MODAL_ACTION_STYLES, ACTION_STYLES } from '@/consts/app-styles';
 import type { UserContentWithDetails, Recommendation } from '@tkhwang-pico/common';
+import { useHapticFeedback } from '@/hooks/use-haptic-feedback';
 
 interface ContentDetailModalProps {
   visible: boolean;
@@ -75,6 +76,7 @@ export function ContentDetailModal({
   const sheetHeight = isAndroid ? desiredSheetHeight : undefined;
   const sheetPaddingBottom = insets.bottom + (isAndroid ? 24 : 16);
   const scrollContentPaddingBottom = 16;
+  const { executeWithHapticFeedback } = useHapticFeedback();
 
   if (!item || !item.contents) {
     return null;
@@ -92,46 +94,51 @@ export function ContentDetailModal({
     ? MODAL_ACTION_STYLES.complete.completed
     : MODAL_ACTION_STYLES.complete.pending;
 
-  const handleToggleComplete = () => {
-    if (onToggleComplete && 'id' in item) {
-      onToggleComplete(item.id);
-      onClose(); // Dismiss modal after action
-    }
-  };
-
-  const handleDelete = () => {
-    deleteContent(item.content_id, onDelete, onClose);
-  };
-
-  const handleLike = () => {
-    if (onLike) {
-      onLike(item.content_id);
-    }
-  };
-
-  const handleAddToQueue = () => {
-    if (onAddToQueue) {
-      const url = content.canonical_url || content.url;
-      if (url) {
-        onAddToQueue(url, item.content_id);
-        onClose();
-      } else {
-        Alert.alert('Error', 'No URL available for this content');
+  const handleToggleComplete = () =>
+    executeWithHapticFeedback(() => {
+      if (onToggleComplete && 'id' in item) {
+        onToggleComplete(item.id);
+        onClose(); // Dismiss modal after action
       }
-    }
-  };
+    });
 
-  const handleNotInterested = () => {
-    if (onNotInterested) {
-      onNotInterested(item.content_id);
-      onClose();
-    }
-  };
+  const handleDelete = () => executeWithHapticFeedback(() => {
+    deleteContent(item.content_id, onDelete, onClose);
+  });
 
-  const handleOpenURL = () => {
-    const url = content.canonical_url || content.url;
-    openURL(url, onClose);
-  };
+  const handleLike = () =>
+    executeWithHapticFeedback(() => {
+      if (onLike) {
+        onLike(item.content_id);
+      }
+    });
+
+  const handleAddToQueue = () =>
+    executeWithHapticFeedback(() => {
+      if (onAddToQueue) {
+        const url = content.canonical_url || content.url;
+        if (url) {
+          onAddToQueue(url, item.content_id);
+          onClose();
+        } else {
+          Alert.alert('Error', 'No URL available for this content');
+        }
+      }
+    });
+
+  const handleNotInterested = () =>
+    executeWithHapticFeedback(() => {
+      if (onNotInterested) {
+        onNotInterested(item.content_id);
+        onClose();
+      }
+    });
+
+  const handleOpenURL = () =>
+    executeWithHapticFeedback(() => {
+      const url = content.canonical_url || content.url;
+      openURL(url, onClose);
+    });
 
   return (
     <Modal
@@ -365,6 +372,7 @@ export function ContentDetailModal({
                             ? MODAL_ACTION_STYLES.like.liked.icon
                             : MODAL_ACTION_STYLES.like.unliked.icon
                         }`}
+                        fill={isLiked ? 'currentColor' : 'none'}
                       />
                       <Text
                         className={`text-xs font-semibold ${
