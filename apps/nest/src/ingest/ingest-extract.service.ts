@@ -2,6 +2,7 @@ import { Readability } from '@mozilla/readability';
 import { Injectable, Logger } from '@nestjs/common';
 import * as cheerio from 'cheerio';
 import { JSDOM } from 'jsdom';
+import { Url } from 'src/shared/domain/value-objects/url.value-object';
 import { detectLang } from 'src/utils/url';
 
 export interface ContentMetadata {
@@ -141,7 +142,13 @@ export class IngestExtractService {
       '';
     const author =
       articleAuthor || metaAuthor || readabilityContent?.byline || null;
+    const baseUrl = Url.create(url);
     const imageUrl = ogImage || twitterImage || null;
+    const normalizedImageUrl = Url.normalizeImageUrl(
+      imageUrl,
+      baseUrl,
+      new URL(url).hostname,
+    );
     const siteName = ogSiteName || readabilityContent?.siteName || null;
 
     // Extract domain from URL
@@ -188,7 +195,7 @@ export class IngestExtractService {
       summary,
       author,
       publishedAt,
-      imageUrl,
+      imageUrl: normalizedImageUrl,
       siteName,
       tags,
       lang,
