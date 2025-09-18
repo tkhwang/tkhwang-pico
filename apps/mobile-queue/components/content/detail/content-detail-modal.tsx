@@ -365,6 +365,7 @@ export function ContentDetailModal({
                             ? MODAL_ACTION_STYLES.like.liked.icon
                             : MODAL_ACTION_STYLES.like.unliked.icon
                         }`}
+                        fill={isLiked ? 'currentColor' : 'none'}
                       />
                       <Text
                         className={`text-xs font-semibold ${

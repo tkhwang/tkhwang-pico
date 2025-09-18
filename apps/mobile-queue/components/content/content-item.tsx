@@ -56,7 +56,7 @@ export function ContentItem({
         )}
         {isLiked ? (
           <View className="absolute -bottom-1 -right-1 h-3.5 w-3.5 items-center justify-center rounded-full bg-rose-200">
-            <Icon as={Heart} className="h-2 w-2 text-rose-600" />
+            <Icon as={Heart} className="h-2 w-2 text-rose-600" fill="currentColor" />
           </View>
         ) : null}
       </View>
