@@ -19,7 +19,7 @@ export interface Recommendation {
   content_id: string;
   distance: number;
   score: number;
-  contents?: Content | null;
+  contents: Content | null;
 }
 
 // Similar content payload returned by Nest `/contents/:id/similar`
