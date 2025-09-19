@@ -10,7 +10,6 @@ import { useToggleContentPreference } from '@/hooks/mutations/use-toggle-content
 import { useSaveContent } from '@/hooks/mutations/use-save-content';
 import { useSetContentPreference } from '@/hooks/mutations/use-content-preference';
 import { ContentDetail } from '@/components/content/detail/content-detail';
-import { isContentLiked } from '@/utils/content-helpers';
 import type { UserContentWithDetails } from '@tkhwang-pico/common';
 import { ArchiveListSkeleton } from '@/components/archive/list/archive-list-skeleton';
 import { SwipeableArchiveItem } from '@/components/archive/swipe/swipeable-archive-item';
@@ -183,35 +182,26 @@ export function ArchiveList() {
 
   const renderItem = ({ item }: { item: GroupedContent }) => {
     return (
-      <View className="mb-4">
-        {/* Date separator */}
-        {item.items.length > 0 && item.items[0].completed_at && (
-          <View className="mb-3">
-            <Text className="text-sm font-medium text-gray-500 dark:text-gray-400">
-              {new Date(item.items[0].completed_at).toLocaleDateString('en-US', {
-                weekday: 'long',
-                month: 'long',
-                day: 'numeric',
-                year: 'numeric',
-              })}
-            </Text>
-          </View>
-        )}
+      <View className="mb-6">
+        {/* Date section header */}
+        <View className="mb-3">
+          <Text className="text-sm font-medium text-gray-500 dark:text-gray-400">
+            {item.date}
+          </Text>
+        </View>
+
         {/* Items for this date */}
         {item.items.map((content, index) => (
-          <View key={content.id} className={index > 0 ? 'mt-3' : ''}>
+          <View key={content.id} className={index > 0 ? 'mt-2' : ''}>
             <SwipeableArchiveItem
               item={content}
-              isFirstOfDay={index === 0}
               onPress={handleItemPress}
               onReopen={handleReopen}
               onDelete={handleDelete}
               onLike={handleLike}
-              isLiked={isContentLiked(content)}
             />
           </View>
         ))}
-        <View className="mt-4 h-px bg-gray-200 dark:bg-gray-700" />
       </View>
     );
   };
