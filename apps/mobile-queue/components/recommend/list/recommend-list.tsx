@@ -32,16 +32,7 @@ export function RecommendList() {
   // Store the content ID being added to queue
   const [addingContentId, setAddingContentId] = useState<string | null>(null);
 
-  const saveContentMutation = useSaveContent({
-    onSuccess: () => {
-      // Clear the stored content ID after success
-      setAddingContentId(null);
-    },
-    onError: () => {
-      // Clear the stored content ID on error
-      setAddingContentId(null);
-    },
-  });
+  const saveContentMutation = useSaveContent();
 
   const setPreferenceMutation = useSetContentPreference();
 
@@ -72,19 +63,24 @@ export function RecommendList() {
   const handleAddToQueue = useCallback(
     (url: string, contentId: string) => {
       setAddingContentId(contentId);
-      saveContentMutation.mutate(url);
-
-      // Remove the recommendation from cache after feedback animation completes
-      // This happens after the visual feedback (300ms)
-      setTimeout(() => {
-        if (user?.id) {
-          const key = queryKey.recommendations.byUserId(user.id);
-          queryClient.setQueryData(key, (oldData: Recommendation[] | undefined) => {
-            if (!oldData) return oldData;
-            return oldData.filter((rec) => rec.content_id !== contentId);
-          });
-        }
-      }, SWIPE_ACTION_CARD_REMOVAL_DELAY_MS); // Slightly longer than SWIPE_ACTION_FEEDBACK_DURATION_MS (300ms) to ensure feedback is visible
+      saveContentMutation.mutate(url, {
+        onSuccess: () => {
+          setAddingContentId(null);
+          // Evict after visual feedback completes
+          setTimeout(() => {
+            if (user?.id) {
+              const key = queryKey.recommendations.byUserId(user.id);
+              queryClient.setQueryData(key, (oldData: Recommendation[] | undefined) => {
+                if (!oldData) return oldData;
+                return oldData.filter((rec) => rec.content_id !== contentId);
+              });
+            }
+          }, SWIPE_ACTION_CARD_REMOVAL_DELAY_MS);
+        },
+        onError: () => {
+          setAddingContentId(null);
+        },
+      });
     },
     [saveContentMutation, user?.id, queryClient]
   );
