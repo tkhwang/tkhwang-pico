@@ -47,7 +47,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
+          title: 'Queue',
           headerShown: false,
           tabBarIcon: ({ color, size }) => <Icon as={Circle} color={color} size={size} />,
         }}
@@ -55,7 +55,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="recommend"
         options={{
-          title: 'Recommend',
+          title: 'Discover',
           headerShown: false,
           tabBarIcon: ({ color, size }) => <Icon as={Star} color={color} size={size} />,
         }}
@@ -63,7 +63,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="timeline"
         options={{
-          title: 'Timeline',
+          title: 'Archive',
           headerShown: false,
           tabBarIcon: ({ color, size }) => <Icon as={CircleCheckBig} color={color} size={size} />,
         }}
