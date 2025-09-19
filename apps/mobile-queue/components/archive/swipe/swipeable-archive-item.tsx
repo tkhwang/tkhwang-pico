@@ -217,7 +217,12 @@ export function SwipeableArchiveItem({
           onLayout={(e: any) => {
             itemHeight.value = e.nativeEvent.layout.height;
           }}>
-          <ContentItem item={item} onPress={handlePress} isLiked={isLiked} />
+          <ContentItem
+            item={item}
+            onPress={handlePress}
+            isLiked={isLiked}
+            showCompletedTime={true}
+          />
         </AnimatedViewTyped>
       </GestureDetector>
     </View>
