@@ -1,10 +1,10 @@
 import React from 'react';
-import { View, ScrollView, TouchableHighlight, Linking, Alert } from 'react-native';
+import { View, ScrollView, TouchableHighlight, Linking, Alert, Platform } from 'react-native';
 import { MainLayout } from '@/components/main-layout';
 import { Text } from '@/components/ui/text';
 import { Icon } from '@/components/ui/icon';
 import { UserAvatar } from '@/components/user-avatar';
-import { ChevronRight, FileText, Shield } from 'lucide-react-native';
+import { ChevronRight, FileText, Shield, Star } from 'lucide-react-native';
 import { useAuth, useUser } from '@clerk/clerk-expo';
 import { router } from 'expo-router';
 
@@ -12,7 +12,7 @@ interface SettingItem {
   id: string;
   title: string;
   icon: any;
-  iconColor: 'blue' | 'green' | 'red' | 'gray';
+  iconColor: 'blue' | 'green' | 'red' | 'gray' | 'yellow';
   action: 'link' | 'navigate' | 'function';
   url?: string;
   onPress?: () => void;
@@ -24,7 +24,37 @@ interface SettingSection {
   items: SettingItem[];
 }
 
+// Platform-specific app store URLs
+const getReviewURL = () => {
+  // TODO: Replace with actual App Store ID when available
+  const APP_STORE_ID = 'YOUR_APP_STORE_ID';
+  const PLAY_STORE_PACKAGE = 'app.tkbetter.pico.queue.dev';
+
+  if (Platform.OS === 'ios') {
+    return `https://apps.apple.com/app/id${APP_STORE_ID}?action=write-review`;
+  } else if (Platform.OS === 'android') {
+    return `https://play.google.com/store/apps/details?id=${PLAY_STORE_PACKAGE}`;
+  } else {
+    // Web or other platforms - could link to a feedback form
+    return 'https://www.tkbetter.app/feedback';
+  }
+};
+
 const settingsSections: SettingSection[] = [
+  {
+    id: 'support',
+    title: 'Support',
+    items: [
+      {
+        id: 'review',
+        title: 'Rate & Review',
+        icon: Star,
+        iconColor: 'yellow',
+        action: 'link',
+        url: getReviewURL(),
+      },
+    ],
+  },
   {
     id: 'legal',
     title: 'Legal',
@@ -65,6 +95,10 @@ const iconColorStyles = {
   gray: {
     bg: 'bg-gray-100 dark:bg-gray-700',
     icon: 'text-gray-600 dark:text-gray-300',
+  },
+  yellow: {
+    bg: 'bg-yellow-100 dark:bg-yellow-900/30',
+    icon: 'text-yellow-600 dark:text-yellow-400',
   },
 };
 
