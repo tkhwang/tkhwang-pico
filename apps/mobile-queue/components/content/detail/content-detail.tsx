@@ -3,16 +3,7 @@ import { View, Alert, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text } from '@/components/ui/text';
 import { Icon } from '@/components/ui/icon';
-import {
-  CheckCircle,
-  Circle,
-  Clock,
-  Calendar,
-  Tag,
-  Globe,
-  FileText,
-  Sparkles,
-} from 'lucide-react-native';
+import { CheckCircle, Circle, Clock, Calendar, Tag, FileText, Sparkles } from 'lucide-react-native';
 import {
   formatFullDate,
   formatReadingTimeWithSuffix,
@@ -21,6 +12,7 @@ import {
 import { useContentActions } from '@/hooks/use-content-actions';
 import { ContentTags } from '@/components/content/sub/content-tags';
 import { ContentThumbnail } from '@/components/content/sub/content-thumbnail';
+import { SiteFavicon } from '@/components/ui/site-favicon';
 import { ContentDetailBottomActions } from './content-detail-bottom-actions';
 import type { UserContentWithDetails, Recommendation } from '@tkhwang-pico/common';
 import { useHapticFeedback } from '@/hooks/use-haptic-feedback';
@@ -234,7 +226,11 @@ export function ContentDetail({
           <View className="mb-4 flex-row flex-wrap">
             {content.domain && (
               <View className="mb-2 mr-3 flex-row items-center">
-                <Icon as={Globe} className="mr-1 h-3.5 w-3.5 text-gray-400" />
+                <SiteFavicon
+                  url={(content.metadata as any)?.favicon_url || null}
+                  size={14}
+                  className="mr-1"
+                />
                 <Text className="text-xs text-gray-600 dark:text-gray-400">{content.domain}</Text>
               </View>
             )}
