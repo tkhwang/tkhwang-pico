@@ -2,6 +2,10 @@ import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { View, RefreshControl, ScrollView } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { Text } from '@/components/ui/text';
+import { ViewModeToggle, type ViewMode } from '@/components/ui/view-mode-toggle';
+import { ContentItemSmallCard } from '@/components/content/content-item-small-card';
+import { ContentItemList } from '@/components/content/content-item-list';
+import { isContentLiked } from '@/utils/content-helpers';
 import { useUserContents } from '@/hooks/queries/use-user-contents';
 import { useDeleteContent } from '@/hooks/mutations/use-delete-content';
 import { useReopenContent } from '@/hooks/mutations/use-reopen-content';
@@ -25,6 +29,7 @@ export function ArchiveList() {
   const [refreshing, setRefreshing] = useState(false);
   const [selectedItem, setSelectedItem] = useState<UserContentWithDetails | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const [viewMode, setViewMode] = useState<ViewMode>('bigCard');
 
   const deleteContentMutation = useDeleteContent();
   const reopenContentMutation = useReopenContent();
@@ -185,36 +190,74 @@ export function ArchiveList() {
       <View className="mb-6">
         {/* Date section header */}
         <View className="mb-3">
-          <Text className="text-sm font-medium text-gray-500 dark:text-gray-400">
-            {item.date}
-          </Text>
+          <Text className="text-sm font-medium text-gray-500 dark:text-gray-400">{item.date}</Text>
         </View>
 
         {/* Items for this date */}
-        {item.items.map((content, index) => (
-          <View key={content.id} className={index > 0 ? 'mt-2' : ''}>
-            <SwipeableArchiveItem
-              item={content}
-              onPress={handleItemPress}
-              onReopen={handleReopen}
-              onDelete={handleDelete}
-              onLike={handleLike}
-            />
+        {viewMode === 'list' ? (
+          <View className="gap-1">
+            {item.items.map((content) => {
+              const isLiked = isContentLiked(content);
+              return (
+                <ContentItemList
+                  key={content.id}
+                  item={content}
+                  onPress={handleItemPress}
+                  isLiked={isLiked}
+                  showCompletedTime={true}
+                />
+              );
+            })}
           </View>
-        ))}
+        ) : viewMode === 'smallCard' ? (
+          <View className="-mx-1 flex-row flex-wrap">
+            {item.items.map((content) => {
+              const isLiked = isContentLiked(content);
+              return (
+                <View key={content.id} className="w-1/2 p-1">
+                  <ContentItemSmallCard
+                    item={content}
+                    onPress={handleItemPress}
+                    isLiked={isLiked}
+                    showCompletedTime={true}
+                  />
+                </View>
+              );
+            })}
+          </View>
+        ) : (
+          // Default bigCard view with swipeable
+          item.items.map((content, index) => (
+            <View key={content.id} className={index > 0 ? 'mt-2' : ''}>
+              <SwipeableArchiveItem
+                item={content}
+                onPress={handleItemPress}
+                onReopen={handleReopen}
+                onDelete={handleDelete}
+                onLike={handleLike}
+              />
+            </View>
+          ))
+        )}
       </View>
     );
   };
 
   return (
     <View className="flex-1">
+      {/* View mode toggle */}
+      <View className="mb-2 px-4 pt-3">
+        <ViewModeToggle mode={viewMode} onModeChange={setViewMode} />
+      </View>
+
       <FlashList
         data={groupedContents}
         renderItem={renderItem}
         keyExtractor={(item) => item.date}
-        estimatedItemSize={200}
+        key={viewMode} // Force re-render when switching modes
+        estimatedItemSize={viewMode === 'list' ? 150 : viewMode === 'smallCard' ? 300 : 200}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 16 }}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 8 }}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}

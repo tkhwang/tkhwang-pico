@@ -3,7 +3,11 @@ import { View, TouchableOpacity, RefreshControl, ScrollView } from 'react-native
 import { FlashList } from '@shopify/flash-list';
 import { Text } from '@/components/ui/text';
 import { SwipeableContentItem } from '../swipe/swipeable-content-item';
+import { ContentItemSmallCard } from '../content-item-small-card';
+import { ContentItemList } from '../content-item-list';
 import { ContentDetail } from '../detail/content-detail';
+import { ViewModeToggle, type ViewMode } from '@/components/ui/view-mode-toggle';
+import { isContentLiked } from '@/utils/content-helpers';
 import { useUserContents } from '@/hooks/queries/use-user-contents';
 import { ContentListSkeleton } from '@/components/content/list/content-list-skeleton';
 import { useToggleTodo } from '@/hooks/mutations/use-toggle-todo';
@@ -19,6 +23,7 @@ export function ContentList() {
   const [refreshing, setRefreshing] = useState(false);
   const [selectedItem, setSelectedItem] = useState<UserContentWithDetails | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const [viewMode, setViewMode] = useState<ViewMode>('bigCard');
 
   const toggleTodoMutation = useToggleTodo();
   const deleteContentMutation = useDeleteContent();
@@ -145,6 +150,25 @@ export function ContentList() {
   }
 
   const renderItem = ({ item }: { item: (typeof userContents)[0] }) => {
+    const isLiked = isContentLiked(item);
+
+    if (viewMode === 'list') {
+      return (
+        <View className="mb-1">
+          <ContentItemList item={item} onPress={handleItemPress} isLiked={isLiked} />
+        </View>
+      );
+    }
+
+    if (viewMode === 'smallCard') {
+      return (
+        <View className="flex-1 p-1">
+          <ContentItemSmallCard item={item} onPress={handleItemPress} isLiked={isLiked} />
+        </View>
+      );
+    }
+
+    // Default bigCard view with swipeable
     return (
       <SwipeableContentItem
         item={item}
@@ -158,13 +182,24 @@ export function ContentList() {
 
   return (
     <View className="flex-1">
+      {/* View mode toggle */}
+      <View className="mb-2 px-4 pt-3">
+        <ViewModeToggle mode={viewMode} onModeChange={setViewMode} />
+      </View>
+
       <FlashList
         data={userContents}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
-        estimatedItemSize={120}
+        key={viewMode} // Force re-render when switching modes
+        estimatedItemSize={viewMode === 'list' ? 60 : viewMode === 'smallCard' ? 150 : 120}
+        numColumns={viewMode === 'smallCard' ? 2 : 1}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: 12, paddingTop: 12, paddingBottom: 12 }}
+        contentContainerStyle={{
+          paddingHorizontal: viewMode === 'smallCard' ? 8 : 12,
+          paddingTop: 8,
+          paddingBottom: 12,
+        }}
         removeClippedSubviews={true}
         drawDistance={200}
         refreshControl={
