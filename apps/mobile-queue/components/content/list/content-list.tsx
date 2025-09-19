@@ -164,7 +164,7 @@ export function ContentList() {
         keyExtractor={(item) => item.id}
         estimatedItemSize={120}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 16 }}
+        contentContainerStyle={{ paddingHorizontal: 12, paddingTop: 12, paddingBottom: 12 }}
         removeClippedSubviews={true}
         drawDistance={200}
         refreshControl={
