@@ -115,22 +115,18 @@ export default function SettingsScreen() {
 
         <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
           {/* Profile Section */}
-          <View className="mt-4">
-            <TouchableHighlight
-              underlayColor="#f3f4f6"
-              className="border-y border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
-              <View className="flex-row items-center px-4 py-3">
-                <UserAvatar className="size-16" />
-                <View className="ml-3 flex-1">
-                  <Text className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                    {user?.fullName || 'User'}
-                  </Text>
-                  <Text className="text-sm text-gray-500 dark:text-gray-400">
-                    {user?.emailAddresses[0]?.emailAddress}
-                  </Text>
-                </View>
+          <View className="mt-4 border-y border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
+            <View className="flex-row items-center px-4 py-3">
+              <UserAvatar className="size-16" />
+              <View className="ml-3 flex-1">
+                <Text className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                  {user?.fullName || 'User'}
+                </Text>
+                <Text className="text-sm text-gray-500 dark:text-gray-400">
+                  {user?.emailAddresses[0]?.emailAddress}
+                </Text>
               </View>
-            </TouchableHighlight>
+            </View>
           </View>
 
           {/* Settings Sections */}
