@@ -78,7 +78,7 @@ export function ContentItem({
       tags={content.tags || undefined}
       labels={item.labels || undefined}
       thumbnailUrl={thumbnailUrl || undefined}
-      isCompleted={item.todo_status === 'completed'}
+      isCompleted={showCompletedTime ? false : item.todo_status === 'completed'}
       onPress={handlePress}
       onLongPress={handleLongPress}
       leftSlot={checkboxSlot}
