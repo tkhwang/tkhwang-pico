@@ -113,6 +113,7 @@ export class IngestService {
         ...baseMetadata,
         image_url: metadata.imageUrl,
         site_name: metadata.siteName,
+        favicon_url: metadata.faviconUrl,
       };
 
       await this.contentsRepository.updateContent(contentId, {
