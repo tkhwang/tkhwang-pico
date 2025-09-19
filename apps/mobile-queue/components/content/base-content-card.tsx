@@ -23,6 +23,7 @@ interface BaseContentCardProps {
   // Metadata props
   metadataProps?: {
     domain?: string;
+    faviconUrl?: string | null;
     date?: string;
     readingTime?: string;
     score?: number;

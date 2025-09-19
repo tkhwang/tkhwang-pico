@@ -69,6 +69,7 @@ export function RecommendItem({ recommendation, onPress }: RecommendItemProps) {
         score: scorePercentage,
         scoreColor: getScoreColorClass(scorePercentage),
         domain: content.domain || 'CONTENT',
+        faviconUrl: (content.metadata as any)?.favicon_url || null,
         date: content.published_at ? formatDate(content.published_at) : undefined,
         readingTime: content.word_count ? formatReadingTime(content.word_count) : undefined,
         rightElement: holdIndicator,

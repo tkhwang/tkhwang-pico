@@ -2,9 +2,11 @@ import React from 'react';
 import { View } from 'react-native';
 import { Text } from '@/components/ui/text';
 import { ContentMatchSpectrum } from '@/components/content/sub/content-match-spectrum';
+import { SiteFavicon } from '@/components/ui/site-favicon';
 
 interface ContentMetadataProps {
   domain?: string;
+  faviconUrl?: string | null;
   date?: string;
   readingTime?: string;
   score?: number;
@@ -19,6 +21,7 @@ interface ContentMetadataProps {
  */
 export function ContentMetadata({
   domain,
+  faviconUrl,
   date,
   readingTime,
   score,
@@ -29,9 +32,10 @@ export function ContentMetadata({
 }: ContentMetadataProps) {
   const metadataItems = [
     domain && (
-      <Text key="domain" className="text-xs text-gray-400 dark:text-gray-500">
-        {domain}
-      </Text>
+      <View key="domain" className="flex-row items-center">
+        <SiteFavicon url={faviconUrl} size={12} className="mr-1" />
+        <Text className="text-xs text-gray-400 dark:text-gray-500">{domain}</Text>
+      </View>
     ),
     date && (
       <Text key="date" className="text-xs text-gray-400 dark:text-gray-500">

@@ -73,6 +73,7 @@ export function ContentItem({ item, onPress, isLiked = false }: ContentItemProps
       leftSlot={checkboxSlot}
       metadataProps={{
         domain: content.domain || 'CONTENT',
+        faviconUrl: (content.metadata as any)?.favicon_url || null,
         date: item.saved_at ? formatDate(item.saved_at) : 'Unknown date',
         readingTime: content.word_count ? formatReadingTime(content.word_count) : undefined,
         rightElement: longPressHint,
