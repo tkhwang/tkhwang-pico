@@ -1,113 +1,186 @@
 import React from 'react';
-import { View, ScrollView, TouchableOpacity } from 'react-native';
+import { View, ScrollView, TouchableHighlight, Linking, Alert } from 'react-native';
 import { MainLayout } from '@/components/main-layout';
 import { Text } from '@/components/ui/text';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
-import { ChevronRight, User, Bell, Shield, HelpCircle, LogOut } from 'lucide-react-native';
-import { useColorScheme } from 'nativewind';
+import { UserAvatar } from '@/components/user-avatar';
+import { ChevronRight, FileText, Shield } from 'lucide-react-native';
+import { useAuth, useUser } from '@clerk/clerk-expo';
 
-const settingsOptions = [
+interface SettingItem {
+  id: string;
+  title: string;
+  icon: any;
+  iconColor: 'blue' | 'green' | 'red' | 'gray';
+  action: 'link' | 'navigate' | 'function';
+  url?: string;
+  onPress?: () => void;
+}
+
+interface SettingSection {
+  id: string;
+  title: string;
+  items: SettingItem[];
+}
+
+const settingsSections: SettingSection[] = [
   {
-    id: 'profile',
-    title: 'Profile',
-    description: 'Manage your account information',
-    icon: User,
-  },
-  {
-    id: 'notifications',
-    title: 'Notifications',
-    description: 'Configure notification preferences',
-    icon: Bell,
-  },
-  {
-    id: 'privacy',
-    title: 'Privacy & Security',
-    description: 'Privacy settings and security options',
-    icon: Shield,
-  },
-  {
-    id: 'help',
-    title: 'Help & Support',
-    description: 'Get help and contact support',
-    icon: HelpCircle,
+    id: 'legal',
+    title: 'Legal',
+    items: [
+      {
+        id: 'terms',
+        title: 'Terms of Service',
+        icon: FileText,
+        iconColor: 'blue',
+        action: 'link',
+        url: 'https://www.tkbetter.app',
+      },
+      {
+        id: 'privacy',
+        title: 'Privacy Policy',
+        icon: Shield,
+        iconColor: 'green',
+        action: 'link',
+        url: 'https://www.tkbetter.app/',
+      },
+    ],
   },
 ];
 
+const iconColorStyles = {
+  blue: {
+    bg: 'bg-blue-100 dark:bg-blue-900/30',
+    icon: 'text-blue-600 dark:text-blue-400',
+  },
+  green: {
+    bg: 'bg-green-100 dark:bg-green-900/30',
+    icon: 'text-green-600 dark:text-green-400',
+  },
+  red: {
+    bg: 'bg-red-100 dark:bg-red-900/30',
+    icon: 'text-red-600 dark:text-red-400',
+  },
+  gray: {
+    bg: 'bg-gray-100 dark:bg-gray-700',
+    icon: 'text-gray-600 dark:text-gray-300',
+  },
+};
+
 export default function SettingsScreen() {
-  const { colorScheme, toggleColorScheme } = useColorScheme();
+  const { user } = useUser();
+  const { signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
+      {
+        text: 'Cancel',
+        style: 'cancel',
+      },
+      {
+        text: 'Sign Out',
+        style: 'destructive',
+        onPress: async () => {
+          await signOut();
+        },
+      },
+    ]);
+  };
+
+  const openLink = (url: string) => {
+    Linking.openURL(url).catch((err) => {
+      Alert.alert('Error', 'Failed to open link');
+      console.error('Failed to open link:', err);
+    });
+  };
+
+  const handleItemPress = (item: SettingItem) => {
+    if (item.action === 'link' && item.url) {
+      openLink(item.url);
+    } else if (item.action === 'function' && item.onPress) {
+      item.onPress();
+    }
+    // TODO: Handle 'navigate' action when needed
+  };
 
   return (
     <MainLayout>
-      <View className="flex-1 bg-white dark:bg-gray-900">
+      <View className="flex-1 bg-gray-50 dark:bg-black">
         {/* Header */}
-        <View className="px-4 py-4">
-          <Text className="text-2xl font-bold text-gray-900 dark:text-gray-100">Settings</Text>
-          <Text className="text-sm text-gray-500 dark:text-gray-400">
-            Manage your app preferences
-          </Text>
+        <View className="border-b border-gray-200 bg-white px-4 py-3 dark:border-gray-800 dark:bg-gray-900">
+          <Text className="text-xl font-semibold text-gray-900 dark:text-gray-100">Settings</Text>
         </View>
 
-        <ScrollView className="flex-1 px-4" showsVerticalScrollIndicator={false}>
-          {/* Theme Toggle */}
-          <Card className="mb-4 border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
-            <View className="flex-row items-center justify-between p-4">
-              <View className="flex-1">
-                <Text className="text-base font-semibold text-gray-900 dark:text-gray-100">
-                  Dark Mode
-                </Text>
-                <Text className="text-sm text-gray-500 dark:text-gray-400">
-                  Toggle between light and dark theme
-                </Text>
-              </View>
-              <Button onPress={toggleColorScheme} size="sm" variant="outline" className="ml-4">
-                <Text className="text-sm">{colorScheme === 'dark' ? 'Light' : 'Dark'}</Text>
-              </Button>
-            </View>
-          </Card>
-
-          {/* Settings Options */}
-          {settingsOptions.map((option) => (
-            <TouchableOpacity key={option.id} className="mb-2">
-              <Card className="border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
-                <View className="flex-row items-center p-4">
-                  <View className="mr-3 h-10 w-10 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700">
-                    <Icon as={option.icon} className="h-5 w-5 text-gray-600 dark:text-gray-300" />
-                  </View>
-                  <View className="flex-1">
-                    <Text className="text-base font-semibold text-gray-900 dark:text-gray-100">
-                      {option.title}
-                    </Text>
-                    <Text className="text-sm text-gray-500 dark:text-gray-400">
-                      {option.description}
-                    </Text>
-                  </View>
-                  <Icon as={ChevronRight} className="h-5 w-5 text-gray-400 dark:text-gray-500" />
-                </View>
-              </Card>
-            </TouchableOpacity>
-          ))}
-
-          {/* Sign Out */}
-          <TouchableOpacity className="mb-8 mt-4">
-            <Card className="border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
-              <View className="flex-row items-center p-4">
-                <View className="mr-3 h-10 w-10 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30">
-                  <Icon as={LogOut} className="h-5 w-5 text-red-600 dark:text-red-400" />
-                </View>
-                <View className="flex-1">
-                  <Text className="text-base font-semibold text-red-600 dark:text-red-400">
-                    Sign Out
+        <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+          {/* Profile Section */}
+          <View className="mt-4">
+            <TouchableHighlight
+              underlayColor="#f3f4f6"
+              className="border-y border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
+              <View className="flex-row items-center px-4 py-3">
+                <UserAvatar className="size-16" />
+                <View className="ml-3 flex-1">
+                  <Text className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                    {user?.fullName || 'User'}
                   </Text>
                   <Text className="text-sm text-gray-500 dark:text-gray-400">
-                    Sign out of your account
+                    {user?.emailAddresses[0]?.emailAddress}
                   </Text>
                 </View>
-                <Icon as={ChevronRight} className="h-5 w-5 text-gray-400 dark:text-gray-500" />
               </View>
-            </Card>
-          </TouchableOpacity>
+            </TouchableHighlight>
+          </View>
+
+          {/* Settings Sections */}
+          {settingsSections.map((section) => (
+            <View key={section.id} className="mt-8">
+              <Text className="mb-1 px-4 text-xs font-medium uppercase text-gray-500 dark:text-gray-400">
+                {section.title}
+              </Text>
+              <View className="border-y border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
+                {section.items.map((item, index) => (
+                  <React.Fragment key={item.id}>
+                    <TouchableHighlight
+                      underlayColor="#f3f4f6"
+                      onPress={() => handleItemPress(item)}>
+                      <View className="flex-row items-center px-4 py-3">
+                        <View
+                          className={`mr-3 h-8 w-8 items-center justify-center rounded-lg ${iconColorStyles[item.iconColor].bg}`}>
+                          <Icon
+                            as={item.icon}
+                            className={`h-5 w-5 ${iconColorStyles[item.iconColor].icon}`}
+                          />
+                        </View>
+                        <Text className="flex-1 text-base text-gray-900 dark:text-gray-100">
+                          {item.title}
+                        </Text>
+                        <Icon
+                          as={ChevronRight}
+                          className="h-5 w-5 text-gray-400 dark:text-gray-600"
+                        />
+                      </View>
+                    </TouchableHighlight>
+                    {index < section.items.length - 1 && (
+                      <View className="ml-[52px] h-[0.5px] bg-gray-200 dark:bg-gray-800" />
+                    )}
+                  </React.Fragment>
+                ))}
+              </View>
+            </View>
+          ))}
+
+          {/* Sign Out Section */}
+          <View className="mb-8 mt-8">
+            <View className="border-y border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
+              <TouchableHighlight underlayColor="#fef2f2" onPress={handleSignOut}>
+                <View className="items-center px-4 py-3">
+                  <Text className="text-base font-medium text-red-600 dark:text-red-400">
+                    Sign Out
+                  </Text>
+                </View>
+              </TouchableHighlight>
+            </View>
+          </View>
         </ScrollView>
       </View>
     </MainLayout>
