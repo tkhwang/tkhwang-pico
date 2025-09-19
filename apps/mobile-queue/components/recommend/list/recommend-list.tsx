@@ -11,6 +11,7 @@ import { useRecommendations } from '@/hooks/queries/use-recommendations';
 import { useSaveContent } from '@/hooks/mutations/use-save-content';
 import { useSetContentPreference } from '@/hooks/mutations/use-content-preference';
 import { queryKey } from '@/hooks/keys/query-key';
+import { SWIPE_ACTION_CARD_REMOVAL_DELAY_MS } from '@/consts/app-consts';
 import type { Recommendation } from '@tkhwang-pico/common';
 
 export function RecommendList() {
@@ -33,15 +34,12 @@ export function RecommendList() {
 
   const saveContentMutation = useSaveContent({
     onSuccess: () => {
-      // Remove the recommendation from the cache after successfully adding to queue
-      if (user?.id && addingContentId) {
-        const key = queryKey.recommendations.byUserId(user.id);
-        queryClient.setQueryData(key, (oldData: Recommendation[] | undefined) => {
-          if (!oldData) return oldData;
-          return oldData.filter((rec) => rec.content_id !== addingContentId);
-        });
-        setAddingContentId(null); // Clear the stored content ID
-      }
+      // Clear the stored content ID after success
+      setAddingContentId(null);
+    },
+    onError: () => {
+      // Clear the stored content ID on error
+      setAddingContentId(null);
     },
   });
 
@@ -73,10 +71,22 @@ export function RecommendList() {
 
   const handleAddToQueue = useCallback(
     (url: string, contentId: string) => {
-      setAddingContentId(contentId); // Store the content ID for the onSuccess callback
+      setAddingContentId(contentId);
       saveContentMutation.mutate(url);
+
+      // Remove the recommendation from cache after feedback animation completes
+      // This happens after the visual feedback (300ms)
+      setTimeout(() => {
+        if (user?.id) {
+          const key = queryKey.recommendations.byUserId(user.id);
+          queryClient.setQueryData(key, (oldData: Recommendation[] | undefined) => {
+            if (!oldData) return oldData;
+            return oldData.filter((rec) => rec.content_id !== contentId);
+          });
+        }
+      }, SWIPE_ACTION_CARD_REMOVAL_DELAY_MS); // Slightly longer than SWIPE_ACTION_FEEDBACK_DURATION_MS (300ms) to ensure feedback is visible
     },
-    [saveContentMutation]
+    [saveContentMutation, user?.id, queryClient]
   );
 
   const handleNotInterested = useCallback(

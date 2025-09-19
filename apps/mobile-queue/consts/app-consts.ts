@@ -1,6 +1,7 @@
 // delay
 export const SAVE_CONTENT_DELAY_MS = 5_000;
-export const SWIPE_ACTION_FEEDBACK_DURATION_MS = 500;
+export const SWIPE_ACTION_FEEDBACK_DURATION_MS = 300; // Reduced from 500ms for faster feedback
+export const SWIPE_ACTION_CARD_REMOVAL_DELAY_MS = 400; // Delay before removing card after feedback animation
 export const DEFAULT_HAPTIC_DURATION_MS = 10;
 
 // swipe action sizing
