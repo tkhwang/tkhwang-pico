@@ -116,52 +116,58 @@ export function ContentDetail({
       ? (item.preferences?.some((preference) => preference.preference_type === 'liked') ?? false)
       : false;
 
-  const handleToggleComplete = () =>
-    executeWithHapticFeedback(() => {
+  const handleToggleComplete = async () => {
+    await executeWithHapticFeedback(async () => {
       if (onToggleComplete && 'id' in item) {
-        onToggleComplete(item.id);
+        await Promise.resolve(onToggleComplete(item.id));
         onClose();
       }
     });
+  };
 
-  const handleDelete = () =>
-    executeWithHapticFeedback(() => {
+  const handleDelete = async () => {
+    await executeWithHapticFeedback(() => {
       deleteContent(item.content_id, onDelete, onClose);
     });
+  };
 
-  const handleLike = () =>
-    executeWithHapticFeedback(() => {
+  const handleLike = async () => {
+    await executeWithHapticFeedback(async () => {
       if (onLike) {
-        onLike(item.content_id);
+        await Promise.resolve(onLike(item.content_id));
       }
     });
+  };
 
-  const handleAddToQueue = () =>
-    executeWithHapticFeedback(() => {
+  const handleAddToQueue = async () => {
+    await executeWithHapticFeedback(async () => {
       if (onAddToQueue) {
         const url = content.canonical_url || content.url;
         if (url) {
-          onAddToQueue(url, item.content_id);
+          await Promise.resolve(onAddToQueue(url, item.content_id));
           onClose();
         } else {
           Alert.alert('Error', 'No URL available for this content');
         }
       }
     });
+  };
 
-  const handleNotInterested = () =>
-    executeWithHapticFeedback(() => {
+  const handleNotInterested = async () => {
+    await executeWithHapticFeedback(async () => {
       if (onNotInterested) {
-        onNotInterested(item.content_id);
+        await Promise.resolve(onNotInterested(item.content_id));
         onClose();
       }
     });
+  };
 
-  const handleOpenURL = () =>
-    executeWithHapticFeedback(() => {
+  const handleOpenURL = async () => {
+    await executeWithHapticFeedback(async () => {
       const url = content.canonical_url || content.url;
-      openURL(url, onClose);
+      await openURL(url, onClose);
     });
+  };
 
   return (
     <BottomSheetModal
