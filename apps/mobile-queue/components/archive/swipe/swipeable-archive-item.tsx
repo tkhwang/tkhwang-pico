@@ -2,40 +2,38 @@ import React, { useCallback } from 'react';
 import { View, Alert, TouchableOpacity } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
-import { ArchiveCard } from '../archive-item';
+import { ContentItem } from '@/components/content/content-item';
 import { Icon } from '@/components/ui/icon';
 import { RotateCcw, Trash2, Heart, Circle, X } from 'lucide-react-native';
 import type { UserContentWithDetails } from '@tkhwang-pico/common';
 import { Text } from '@/components/ui/text';
 import { useSwipeableItem } from '@/hooks/use-swipeable-item';
+import { isContentLiked } from '@/utils/content-helpers';
 import {
   SWIPE_ACTION_BUTTON_WIDTH,
   SWIPE_MENU_DAMPING,
   ARCHIVE_TAB_LEFT_ACTION_WIDTH,
   ARCHIVE_TAB_RIGHT_ACTION_WIDTH,
 } from '@/consts/app-consts';
-import { ACTION_STYLES, DELETE_STYLES, REOPEN_STYLES } from '@/consts/app-styles';
+import { ACTION_STYLES } from '@/consts/app-styles';
 import { useSwipeActionFeedback } from '@/hooks/use-swipe-action-feedback';
 
 interface SwipeableArchiveItemProps {
   item: UserContentWithDetails;
-  isFirstOfDay?: boolean;
   onReopen?: (id: string) => void;
   onDelete?: (contentId: string) => void;
   onPress?: (item: UserContentWithDetails) => void;
   onLike?: (contentId: string) => void;
-  isLiked?: boolean;
 }
 
 export function SwipeableArchiveItem({
   item,
-  isFirstOfDay = false,
   onReopen,
   onDelete,
   onPress,
   onLike,
-  isLiked = false,
 }: SwipeableArchiveItemProps) {
+  const isLiked = isContentLiked(item);
   const { isProcessing, actionCompleted, executeWithFeedback } = useSwipeActionFeedback();
 
   const {
@@ -219,7 +217,7 @@ export function SwipeableArchiveItem({
           onLayout={(e: any) => {
             itemHeight.value = e.nativeEvent.layout.height;
           }}>
-          <ArchiveCard item={item} isFirstOfDay={isFirstOfDay} onPress={handlePress} />
+          <ContentItem item={item} onPress={handlePress} isLiked={isLiked} />
         </AnimatedViewTyped>
       </GestureDetector>
     </View>
