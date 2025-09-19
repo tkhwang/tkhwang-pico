@@ -38,6 +38,8 @@ interface BaseContentCardProps {
 
   // Slot for custom left icon/checkbox
   leftSlot?: React.ReactNode;
+  // Slot for custom top left content (e.g., match spectrum)
+  topLeftSlot?: React.ReactNode;
   // Slot for custom bottom content
   bottomSlot?: React.ReactNode;
 }
@@ -60,6 +62,7 @@ export function BaseContentCard({
   isCompleted = false,
   containerClassName = '',
   leftSlot,
+  topLeftSlot,
   bottomSlot,
 }: BaseContentCardProps) {
   const titleColorClass = isCompleted
@@ -68,6 +71,9 @@ export function BaseContentCard({
 
   const content = (
     <>
+      {/* Top left slot (e.g., match spectrum) */}
+      {topLeftSlot}
+
       {/* Main content row */}
       <View className="flex-row items-start">
         {/* Left slot (checkbox, icon, etc.) */}

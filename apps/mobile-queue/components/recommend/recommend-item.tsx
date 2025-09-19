@@ -4,6 +4,7 @@ import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
 import { Sparkles, ExternalLink } from 'lucide-react-native';
 import { BaseContentCard } from '@/components/content/base-content-card';
+import { ContentMatchSpectrum } from '@/components/content/sub/content-match-spectrum';
 import { useContentActions } from '@/hooks/use-content-actions';
 import {
   formatDate,
@@ -55,6 +56,13 @@ export function RecommendItem({ recommendation, onPress }: RecommendItemProps) {
     </View>
   );
 
+  // Create top spectrum slot
+  const topSpectrumSlot = (
+    <View className="mb-2">
+      <ContentMatchSpectrum score={scorePercentage} />
+    </View>
+  );
+
   return (
     <BaseContentCard
       title={content.title || undefined}
@@ -65,6 +73,7 @@ export function RecommendItem({ recommendation, onPress }: RecommendItemProps) {
       onPress={handlePress}
       onLongPress={handleLongPress}
       leftSlot={recommendIconSlot}
+      topLeftSlot={topSpectrumSlot}
       metadataProps={{
         score: scorePercentage,
         scoreColor: getScoreColorClass(scorePercentage),
@@ -73,7 +82,7 @@ export function RecommendItem({ recommendation, onPress }: RecommendItemProps) {
         date: content.published_at ? formatDate(content.published_at) : undefined,
         readingTime: content.word_count ? formatReadingTime(content.word_count) : undefined,
         rightElement: holdIndicator,
-        showMatchSpectrum: true,
+        showMatchSpectrum: false,
       }}
     />
   );
