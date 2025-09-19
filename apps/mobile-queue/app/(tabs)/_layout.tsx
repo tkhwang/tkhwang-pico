@@ -1,6 +1,6 @@
 import { Tabs } from 'expo-router';
 import { Icon } from '@/components/ui/icon';
-import { Circle, Star, CircleCheckBig, Settings } from 'lucide-react-native';
+import { Layers, Compass, Brain, Settings } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import * as React from 'react';
 import * as SplashScreen from 'expo-splash-screen';
@@ -49,7 +49,7 @@ export default function TabLayout() {
         options={{
           title: 'Queue',
           headerShown: false,
-          tabBarIcon: ({ color, size }) => <Icon as={Circle} color={color} size={size} />,
+          tabBarIcon: ({ color, size }) => <Icon as={Layers} color={color} size={size} />,
         }}
       />
       <Tabs.Screen
@@ -57,7 +57,7 @@ export default function TabLayout() {
         options={{
           title: 'Discover',
           headerShown: false,
-          tabBarIcon: ({ color, size }) => <Icon as={Star} color={color} size={size} />,
+          tabBarIcon: ({ color, size }) => <Icon as={Compass} color={color} size={size} />,
         }}
       />
       <Tabs.Screen
@@ -65,7 +65,7 @@ export default function TabLayout() {
         options={{
           title: 'Archive',
           headerShown: false,
-          tabBarIcon: ({ color, size }) => <Icon as={CircleCheckBig} color={color} size={size} />,
+          tabBarIcon: ({ color, size }) => <Icon as={Brain} color={color} size={size} />,
         }}
       />
       <Tabs.Screen
