@@ -50,7 +50,7 @@ export function ContentMetadata({
   ].filter(Boolean) as React.ReactNode[];
 
   return (
-    <View className={`mb-1.5 ${className}`}>
+    <View className={`mb-1 ${className}`}>
       <View className="flex-row items-start justify-between">
         <View className="flex-1 pr-2">
           {showMatchSpectrum && <ContentMatchSpectrum score={score} />}
