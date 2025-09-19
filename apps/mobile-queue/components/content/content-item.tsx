@@ -3,7 +3,12 @@ import { View } from 'react-native';
 import { Icon } from '@/components/ui/icon';
 import { ExternalLink, Heart, CircleCheckBig } from 'lucide-react-native';
 import { BaseContentCard } from '@/components/content/base-content-card';
-import { formatDate, formatReadingTime, getThumbnailUrl } from '@/utils/content-formatters';
+import {
+  formatDate,
+  formatReadingTime,
+  getThumbnailUrl,
+  formatArchiveDate,
+} from '@/utils/content-formatters';
 import { useContentActions } from '@/hooks/use-content-actions';
 import type { UserContentWithDetails } from '@tkhwang-pico/common';
 import { Text } from '@/components/ui/text';
@@ -12,9 +17,15 @@ interface ContentItemProps {
   item: UserContentWithDetails;
   onPress?: (item: UserContentWithDetails) => void;
   isLiked?: boolean;
+  showCompletedTime?: boolean;
 }
 
-export function ContentItem({ item, onPress, isLiked = false }: ContentItemProps) {
+export function ContentItem({
+  item,
+  onPress,
+  isLiked = false,
+  showCompletedTime = false,
+}: ContentItemProps) {
   const { openURL } = useContentActions();
   const content = item.contents;
 
@@ -73,7 +84,13 @@ export function ContentItem({ item, onPress, isLiked = false }: ContentItemProps
       leftSlot={checkboxSlot}
       metadataProps={{
         domain: content.domain || 'CONTENT',
-        date: item.saved_at ? formatDate(item.saved_at) : 'Unknown date',
+        faviconUrl: (content.metadata as any)?.favicon_url || null,
+        date:
+          showCompletedTime && item.completed_at
+            ? `Completed at ${formatArchiveDate(item.completed_at).time}`
+            : item.saved_at
+              ? formatDate(item.saved_at)
+              : 'Unknown date',
         readingTime: content.word_count ? formatReadingTime(content.word_count) : undefined,
         rightElement: longPressHint,
       }}

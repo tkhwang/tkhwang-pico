@@ -7,8 +7,9 @@ import type { UserContentWithDetails, Content } from '@tkhwang-pico/common';
 import { SAVE_CONTENT_DELAY_MS } from '@/consts/app-consts';
 
 interface UseSaveContentOptions {
+  onMutate?: () => any;
   onSuccess?: () => void;
-  onError?: (error: Error) => void;
+  onError?: (error: Error, variables: string, context: any) => void;
 }
 
 export function useSaveContent(options?: UseSaveContentOptions) {
@@ -19,6 +20,7 @@ export function useSaveContent(options?: UseSaveContentOptions) {
   type MutationContext = {
     previousQueries?: Array<[queryKey: unknown[], data: UserContentWithDetails[]]>;
     optimisticId?: string;
+    userContext?: any;
   };
 
   type SaveContentResult = Awaited<ReturnType<typeof saveContent>>;
@@ -30,7 +32,10 @@ export function useSaveContent(options?: UseSaveContentOptions) {
       return saveContent(url, token);
     },
     onMutate: async (url: string) => {
-      if (!user?.id) return { previousQueries: undefined };
+      // Call user's onMutate first if provided
+      const userContext = options?.onMutate?.();
+
+      if (!user?.id) return { previousQueries: undefined, userContext };
 
       const key = queryKey.userContents.byUserId(user.id);
       await queryClient.cancelQueries({ queryKey: key });
@@ -108,9 +113,9 @@ export function useSaveContent(options?: UseSaveContentOptions) {
         queryClient.setQueryData(specificQueryKey, nextItems);
       });
 
-      return { previousQueries, optimisticId };
+      return { previousQueries, optimisticId, userContext };
     },
-    onError: (error: Error, _url, context) => {
+    onError: (error: Error, url, context) => {
       console.error('Failed to save content:', error);
 
       // Rollback each query cache to its previous state
@@ -126,7 +131,8 @@ export function useSaveContent(options?: UseSaveContentOptions) {
         [{ text: 'OK' }]
       );
 
-      options?.onError?.(error);
+      // Call user's onError with userContext
+      options?.onError?.(error, url, context?.userContext);
     },
     onSuccess: (data, _url, context) => {
       if (user?.id) {

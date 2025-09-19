@@ -2,7 +2,10 @@ import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { View, RefreshControl, ScrollView } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { Text } from '@/components/ui/text';
-import { SwipeableTimelineItem } from '../swipe/swipeable-timeline-item';
+import { ViewModeToggle, type ViewMode } from '@/components/ui/view-mode-toggle';
+import { ContentItemSmallCard } from '@/components/content/content-item-small-card';
+import { ContentItemList } from '@/components/content/content-item-list';
+import { isContentLiked } from '@/utils/content-helpers';
 import { useUserContents } from '@/hooks/queries/use-user-contents';
 import { useDeleteContent } from '@/hooks/mutations/use-delete-content';
 import { useReopenContent } from '@/hooks/mutations/use-reopen-content';
@@ -10,22 +13,23 @@ import { useToggleContent } from '@/hooks/mutations/use-toggle-content';
 import { useToggleContentPreference } from '@/hooks/mutations/use-toggle-content-preference';
 import { useSaveContent } from '@/hooks/mutations/use-save-content';
 import { useSetContentPreference } from '@/hooks/mutations/use-content-preference';
-import { TimelineListSkeleton } from '@/components/timeline/list/timeline-list-skeleton';
 import { ContentDetail } from '@/components/content/detail/content-detail';
-import { isContentLiked } from '@/utils/content-helpers';
 import type { UserContentWithDetails } from '@tkhwang-pico/common';
+import { ArchiveListSkeleton } from '@/components/archive/list/archive-list-skeleton';
+import { SwipeableArchiveItem } from '@/components/archive/swipe/swipeable-archive-item';
 
 interface GroupedContent {
   date: string;
   items: UserContentWithDetails[];
 }
 
-export function TimelineList() {
+export function ArchiveList() {
   const { data: contents = [], isLoading, error, refetch } = useUserContents('completed');
 
   const [refreshing, setRefreshing] = useState(false);
   const [selectedItem, setSelectedItem] = useState<UserContentWithDetails | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const [viewMode, setViewMode] = useState<ViewMode>('bigCard');
 
   const deleteContentMutation = useDeleteContent();
   const reopenContentMutation = useReopenContent();
@@ -135,17 +139,17 @@ export function TimelineList() {
     }));
   }, [contents]);
 
-  if (isLoading && !refreshing) return <TimelineListSkeleton />;
+  if (isLoading && !refreshing) return <ArchiveListSkeleton />;
 
   if (error) {
     return (
-      <View className="flex-1 items-center justify-center px-4">
+      <View className="flex-1 items-center justify-center bg-gray-50 px-4 dark:bg-gray-900">
         <Text className="mb-4 text-4xl">⚠️</Text>
         <Text className="mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100">
-          Failed to load timeline
+          Failed to load archive
         </Text>
         <Text className="mb-4 text-center text-sm text-gray-500 dark:text-gray-400">
-          {error.message || 'An error occurred while loading your timeline'}
+          {error.message || 'An error occurred while loading your archive'}
         </Text>
       </View>
     );
@@ -154,7 +158,7 @@ export function TimelineList() {
   if (groupedContents.length === 0) {
     return (
       <ScrollView
-        className="flex-1"
+        className="flex-1 bg-gray-50 dark:bg-gray-900"
         contentContainerStyle={{
           flexGrow: 1,
           justifyContent: 'center',
@@ -175,7 +179,7 @@ export function TimelineList() {
           No completed contents yet
         </Text>
         <Text className="text-center text-sm text-gray-500 dark:text-gray-400">
-          Complete some contents to see them in your timeline
+          Complete some contents to see them in your archive
         </Text>
       </ScrollView>
     );
@@ -183,48 +187,78 @@ export function TimelineList() {
 
   const renderItem = ({ item }: { item: GroupedContent }) => {
     return (
-      <View className="mb-4">
-        {/* Date separator */}
-        {item.items.length > 0 && item.items[0].completed_at && (
-          <View className="mb-3">
-            <Text className="text-sm font-medium text-gray-500 dark:text-gray-400">
-              {new Date(item.items[0].completed_at).toLocaleDateString('en-US', {
-                weekday: 'long',
-                month: 'long',
-                day: 'numeric',
-                year: 'numeric',
-              })}
-            </Text>
-          </View>
-        )}
+      <View className="mb-6">
+        {/* Date section header */}
+        <View className="mb-3">
+          <Text className="text-sm font-medium text-gray-500 dark:text-gray-400">{item.date}</Text>
+        </View>
+
         {/* Items for this date */}
-        {item.items.map((content, index) => (
-          <View key={content.id} className={index > 0 ? 'mt-3' : ''}>
-            <SwipeableTimelineItem
-              item={content}
-              isFirstOfDay={index === 0}
-              onPress={handleItemPress}
-              onReopen={handleReopen}
-              onDelete={handleDelete}
-              onLike={handleLike}
-              isLiked={isContentLiked(content)}
-            />
+        {viewMode === 'list' ? (
+          <View>
+            {item.items.map((content) => {
+              const isLiked = isContentLiked(content);
+              return (
+                <View key={content.id} className="mb-1">
+                  <ContentItemList
+                    item={content}
+                    onPress={handleItemPress}
+                    isLiked={isLiked}
+                    showCompletedTime={true}
+                  />
+                </View>
+              );
+            })}
           </View>
-        ))}
-        <View className="mt-4 h-px bg-gray-200 dark:bg-gray-700" />
+        ) : viewMode === 'smallCard' ? (
+          <View className="-mx-1 flex-row flex-wrap">
+            {item.items.map((content) => {
+              const isLiked = isContentLiked(content);
+              return (
+                <View key={content.id} className="w-1/2 p-1">
+                  <ContentItemSmallCard
+                    item={content}
+                    onPress={handleItemPress}
+                    isLiked={isLiked}
+                    showCompletedTime={true}
+                  />
+                </View>
+              );
+            })}
+          </View>
+        ) : (
+          // Default bigCard view with swipeable
+          item.items.map((content, index) => (
+            <View key={content.id} className={index > 0 ? 'mt-2' : ''}>
+              <SwipeableArchiveItem
+                item={content}
+                onPress={handleItemPress}
+                onReopen={handleReopen}
+                onDelete={handleDelete}
+                onLike={handleLike}
+              />
+            </View>
+          ))
+        )}
       </View>
     );
   };
 
   return (
-    <View className="flex-1">
+    <View className="flex-1 bg-gray-50 dark:bg-gray-900">
+      {/* View mode toggle */}
+      <View className="mb-2 px-4 pt-3">
+        <ViewModeToggle mode={viewMode} onModeChange={setViewMode} />
+      </View>
+
       <FlashList
         data={groupedContents}
         renderItem={renderItem}
         keyExtractor={(item) => item.date}
-        estimatedItemSize={200}
+        key={viewMode} // Force re-render when switching modes
+        estimatedItemSize={viewMode === 'list' ? 150 : viewMode === 'smallCard' ? 300 : 200}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 16 }}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 8 }}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}

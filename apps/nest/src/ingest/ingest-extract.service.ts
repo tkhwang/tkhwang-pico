@@ -16,6 +16,7 @@ export interface ContentMetadata {
   lang?: string;
   wordCount?: number;
   domain?: string;
+  faviconUrl?: string | null;
 }
 
 @Injectable()
@@ -101,6 +102,13 @@ export class IngestExtractService {
     const metaKeywords = $('meta[name="keywords"]').attr('content');
     const pageTitle = $('title').text();
 
+    // Extract favicon
+    const faviconLink =
+      $('link[rel="icon"]').attr('href') ||
+      $('link[rel="shortcut icon"]').attr('href') ||
+      $('link[rel="apple-touch-icon"]').attr('href') ||
+      $('link[rel="apple-touch-icon-precomposed"]').attr('href');
+
     // Extract language
     const htmlLang = $('html').attr('lang');
 
@@ -155,6 +163,21 @@ export class IngestExtractService {
     const urlObj = new URL(url);
     const domain = urlObj.hostname;
 
+    // Process favicon URL
+    let faviconUrl: string | null = null;
+    if (faviconLink) {
+      try {
+        // Convert relative URL to absolute URL
+        faviconUrl = new URL(faviconLink, url).toString();
+      } catch {
+        // If URL parsing fails, fallback to Google Favicon API
+        faviconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
+      }
+    } else {
+      // If no favicon found in HTML, use Google Favicon API
+      faviconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
+    }
+
     // Detect language
     let lang = htmlLang || null;
     if (!lang) {
@@ -201,6 +224,7 @@ export class IngestExtractService {
       lang,
       wordCount,
       domain,
+      faviconUrl,
     };
   }
 

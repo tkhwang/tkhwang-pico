@@ -23,6 +23,7 @@ interface BaseContentCardProps {
   // Metadata props
   metadataProps?: {
     domain?: string;
+    faviconUrl?: string | null;
     date?: string;
     readingTime?: string;
     score?: number;
@@ -37,6 +38,8 @@ interface BaseContentCardProps {
 
   // Slot for custom left icon/checkbox
   leftSlot?: React.ReactNode;
+  // Slot for custom top left content (e.g., match spectrum)
+  topLeftSlot?: React.ReactNode;
   // Slot for custom bottom content
   bottomSlot?: React.ReactNode;
 }
@@ -59,6 +62,7 @@ export function BaseContentCard({
   isCompleted = false,
   containerClassName = '',
   leftSlot,
+  topLeftSlot,
   bottomSlot,
 }: BaseContentCardProps) {
   const titleColorClass = isCompleted
@@ -67,8 +71,8 @@ export function BaseContentCard({
 
   const content = (
     <>
-      {/* Metadata row */}
-      {metadataProps && <ContentMetadata {...metadataProps} />}
+      {/* Top left slot (e.g., match spectrum) */}
+      {topLeftSlot}
 
       {/* Main content row */}
       <View className="flex-row items-start">
@@ -117,6 +121,13 @@ export function BaseContentCard({
         {/* Thumbnail */}
         <ContentThumbnail imageUrl={thumbnailUrl} size={thumbnailSize} />
       </View>
+
+      {/* Metadata row - moved to bottom */}
+      {metadataProps && (
+        <View className="mt-4">
+          <ContentMetadata {...metadataProps} />
+        </View>
+      )}
 
       {/* Bottom slot for additional content */}
       {bottomSlot}

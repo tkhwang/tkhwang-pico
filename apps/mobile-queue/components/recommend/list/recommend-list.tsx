@@ -11,6 +11,7 @@ import { useRecommendations } from '@/hooks/queries/use-recommendations';
 import { useSaveContent } from '@/hooks/mutations/use-save-content';
 import { useSetContentPreference } from '@/hooks/mutations/use-content-preference';
 import { queryKey } from '@/hooks/keys/query-key';
+import { SWIPE_ACTION_CARD_REMOVAL_DELAY_MS } from '@/consts/app-consts';
 import type { Recommendation } from '@tkhwang-pico/common';
 
 export function RecommendList() {
@@ -31,19 +32,7 @@ export function RecommendList() {
   // Store the content ID being added to queue
   const [addingContentId, setAddingContentId] = useState<string | null>(null);
 
-  const saveContentMutation = useSaveContent({
-    onSuccess: () => {
-      // Remove the recommendation from the cache after successfully adding to queue
-      if (user?.id && addingContentId) {
-        const key = queryKey.recommendations.byUserId(user.id);
-        queryClient.setQueryData(key, (oldData: Recommendation[] | undefined) => {
-          if (!oldData) return oldData;
-          return oldData.filter((rec) => rec.content_id !== addingContentId);
-        });
-        setAddingContentId(null); // Clear the stored content ID
-      }
-    },
-  });
+  const saveContentMutation = useSaveContent();
 
   const setPreferenceMutation = useSetContentPreference();
 
@@ -73,10 +62,27 @@ export function RecommendList() {
 
   const handleAddToQueue = useCallback(
     (url: string, contentId: string) => {
-      setAddingContentId(contentId); // Store the content ID for the onSuccess callback
-      saveContentMutation.mutate(url);
+      setAddingContentId(contentId);
+      saveContentMutation.mutate(url, {
+        onSuccess: () => {
+          setAddingContentId(null);
+          // Evict after visual feedback completes
+          setTimeout(() => {
+            if (user?.id) {
+              const key = queryKey.recommendations.byUserId(user.id);
+              queryClient.setQueryData(key, (oldData: Recommendation[] | undefined) => {
+                if (!oldData) return oldData;
+                return oldData.filter((rec) => rec.content_id !== contentId);
+              });
+            }
+          }, SWIPE_ACTION_CARD_REMOVAL_DELAY_MS);
+        },
+        onError: () => {
+          setAddingContentId(null);
+        },
+      });
     },
-    [saveContentMutation]
+    [saveContentMutation, user?.id, queryClient]
   );
 
   const handleNotInterested = useCallback(

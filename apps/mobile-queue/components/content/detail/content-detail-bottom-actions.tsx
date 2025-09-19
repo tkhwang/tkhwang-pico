@@ -19,12 +19,12 @@ interface ContentDetailBottomActionsProps {
   isLiked: boolean;
   sheetPaddingBottom: number;
   // Action handlers
-  onToggleComplete: () => void;
-  onLike: () => void;
-  onDelete: () => void;
-  onOpenURL: () => void;
-  onAddToQueue?: () => void;
-  onNotInterested?: () => void;
+  onToggleComplete: () => void | Promise<void>;
+  onLike: () => void | Promise<void>;
+  onDelete: () => void | Promise<void>;
+  onOpenURL: () => void | Promise<void>;
+  onAddToQueue?: () => void | Promise<void>;
+  onNotInterested?: () => void | Promise<void>;
 }
 
 export function ContentDetailBottomActions({
