@@ -90,7 +90,9 @@ function ArchiveDateGroup() {
 
 export function ArchiveListSkeleton() {
   return (
-    <ScrollView className="flex-1 px-4" showsVerticalScrollIndicator={false}>
+    <ScrollView
+      className="flex-1 bg-gray-50 px-4 dark:bg-gray-900"
+      showsVerticalScrollIndicator={false}>
       <View className="py-4">
         {/* Show 3 date groups */}
         {[...Array(3)].map((_, index) => (

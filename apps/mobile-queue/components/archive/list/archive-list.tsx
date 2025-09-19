@@ -143,7 +143,7 @@ export function ArchiveList() {
 
   if (error) {
     return (
-      <View className="flex-1 items-center justify-center px-4">
+      <View className="flex-1 items-center justify-center bg-gray-50 px-4 dark:bg-gray-900">
         <Text className="mb-4 text-4xl">⚠️</Text>
         <Text className="mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100">
           Failed to load archive
@@ -158,7 +158,7 @@ export function ArchiveList() {
   if (groupedContents.length === 0) {
     return (
       <ScrollView
-        className="flex-1"
+        className="flex-1 bg-gray-50 dark:bg-gray-900"
         contentContainerStyle={{
           flexGrow: 1,
           justifyContent: 'center',
@@ -195,17 +195,18 @@ export function ArchiveList() {
 
         {/* Items for this date */}
         {viewMode === 'list' ? (
-          <View className="gap-1">
+          <View>
             {item.items.map((content) => {
               const isLiked = isContentLiked(content);
               return (
-                <ContentItemList
-                  key={content.id}
-                  item={content}
-                  onPress={handleItemPress}
-                  isLiked={isLiked}
-                  showCompletedTime={true}
-                />
+                <View key={content.id} className="mb-1">
+                  <ContentItemList
+                    item={content}
+                    onPress={handleItemPress}
+                    isLiked={isLiked}
+                    showCompletedTime={true}
+                  />
+                </View>
               );
             })}
           </View>
@@ -244,7 +245,7 @@ export function ArchiveList() {
   };
 
   return (
-    <View className="flex-1">
+    <View className="flex-1 bg-gray-50 dark:bg-gray-900">
       {/* View mode toggle */}
       <View className="mb-2 px-4 pt-3">
         <ViewModeToggle mode={viewMode} onModeChange={setViewMode} />
