@@ -8,7 +8,7 @@ import { QueryProvider } from '@/providers/query-provider';
 import { ThemeProvider } from '@react-navigation/native';
 import { PortalHost } from '@rn-primitives/portal';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { Stack, router } from 'expo-router';
+import { Stack, router, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useColorScheme } from 'nativewind';
@@ -97,6 +97,7 @@ export default Sentry.wrap(function RootLayout() {
 
 function Routes() {
   const { isSignedIn, isLoaded } = useAuth();
+  const segments = useSegments();
 
   React.useEffect(() => {
     if (isLoaded && Platform.OS !== 'web') {
@@ -107,25 +108,23 @@ function Routes() {
   }, [isLoaded]);
 
   React.useEffect(() => {
-    // Navigate based on auth state changes
-    if (isLoaded) {
-      if (!isSignedIn) {
-        // User is not signed in, navigate to sign-in screen
-        router.replace('/sign-in');
-      } else {
-        // User is signed in, navigate to main app
-        router.replace('/');
-      }
+    if (!isLoaded) return;
+
+    const inAuthGroup = segments[0] === '(auth)';
+
+    if (!isSignedIn && !inAuthGroup) {
+      router.replace('/(auth)/sign-in');
+    } else if (isSignedIn && inAuthGroup) {
+      router.replace('/(tabs)');
     }
-  }, [isSignedIn, isLoaded]);
+  }, [isLoaded, isSignedIn, segments]);
 
   if (!isLoaded) return null;
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="index" />
       <Stack.Screen name="(tabs)" />
-      <Stack.Screen name="sign-in" />
+      <Stack.Screen name="(auth)" />
     </Stack>
   );
 }
