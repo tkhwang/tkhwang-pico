@@ -190,7 +190,9 @@ export function ArchiveList() {
       <View className="mb-6">
         {/* Date section header */}
         <View className="mb-3">
-          <Text className="text-sm font-medium text-gray-500 dark:text-gray-400">{item.date}</Text>
+          <Text className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+            📅 {item.date}
+          </Text>
         </View>
 
         {/* Items for this date */}
