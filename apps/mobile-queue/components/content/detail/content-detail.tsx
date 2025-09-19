@@ -214,6 +214,14 @@ export function ContentDetail({
           contentContainerStyle={{
             paddingBottom: scrollBottomInset,
           }}>
+          {/* Title */}
+          <Text
+            className="mb-4 text-xl font-bold text-gray-900 dark:text-gray-100"
+            numberOfLines={3}
+            adjustsFontSizeToFit={false}>
+            {content.title || 'Untitled'}
+          </Text>
+
           {/* Metadata */}
           <View className="mb-1 flex-row flex-wrap">
             {content.domain && (
@@ -245,14 +253,6 @@ export function ContentDetail({
                 </View>
               )}
           </View>
-
-          {/* Title */}
-          <Text
-            className="mb-4 text-xl font-bold text-gray-900 dark:text-gray-100"
-            numberOfLines={3}
-            adjustsFontSizeToFit={false}>
-            {content.title || 'Untitled'}
-          </Text>
 
           {/* Thumbnail */}
           {thumbnailUrl && (

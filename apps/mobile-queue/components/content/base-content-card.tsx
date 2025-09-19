@@ -68,9 +68,6 @@ export function BaseContentCard({
 
   const content = (
     <>
-      {/* Metadata row */}
-      {metadataProps && <ContentMetadata {...metadataProps} />}
-
       {/* Main content row */}
       <View className="flex-row items-start">
         {/* Left slot (checkbox, icon, etc.) */}
@@ -118,6 +115,13 @@ export function BaseContentCard({
         {/* Thumbnail */}
         <ContentThumbnail imageUrl={thumbnailUrl} size={thumbnailSize} />
       </View>
+
+      {/* Metadata row - moved to bottom */}
+      {metadataProps && (
+        <View className="mt-4">
+          <ContentMetadata {...metadataProps} />
+        </View>
+      )}
 
       {/* Bottom slot for additional content */}
       {bottomSlot}
