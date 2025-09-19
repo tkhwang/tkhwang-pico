@@ -2,7 +2,6 @@ import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { View, RefreshControl, ScrollView } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { Text } from '@/components/ui/text';
-import { SwipeableTimelineItem } from '../swipe/swipeable-timeline-item';
 import { useUserContents } from '@/hooks/queries/use-user-contents';
 import { useDeleteContent } from '@/hooks/mutations/use-delete-content';
 import { useReopenContent } from '@/hooks/mutations/use-reopen-content';
@@ -10,17 +9,18 @@ import { useToggleContent } from '@/hooks/mutations/use-toggle-content';
 import { useToggleContentPreference } from '@/hooks/mutations/use-toggle-content-preference';
 import { useSaveContent } from '@/hooks/mutations/use-save-content';
 import { useSetContentPreference } from '@/hooks/mutations/use-content-preference';
-import { TimelineListSkeleton } from '@/components/timeline/list/timeline-list-skeleton';
 import { ContentDetail } from '@/components/content/detail/content-detail';
 import { isContentLiked } from '@/utils/content-helpers';
 import type { UserContentWithDetails } from '@tkhwang-pico/common';
+import { ArchiveListSkeleton } from '@/components/archive/list/archive-list-skeleton';
+import { SwipeableArchiveItem } from '@/components/archive/swipe/swipeable-archive-item';
 
 interface GroupedContent {
   date: string;
   items: UserContentWithDetails[];
 }
 
-export function TimelineList() {
+export function ArchiveList() {
   const { data: contents = [], isLoading, error, refetch } = useUserContents('completed');
 
   const [refreshing, setRefreshing] = useState(false);
@@ -135,17 +135,17 @@ export function TimelineList() {
     }));
   }, [contents]);
 
-  if (isLoading && !refreshing) return <TimelineListSkeleton />;
+  if (isLoading && !refreshing) return <ArchiveListSkeleton />;
 
   if (error) {
     return (
       <View className="flex-1 items-center justify-center px-4">
         <Text className="mb-4 text-4xl">⚠️</Text>
         <Text className="mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100">
-          Failed to load timeline
+          Failed to load archive
         </Text>
         <Text className="mb-4 text-center text-sm text-gray-500 dark:text-gray-400">
-          {error.message || 'An error occurred while loading your timeline'}
+          {error.message || 'An error occurred while loading your archive'}
         </Text>
       </View>
     );
@@ -175,7 +175,7 @@ export function TimelineList() {
           No completed contents yet
         </Text>
         <Text className="text-center text-sm text-gray-500 dark:text-gray-400">
-          Complete some contents to see them in your timeline
+          Complete some contents to see them in your archive
         </Text>
       </ScrollView>
     );
@@ -200,7 +200,7 @@ export function TimelineList() {
         {/* Items for this date */}
         {item.items.map((content, index) => (
           <View key={content.id} className={index > 0 ? 'mt-3' : ''}>
-            <SwipeableTimelineItem
+            <SwipeableArchiveItem
               item={content}
               isFirstOfDay={index === 0}
               onPress={handleItemPress}

@@ -4,24 +4,24 @@ import { Text } from '@/components/ui/text';
 import { Icon } from '@/components/ui/icon';
 import { Clock, ExternalLink, Heart } from 'lucide-react-native';
 import { ContentThumbnail } from '@/components/content/sub/content-thumbnail';
-import { formatTimelineDate } from '@/utils/content-formatters';
+import { formatArchiveDate } from '@/utils/content-formatters';
 import { useContentActions } from '@/hooks/use-content-actions';
 import type { UserContentWithDetails } from '@tkhwang-pico/common';
 
-interface TimelineCardProps {
+interface ArchiveCardProps {
   item: UserContentWithDetails;
   isFirstOfDay?: boolean;
   onPress?: (item: UserContentWithDetails) => void;
 }
 
-export function TimelineCard({ item, isFirstOfDay = false, onPress }: TimelineCardProps) {
+export function ArchiveCard({ item, isFirstOfDay = false, onPress }: ArchiveCardProps) {
   const { openURL } = useContentActions();
   const content = item.contents;
   const isLiked =
     item.preferences?.some((preference) => preference.preference_type === 'liked') ?? false;
 
   // Parse completed date
-  const dateInfo = item.completed_at ? formatTimelineDate(item.completed_at) : null;
+  const dateInfo = item.completed_at ? formatArchiveDate(item.completed_at) : null;
 
   const handleLongPress = () => {
     const url = content?.canonical_url || content?.url;
@@ -136,20 +136,20 @@ export function TimelineCard({ item, isFirstOfDay = false, onPress }: TimelineCa
   );
 }
 
-interface TimelineItemProps {
+interface ArchiveItemProps {
   date: string;
   items: UserContentWithDetails[];
   onPress?: (item: UserContentWithDetails) => void;
 }
 
-export function TimelineItem({ items, onPress }: TimelineItemProps) {
+export function ArchiveItem({ items, onPress }: ArchiveItemProps) {
   return (
     <View className="mb-4">
       {/* Items for this date */}
       <View>
         {items.map((item, index) => (
           <View key={item.id} className={index > 0 ? 'mt-3' : ''}>
-            <TimelineCard item={item} isFirstOfDay={index === 0} onPress={onPress} />
+            <ArchiveCard item={item} isFirstOfDay={index === 0} onPress={onPress} />
           </View>
         ))}
       </View>

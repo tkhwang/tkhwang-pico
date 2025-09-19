@@ -61,7 +61,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="timeline"
+        name="archive"
         options={{
           title: 'Archive',
           headerShown: false,

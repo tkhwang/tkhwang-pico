@@ -81,11 +81,11 @@ export const getScoreColorClass = (score: number): string => {
 };
 
 /**
- * Parse and format time for timeline
+ * Parse and format time for archive view
  * @param dateString - ISO date string
  * @returns Object with day of week, day of month, and time
  */
-export const formatTimelineDate = (dateString: string) => {
+export const formatArchiveDate = (dateString: string) => {
   const date = new Date(dateString);
 
   return {

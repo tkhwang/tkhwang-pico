@@ -1,7 +1,7 @@
 import { ScrollView, View, Animated } from 'react-native';
 import { useEffect, useRef } from 'react';
 
-function TimelineCardSkeleton({ isFirstOfDay = false }: { isFirstOfDay?: boolean }) {
+function ArchiveCardSkeleton({ isFirstOfDay = false }: { isFirstOfDay?: boolean }) {
   const fadeAnim = useRef(new Animated.Value(0.5)).current;
 
   useEffect(() => {
@@ -69,16 +69,16 @@ function TimelineCardSkeleton({ isFirstOfDay = false }: { isFirstOfDay?: boolean
   );
 }
 
-function TimelineDateGroup() {
+function ArchiveDateGroup() {
   return (
     <View className="mb-4">
       {/* Items for this date */}
       <View>
         {/* First item with date */}
-        <TimelineCardSkeleton isFirstOfDay={true} />
+        <ArchiveCardSkeleton isFirstOfDay={true} />
         {/* Second item without date */}
         <View className="mt-3">
-          <TimelineCardSkeleton isFirstOfDay={false} />
+          <ArchiveCardSkeleton isFirstOfDay={false} />
         </View>
       </View>
 
@@ -88,13 +88,13 @@ function TimelineDateGroup() {
   );
 }
 
-export function TimelineListSkeleton() {
+export function ArchiveListSkeleton() {
   return (
     <ScrollView className="flex-1 px-4" showsVerticalScrollIndicator={false}>
       <View className="py-4">
         {/* Show 3 date groups */}
         {[...Array(3)].map((_, index) => (
-          <TimelineDateGroup key={index} />
+          <ArchiveDateGroup key={index} />
         ))}
       </View>
     </ScrollView>
