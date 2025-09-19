@@ -6,6 +6,7 @@ import { Icon } from '@/components/ui/icon';
 import { UserAvatar } from '@/components/user-avatar';
 import { ChevronRight, FileText, Shield } from 'lucide-react-native';
 import { useAuth, useUser } from '@clerk/clerk-expo';
+import { router } from 'expo-router';
 
 interface SettingItem {
   id: string;
@@ -82,6 +83,7 @@ export default function SettingsScreen() {
         style: 'destructive',
         onPress: async () => {
           await signOut();
+          router.replace('/(auth)/sign-in');
         },
       },
     ]);
