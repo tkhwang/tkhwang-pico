@@ -10,6 +10,7 @@ export default ({ config }) => ({
       },
       edgeToEdgeEnabled: true,
       package: 'app.tkbetter.pico.queue.dev',
+      permissions: ['android.permission.VIBRATE'],
     },
     assetBundlePatterns: ['**/*'],
     experiments: {
