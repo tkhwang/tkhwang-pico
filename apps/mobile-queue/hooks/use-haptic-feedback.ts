@@ -1,7 +1,8 @@
-import { DEFAULT_HAPTIC_DURATION_MS } from '@/consts/app-consts';
 import * as Haptics from 'expo-haptics';
 import { useCallback } from 'react';
 import { Platform, Vibration } from 'react-native';
+
+import { DEFAULT_HAPTIC_DURATION_MS } from '@/consts/app-consts';
 
 export function useHapticFeedback(defaultDuration = DEFAULT_HAPTIC_DURATION_MS) {
   const triggerFeedback = useCallback(

@@ -1,8 +1,9 @@
 import React from 'react';
 import { View } from 'react-native';
-import { Text } from '@/components/ui/text';
+
 import { ContentMatchSpectrum } from '@/components/content/sub/content-match-spectrum';
 import { SiteFavicon } from '@/components/ui/site-favicon';
+import { Text } from '@/components/ui/text';
 
 interface ContentMetadataProps {
   domain?: string;

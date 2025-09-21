@@ -1,13 +1,14 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth, useUser } from '@clerk/clerk-expo';
-import { Alert } from 'react-native';
-import { togglePreference } from '@/lib/supabase/preferences';
-import { queryKey } from '@/hooks/keys/query-key';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type {
   PreferenceType,
   UserContentPreferenceTyped,
   UserContentWithDetails,
 } from '@tkhwang-pico/common';
+import { Alert } from 'react-native';
+
+import { queryKey } from '@/hooks/keys/query-key';
+import { togglePreference } from '@/lib/supabase/preferences';
 
 interface ToggleContentPreferenceParams {
   contentId: string;
@@ -36,10 +37,10 @@ export function useToggleContentPreference(options?: UseToggleContentPreferenceO
     Error,
     ToggleContentPreferenceParams,
     {
-      previousUserContents?: Array<{
+      previousUserContents?: {
         queryKey: readonly unknown[];
         data: UserContentWithDetails[] | undefined;
-      }>;
+      }[];
     }
   >({
     mutationFn: async ({ contentId, preferenceType, reason }) => {

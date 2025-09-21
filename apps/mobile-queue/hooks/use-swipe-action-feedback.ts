@@ -1,4 +1,5 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+
 import { SWIPE_ACTION_FEEDBACK_DURATION_MS } from '@/consts/app-consts';
 import { useHapticFeedback } from '@/hooks/use-haptic-feedback';
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, ScrollView } from 'react-native';
+import { ScrollView, View } from 'react-native';
 
 function SkeletonCard() {
   return (
@@ -39,7 +39,8 @@ export function RecommendListSkeleton() {
     <ScrollView
       className="flex-1 bg-gray-50 dark:bg-gray-900"
       showsVerticalScrollIndicator={false}
-      contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 16 }}>
+      contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 16 }}
+    >
       {[1, 2, 3, 4, 5].map((index) => (
         <SkeletonCard key={index} />
       ))}

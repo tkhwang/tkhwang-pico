@@ -1,12 +1,13 @@
-import React from 'react';
-import { View, TouchableOpacity } from 'react-native';
-import { Text } from '@/components/ui/text';
-import { Icon } from '@/components/ui/icon';
-import { Clock, ExternalLink, Heart } from 'lucide-react-native';
-import { ContentThumbnail } from '@/components/content/sub/content-thumbnail';
-import { formatArchiveDate } from '@/utils/content-formatters';
-import { useContentActions } from '@/hooks/use-content-actions';
 import type { UserContentWithDetails } from '@tkhwang-pico/common';
+import { Clock, ExternalLink, Heart } from 'lucide-react-native';
+import React from 'react';
+import { TouchableOpacity, View } from 'react-native';
+
+import { ContentThumbnail } from '@/components/content/sub/content-thumbnail';
+import { Icon } from '@/components/ui/icon';
+import { Text } from '@/components/ui/text';
+import { useContentActions } from '@/hooks/use-content-actions';
+import { formatArchiveDate } from '@/utils/content-formatters';
 
 interface ArchiveCardProps {
   item: UserContentWithDetails;
@@ -34,7 +35,8 @@ export function ArchiveCard({ item, isFirstOfDay = false, onPress }: ArchiveCard
       onLongPress={handleLongPress}
       delayLongPress={500}
       activeOpacity={0.7}
-      className="overflow-hidden rounded-xl bg-white shadow-sm dark:bg-gray-800">
+      className="overflow-hidden rounded-xl bg-white shadow-sm dark:bg-gray-800"
+    >
       <View className="flex-row py-3 pl-1.5 pr-3">
         {/* Date Column - Left */}
         <View className="mr-2 w-12 items-center">
@@ -85,7 +87,8 @@ export function ArchiveCard({ item, isFirstOfDay = false, onPress }: ArchiveCard
               {/* Title */}
               <Text
                 className="text-base font-semibold text-gray-900 dark:text-gray-100"
-                numberOfLines={2}>
+                numberOfLines={2}
+              >
                 {content?.title || 'Untitled'}
               </Text>
 
@@ -93,7 +96,8 @@ export function ArchiveCard({ item, isFirstOfDay = false, onPress }: ArchiveCard
               {content?.summary && (
                 <Text
                   className="mb-2 mt-1 text-xs text-gray-600 dark:text-gray-400"
-                  numberOfLines={3}>
+                  numberOfLines={3}
+                >
                   {content.summary}
                 </Text>
               )}

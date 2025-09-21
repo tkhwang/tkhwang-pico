@@ -1,8 +1,9 @@
 import { useUser } from '@clerk/clerk-expo';
-import { getUserContents } from '@/lib/supabase/contents';
-import type { UserContentWithDetails, TodoFilterType } from '@tkhwang-pico/common';
+import type { TodoFilterType, UserContentWithDetails } from '@tkhwang-pico/common';
+
 import { queryKey } from '@/hooks/keys/query-key';
 import { useSupabaseQuery } from '@/hooks/queries/supabase/use-supabase-query';
+import { getUserContents } from '@/lib/supabase/contents';
 
 export function useUserContents(todoFilter: TodoFilterType = 'pending') {
   const { user } = useUser();

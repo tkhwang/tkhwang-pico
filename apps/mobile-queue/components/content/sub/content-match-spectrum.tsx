@@ -49,7 +49,6 @@ export function ContentMatchSpectrum({ score }: MatchSpectrumProps) {
           const borderWidth = !hasScore || !isActive ? 1 : 0;
           return (
             <View
-              // eslint-disable-next-line react/no-array-index-key
               key={index}
               style={[
                 styles.block,

@@ -1,5 +1,6 @@
 import React from 'react';
-import { TouchableOpacity, ViewStyle } from 'react-native';
+import { TouchableOpacity, type ViewStyle } from 'react-native';
+
 import { Text } from './ui/text';
 
 interface FABProps {
@@ -22,7 +23,8 @@ export function FAB({ onPress, icon = '+', className = '', style }: FABProps) {
     <TouchableOpacity
       onPress={onPress}
       className={`absolute bottom-6 right-6 h-14 w-14 items-center justify-center rounded-full bg-blue-500 shadow-lg active:bg-blue-600 dark:bg-blue-600 dark:active:bg-blue-700 ${className}`}
-      style={[defaultStyle, style]}>
+      style={[defaultStyle, style]}
+    >
       {typeof icon === 'string' ? <Text className="text-2xl text-white">{icon}</Text> : icon}
     </TouchableOpacity>
   );

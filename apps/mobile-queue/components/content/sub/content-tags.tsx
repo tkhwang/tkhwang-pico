@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, TouchableOpacity } from 'react-native';
+import { TouchableOpacity, View } from 'react-native';
+
 import { Text } from '@/components/ui/text';
 
 interface ContentTagsProps {
@@ -52,7 +53,8 @@ export function ContentTags({
         {displayTags.map((tag, index) => (
           <View
             key={`tag-${index}`}
-            className={`mr-1.5 mt-1 rounded-full px-1.5 py-0.5 ${bgColor}`}>
+            className={`mr-1.5 mt-1 rounded-full px-1.5 py-0.5 ${bgColor}`}
+          >
             <Text className={`text-[10px] ${textColor}`}>{String(tag)}</Text>
           </View>
         ))}
@@ -60,7 +62,8 @@ export function ContentTags({
           <TouchableOpacity
             onPress={() => setIsExpanded(!isExpanded)}
             className="mr-1.5 mt-1 rounded-full border border-gray-300 bg-transparent px-2 py-0.5 dark:border-gray-500"
-            activeOpacity={0.7}>
+            activeOpacity={0.7}
+          >
             <Text className="text-[10px] font-medium text-gray-600 dark:text-gray-400">
               {isExpanded ? 'Show less' : `+${remainingCount} more`}
             </Text>

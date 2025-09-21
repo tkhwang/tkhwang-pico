@@ -1,12 +1,13 @@
+import { type StartSSOFlowParams, useSSO } from '@clerk/clerk-expo';
+import * as AuthSession from 'expo-auth-session';
+import { router } from 'expo-router';
+import * as WebBrowser from 'expo-web-browser';
+import * as React from 'react';
+import { Image, type ImageSourcePropType, Platform, View } from 'react-native';
+
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { cn } from '@/lib/utils';
-import { useSSO, type StartSSOFlowParams } from '@clerk/clerk-expo';
-import * as AuthSession from 'expo-auth-session';
-import * as WebBrowser from 'expo-web-browser';
-import { router } from 'expo-router';
-import * as React from 'react';
-import { Image, Platform, View, type ImageSourcePropType } from 'react-native';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -105,12 +106,14 @@ export function SocialConnections() {
               'h-12 w-full flex-row items-center justify-start gap-3 rounded-lg pl-1',
               strategy.backgroundColor
             )}
-            onPress={onSocialLoginPress(strategy.type)}>
+            onPress={onSocialLoginPress(strategy.type)}
+          >
             <View
               className={cn(
                 'h-10 w-10 items-center justify-center rounded-full',
                 strategy.type === 'oauth_apple' ? 'bg-transparent' : 'bg-white'
-              )}>
+              )}
+            >
               <Image
                 className="size-5"
                 tintColor={Platform.select({

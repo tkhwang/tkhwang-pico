@@ -1,17 +1,18 @@
+import type { UserContentWithDetails } from '@tkhwang-pico/common';
+import { CircleCheckBig, ExternalLink, Heart } from 'lucide-react-native';
 import React from 'react';
 import { View } from 'react-native';
-import { Icon } from '@/components/ui/icon';
-import { ExternalLink, Heart, CircleCheckBig } from 'lucide-react-native';
+
 import { BaseContentCard } from '@/components/content/base-content-card';
+import { Icon } from '@/components/ui/icon';
+import { Text } from '@/components/ui/text';
+import { useContentActions } from '@/hooks/use-content-actions';
 import {
+  formatArchiveDate,
   formatDate,
   formatReadingTime,
   getThumbnailUrl,
-  formatArchiveDate,
 } from '@/utils/content-formatters';
-import { useContentActions } from '@/hooks/use-content-actions';
-import type { UserContentWithDetails } from '@tkhwang-pico/common';
-import { Text } from '@/components/ui/text';
 
 interface ContentItemProps {
   item: UserContentWithDetails;

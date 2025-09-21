@@ -1,6 +1,7 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@clerk/clerk-expo';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Alert } from 'react-native';
+
 import { queryKey } from '@/hooks/keys/query-key';
 import { markAsPending } from '@/lib/supabase/todo';
 

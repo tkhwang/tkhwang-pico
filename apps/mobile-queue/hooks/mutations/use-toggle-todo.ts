@@ -1,8 +1,9 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@clerk/clerk-expo';
-import { toggleTodoStatus } from '@/lib/supabase/todo';
-import { queryKey } from '@/hooks/keys/query-key';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Alert } from 'react-native';
+
+import { queryKey } from '@/hooks/keys/query-key';
+import { toggleTodoStatus } from '@/lib/supabase/todo';
 
 export function useToggleTodo() {
   const { getToken, userId } = useAuth();

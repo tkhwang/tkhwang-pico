@@ -1,6 +1,7 @@
-import { cn } from '@/lib/utils';
-import { Platform, TextInput, type TextInputProps } from 'react-native';
 import React from 'react';
+import { Platform, TextInput, type TextInputProps } from 'react-native';
+
+import { cn } from '@/lib/utils';
 
 const Input = React.forwardRef<TextInput, TextInputProps>(
   ({ className, placeholderClassName, ...props }, ref) => {

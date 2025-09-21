@@ -1,22 +1,23 @@
-import React, { useState, useCallback, useMemo, useEffect } from 'react';
-import { View, RefreshControl, ScrollView } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
-import { Text } from '@/components/ui/text';
-import { ViewModeToggle, type ViewMode } from '@/components/ui/view-mode-toggle';
-import { ContentItemSmallCard } from '@/components/content/content-item-small-card';
-import { ContentItemList } from '@/components/content/content-item-list';
-import { isContentLiked } from '@/utils/content-helpers';
-import { useUserContents } from '@/hooks/queries/use-user-contents';
-import { useDeleteContent } from '@/hooks/mutations/use-delete-content';
-import { useReopenContent } from '@/hooks/mutations/use-reopen-content';
-import { useToggleContent } from '@/hooks/mutations/use-toggle-content';
-import { useToggleContentPreference } from '@/hooks/mutations/use-toggle-content-preference';
-import { useSaveContent } from '@/hooks/mutations/use-save-content';
-import { useSetContentPreference } from '@/hooks/mutations/use-content-preference';
-import { ContentDetail } from '@/components/content/detail/content-detail';
 import type { UserContentWithDetails } from '@tkhwang-pico/common';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { RefreshControl, ScrollView, View } from 'react-native';
+
 import { ArchiveListSkeleton } from '@/components/archive/list/archive-list-skeleton';
 import { SwipeableArchiveItem } from '@/components/archive/swipe/swipeable-archive-item';
+import { ContentItemList } from '@/components/content/content-item-list';
+import { ContentItemSmallCard } from '@/components/content/content-item-small-card';
+import { ContentDetail } from '@/components/content/detail/content-detail';
+import { Text } from '@/components/ui/text';
+import { type ViewMode, ViewModeToggle } from '@/components/ui/view-mode-toggle';
+import { useSetContentPreference } from '@/hooks/mutations/use-content-preference';
+import { useDeleteContent } from '@/hooks/mutations/use-delete-content';
+import { useReopenContent } from '@/hooks/mutations/use-reopen-content';
+import { useSaveContent } from '@/hooks/mutations/use-save-content';
+import { useToggleContent } from '@/hooks/mutations/use-toggle-content';
+import { useToggleContentPreference } from '@/hooks/mutations/use-toggle-content-preference';
+import { useUserContents } from '@/hooks/queries/use-user-contents';
+import { isContentLiked } from '@/utils/content-helpers';
 
 interface GroupedContent {
   date: string;
@@ -117,7 +118,7 @@ export function ArchiveList() {
 
   // Group contents by date
   const groupedContents = useMemo((): GroupedContent[] => {
-    const groups: { [key: string]: UserContentWithDetails[] } = {};
+    const groups: Record<string, UserContentWithDetails[]> = {};
 
     contents.forEach((content) => {
       if (content.completed_at) {
@@ -173,7 +174,8 @@ export function ArchiveList() {
             colors={['#3B82F6']}
             progressBackgroundColor="#ffffff"
           />
-        }>
+        }
+      >
         <Text className="mb-4 text-4xl">📅</Text>
         <Text className="mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100">
           No completed contents yet

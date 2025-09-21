@@ -1,7 +1,8 @@
+import { View } from 'react-native';
+
 import { SocialConnections } from '@/components/social-connections';
 import { Card, CardContent, CardDescription } from '@/components/ui/card';
 import { Text } from '@/components/ui/text';
-import { View } from 'react-native';
 
 export function SignInForm() {
   return (

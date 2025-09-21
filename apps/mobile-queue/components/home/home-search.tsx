@@ -1,5 +1,6 @@
-import { Input } from '@/components/ui/input';
 import { View } from 'react-native';
+
+import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
 
 export function HomeSearch() {

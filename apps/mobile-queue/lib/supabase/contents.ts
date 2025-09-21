@@ -1,10 +1,11 @@
-import { createSupabaseClientWithClerkAuth } from '../../utils/supabase';
 import type {
-  UserContentWithDetails,
   TodoFilterType,
   UserContentPreference,
   UserContentPreferenceTyped,
+  UserContentWithDetails,
 } from '@tkhwang-pico/common';
+
+import { createSupabaseClientWithClerkAuth } from '../../utils/supabase';
 
 export async function getUserContents(
   clerkToken: string,
@@ -55,7 +56,8 @@ export async function getUserContents(
     preferenceData?.forEach((preference) => {
       const typedPreference: UserContentPreferenceTyped = {
         ...preference,
-        preference_type: preference.preference_type as UserContentPreferenceTyped['preference_type'],
+        preference_type:
+          preference.preference_type as UserContentPreferenceTyped['preference_type'],
       };
 
       const contentPreferences = preferenceMap.get(preference.content_id) ?? [];

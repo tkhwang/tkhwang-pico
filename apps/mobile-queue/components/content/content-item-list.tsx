@@ -1,12 +1,13 @@
-import React from 'react';
-import { View, TouchableOpacity } from 'react-native';
-import { Text } from '@/components/ui/text';
-import { Icon } from '@/components/ui/icon';
-import { CircleCheckBig, Heart, Clock, ExternalLink } from 'lucide-react-native';
-import { SiteFavicon } from '@/components/ui/site-favicon';
-import { formatDate, formatArchiveDate } from '@/utils/content-formatters';
-import { useContentActions } from '@/hooks/use-content-actions';
 import type { UserContentWithDetails } from '@tkhwang-pico/common';
+import { CircleCheckBig, Clock, ExternalLink, Heart } from 'lucide-react-native';
+import React from 'react';
+import { TouchableOpacity, View } from 'react-native';
+
+import { Icon } from '@/components/ui/icon';
+import { SiteFavicon } from '@/components/ui/site-favicon';
+import { Text } from '@/components/ui/text';
+import { useContentActions } from '@/hooks/use-content-actions';
+import { formatArchiveDate, formatDate } from '@/utils/content-formatters';
 
 interface ContentItemListProps {
   item: UserContentWithDetails;
@@ -45,7 +46,8 @@ export function ContentItemList({
       onLongPress={handleLongPress}
       delayLongPress={500}
       activeOpacity={0.7}
-      className="flex-row items-center rounded-lg bg-white px-3 py-2.5 dark:bg-gray-800">
+      className="flex-row items-center rounded-lg bg-white px-3 py-2.5 dark:bg-gray-800"
+    >
       {/* Status Icon */}
       <View className="mr-2.5">
         {isCompleted ? (

@@ -1,21 +1,23 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import { View, TouchableOpacity, RefreshControl, ScrollView } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
-import { Text } from '@/components/ui/text';
-import { SwipeableContentItem } from '../swipe/swipeable-content-item';
-import { ContentItemSmallCard } from '../content-item-small-card';
-import { ContentItemList } from '../content-item-list';
-import { ContentDetail } from '../detail/content-detail';
-import { ViewModeToggle, type ViewMode } from '@/components/ui/view-mode-toggle';
-import { isContentLiked } from '@/utils/content-helpers';
-import { useUserContents } from '@/hooks/queries/use-user-contents';
-import { ContentListSkeleton } from '@/components/content/list/content-list-skeleton';
-import { useToggleTodo } from '@/hooks/mutations/use-toggle-todo';
-import { useDeleteContent } from '@/hooks/mutations/use-delete-content';
-import { useToggleContentPreference } from '@/hooks/mutations/use-toggle-content-preference';
-import { useSaveContent } from '@/hooks/mutations/use-save-content';
-import { useSetContentPreference } from '@/hooks/mutations/use-content-preference';
 import type { UserContentWithDetails } from '@tkhwang-pico/common';
+import React, { useCallback, useEffect, useState } from 'react';
+import { RefreshControl, ScrollView, TouchableOpacity, View } from 'react-native';
+
+import { ContentListSkeleton } from '@/components/content/list/content-list-skeleton';
+import { Text } from '@/components/ui/text';
+import { type ViewMode, ViewModeToggle } from '@/components/ui/view-mode-toggle';
+import { useSetContentPreference } from '@/hooks/mutations/use-content-preference';
+import { useDeleteContent } from '@/hooks/mutations/use-delete-content';
+import { useSaveContent } from '@/hooks/mutations/use-save-content';
+import { useToggleContentPreference } from '@/hooks/mutations/use-toggle-content-preference';
+import { useToggleTodo } from '@/hooks/mutations/use-toggle-todo';
+import { useUserContents } from '@/hooks/queries/use-user-contents';
+import { isContentLiked } from '@/utils/content-helpers';
+
+import { ContentItemList } from '../content-item-list';
+import { ContentItemSmallCard } from '../content-item-small-card';
+import { ContentDetail } from '../detail/content-detail';
+import { SwipeableContentItem } from '../swipe/swipeable-content-item';
 
 export function ContentList() {
   const { data: userContents = [], isLoading, error, refetch } = useUserContents('pending');
@@ -137,7 +139,8 @@ export function ContentList() {
             colors={['#3B82F6']}
             progressBackgroundColor="#ffffff"
           />
-        }>
+        }
+      >
         <Text className="mb-4 text-4xl">📚</Text>
         <Text className="mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100">
           No saved contents yet

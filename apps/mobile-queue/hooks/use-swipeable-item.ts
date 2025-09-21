@@ -1,17 +1,17 @@
 import { useCallback, useState } from 'react';
 import {
   Gesture,
-  GestureUpdateEvent,
-  PanGestureHandlerEventPayload,
+  type GestureUpdateEvent,
+  type PanGestureHandlerEventPayload,
 } from 'react-native-gesture-handler';
 import {
+  Extrapolation,
+  interpolate,
+  runOnJS,
+  type SharedValue,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
-  runOnJS,
-  interpolate,
-  Extrapolation,
-  SharedValue,
 } from 'react-native-reanimated';
 
 interface UseSwipeableItemProps {

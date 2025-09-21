@@ -1,5 +1,5 @@
-import { useQuery, type UseQueryOptions, type QueryKey } from '@tanstack/react-query';
 import { useAuth } from '@clerk/clerk-expo';
+import { type QueryKey, useQuery, type UseQueryOptions } from '@tanstack/react-query';
 
 /**
  * Common hook for Supabase queries with automatic Clerk token management
