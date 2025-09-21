@@ -21,6 +21,8 @@ PICO (Personal Intelligent Companion Operator) is a cross-platform monorepo with
 ```bash
 yarn                    # Install all dependencies
 yarn clean              # Clean all node_modules, build artifacts, and caches
+yarn type-check         # Type check all workspaces
+yarn lint               # Lint all workspaces
 ```
 
 ### Mobile App (`apps/mobile-queue/`)
@@ -35,6 +37,9 @@ yarn web               # Start web version
 yarn build:ios                # Production iOS build
 yarn build:android            # Android preview build
 
+yarn lint              # Run ESLint
+yarn lint:fix          # Run ESLint with auto-fix
+yarn type-check        # Run TypeScript type checking
 yarn clean             # Clean Expo cache and node_modules
 ```
 
@@ -45,6 +50,7 @@ yarn dev               # Start Next.js dev server with Turbopack
 yarn build             # Build for production
 yarn start             # Start production server
 yarn lint              # Run ESLint
+yarn type-check        # Run TypeScript type checking
 ```
 
 ### Mastra AI System (`apps/mastra/`)
@@ -53,6 +59,9 @@ yarn lint              # Run ESLint
 yarn dev               # Start Mastra development server with hot reload
 yarn build             # Build Mastra agent system
 yarn start             # Start production Mastra server
+yarn lint              # Run ESLint
+yarn lint:fix          # Run ESLint with auto-fix
+yarn type-check        # Run TypeScript type checking
 ```
 
 ### Nest.js Backend (`apps/nest/`)
@@ -61,6 +70,8 @@ yarn start             # Start production Mastra server
 yarn dev               # Start Nest.js development server
 yarn build             # Build for production
 yarn start             # Start production server
+yarn lint              # Run ESLint
+yarn type-check        # Run TypeScript type checking
 ```
 
 ### LangChain System (`apps/langchain/`)
@@ -69,6 +80,8 @@ yarn start             # Start production server
 yarn dev               # Start LangChain development server
 yarn build             # Build LangChain agent system
 yarn start             # Start production server
+yarn lint              # Run ESLint
+yarn type-check        # Run TypeScript type checking
 ```
 
 ## Architecture & Patterns
@@ -145,6 +158,44 @@ The project implements a unique cross-platform UI approach:
 4. **Vector RAG System**: LibSQL vector database for document search and retrieval
 5. **Real-Time AI Integration**: CopilotKit runtime connecting web UI to Mastra agents
 6. **Cross-Platform Compatibility**: Mobile components render on web via react-native-web
+
+## Shared Configuration Packages
+
+The project uses two shared configuration packages to maintain consistency across all apps:
+
+### TypeScript Configuration (`packages/config-typescript/`)
+
+Provides platform-specific TypeScript configurations that extend a common base:
+
+- **Base Config**: `tsconfig.base.json` - Common TypeScript settings (ES2020, strict mode, etc.)
+- **Platform Configs**:
+  - `tsconfig.next.json` - Next.js-specific settings with App Router support
+  - `tsconfig.expo.json` - Expo/React Native configuration
+  - `tsconfig.nest.json` - Nest.js backend configuration
+  - `tsconfig.node.json` - Node.js applications
+  - `tsconfig.react.json` - General React applications
+  - `tsconfig.react-native.json` - React Native specifics
+  - `tsconfig.build.json` - Build-time configurations
+
+**Usage Pattern**: Apps extend the appropriate config via `"extends": "@tkhwang-pico/config-typescript/next"`
+
+### ESLint/Prettier Configuration (`packages/config-eslint-prettier/`)
+
+Uses ESLint Flat Config with TypeScript ESLint and platform-specific rules:
+
+- **Base Config**: `eslint/flat/base.mjs` - TypeScript, import sorting, and Prettier integration
+- **Platform Configs**:
+  - `eslint/flat/next.mjs` - Next.js rules and React hooks
+  - `eslint/flat/expo.mjs` - React Native and Expo-specific rules
+  - `eslint/flat/nest.mjs` - Node.js and Nest.js backend rules
+  - `eslint/flat/node.mjs` - General Node.js applications
+  - `eslint/flat/react.mjs` - React-specific rules
+
+**Prettier Configs**:
+- `prettier/prettier.base.cjs` - Standard Prettier configuration
+- `prettier/prettier.tailwind.cjs` - Tailwind CSS class sorting
+
+**Usage Pattern**: Apps import and extend configs: `import baseConfig from '@tkhwang-pico/config-eslint-prettier/eslint/next'`
 
 ## EAS Build Configuration
 
@@ -246,21 +297,39 @@ The web app validates required environment variables on startup and will throw d
 
 ## Code Quality & Linting
 
-### ESLint Configuration
+### ESLint Configuration (Flat Config)
 
-- **Web**: Next.js + TypeScript + TanStack Query rules
-- **Mobile**: Expo + Prettier + import ordering rules
-- **Mastra**: Standard TypeScript configuration
+All apps use the shared ESLint configuration with platform-specific extensions:
 
-### Import Organization (Mobile)
+- **Shared Base**: TypeScript ESLint, import sorting, Prettier integration
+- **Web (`apps/web/`)**: Next.js rules + TanStack Query plugin
+- **Mobile (`apps/mobile-queue/`)**: React Native + Expo rules + import ordering
+- **Mastra (`apps/mastra/`)**: Node.js + TypeScript configuration
+- **Nest.js (`apps/nest/`)**: Backend-specific Node.js rules
+- **LangChain (`apps/langchain/`)**: Node.js + TypeScript configuration
 
-Mobile app enforces strict import ordering:
+### Key ESLint Rules Applied Across All Apps
 
-1. Built-in modules
-2. External packages (React/React Native first)
-3. Internal modules (`@/` alias)
-4. Relative imports
-5. Type imports
+- **Import Organization**: Enforced by `simple-import-sort` plugin
+- **TypeScript**: Consistent type imports with `@typescript-eslint/consistent-type-imports`
+- **Unused Variables**: Warnings for unused vars (with `_` prefix exceptions)
+- **Prettier Integration**: Automatic code formatting
+
+### Import Organization Pattern
+
+All apps enforce consistent import ordering:
+
+1. Built-in modules (Node.js, React Native)
+2. External packages (React/React Native first, then alphabetical)
+3. Internal modules (using `@/` alias)
+4. Relative imports (./filename)
+5. Type imports (separated and marked with `type`)
+
+### Platform-Specific Rules
+
+- **Web**: Next.js patterns, React hooks, TanStack Query exhaustive deps
+- **Mobile**: React Native patterns, Expo conventions, platform-specific imports
+- **Backend**: Node.js patterns, async/await best practices
 
 ## Testing & Quality
 
