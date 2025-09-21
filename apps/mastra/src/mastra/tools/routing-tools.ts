@@ -1,5 +1,6 @@
 import { createTool } from "@mastra/core/tools";
 import { z } from "zod";
+
 import { routingNetwork } from "../network/routing-network";
 import { detectLanguage, generateFallbackMessage } from "./fallback-tools";
 
@@ -41,10 +42,10 @@ export const checkRequestIntent = createTool({
     ];
 
     const hasWeather = weatherKeywords.some((keyword) =>
-      message.includes(keyword)
+      message.includes(keyword),
     );
     const hasActivity = activityKeywords.some((keyword) =>
-      message.includes(keyword)
+      message.includes(keyword),
     );
 
     return {
@@ -77,7 +78,7 @@ export const handleUserRequest = createTool({
         ],
         {
           runtimeContext,
-        }
+        },
       );
 
       return {

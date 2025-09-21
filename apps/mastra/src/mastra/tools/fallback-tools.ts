@@ -1,5 +1,6 @@
 import { createTool } from "@mastra/core/tools";
 import { z } from "zod";
+
 import { AVAILABLE_CAPABILITIES } from "../capabilities/available-capabilities";
 
 function generateMessage(locale: "ko" | "en", capabilityList: string): string {
@@ -53,7 +54,8 @@ const generateFallbackMessage = createTool({
 
     const locale = language === "korean" ? "ko" : "en";
     const capabilityList = AVAILABLE_CAPABILITIES.map(
-      (capability) => `• ${capability.description[locale]} (${capability.name})`
+      (capability) =>
+        `• ${capability.description[locale]} (${capability.name})`,
     ).join("\n");
 
     const message = generateMessage(locale, capabilityList);

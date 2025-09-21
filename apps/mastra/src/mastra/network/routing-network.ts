@@ -1,7 +1,8 @@
 import { openai } from "@ai-sdk/openai";
 import { NewAgentNetwork } from "@mastra/core/network/vNext";
-import { weatherAgent } from "../agents/weather-agent";
+
 import { fallbackAgent } from "../agents/fallback-agent";
+import { weatherAgent } from "../agents/weather-agent";
 import { weatherWorkflow } from "../workflows/weather-workflow";
 
 export const routingNetwork = new NewAgentNetwork({
