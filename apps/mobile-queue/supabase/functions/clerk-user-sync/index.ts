@@ -22,6 +22,13 @@ function json(data: unknown, status = 200, headers: HeadersInit = {}) {
 }
 
 serve(async (req) => {
+  if (!SUPABASE_URL || !SERVICE_ROLE_KEY || !CLERK_WEBHOOK_SECRET) {
+    console.error(
+      'Missing required env(s): SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, or CLERK_WEBHOOK_SECRET'
+    );
+    return json({ error: 'Server misconfiguration' }, 500);
+  }
+
   // CORS (Clerk 대시보드 프리플라이트 대비)
   if (req.method === 'OPTIONS') {
     return new Response(null, {
