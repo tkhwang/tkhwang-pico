@@ -26,16 +26,9 @@ export const EVENTS = {
 } as const;
 
 // Type helpers
-export type ContentEventType =
-  (typeof EVENTS.CONTENT)[keyof typeof EVENTS.CONTENT];
+export type ContentEventType = (typeof EVENTS.CONTENT)[keyof typeof EVENTS.CONTENT];
 export type UserEventType = (typeof EVENTS.USER)[keyof typeof EVENTS.USER];
-export type EmbeddingEventType =
-  (typeof EVENTS.EMBEDDING)[keyof typeof EVENTS.EMBEDDING];
-export type IngestEventType =
-  (typeof EVENTS.INGEST)[keyof typeof EVENTS.INGEST];
+export type EmbeddingEventType = (typeof EVENTS.EMBEDDING)[keyof typeof EVENTS.EMBEDDING];
+export type IngestEventType = (typeof EVENTS.INGEST)[keyof typeof EVENTS.INGEST];
 
-export type AllEventTypes =
-  | ContentEventType
-  | UserEventType
-  | EmbeddingEventType
-  | IngestEventType;
+export type AllEventTypes = ContentEventType | UserEventType | EmbeddingEventType | IngestEventType;

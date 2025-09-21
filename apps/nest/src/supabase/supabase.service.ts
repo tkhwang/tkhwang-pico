@@ -12,9 +12,7 @@ export class SupabaseService {
 
   constructor(private configService: ConfigService) {
     const supabaseUrl = this.configService.get<string>('SUPABASE_URL');
-    const supabaseKey = this.configService.get<string>(
-      'SUPABASE_SERVICE_ROLE_KEY',
-    );
+    const supabaseKey = this.configService.get<string>('SUPABASE_SERVICE_ROLE_KEY');
     const supabaseAnonKey = this.configService.get<string>('SUPABASE_ANON_KEY');
 
     if (!supabaseUrl || !supabaseKey) {
@@ -37,9 +35,7 @@ export class SupabaseService {
    */
   getClientForUser(jwt: string): SupabaseClient<Database> {
     if (!this.supabaseAnonKey) {
-      throw new Error(
-        'SUPABASE_ANON_KEY is required to create user-scoped clients',
-      );
+      throw new Error('SUPABASE_ANON_KEY is required to create user-scoped clients');
     }
     return createClient<Database>(this.supabaseUrl, this.supabaseAnonKey, {
       global: { headers: { Authorization: `Bearer ${jwt}` } },

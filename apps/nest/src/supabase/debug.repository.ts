@@ -22,9 +22,7 @@ export class DebugRepository {
   }
 
   async saveFailedContent(data: DebugFailedContentData) {
-    const { error } = await this.client
-      .from('debug_failed_contents')
-      .insert(data);
+    const { error } = await this.client.from('debug_failed_contents').insert(data);
 
     if (error) {
       this.logger.error(`Failed to save debug info: ${error.message}`, error);
@@ -41,10 +39,7 @@ export class DebugRepository {
       .limit(limit);
 
     if (error) {
-      this.logger.error(
-        `Failed to get debug contents: ${error.message}`,
-        error,
-      );
+      this.logger.error(`Failed to get debug contents: ${error.message}`, error);
       return [];
     }
 
@@ -60,10 +55,7 @@ export class DebugRepository {
       .limit(limit);
 
     if (error) {
-      this.logger.error(
-        `Failed to get debug contents by error type: ${error.message}`,
-        error,
-      );
+      this.logger.error(`Failed to get debug contents by error type: ${error.message}`, error);
       return [];
     }
 

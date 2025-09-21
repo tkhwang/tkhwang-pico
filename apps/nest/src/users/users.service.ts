@@ -22,13 +22,10 @@ export class UsersService {
     const userClient = this.supabaseService.getClientForUser(userToken);
 
     // First get recommendations from RPC
-    const { data: recommendations, error: rpcError } = await userClient.rpc(
-      'recommend_feed',
-      {
-        p_limit: limit,
-        ...(lang && { p_lang: lang }),
-      },
-    );
+    const { data: recommendations, error: rpcError } = await userClient.rpc('recommend_feed', {
+      p_limit: limit,
+      ...(lang && { p_lang: lang }),
+    });
 
     if (rpcError) {
       this.logger.error('Failed to get recommendations:', rpcError);
@@ -45,9 +42,7 @@ export class UsersService {
     }
 
     // Type-safe extraction of content IDs
-    const contentIds = (recommendations as RecommendationItem[]).map(
-      (rec) => rec.content_id,
-    );
+    const contentIds = (recommendations as RecommendationItem[]).map((rec) => rec.content_id);
 
     // Fetch full content data
     const { data: contents, error: contentError } = await userClient
@@ -61,9 +56,7 @@ export class UsersService {
     }
 
     // Create a map for quick lookup
-    const contentMap = new Map(
-      contents?.map((content) => [content.id, content]) ?? [],
-    );
+    const contentMap = new Map(contents?.map((content) => [content.id, content]) ?? []);
 
     // Merge recommendations with content data
     return (recommendations as RecommendationItem[]).map((item) => ({
@@ -77,18 +70,11 @@ export class UsersService {
 
   async deleteUserContent(userId: string, contentId: string) {
     // First check if the user_content link exists and belongs to the user
-    const userContent = await this.userContentsRepository.findByUserAndContent(
-      userId,
-      contentId,
-    );
+    const userContent = await this.userContentsRepository.findByUserAndContent(userId, contentId);
 
     if (!userContent) {
-      this.logger.error(
-        `No user_content link found for userId=${userId}, contentId=${contentId}`,
-      );
-      throw new NotFoundException(
-        `Content with ID ${contentId} not found for this user`,
-      );
+      this.logger.error(`No user_content link found for userId=${userId}, contentId=${contentId}`);
+      throw new NotFoundException(`Content with ID ${contentId} not found for this user`);
     }
 
     // Delete the user_content link - now with user_id check

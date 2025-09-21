@@ -8,17 +8,7 @@ import { UserContentsRepository } from './user-contents.repository';
 
 @Module({
   imports: [ConfigModule],
-  providers: [
-    SupabaseService,
-    ContentsRepository,
-    UserContentsRepository,
-    DebugRepository,
-  ],
-  exports: [
-    SupabaseService,
-    ContentsRepository,
-    UserContentsRepository,
-    DebugRepository,
-  ],
+  providers: [SupabaseService, ContentsRepository, UserContentsRepository, DebugRepository],
+  exports: [SupabaseService, ContentsRepository, UserContentsRepository, DebugRepository],
 })
 export class SupabaseModule {}
