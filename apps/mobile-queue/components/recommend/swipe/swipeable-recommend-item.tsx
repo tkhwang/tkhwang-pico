@@ -1,7 +1,7 @@
 import type { Recommendation } from '@tkhwang-pico/common';
 import { Circle, ThumbsDown, ThumbsUp, X } from 'lucide-react-native';
 import React, { useCallback } from 'react';
-import { Alert, TouchableOpacity, View } from 'react-native';
+import { Alert, type LayoutChangeEvent, TouchableOpacity, View } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
 
@@ -156,7 +156,7 @@ export function SwipeableRecommendItem({
       <GestureDetector gesture={panGesture}>
         <AnimatedViewTyped
           style={animatedStyle}
-          onLayout={(event: any) => {
+          onLayout={(event: LayoutChangeEvent) => {
             itemHeight.value = event.nativeEvent.layout.height;
           }}
         >
