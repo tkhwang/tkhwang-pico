@@ -1,26 +1,15 @@
-import { dirname } from "path";
-import { fileURLToPath } from "url";
-import { FlatCompat } from "@eslint/eslintrc";
-import queryPlugin from "@tanstack/eslint-plugin-query";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-});
+import baseConfig from '@tkhwang-pico/config-eslint-prettier/eslint/next';
+import queryPlugin from '@tanstack/eslint-plugin-query';
 
 const eslintConfig = [
+  ...baseConfig,
   {
-    // register the plugin
-    plugins: { "@tanstack/query": queryPlugin },
-    // enable desired rules
+    plugins: { '@tanstack/query': queryPlugin },
     rules: {
-      "@tanstack/query/exhaustive-deps": "warn",
-      "@tanstack/query/no-rest-destructuring": "off",
+      '@tanstack/query/exhaustive-deps': 'warn',
+      '@tanstack/query/no-rest-destructuring': 'off',
     },
   },
-  ...compat.extends("next/core-web-vitals", "next/typescript"),
 ];
 
 export default eslintConfig;

@@ -54,7 +54,9 @@
     "@types/react": "~19.0.14",
     "prettier": "^3.6.2",
     "prettier-plugin-tailwindcss": "^0.6.14",
-    "typescript": "~5.8.3"
+    "typescript": "~5.8.3",
+    "@tkhwang-pico/config-eslint-prettier": "*",
+    "@tkhwang-pico/config-typescript": "*"
   },
   "main": "expo-router/entry",
   "name": "@tkhwang-pico/mobile-queue",

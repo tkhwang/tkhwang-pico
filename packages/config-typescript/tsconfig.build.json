@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "tkhwang Pico Build",
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "noEmit": false,
+    "emitDeclarationOnly": false
+  },
+  "exclude": ["**/*.spec.ts", "**/*.test.ts", "**/*.stories.tsx", "node_modules"]
+}

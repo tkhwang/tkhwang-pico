@@ -18,7 +18,8 @@
   "devDependencies": {
     "@types/node": "^24.3.0",
     "mastra": "^0.11.2",
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.2",
+    "@tkhwang-pico/config-typescript": "*"
   },
   "engines": {
     "node": ">=20.9.0"
