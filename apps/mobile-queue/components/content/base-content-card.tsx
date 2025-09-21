@@ -1,9 +1,11 @@
 import React from 'react';
-import { View, TouchableOpacity } from 'react-native';
+import { TouchableOpacity, View } from 'react-native';
+
 import { Text } from '@/components/ui/text';
+
 import { ContentMetadata } from './sub/content-metadata';
-import { ContentThumbnail } from './sub/content-thumbnail';
 import { ContentTags } from './sub/content-tags';
+import { ContentThumbnail } from './sub/content-thumbnail';
 
 interface BaseContentCardProps {
   // Required props
@@ -97,7 +99,8 @@ export function BaseContentCard({
           {note && (
             <Text
               className="mb-1 text-xs italic text-gray-500 dark:text-gray-500"
-              numberOfLines={1}>
+              numberOfLines={1}
+            >
               {note}
             </Text>
           )}
@@ -106,7 +109,8 @@ export function BaseContentCard({
           {author && (
             <Text
               className="mb-1 text-xs italic text-gray-500 dark:text-gray-500"
-              numberOfLines={1}>
+              numberOfLines={1}
+            >
               by {author}
             </Text>
           )}
@@ -141,7 +145,8 @@ export function BaseContentCard({
         onPress={onPress}
         onLongPress={onLongPress}
         delayLongPress={500}
-        activeOpacity={0.7}>
+        activeOpacity={0.7}
+      >
         {content}
       </TouchableOpacity>
     );
@@ -149,7 +154,8 @@ export function BaseContentCard({
 
   return (
     <View
-      className={`rounded-lg border border-gray-100 bg-white p-3 dark:border-gray-700 dark:bg-gray-800 ${containerClassName}`}>
+      className={`rounded-lg border border-gray-100 bg-white p-3 dark:border-gray-700 dark:bg-gray-800 ${containerClassName}`}
+    >
       {content}
     </View>
   );

@@ -1,11 +1,12 @@
-import { Mastra } from "@mastra/core/mastra";
-import { PinoLogger } from "@mastra/loggers";
-import { LibSQLStore } from "@mastra/libsql";
-import { weatherWorkflow } from "./workflows/weather-workflow";
-import { weatherAgent } from "./agents/weather-agent";
 import { registerCopilotKit } from "@ag-ui/mastra";
-import { routingAgent } from "./agents/routing-agent";
+import { Mastra } from "@mastra/core/mastra";
+import { LibSQLStore } from "@mastra/libsql";
+import { PinoLogger } from "@mastra/loggers";
+
 import { fallbackAgent } from "./agents/fallback-agent";
+import { routingAgent } from "./agents/routing-agent";
+import { weatherAgent } from "./agents/weather-agent";
+import { weatherWorkflow } from "./workflows/weather-workflow";
 
 export const mastra = new Mastra({
   agents: { routingAgent, weatherAgent, fallbackAgent },
@@ -31,7 +32,7 @@ export const mastra = new Mastra({
         setContext: (c, runtimeContext) => {
           runtimeContext.set(
             "user-id",
-            c.req.header("X-User-ID") || "anonymous"
+            c.req.header("X-User-ID") || "anonymous",
           );
           runtimeContext.set("temperature-scale", "celsius");
         },

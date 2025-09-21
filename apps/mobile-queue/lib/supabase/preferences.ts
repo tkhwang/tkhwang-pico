@@ -1,8 +1,9 @@
-import { createSupabaseClientWithClerkAuth } from '@/utils/supabase';
 import {
-  PreferenceType,
-  UserContentPreferenceTyped as UserContentPreference,
+  type PreferenceType,
+  type UserContentPreferenceTyped as UserContentPreference,
 } from '@tkhwang-pico/common';
+
+import { createSupabaseClientWithClerkAuth } from '@/utils/supabase';
 
 // Re-export for convenience
 export type { PreferenceType, UserContentPreference };

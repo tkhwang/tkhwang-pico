@@ -1,6 +1,10 @@
 import { openai } from "@ai-sdk/openai";
 import { Agent } from "@mastra/core";
-import { detectLanguage, generateFallbackMessage } from "../tools/fallback-tools";
+
+import {
+  detectLanguage,
+  generateFallbackMessage,
+} from "../tools/fallback-tools";
 
 export const fallbackAgent = new Agent({
   id: "fallbackAgent",

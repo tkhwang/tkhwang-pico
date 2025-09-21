@@ -35,10 +35,7 @@ export class LoggingMiddleware implements NestMiddleware {
       } else if (statusCode >= 400) {
         this.logger.warn(logMessage, 'HTTP');
       } else {
-        this.logger.log(
-          `${this.getStatusColor(statusCode)} ${logMessage}`,
-          'HTTP',
-        );
+        this.logger.log(`${this.getStatusColor(statusCode)} ${logMessage}`, 'HTTP');
       }
 
       return originalSend.call(res, data);

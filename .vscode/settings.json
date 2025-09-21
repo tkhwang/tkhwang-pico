@@ -33,6 +33,10 @@
   ],
   "eslint.workingDirectories": [
     {
+      "directory": "apps/mobile-queue",
+      "changeProcessCWD": true
+    },
+    {
       "mode": "auto"
     }
   ],

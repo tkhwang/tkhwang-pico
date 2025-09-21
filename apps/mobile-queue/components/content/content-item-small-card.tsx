@@ -1,13 +1,15 @@
-import React from 'react';
-import { View, TouchableOpacity } from 'react-native';
-import { Text } from '@/components/ui/text';
-import { Icon } from '@/components/ui/icon';
-import { CircleCheckBig, Circle, Heart } from 'lucide-react-native';
-import { ContentThumbnail } from './sub/content-thumbnail';
-import { SiteFavicon } from '@/components/ui/site-favicon';
-import { getThumbnailUrl } from '@/utils/content-formatters';
-import { useContentActions } from '@/hooks/use-content-actions';
 import type { UserContentWithDetails } from '@tkhwang-pico/common';
+import { Circle, CircleCheckBig, Heart } from 'lucide-react-native';
+import React from 'react';
+import { TouchableOpacity, View } from 'react-native';
+
+import { Icon } from '@/components/ui/icon';
+import { SiteFavicon } from '@/components/ui/site-favicon';
+import { Text } from '@/components/ui/text';
+import { useContentActions } from '@/hooks/use-content-actions';
+import { getThumbnailUrl } from '@/utils/content-formatters';
+
+import { ContentThumbnail } from './sub/content-thumbnail';
 
 interface ContentItemSmallCardProps {
   item: UserContentWithDetails;
@@ -46,7 +48,8 @@ export function ContentItemSmallCard({
       onLongPress={handleLongPress}
       delayLongPress={500}
       activeOpacity={0.7}
-      className="flex-1 rounded-lg border border-gray-100 bg-white p-2.5 dark:border-gray-700 dark:bg-gray-800">
+      className="flex-1 rounded-lg border border-gray-100 bg-white p-2.5 dark:border-gray-700 dark:bg-gray-800"
+    >
       {/* Thumbnail */}
       {thumbnailUrl ? (
         <ContentThumbnail
@@ -73,7 +76,8 @@ export function ContentItemSmallCard({
       {/* Title */}
       <Text
         className="mb-1.5 text-sm font-medium text-gray-900 dark:text-gray-100"
-        numberOfLines={2}>
+        numberOfLines={2}
+      >
         {content.title || 'Untitled'}
       </Text>
 

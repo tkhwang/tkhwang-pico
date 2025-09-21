@@ -22,17 +22,13 @@ export class IngestSummaryService {
     });
   }
 
-  async generateSummary(
-    content: string,
-    lang: string = 'en',
-  ): Promise<string | null> {
+  async generateSummary(content: string, lang = 'en'): Promise<string | null> {
     if (!content || content.trim().length < 100) {
       return null;
     }
 
     try {
-      const model =
-        this.configService.get<string>('OPENAI_MODEL') || this.defaultModel;
+      const model = this.configService.get<string>('OPENAI_MODEL') || this.defaultModel;
 
       const systemPrompt = this.getSystemPrompt(lang);
       const response = await this.openai.chat.completions.create({
@@ -58,9 +54,7 @@ export class IngestSummaryService {
       return summary;
     } catch (error) {
       this.logger.error(
-        `Failed to generate summary: ${
-          error instanceof Error ? error.message : 'Unknown error'
-        }`,
+        `Failed to generate summary: ${error instanceof Error ? error.message : 'Unknown error'}`,
       );
       return null;
     }
@@ -72,8 +66,7 @@ export class IngestSummaryService {
     }
 
     try {
-      const model =
-        this.configService.get<string>('OPENAI_MODEL') || this.defaultModel;
+      const model = this.configService.get<string>('OPENAI_MODEL') || this.defaultModel;
 
       const response = await this.openai.chat.completions.create({
         model,
@@ -105,9 +98,7 @@ export class IngestSummaryService {
         .slice(0, 5);
     } catch (error) {
       this.logger.error(
-        `Failed to extract keywords: ${
-          error instanceof Error ? error.message : 'Unknown error'
-        }`,
+        `Failed to extract keywords: ${error instanceof Error ? error.message : 'Unknown error'}`,
       );
       return [];
     }

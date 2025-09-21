@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { View } from 'react-native';
+
+import { ContentList } from '../content/list/content-list';
 import { FAB } from '../fab';
 import { FabModal } from './fab-modal';
-import { ContentList } from '../content/list/content-list';
 
 export function Home() {
   const [isModalVisible, setIsModalVisible] = useState(false);

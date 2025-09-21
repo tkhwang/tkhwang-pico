@@ -1,21 +1,23 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
-  View,
-  ScrollView,
-  TouchableOpacity,
-  Modal,
-  TouchableWithoutFeedback,
-  Pressable,
   Alert,
-  KeyboardAvoidingView,
-  Platform,
   Keyboard,
-  TextInput,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  Pressable,
+  ScrollView,
+  type TextInput,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
 } from 'react-native';
+
 import { Text } from '@/components/ui/text';
-import { Input } from '../ui/input';
-import { Button } from '../ui/button';
 import { useSaveContent } from '@/hooks/mutations/use-save-content';
+
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
 
 interface FabModalProps {
   visible: boolean;
@@ -72,14 +74,16 @@ export function FabModal({ visible, onClose, onSuccess }: FabModalProps) {
       visible={visible}
       animationType="slide"
       transparent={true}
-      onRequestClose={handleCloseModal}>
+      onRequestClose={handleCloseModal}
+    >
       {/* 외부 클릭 감지용 전체 영역 */}
       <TouchableWithoutFeedback onPress={handleCloseModal}>
         <View className="flex-1 justify-end bg-black/50">
           {/* KeyboardAvoidingView for proper keyboard handling */}
           <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}>
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+          >
             {/* 실제 모달 콘텐츠 - 클릭 이벤트 차단 */}
             <Pressable className="max-h-[90%]">
               <View className="rounded-t-3xl bg-white dark:bg-gray-900">
@@ -124,7 +128,8 @@ export function FabModal({ visible, onClose, onSuccess }: FabModalProps) {
                   <Button
                     onPress={handleSubmitUrl}
                     disabled={!url.trim() || saveContentMutation.isPending}
-                    className="mb-6 h-12 rounded-lg bg-blue-500 active:bg-blue-600 disabled:opacity-50">
+                    className="mb-6 h-12 rounded-lg bg-blue-500 active:bg-blue-600 disabled:opacity-50"
+                  >
                     <Text className="font-semibold text-white">
                       {saveContentMutation.isPending ? 'Saving...' : 'Add Content'}
                     </Text>

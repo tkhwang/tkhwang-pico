@@ -90,16 +90,14 @@ export class IngestService {
       // Extract keywords if we have OpenAI configured
       let keywords = metadata.tags || [];
       if (keywords.length === 0 && finalSummary) {
-        const extractedKeywords =
-          await this.summaryService.extractKeywords(finalSummary);
+        const extractedKeywords = await this.summaryService.extractKeywords(finalSummary);
         if (extractedKeywords.length > 0) {
           keywords = extractedKeywords;
         }
       }
 
       // Preserve existing metadata, then update content in database
-      const existingMetadata =
-        await this.contentsRepository.getMetadata(contentId);
+      const existingMetadata = await this.contentsRepository.getMetadata(contentId);
 
       // Ensure metadata is an object before spreading
       const baseMetadata =
@@ -132,13 +130,11 @@ export class IngestService {
 
       // Create/Update summary embedding (best-effort; don't fail the whole ingest)
       try {
-        const baseText =
-          finalSummary || metadata.summary || metadata.title || '';
-        const upsertSummaryEmbeddingResult =
-          await this.embeddingService.upsertSummaryEmbedding(
-            contentId,
-            baseText,
-          );
+        const baseText = finalSummary || metadata.summary || metadata.title || '';
+        const upsertSummaryEmbeddingResult = await this.embeddingService.upsertSummaryEmbedding(
+          contentId,
+          baseText,
+        );
         if (!upsertSummaryEmbeddingResult.ok) {
           this.logger.warn(
             `Embedding not saved for contentId=${contentId} (model=${upsertSummaryEmbeddingResult.model ?? 'n/a'})`,

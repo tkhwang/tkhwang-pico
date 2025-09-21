@@ -1,17 +1,28 @@
+import type { UserContentWithDetails } from '@tkhwang-pico/common';
+import { CircleCheckBig, ExternalLink, Heart } from 'lucide-react-native';
 import React from 'react';
 import { View } from 'react-native';
-import { Icon } from '@/components/ui/icon';
-import { ExternalLink, Heart, CircleCheckBig } from 'lucide-react-native';
+
 import { BaseContentCard } from '@/components/content/base-content-card';
+import { Icon } from '@/components/ui/icon';
+import { Text } from '@/components/ui/text';
+import { useContentActions } from '@/hooks/use-content-actions';
 import {
+  formatArchiveDate,
   formatDate,
   formatReadingTime,
   getThumbnailUrl,
-  formatArchiveDate,
 } from '@/utils/content-formatters';
-import { useContentActions } from '@/hooks/use-content-actions';
-import type { UserContentWithDetails } from '@tkhwang-pico/common';
-import { Text } from '@/components/ui/text';
+
+const getFaviconUrl = (metadata: unknown): string | null => {
+  if (!metadata || typeof metadata !== 'object' || Array.isArray(metadata)) {
+    return null;
+  }
+
+  const { favicon_url } = metadata as { favicon_url?: unknown };
+
+  return typeof favicon_url === 'string' ? favicon_url : null;
+};
 
 interface ContentItemProps {
   item: UserContentWithDetails;
@@ -43,6 +54,7 @@ export function ContentItem({
   };
 
   const thumbnailUrl = getThumbnailUrl(content);
+  const faviconUrl = getFaviconUrl(content.metadata);
 
   // Create checkbox slot
   const checkboxSlot = (
@@ -84,7 +96,7 @@ export function ContentItem({
       leftSlot={checkboxSlot}
       metadataProps={{
         domain: content.domain || 'CONTENT',
-        faviconUrl: (content.metadata as any)?.favicon_url || null,
+        faviconUrl,
         date:
           showCompletedTime && item.completed_at
             ? `Completed at ${formatArchiveDate(item.completed_at).time}`

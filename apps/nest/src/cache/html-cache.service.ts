@@ -25,9 +25,7 @@ export class HtmlCacheService {
       updateAgeOnHas: false,
     });
 
-    this.logger.log(
-      `HTML cache initialized (max: 50 items, maxSize: 100MB, TTL: 5min)`,
-    );
+    this.logger.log(`HTML cache initialized (max: 50 items, maxSize: 100MB, TTL: 5min)`);
   }
 
   /**
@@ -58,9 +56,7 @@ export class HtmlCacheService {
       const entry = this.cache.get(key);
       if (entry) {
         const age = Date.now() - entry.timestamp;
-        this.logger.debug(
-          `Cache hit for ${key} (age: ${Math.round(age / 1000)}s)`,
-        );
+        this.logger.debug(`Cache hit for ${key} (age: ${Math.round(age / 1000)}s)`);
         return entry.html;
       }
       this.logger.debug(`Cache miss for ${key}`);

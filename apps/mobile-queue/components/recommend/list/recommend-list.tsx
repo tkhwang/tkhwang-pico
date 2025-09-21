@@ -1,18 +1,20 @@
-import React, { useState, useCallback, useMemo } from 'react';
-import { View, RefreshControl, ScrollView } from 'react-native';
+import { useUser } from '@clerk/clerk-expo';
 import { FlashList } from '@shopify/flash-list';
 import { useQueryClient } from '@tanstack/react-query';
-import { useUser } from '@clerk/clerk-expo';
+import type { Recommendation } from '@tkhwang-pico/common';
+import React, { useCallback, useMemo, useState } from 'react';
+import { RefreshControl, ScrollView, View } from 'react-native';
+
 import { Text } from '@/components/ui/text';
+import { SWIPE_ACTION_CARD_REMOVAL_DELAY_MS } from '@/consts/app-consts';
+import { queryKey } from '@/hooks/keys/query-key';
+import { useSetContentPreference } from '@/hooks/mutations/use-content-preference';
+import { useSaveContent } from '@/hooks/mutations/use-save-content';
+import { useRecommendations } from '@/hooks/queries/use-recommendations';
+
+import { ContentDetail } from '../../content/detail/content-detail';
 import { SwipeableRecommendItem } from '../swipe/swipeable-recommend-item';
 import { RecommendListSkeleton } from './recommend-list-skeleton';
-import { ContentDetail } from '../../content/detail/content-detail';
-import { useRecommendations } from '@/hooks/queries/use-recommendations';
-import { useSaveContent } from '@/hooks/mutations/use-save-content';
-import { useSetContentPreference } from '@/hooks/mutations/use-content-preference';
-import { queryKey } from '@/hooks/keys/query-key';
-import { SWIPE_ACTION_CARD_REMOVAL_DELAY_MS } from '@/consts/app-consts';
-import type { Recommendation } from '@tkhwang-pico/common';
 
 export function RecommendList() {
   const queryClient = useQueryClient();
@@ -145,7 +147,8 @@ export function RecommendList() {
             colors={['#3B82F6']}
             progressBackgroundColor="#ffffff"
           />
-        }>
+        }
+      >
         <Text className="mb-4 text-4xl">🔍</Text>
         <Text className="mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100">
           No recommendations yet

@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "tkhwang Pico React Native",
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2021"],
+    "jsx": "react-jsx",
+    "moduleResolution": "Node",
+    "types": ["react", "react-native"]
+  }
+}

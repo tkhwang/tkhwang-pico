@@ -1,27 +1,29 @@
+import {
+  BottomSheetBackdrop,
+  type BottomSheetBackdropProps,
+  BottomSheetModal,
+  BottomSheetScrollView,
+} from '@gorhom/bottom-sheet';
+import type { Recommendation, UserContentWithDetails } from '@tkhwang-pico/common';
+import { Calendar, CheckCircle, Circle, Clock, FileText, Sparkles, Tag } from 'lucide-react-native';
 import React from 'react';
-import { View, Alert, Platform } from 'react-native';
+import { Alert, Platform, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Text } from '@/components/ui/text';
+
+import { ContentTags } from '@/components/content/sub/content-tags';
+import { ContentThumbnail } from '@/components/content/sub/content-thumbnail';
 import { Icon } from '@/components/ui/icon';
-import { CheckCircle, Circle, Clock, Calendar, Tag, FileText, Sparkles } from 'lucide-react-native';
+import { SiteFavicon } from '@/components/ui/site-favicon';
+import { Text } from '@/components/ui/text';
+import { useContentActions } from '@/hooks/use-content-actions';
+import { useHapticFeedback } from '@/hooks/use-haptic-feedback';
 import {
   formatFullDate,
   formatReadingTimeWithSuffix,
   getThumbnailUrl,
 } from '@/utils/content-formatters';
-import { useContentActions } from '@/hooks/use-content-actions';
-import { ContentTags } from '@/components/content/sub/content-tags';
-import { ContentThumbnail } from '@/components/content/sub/content-thumbnail';
-import { SiteFavicon } from '@/components/ui/site-favicon';
+
 import { ContentDetailBottomActions } from './content-detail-bottom-actions';
-import type { UserContentWithDetails, Recommendation } from '@tkhwang-pico/common';
-import { useHapticFeedback } from '@/hooks/use-haptic-feedback';
-import {
-  BottomSheetModal,
-  BottomSheetBackdrop,
-  BottomSheetScrollView,
-  type BottomSheetBackdropProps,
-} from '@gorhom/bottom-sheet';
 
 interface ContentDetailProps {
   visible: boolean;
@@ -184,7 +186,8 @@ export function ContentDetail({
       topInset={insets.top}
       backgroundStyle={{ backgroundColor: 'transparent' }}
       style={{ overflow: 'hidden' }}
-      android_keyboardInputMode="adjustResize">
+      android_keyboardInputMode="adjustResize"
+    >
       <View className="flex-1 rounded-t-2xl bg-white dark:bg-gray-800">
         {/* Header */}
         <View className="flex-row items-center justify-center border-b border-gray-200 px-4 pb-3 pt-4 dark:border-gray-700">
@@ -219,12 +222,14 @@ export function ContentDetail({
           bounces
           contentContainerStyle={{
             paddingBottom: scrollBottomInset,
-          }}>
+          }}
+        >
           {/* Title */}
           <Text
             className="mb-4 text-xl font-bold text-gray-900 dark:text-gray-100"
             numberOfLines={3}
-            adjustsFontSizeToFit={false}>
+            adjustsFontSizeToFit={false}
+          >
             {content.title || 'Untitled'}
           </Text>
 

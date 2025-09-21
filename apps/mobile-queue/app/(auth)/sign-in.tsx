@@ -1,6 +1,7 @@
-import { SignInForm } from '@/components/sign-in-form';
 import * as React from 'react';
-import { ScrollView, View, SafeAreaView } from 'react-native';
+import { SafeAreaView, ScrollView, View } from 'react-native';
+
+import { SignInForm } from '@/components/sign-in-form';
 
 export default function SignInScreen() {
   return (
@@ -8,7 +9,8 @@ export default function SignInScreen() {
       <ScrollView
         keyboardShouldPersistTaps="handled"
         contentContainerClassName="flex-1 items-center justify-center p-4"
-        keyboardDismissMode="interactive">
+        keyboardDismissMode="interactive"
+      >
         <View className="w-full max-w-sm">
           <SignInForm />
         </View>

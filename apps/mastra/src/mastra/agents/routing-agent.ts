@@ -1,10 +1,11 @@
 import { openai } from "@ai-sdk/openai";
 import { Agent } from "@mastra/core";
+
 import {
-  handleUserRequest,
   checkRequestIntent,
   detectLanguage,
   generateFallbackMessage,
+  handleUserRequest,
 } from "../tools/routing-tools";
 import { weatherTool } from "../tools/weather-tool";
 

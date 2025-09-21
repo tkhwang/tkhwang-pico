@@ -1,0 +1,31 @@
+{
+  "name": "@tkhwang-pico/config-typescript",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "files": [
+    "tsconfig.base.json",
+    "tsconfig.react.json",
+    "tsconfig.react-native.json",
+    "tsconfig.next.json",
+    "tsconfig.expo.json",
+    "tsconfig.nest.json",
+    "tsconfig.node.json",
+    "tsconfig.build.json",
+    "README.md"
+  ],
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "exports": {
+    ".": "./tsconfig.base.json",
+    "./base": "./tsconfig.base.json",
+    "./react": "./tsconfig.react.json",
+    "./react-native": "./tsconfig.react-native.json",
+    "./next": "./tsconfig.next.json",
+    "./expo": "./tsconfig.expo.json",
+    "./nest": "./tsconfig.nest.json",
+    "./node": "./tsconfig.node.json",
+    "./build": "./tsconfig.build.json"
+  }
+}

@@ -32,10 +32,7 @@ export class IngestEmbeddingService {
     });
 
     // Get expected pgvector dimension from config or use default
-    this.pgvectorDimension = this.configService.get<number>(
-      'PGVECTOR_DIM',
-      1536,
-    );
+    this.pgvectorDimension = this.configService.get<number>('PGVECTOR_DIM', 1536);
     this.logger.log(`Expected pgvector dimension: ${this.pgvectorDimension}`);
   }
 
@@ -45,15 +42,12 @@ export class IngestEmbeddingService {
   ): Promise<{ ok: boolean; model?: string }> {
     const cleanedText = (text ?? '').trim();
     if (!cleanedText) {
-      this.logger.warn(
-        `Skip embedding: empty text for contentId=${contentId.substring(0, 8)}...`,
-      );
+      this.logger.warn(`Skip embedding: empty text for contentId=${contentId.substring(0, 8)}...`);
       return { ok: false };
     }
 
     const model =
-      this.configService.get<string>('OPENAI_EMBEDDING_MODEL') ||
-      this.defaultEmbeddingModel;
+      this.configService.get<string>('OPENAI_EMBEDDING_MODEL') || this.defaultEmbeddingModel;
 
     try {
       const createEmbeddingsResult = await this.openai.embeddings.create({
@@ -61,12 +55,9 @@ export class IngestEmbeddingService {
         input: cleanedText,
       });
 
-      const vector: number[] | undefined =
-        createEmbeddingsResult.data?.[0]?.embedding;
+      const vector: number[] | undefined = createEmbeddingsResult.data?.[0]?.embedding;
       if (!vector || vector.length === 0) {
-        this.logger.warn(
-          `Empty embedding returned for contentId=${contentId.substring(0, 8)}...`,
-        );
+        this.logger.warn(`Empty embedding returned for contentId=${contentId.substring(0, 8)}...`);
         return { ok: false };
       }
 
@@ -90,27 +81,23 @@ export class IngestEmbeddingService {
         .single();
 
       if (insertEmbeddingsResult.error) {
-        if (
-          insertEmbeddingsResult.error.code !==
-          APP_ERRORS.POSTGRES.UNIQUE_VIOLATION
-        ) {
+        if (insertEmbeddingsResult.error.code !== APP_ERRORS.POSTGRES.UNIQUE_VIOLATION) {
           this.logger.error(
             `Insert embedding failed for contentId=${contentId}: ${insertEmbeddingsResult.error.message}`,
           );
           return { ok: false };
         }
 
-        const updateContentEmbeddingsResult =
-          await this.supabaseService.serviceClient
-            .from('content_embeddings')
-            .update({
-              embedding: this.toPgvectorString(vector),
-              created_at: new Date().toISOString(),
-            })
-            .eq('content_id', contentId)
-            .eq('scope', 'summary')
-            .eq('chunk_index', 0)
-            .eq('embedding_model', model);
+        const updateContentEmbeddingsResult = await this.supabaseService.serviceClient
+          .from('content_embeddings')
+          .update({
+            embedding: this.toPgvectorString(vector),
+            created_at: new Date().toISOString(),
+          })
+          .eq('content_id', contentId)
+          .eq('scope', 'summary')
+          .eq('chunk_index', 0)
+          .eq('embedding_model', model);
 
         if (updateContentEmbeddingsResult.error) {
           this.logger.error(

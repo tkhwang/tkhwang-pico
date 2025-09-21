@@ -1,17 +1,18 @@
-import React from 'react';
-import { View, TouchableOpacity } from 'react-native';
-import { Text } from '@/components/ui/text';
-import { Icon } from '@/components/ui/icon';
 import {
-  ExternalLink,
   CheckCircle,
-  Trash2,
-  ThumbsUp,
-  ThumbsDown,
-  RotateCcw,
+  ExternalLink,
   Heart,
+  RotateCcw,
+  ThumbsDown,
+  ThumbsUp,
+  Trash2,
 } from 'lucide-react-native';
-import { MODAL_ACTION_STYLES, ACTION_STYLES } from '@/consts/app-styles';
+import React from 'react';
+import { TouchableOpacity, View } from 'react-native';
+
+import { Icon } from '@/components/ui/icon';
+import { Text } from '@/components/ui/text';
+import { ACTION_STYLES, MODAL_ACTION_STYLES } from '@/consts/app-styles';
 
 interface ContentDetailBottomActionsProps {
   mode: 'home' | 'recommend';
@@ -49,14 +50,16 @@ export function ContentDetailBottomActions({
   return (
     <View
       className="border-t border-gray-200 bg-white px-4 pt-2 dark:border-gray-700 dark:bg-gray-800"
-      style={{ paddingBottom: sheetPaddingBottom }}>
+      style={{ paddingBottom: sheetPaddingBottom }}
+    >
       <View className="flex-row gap-2">
         {isRecommendation ? (
           <>
             {/* Add to Queue Button */}
             <TouchableOpacity
               onPress={onAddToQueue}
-              className={`flex-1 items-center justify-center rounded-lg px-2 py-3 ${MODAL_ACTION_STYLES.addToQueue.container}`}>
+              className={`flex-1 items-center justify-center rounded-lg px-2 py-3 ${MODAL_ACTION_STYLES.addToQueue.container}`}
+            >
               <Icon
                 as={ThumbsUp}
                 className={`mb-1 h-5 w-5 ${MODAL_ACTION_STYLES.addToQueue.icon}`}
@@ -69,7 +72,8 @@ export function ContentDetailBottomActions({
             {/* Open in Browser Button */}
             <TouchableOpacity
               onPress={onOpenURL}
-              className={`flex-1 items-center justify-center rounded-lg px-2 py-3 ${MODAL_ACTION_STYLES.open.container}`}>
+              className={`flex-1 items-center justify-center rounded-lg px-2 py-3 ${MODAL_ACTION_STYLES.open.container}`}
+            >
               <Icon as={ExternalLink} className={`mb-1 h-5 w-5 ${MODAL_ACTION_STYLES.open.icon}`} />
               <Text className={`text-xs font-semibold ${MODAL_ACTION_STYLES.open.text}`}>Open</Text>
             </TouchableOpacity>
@@ -77,7 +81,8 @@ export function ContentDetailBottomActions({
             {/* Not Interested Button */}
             <TouchableOpacity
               onPress={onNotInterested}
-              className={`flex-1 items-center justify-center rounded-lg px-2 py-3 ${MODAL_ACTION_STYLES.notInterested.container}`}>
+              className={`flex-1 items-center justify-center rounded-lg px-2 py-3 ${MODAL_ACTION_STYLES.notInterested.container}`}
+            >
               <Icon
                 as={ThumbsDown}
                 className={`mb-1 h-5 w-5 ${MODAL_ACTION_STYLES.notInterested.icon}`}
@@ -92,7 +97,8 @@ export function ContentDetailBottomActions({
             {/* Like Button */}
             <TouchableOpacity
               onPress={onLike}
-              className={`flex-1 items-center justify-center rounded-lg px-2 py-3 ${likeStyles.container}`}>
+              className={`flex-1 items-center justify-center rounded-lg px-2 py-3 ${likeStyles.container}`}
+            >
               <Icon
                 as={Heart}
                 className={`mb-1 h-5 w-5 ${likeStyles.icon}`}
@@ -106,7 +112,8 @@ export function ContentDetailBottomActions({
             {/* Toggle Complete Button */}
             <TouchableOpacity
               onPress={onToggleComplete}
-              className={`flex-1 items-center justify-center rounded-lg px-2 py-3 ${completeStyles.container}`}>
+              className={`flex-1 items-center justify-center rounded-lg px-2 py-3 ${completeStyles.container}`}
+            >
               <Icon
                 as={isCompleted ? RotateCcw : CheckCircle}
                 className={`mb-1 h-5 w-5 ${completeStyles.icon}`}
@@ -121,7 +128,8 @@ export function ContentDetailBottomActions({
             {/* Open in Browser Button */}
             <TouchableOpacity
               onPress={onOpenURL}
-              className={`flex-1 items-center justify-center rounded-lg px-2 py-3 ${MODAL_ACTION_STYLES.open.container}`}>
+              className={`flex-1 items-center justify-center rounded-lg px-2 py-3 ${MODAL_ACTION_STYLES.open.container}`}
+            >
               <Icon as={ExternalLink} className={`mb-1 h-5 w-5 ${MODAL_ACTION_STYLES.open.icon}`} />
               <Text className={`text-xs font-semibold ${MODAL_ACTION_STYLES.open.text}`}>Open</Text>
             </TouchableOpacity>
@@ -129,7 +137,8 @@ export function ContentDetailBottomActions({
             {/* Delete Button */}
             <TouchableOpacity
               onPress={onDelete}
-              className={`flex-1 items-center justify-center rounded-lg px-2 py-3 ${MODAL_ACTION_STYLES.delete.container}`}>
+              className={`flex-1 items-center justify-center rounded-lg px-2 py-3 ${MODAL_ACTION_STYLES.delete.container}`}
+            >
               <Icon as={Trash2} className={`mb-1 h-5 w-5 ${MODAL_ACTION_STYLES.delete.icon}`} />
               <Text className={`text-xs font-semibold ${MODAL_ACTION_STYLES.delete.text}`}>
                 Delete

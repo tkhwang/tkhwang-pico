@@ -1,7 +1,8 @@
-import { UserAvatar } from '@/components/user-avatar';
 import { router } from 'expo-router';
 import * as React from 'react';
 import { TouchableOpacity } from 'react-native';
+
+import { UserAvatar } from '@/components/user-avatar';
 
 export function UserMenu() {
   const handlePress = () => {

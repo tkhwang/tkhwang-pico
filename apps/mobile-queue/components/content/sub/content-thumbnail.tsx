@@ -1,7 +1,8 @@
-import React from 'react';
-import { View, Image } from 'react-native';
-import { Icon } from '@/components/ui/icon';
 import { FileText } from 'lucide-react-native';
+import React from 'react';
+import { Image, View } from 'react-native';
+
+import { Icon } from '@/components/ui/icon';
 
 interface ContentThumbnailProps {
   imageUrl?: string | null;
@@ -24,7 +25,11 @@ const iconSizes = {
 /**
  * Reusable content thumbnail component with fallback
  */
-export function ContentThumbnail({ imageUrl, size = 'medium', className = '' }: ContentThumbnailProps) {
+export function ContentThumbnail({
+  imageUrl,
+  size = 'medium',
+  className = '',
+}: ContentThumbnailProps) {
   const sizeClass = sizeClasses[size];
   const iconSize = iconSizes[size];
 
@@ -40,7 +45,8 @@ export function ContentThumbnail({ imageUrl, size = 'medium', className = '' }: 
 
   return (
     <View
-      className={`${sizeClass} items-center justify-center rounded-md bg-gray-100 dark:bg-gray-800 ${className}`}>
+      className={`${sizeClass} items-center justify-center rounded-md bg-gray-100 dark:bg-gray-800 ${className}`}
+    >
       <Icon as={FileText} className={`${iconSize} text-gray-400 dark:text-gray-600`} />
     </View>
   );

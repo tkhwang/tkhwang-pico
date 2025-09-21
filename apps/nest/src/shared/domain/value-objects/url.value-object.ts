@@ -92,9 +92,7 @@ export class Url {
 
   isLocalhost(): boolean {
     return (
-      this.hostname === 'localhost' ||
-      this.hostname === '127.0.0.1' ||
-      this.hostname === '::1'
+      this.hostname === 'localhost' || this.hostname === '127.0.0.1' || this.hostname === '::1'
     );
   }
 
@@ -179,11 +177,7 @@ export class Url {
     const lower = trimmed.toLowerCase();
 
     // Disallow dangerous schemes outright
-    if (
-      /^(javascript|vbscript|file|filesystem|about|chrome|chrome-extension):/.test(
-        lower,
-      )
-    ) {
+    if (/^(javascript|vbscript|file|filesystem|about|chrome|chrome-extension):/.test(lower)) {
       return null;
     }
 
@@ -210,12 +204,8 @@ export class Url {
 
     // Fallback to domain if available
     if (domain && trimmed.startsWith('/')) {
-      const host =
-        domain.includes(':') && !domain.startsWith('[')
-          ? `[${domain}]`
-          : domain;
-      const domainUrl =
-        Url.tryCreate(`https://${host}`) ?? Url.tryCreate(`http://${host}`);
+      const host = domain.includes(':') && !domain.startsWith('[') ? `[${domain}]` : domain;
+      const domainUrl = Url.tryCreate(`https://${host}`) ?? Url.tryCreate(`http://${host}`);
       if (domainUrl) {
         const resolved = domainUrl.resolveRelative(trimmed);
         if (resolved) return resolved.href;

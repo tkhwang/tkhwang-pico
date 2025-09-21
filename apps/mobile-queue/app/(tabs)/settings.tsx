@@ -1,12 +1,13 @@
-import React from 'react';
-import { View, ScrollView, TouchableHighlight, Linking, Alert, Platform } from 'react-native';
-import { MainLayout } from '@/components/main-layout';
-import { Text } from '@/components/ui/text';
-import { Icon } from '@/components/ui/icon';
-import { UserAvatar } from '@/components/user-avatar';
-import { ChevronRight, FileText, Shield, Star } from 'lucide-react-native';
 import { useAuth, useUser } from '@clerk/clerk-expo';
 import { router } from 'expo-router';
+import { ChevronRight, FileText, Shield, Star } from 'lucide-react-native';
+import React from 'react';
+import { Alert, Linking, Platform, ScrollView, TouchableHighlight, View } from 'react-native';
+
+import { MainLayout } from '@/components/main-layout';
+import { Icon } from '@/components/ui/icon';
+import { Text } from '@/components/ui/text';
+import { UserAvatar } from '@/components/user-avatar';
 
 interface SettingItem {
   id: string;
@@ -174,10 +175,12 @@ export default function SettingsScreen() {
                   <React.Fragment key={item.id}>
                     <TouchableHighlight
                       underlayColor="#f3f4f6"
-                      onPress={() => handleItemPress(item)}>
+                      onPress={() => handleItemPress(item)}
+                    >
                       <View className="flex-row items-center px-4 py-3">
                         <View
-                          className={`mr-3 h-8 w-8 items-center justify-center rounded-lg ${iconColorStyles[item.iconColor].bg}`}>
+                          className={`mr-3 h-8 w-8 items-center justify-center rounded-lg ${iconColorStyles[item.iconColor].bg}`}
+                        >
                           <Icon
                             as={item.icon}
                             className={`h-5 w-5 ${iconColorStyles[item.iconColor].icon}`}

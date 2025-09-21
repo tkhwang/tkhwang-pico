@@ -51,10 +51,7 @@ export class ContentsService {
       await this.debugRepository.saveFailedContent({
         url: canonicalUrl,
         user_id: userId,
-        error_message:
-          fetchError instanceof Error
-            ? fetchError.message
-            : 'Failed to fetch URL',
+        error_message: fetchError instanceof Error ? fetchError.message : 'Failed to fetch URL',
         error_type: this.ingestExtractService.getErrorType(fetchError),
         metadata: { original_url: redactedOriginalUrl },
       });
@@ -80,9 +77,7 @@ export class ContentsService {
     try {
       await this.userContentsRepository.linkUserContent(userId, contents.id);
     } catch {
-      throw new InternalServerErrorException(
-        'Failed to save user content link',
-      );
+      throw new InternalServerErrorException('Failed to save user content link');
     }
 
     // 5) Emit events for processing and personalization
@@ -123,8 +118,7 @@ export class ContentsService {
 
     switch (errorType) {
       case 'access_denied':
-        message =
-          'Access denied. The website requires authentication or blocks automated access.';
+        message = 'Access denied. The website requires authentication or blocks automated access.';
         statusCode = HttpStatus.FORBIDDEN;
         break;
       case 'not_found':
@@ -132,8 +126,7 @@ export class ContentsService {
         statusCode = HttpStatus.NOT_FOUND;
         break;
       case 'timeout':
-        message =
-          'The website took too long to respond. Please try again later.';
+        message = 'The website took too long to respond. Please try again later.';
         statusCode = HttpStatus.REQUEST_TIMEOUT;
         break;
       case 'unsupported_protocol':
@@ -151,8 +144,7 @@ export class ContentsService {
         statusCode = HttpStatus.PAYLOAD_TOO_LARGE;
         break;
       case 'network_error':
-        message =
-          'Unable to connect to the website. Please check the URL and try again.';
+        message = 'Unable to connect to the website. Please check the URL and try again.';
         statusCode = HttpStatus.SERVICE_UNAVAILABLE;
         break;
       default:

@@ -1,4 +1,4 @@
-import { Logger, LogLevel, ValidationPipe } from '@nestjs/common';
+import { Logger, type LogLevel, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';

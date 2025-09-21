@@ -1,7 +1,8 @@
+import { Globe } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { Image, View } from 'react-native';
+
 import { Icon } from '@/components/ui/icon';
-import { Globe } from 'lucide-react-native';
 
 interface SiteFaviconProps {
   url?: string | null;
@@ -20,7 +21,8 @@ export function SiteFavicon({ url, size = 12, className = '' }: SiteFaviconProps
     return (
       <View
         className={`items-center justify-center ${className}`}
-        style={{ width: size, height: size }}>
+        style={{ width: size, height: size }}
+      >
         <Icon
           as={Globe}
           className="text-gray-400 dark:text-gray-500"

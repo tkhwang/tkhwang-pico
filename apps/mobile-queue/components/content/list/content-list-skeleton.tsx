@@ -1,5 +1,6 @@
-import { ScrollView, View, Animated } from 'react-native';
 import { useEffect, useRef } from 'react';
+import { Animated, ScrollView, View } from 'react-native';
+
 import { ContentItemSkeleton } from '@/components/content/content-item-skeleton';
 
 export function ContentListSkeleton() {

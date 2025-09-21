@@ -61,9 +61,7 @@ export class UserEmbeddingService {
       await this.recomputeForUser(payload.userId);
     } catch (e) {
       this.logger.warn(
-        `recomputeForUser on save failed: ${
-          e instanceof Error ? e.message : 'Unknown error'
-        }`,
+        `recomputeForUser on save failed: ${e instanceof Error ? e.message : 'Unknown error'}`,
       );
     }
   }
@@ -77,9 +75,7 @@ export class UserEmbeddingService {
       .eq('content_id', payload.contentId)
       .limit(1000);
     if (error) return;
-    const uniqueUsers = Array.from(
-      new Set((users ?? []).map((u) => u.user_id)),
-    );
+    const uniqueUsers = Array.from(new Set((users ?? []).map((u) => u.user_id)));
     for (const uid of uniqueUsers) {
       try {
         await this.recomputeForUser(uid, payload.model);
@@ -98,9 +94,7 @@ export class UserEmbeddingService {
    */
   async recomputeForUser(userId: string, model?: string): Promise<boolean> {
     const embeddingModel =
-      model ||
-      this.config.get<string>('OPENAI_EMBEDDING_MODEL') ||
-      this.defaultEmbeddingModel;
+      model || this.config.get<string>('OPENAI_EMBEDDING_MODEL') || this.defaultEmbeddingModel;
 
     // 1) Fetch user's saved content ids (cap to recent N)
     const { data: saved, error: savedErr } = await this.supabase.serviceClient
@@ -137,9 +131,7 @@ export class UserEmbeddingService {
       const val = row.embedding as unknown;
       let vec: number[] = [];
       if (Array.isArray(val)) {
-        vec = (val as unknown[]).filter((x) =>
-          Number.isFinite(x as number),
-        ) as number[];
+        vec = (val as unknown[]).filter((x) => Number.isFinite(x as number)) as number[];
       } else if (typeof val === 'string') {
         vec = parsePgvectorString(val);
       }
@@ -147,9 +139,7 @@ export class UserEmbeddingService {
     }
 
     if (vectors.length === 0) {
-      this.logger.log(
-        `No vectors available for user=${userId} (model=${embeddingModel}).`,
-      );
+      this.logger.log(`No vectors available for user=${userId} (model=${embeddingModel}).`);
       return false;
     }
 
@@ -157,15 +147,13 @@ export class UserEmbeddingService {
     const avg = avgVectors(vectors);
     if (!avg.length) return false;
 
-    const { error: upErr } = await this.supabase.serviceClient
-      .from('user_embeddings')
-      .upsert({
-        user_id: userId,
-        source: 'history',
-        embedding_model: embeddingModel,
-        embedding: toPgvectorString(avg),
-        updated_at: new Date().toISOString(),
-      });
+    const { error: upErr } = await this.supabase.serviceClient.from('user_embeddings').upsert({
+      user_id: userId,
+      source: 'history',
+      embedding_model: embeddingModel,
+      embedding: toPgvectorString(avg),
+      updated_at: new Date().toISOString(),
+    });
 
     if (upErr) {
       this.logger.error(`Failed to upsert user embedding: ${upErr.message}`);

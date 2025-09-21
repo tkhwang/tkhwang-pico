@@ -1,11 +1,12 @@
+import type { UserContentWithDetails } from '@tkhwang-pico/common';
+import { Check, CircleCheckBig, Heart, RotateCcw, Trash2, X } from 'lucide-react-native';
 import React, { useCallback } from 'react';
-import { View, LayoutChangeEvent, TouchableOpacity, Alert } from 'react-native';
+import { Alert, type LayoutChangeEvent, TouchableOpacity, View } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
+
+import { ContentItem } from '@/components/content/content-item';
 import { Icon } from '@/components/ui/icon';
-import { Check, Trash2, RotateCcw, Heart, X, CircleCheckBig } from 'lucide-react-native';
-import { useSwipeableItem } from '@/hooks/use-swipeable-item';
-import type { UserContentWithDetails } from '@tkhwang-pico/common';
 import { Text } from '@/components/ui/text';
 import {
   HOME_TAB_LEFT_ACTION_WIDTH,
@@ -14,9 +15,9 @@ import {
   SWIPE_MENU_DAMPING,
 } from '@/consts/app-consts';
 import { ACTION_STYLES, COMPLETION_STYLES, DELETE_STYLES } from '@/consts/app-styles';
-import { ContentItem } from '@/components/content/content-item';
-import { isContentLiked } from '@/utils/content-helpers';
 import { useSwipeActionFeedback } from '@/hooks/use-swipe-action-feedback';
+import { useSwipeableItem } from '@/hooks/use-swipeable-item';
+import { isContentLiked } from '@/utils/content-helpers';
 
 // Type assertion for React 19 compatibility
 const AnimatedViewTyped = Animated.View as any;
@@ -167,13 +168,15 @@ export function SwipeableContentItem({
       {/* Left Background - Like + Complete (blue when reopening) - visible when swiping right */}
       <AnimatedViewTyped
         className="absolute left-0 top-0 flex-row overflow-hidden rounded-l-lg"
-        style={[leftContainerStyle, { width: HOME_TAB_LEFT_ACTION_WIDTH }]}>
+        style={[leftContainerStyle, { width: HOME_TAB_LEFT_ACTION_WIDTH }]}
+      >
         <TouchableOpacity
           activeOpacity={0.8}
           onPress={handleLikePress}
           disabled={isProcessing}
           className={`items-center justify-center ${likeStyles.bg}`}
-          style={{ width: SWIPE_ACTION_BUTTON_WIDTH }}>
+          style={{ width: SWIPE_ACTION_BUTTON_WIDTH }}
+        >
           <AnimatedViewTyped style={leftIconStyle}>
             <Icon
               as={Heart}
@@ -190,7 +193,8 @@ export function SwipeableContentItem({
           onPress={handleCompletePress}
           disabled={isProcessing}
           className={`items-center justify-center ${completionStyles.bg}`}
-          style={{ width: SWIPE_ACTION_BUTTON_WIDTH }}>
+          style={{ width: SWIPE_ACTION_BUTTON_WIDTH }}
+        >
           <AnimatedViewTyped style={leftIconStyle}>
             <Icon as={LeftIcon} className={`h-6 w-6 ${completionStyles.icon}`} />
           </AnimatedViewTyped>
@@ -206,12 +210,14 @@ export function SwipeableContentItem({
         style={[
           rightContainerStyle,
           { width: HOME_TAB_RIGHT_ACTION_WIDTH, alignItems: 'center', justifyContent: 'center' },
-        ]}>
+        ]}
+      >
         <TouchableOpacity
           activeOpacity={0.8}
           onPress={handleDeletePress}
           disabled={isProcessing}
-          className={`h-full w-full items-center justify-center rounded-r-lg ${deleteStyles.bg}`}>
+          className={`h-full w-full items-center justify-center rounded-r-lg ${deleteStyles.bg}`}
+        >
           <AnimatedViewTyped style={rightIconStyle}>
             <Icon
               as={actionCompleted === 'delete' ? X : Trash2}
@@ -230,12 +236,9 @@ export function SwipeableContentItem({
           style={animatedStyle}
           onLayout={(event: LayoutChangeEvent) => {
             itemHeight.value = event.nativeEvent.layout.height;
-          }}>
-          <ContentItem
-            item={item}
-            onPress={handleContentPress}
-            isLiked={isLiked}
-          />
+          }}
+        >
+          <ContentItem item={item} onPress={handleContentPress} isLiked={isLiked} />
         </AnimatedViewTyped>
       </GestureDetector>
     </View>

@@ -1,22 +1,23 @@
+import type { UserContentWithDetails } from '@tkhwang-pico/common';
+import { Circle, Heart, RotateCcw, Trash2, X } from 'lucide-react-native';
 import React, { useCallback } from 'react';
-import { View, Alert, TouchableOpacity } from 'react-native';
+import { Alert, TouchableOpacity, View } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
+
 import { ContentItem } from '@/components/content/content-item';
 import { Icon } from '@/components/ui/icon';
-import { RotateCcw, Trash2, Heart, Circle, X } from 'lucide-react-native';
-import type { UserContentWithDetails } from '@tkhwang-pico/common';
 import { Text } from '@/components/ui/text';
-import { useSwipeableItem } from '@/hooks/use-swipeable-item';
-import { isContentLiked } from '@/utils/content-helpers';
 import {
-  SWIPE_ACTION_BUTTON_WIDTH,
-  SWIPE_MENU_DAMPING,
   ARCHIVE_TAB_LEFT_ACTION_WIDTH,
   ARCHIVE_TAB_RIGHT_ACTION_WIDTH,
+  SWIPE_ACTION_BUTTON_WIDTH,
+  SWIPE_MENU_DAMPING,
 } from '@/consts/app-consts';
 import { ACTION_STYLES } from '@/consts/app-styles';
 import { useSwipeActionFeedback } from '@/hooks/use-swipe-action-feedback';
+import { useSwipeableItem } from '@/hooks/use-swipeable-item';
+import { isContentLiked } from '@/utils/content-helpers';
 
 interface SwipeableArchiveItemProps {
   item: UserContentWithDetails;
@@ -147,16 +148,19 @@ export function SwipeableArchiveItem({
       {/* Left Background - Reopen (Blue) - Only visible when swiping right */}
       <AnimatedViewTyped
         className="absolute left-0 top-0 overflow-hidden rounded-l-xl"
-        style={[leftContainerStyle, { width: ARCHIVE_TAB_LEFT_ACTION_WIDTH }]}>
+        style={[leftContainerStyle, { width: ARCHIVE_TAB_LEFT_ACTION_WIDTH }]}
+      >
         <View
           className="flex-row items-stretch"
-          style={{ width: ARCHIVE_TAB_LEFT_ACTION_WIDTH, height: '100%' }}>
+          style={{ width: ARCHIVE_TAB_LEFT_ACTION_WIDTH, height: '100%' }}
+        >
           <TouchableOpacity
             activeOpacity={0.8}
             onPress={handleLike}
             disabled={isProcessing}
             className={`items-center justify-center ${leftLikeStyles.bg}`}
-            style={{ width: SWIPE_ACTION_BUTTON_WIDTH }}>
+            style={{ width: SWIPE_ACTION_BUTTON_WIDTH }}
+          >
             <AnimatedViewTyped style={leftIconStyle}>
               <Icon
                 as={Heart}
@@ -173,7 +177,8 @@ export function SwipeableArchiveItem({
             onPress={handleReopen}
             disabled={isProcessing}
             className={`items-center justify-center ${leftReopenStyles.bg}`}
-            style={{ width: SWIPE_ACTION_BUTTON_WIDTH }}>
+            style={{ width: SWIPE_ACTION_BUTTON_WIDTH }}
+          >
             <AnimatedViewTyped style={leftIconStyle}>
               <Icon
                 as={actionCompleted === 'reopen' ? Circle : RotateCcw}
@@ -190,13 +195,15 @@ export function SwipeableArchiveItem({
       {/* Right Background - Delete (Red) - Only visible when swiping left */}
       <AnimatedViewTyped
         className={`absolute right-0 top-0 overflow-hidden rounded-r-xl ${rightStyles.bg}`}
-        style={[rightContainerStyle, { width: ARCHIVE_TAB_RIGHT_ACTION_WIDTH }]}>
+        style={[rightContainerStyle, { width: ARCHIVE_TAB_RIGHT_ACTION_WIDTH }]}
+      >
         <TouchableOpacity
           activeOpacity={0.8}
           onPress={handleDelete}
           disabled={isProcessing}
           className="items-center justify-center"
-          style={{ width: ARCHIVE_TAB_RIGHT_ACTION_WIDTH, height: '100%' }}>
+          style={{ width: ARCHIVE_TAB_RIGHT_ACTION_WIDTH, height: '100%' }}
+        >
           <AnimatedViewTyped style={rightIconStyle}>
             <Icon
               as={actionCompleted === 'delete' ? X : Trash2}
@@ -216,7 +223,8 @@ export function SwipeableArchiveItem({
           style={animatedStyle}
           onLayout={(e: any) => {
             itemHeight.value = e.nativeEvent.layout.height;
-          }}>
+          }}
+        >
           <ContentItem
             item={item}
             onPress={handlePress}

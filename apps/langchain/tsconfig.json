@@ -1,23 +1,17 @@
 {
-  "extends": "@tsconfig/recommended",
+  "extends": "@tkhwang-pico/config-typescript/node",
   "compilerOptions": {
-    "target": "ES2021",
-    "lib": ["ES2021", "ES2022.Object", "DOM"],
+    "lib": ["ES2021", "ES2022.Object"],
     "module": "NodeNext",
-    "moduleResolution": "nodenext",
-    "esModuleInterop": true,
+    "moduleResolution": "NodeNext",
+    "outDir": "dist",
+    "types": ["jest", "node"],
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "useDefineForClassFields": true,
-    "strictPropertyInitialization": false,
-    "allowJs": true,
-    "strict": true,
-    "strictFunctionTypes": false,
-    "outDir": "dist",
-    "types": ["jest", "node"],
-    "resolveJsonModule": true
+    "strictPropertyInitialization": false
   },
   "include": ["**/*.ts", "**/*.js"],
   "exclude": ["node_modules", "dist"]

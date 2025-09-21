@@ -1,9 +1,10 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth, useUser } from '@clerk/clerk-expo';
-import { Alert } from 'react-native';
-import { setContentPreference } from '@/lib/supabase/preferences';
-import { queryKey } from '@/hooks/keys/query-key';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { PreferenceType, Recommendation } from '@tkhwang-pico/common';
+import { Alert } from 'react-native';
+
+import { queryKey } from '@/hooks/keys/query-key';
+import { setContentPreference } from '@/lib/supabase/preferences';
 
 interface SetPreferenceParams {
   contentId: string;
@@ -25,9 +26,9 @@ export function useSetContentPreference(options?: UseSetContentPreferenceOptions
   const { getToken } = useAuth();
   const { user } = useUser();
 
-  type MutationContext = {
+  interface MutationContext {
     previousRecommendations?: Recommendation[];
-  };
+  }
 
   return useMutation<unknown, Error, SetPreferenceParams, MutationContext>({
     mutationFn: async ({ contentId, preferenceType, reason }) => {

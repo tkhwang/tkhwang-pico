@@ -1,5 +1,5 @@
-import { ScrollView, View, Animated } from 'react-native';
 import { useEffect, useRef } from 'react';
+import { Animated, ScrollView, View } from 'react-native';
 
 function ArchiveCardSkeleton({ isFirstOfDay = false }: { isFirstOfDay?: boolean }) {
   const fadeAnim = useRef(new Animated.Value(0.5)).current;
@@ -92,7 +92,8 @@ export function ArchiveListSkeleton() {
   return (
     <ScrollView
       className="flex-1 bg-gray-50 px-4 dark:bg-gray-900"
-      showsVerticalScrollIndicator={false}>
+      showsVerticalScrollIndicator={false}
+    >
       <View className="py-4">
         {/* Show 3 date groups */}
         {[...Array(3)].map((_, index) => (

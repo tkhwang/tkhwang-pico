@@ -1,8 +1,9 @@
 import { useUser } from '@clerk/clerk-expo';
-import { getRecommendations } from '@/lib/api/recommendations';
 import type { Recommendation } from '@tkhwang-pico/common';
+
 import { queryKey } from '@/hooks/keys/query-key';
 import { useSupabaseQuery } from '@/hooks/queries/supabase/use-supabase-query';
+import { getRecommendations } from '@/lib/api/recommendations';
 
 interface UseRecommendationsOptions {
   limit?: number;

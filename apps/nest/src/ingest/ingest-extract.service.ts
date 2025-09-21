@@ -39,8 +39,7 @@ export class IngestExtractService {
         headers: {
           'user-agent':
             'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-          accept:
-            'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+          accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
           'accept-language': 'en-US,en;q=0.9,ko;q=0.8',
           'accept-encoding': 'gzip, deflate, br',
           'cache-control': 'no-cache',
@@ -82,18 +81,14 @@ export class IngestExtractService {
     const ogImage = $('meta[property="og:image"]').attr('content');
     const ogSiteName = $('meta[property="og:site_name"]').attr('content');
     const articleAuthor = $('meta[property="article:author"]').attr('content');
-    const articlePublished = $('meta[property="article:published_time"]').attr(
-      'content',
-    );
+    const articlePublished = $('meta[property="article:published_time"]').attr('content');
     const articleTags = $('meta[property="article:tag"]')
       .map((_, el) => $(el).attr('content'))
       .get();
 
     // Extract Twitter Card tags
     const twitterTitle = $('meta[name="twitter:title"]').attr('content');
-    const twitterDescription = $('meta[name="twitter:description"]').attr(
-      'content',
-    );
+    const twitterDescription = $('meta[name="twitter:description"]').attr('content');
     const twitterImage = $('meta[name="twitter:image"]').attr('content');
 
     // Extract standard meta tags
@@ -136,27 +131,13 @@ export class IngestExtractService {
     }
 
     // Determine final values with priority
-    const title =
-      ogTitle ||
-      twitterTitle ||
-      readabilityContent?.title ||
-      pageTitle ||
-      'Untitled';
+    const title = ogTitle || twitterTitle || readabilityContent?.title || pageTitle || 'Untitled';
     const summary =
-      ogDescription ||
-      twitterDescription ||
-      metaDescription ||
-      readabilityContent?.excerpt ||
-      '';
-    const author =
-      articleAuthor || metaAuthor || readabilityContent?.byline || null;
+      ogDescription || twitterDescription || metaDescription || readabilityContent?.excerpt || '';
+    const author = articleAuthor || metaAuthor || readabilityContent?.byline || null;
     const baseUrl = Url.create(url);
     const imageUrl = ogImage || twitterImage || null;
-    const normalizedImageUrl = Url.normalizeImageUrl(
-      imageUrl,
-      baseUrl,
-      new URL(url).hostname,
-    );
+    const normalizedImageUrl = Url.normalizeImageUrl(imageUrl, baseUrl, new URL(url).hostname);
     const siteName = ogSiteName || readabilityContent?.siteName || null;
 
     // Extract domain from URL
@@ -256,10 +237,7 @@ export class IngestExtractService {
     const message = error.message.toLowerCase();
 
     // HTTP status codes
-    if (
-      message.includes('403 forbidden') ||
-      message.includes('401 unauthorized')
-    ) {
+    if (message.includes('403 forbidden') || message.includes('401 unauthorized')) {
       return 'access_denied';
     }
     if (message.includes('404 not found') || message.includes('410 gone')) {

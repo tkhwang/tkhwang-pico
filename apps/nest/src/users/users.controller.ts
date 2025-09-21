@@ -26,19 +26,13 @@ export class UsersController {
     @Query('limit', new DefaultValuePipe(20), ParseIntPipe) limit: number,
     @Query('lang') lang?: string,
   ) {
-    const safeLimit = Math.max(
-      1,
-      Math.min(QUERY_SIMILAR_CONTENTS_MAX_QUERY_LIMIT, limit),
-    );
+    const safeLimit = Math.max(1, Math.min(QUERY_SIMILAR_CONTENTS_MAX_QUERY_LIMIT, limit));
     return this.usersService.getRecommendations(token, safeLimit, lang);
   }
 
   @Delete('contents/:id')
   @UseGuards(JwtAuthGuard)
-  async deleteUserContent(
-    @UserId() userId: string,
-    @Param('id') contentId: string,
-  ) {
+  async deleteUserContent(@UserId() userId: string, @Param('id') contentId: string) {
     return this.usersService.deleteUserContent(userId, contentId);
   }
 }

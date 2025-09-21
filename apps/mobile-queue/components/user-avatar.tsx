@@ -1,7 +1,8 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Text } from '@/components/ui/text';
 import { useUser } from '@clerk/clerk-expo';
 import * as React from 'react';
+
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Text } from '@/components/ui/text';
 
 interface UserAvatarProps extends Omit<React.ComponentProps<typeof Avatar>, 'alt'> {}
 

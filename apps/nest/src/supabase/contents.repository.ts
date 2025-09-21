@@ -1,10 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { QUERY_SIMILAR_CONTENTS_DEFAULT_LIMIT } from 'src/consts/app-consts';
 
-import type {
-  Content,
-  SimilarContentRecommendation,
-} from '@tkhwang-pico/common';
+import type { Content, SimilarContentRecommendation } from '@tkhwang-pico/common';
 
 import { SupabaseService } from './supabase.service';
 
@@ -59,11 +56,7 @@ export class ContentsRepository {
   }
 
   async findById(id: string) {
-    const { data, error } = await this.client
-      .from('contents')
-      .select('*')
-      .eq('id', id)
-      .single();
+    const { data, error } = await this.client.from('contents').select('*').eq('id', id).single();
 
     if (error) {
       this.logger.error(`Failed to find content by id ${id}: ${error.message}`);
@@ -73,28 +66,17 @@ export class ContentsRepository {
     return data;
   }
 
-  async updateStatus(
-    id: string,
-    status: 'pending' | 'ready' | 'failed' | 'archived',
-  ) {
-    const { error } = await this.client
-      .from('contents')
-      .update({ status })
-      .eq('id', id);
+  async updateStatus(id: string, status: 'pending' | 'ready' | 'failed' | 'archived') {
+    const { error } = await this.client.from('contents').update({ status }).eq('id', id);
 
     if (error) {
-      this.logger.error(
-        `Failed to update content status to ${status}: ${error.message}`,
-      );
+      this.logger.error(`Failed to update content status to ${status}: ${error.message}`);
       throw error;
     }
   }
 
   async updateContent(id: string, data: ContentUpdateData) {
-    const { error } = await this.client
-      .from('contents')
-      .update(data)
-      .eq('id', id);
+    const { error } = await this.client.from('contents').update(data).eq('id', id);
 
     if (error) {
       this.logger.error(`Failed to update content ${id}: ${error.message}`);
@@ -119,9 +101,7 @@ export class ContentsRepository {
       .single();
 
     if (error) {
-      this.logger.error(
-        `Failed to get metadata for content ${id}: ${error.message}`,
-      );
+      this.logger.error(`Failed to get metadata for content ${id}: ${error.message}`);
       throw error;
     }
 
@@ -149,9 +129,7 @@ export class ContentsRepository {
       return [];
     }
 
-    const contentIds = results
-      .map((item) => item.content_id)
-      .filter((id) => id);
+    const contentIds = results.map((item) => item.content_id).filter((id) => id);
 
     const uniqueContentIds = Array.from(new Set(contentIds));
 
@@ -166,15 +144,12 @@ export class ContentsRepository {
       .eq('status', 'ready');
 
     if (contentError) {
-      this.logger.error(
-        `Failed to fetch similar content details: ${contentError.message}`,
-      );
+      this.logger.error(`Failed to fetch similar content details: ${contentError.message}`);
       throw contentError;
     }
 
     const contentMap = new Map<string, Content>(
-      (contents as Content[] | null)?.map((content) => [content.id, content]) ??
-        [],
+      (contents as Content[] | null)?.map((content) => [content.id, content]) ?? [],
     );
 
     return results.map((item) => ({

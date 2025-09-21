@@ -22,14 +22,9 @@ describe('IngestExtractService', () => {
         </html>
       `;
 
-      const metadata = service.extractMetadata(
-        html,
-        'https://playbook.samaltman.com/',
-      );
+      const metadata = service.extractMetadata(html, 'https://playbook.samaltman.com/');
 
-      expect(metadata.imageUrl).toBe(
-        'https://playbook.samaltman.com/img/facebook.png',
-      );
+      expect(metadata.imageUrl).toBe('https://playbook.samaltman.com/img/facebook.png');
     });
   });
 });

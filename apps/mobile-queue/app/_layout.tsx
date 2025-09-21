@@ -1,22 +1,23 @@
 import 'react-native-gesture-handler';
 import '@/global.css';
 
-import { NAV_THEME } from '@/lib/theme';
-import { ClerkProvider, ClerkLoaded, useAuth } from '@clerk/clerk-expo';
+import { ClerkLoaded, ClerkProvider, useAuth } from '@clerk/clerk-expo';
 import { tokenCache } from '@clerk/clerk-expo/token-cache';
-import { QueryProvider } from '@/providers/query-provider';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { ThemeProvider } from '@react-navigation/native';
 import { PortalHost } from '@rn-primitives/portal';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { Stack, router, useSegments } from 'expo-router';
+import * as Sentry from '@sentry/react-native';
+import Constants from 'expo-constants';
+import { router, Stack, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useColorScheme } from 'nativewind';
 import * as React from 'react';
-import Constants from 'expo-constants';
-import { View, Text, Platform } from 'react-native';
-import * as Sentry from '@sentry/react-native';
-import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
+import { Platform, Text, View } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+
+import { NAV_THEME } from '@/lib/theme';
+import { QueryProvider } from '@/providers/query-provider';
 
 // Prevent the splash screen from auto-hiding before our app is ready
 // Only call this on native platforms (iOS/Android)

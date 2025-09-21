@@ -38,17 +38,10 @@ export class ContentsController {
   async getSimilarContents(
     @UserId() userId: string,
     @Param('id') id: string,
-    @Query(
-      'limit',
-      new DefaultValuePipe(QUERY_SIMILAR_CONTENTS_DEFAULT_LIMIT),
-      ParseIntPipe,
-    )
+    @Query('limit', new DefaultValuePipe(QUERY_SIMILAR_CONTENTS_DEFAULT_LIMIT), ParseIntPipe)
     limit: number,
   ) {
-    const safeLimit = Math.max(
-      1,
-      Math.min(QUERY_SIMILAR_CONTENTS_MAX_QUERY_LIMIT, limit),
-    );
+    const safeLimit = Math.max(1, Math.min(QUERY_SIMILAR_CONTENTS_MAX_QUERY_LIMIT, limit));
     return this.contentsService.getSimilarContents(userId, id, safeLimit);
   }
 }

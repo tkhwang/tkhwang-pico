@@ -1,10 +1,11 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth, useUser } from '@clerk/clerk-expo';
-import { saveContent } from '@/lib/api/contents';
-import { queryKey } from '@/hooks/keys/query-key';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { Content, UserContentWithDetails } from '@tkhwang-pico/common';
 import { Alert } from 'react-native';
-import type { UserContentWithDetails, Content } from '@tkhwang-pico/common';
+
 import { SAVE_CONTENT_DELAY_MS } from '@/consts/app-consts';
+import { queryKey } from '@/hooks/keys/query-key';
+import { saveContent } from '@/lib/api/contents';
 
 interface UseSaveContentOptions {
   onMutate?: () => any;
@@ -17,11 +18,11 @@ export function useSaveContent(options?: UseSaveContentOptions) {
   const { getToken } = useAuth();
   const { user } = useUser();
 
-  type MutationContext = {
-    previousQueries?: Array<[queryKey: unknown[], data: UserContentWithDetails[]]>;
+  interface MutationContext {
+    previousQueries?: [queryKey: unknown[], data: UserContentWithDetails[]][];
     optimisticId?: string;
     userContext?: any;
-  };
+  }
 
   type SaveContentResult = Awaited<ReturnType<typeof saveContent>>;
 
@@ -46,7 +47,7 @@ export function useSaveContent(options?: UseSaveContentOptions) {
       });
 
       // Filter out queries with undefined data and convert to mutable arrays
-      const previousQueries: Array<[unknown[], UserContentWithDetails[]]> = allQueries
+      const previousQueries: [unknown[], UserContentWithDetails[]][] = allQueries
         .filter((entry): entry is [unknown[], UserContentWithDetails[]] => entry[1] !== undefined)
         .map(([queryKey, data]) => [[...queryKey], data]);
 

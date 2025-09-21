@@ -33,10 +33,7 @@ export class UserContentsRepository {
   }
 
   async deleteByContentId(contentId: string) {
-    const { error } = await this.client
-      .from('user_contents')
-      .delete()
-      .eq('content_id', contentId);
+    const { error } = await this.client.from('user_contents').delete().eq('content_id', contentId);
 
     if (error) {
       this.logger.error(
@@ -62,15 +59,10 @@ export class UserContentsRepository {
   }
 
   async deleteByUserId(userId: string) {
-    const { error } = await this.client
-      .from('user_contents')
-      .delete()
-      .eq('user_id', userId);
+    const { error } = await this.client.from('user_contents').delete().eq('user_id', userId);
 
     if (error) {
-      this.logger.error(
-        `Failed to delete user_contents for user ${userId}: ${error.message}`,
-      );
+      this.logger.error(`Failed to delete user_contents for user ${userId}: ${error.message}`);
       throw error;
     }
   }
@@ -84,10 +76,7 @@ export class UserContentsRepository {
       offset?: number;
     },
   ) {
-    let query = this.client
-      .from('user_contents')
-      .select('*, contents(*)')
-      .eq('user_id', userId);
+    let query = this.client.from('user_contents').select('*, contents(*)').eq('user_id', userId);
 
     if (filters?.archived !== undefined) {
       query = query.eq('archived', filters.archived);
@@ -102,10 +91,7 @@ export class UserContentsRepository {
     }
 
     if (filters?.offset) {
-      query = query.range(
-        filters.offset,
-        filters.offset + (filters.limit || 10) - 1,
-      );
+      query = query.range(filters.offset, filters.offset + (filters.limit || 10) - 1);
     }
 
     const { data, error } = await query.order('saved_at', { ascending: false });

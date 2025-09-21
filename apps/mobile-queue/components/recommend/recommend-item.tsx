@@ -1,10 +1,12 @@
+import type { Recommendation } from '@tkhwang-pico/common';
+import { ExternalLink, Sparkles } from 'lucide-react-native';
 import React from 'react';
 import { View } from 'react-native';
-import { Icon } from '@/components/ui/icon';
-import { Text } from '@/components/ui/text';
-import { Sparkles, ExternalLink } from 'lucide-react-native';
+
 import { BaseContentCard } from '@/components/content/base-content-card';
 import { ContentMatchSpectrum } from '@/components/content/sub/content-match-spectrum';
+import { Icon } from '@/components/ui/icon';
+import { Text } from '@/components/ui/text';
 import { useContentActions } from '@/hooks/use-content-actions';
 import {
   formatDate,
@@ -13,7 +15,6 @@ import {
   getScoreColorClass,
   getThumbnailUrl,
 } from '@/utils/content-formatters';
-import type { Recommendation } from '@tkhwang-pico/common';
 
 interface RecommendItemProps {
   recommendation: Recommendation;

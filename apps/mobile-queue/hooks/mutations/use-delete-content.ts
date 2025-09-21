@@ -1,8 +1,9 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@clerk/clerk-expo';
-import { nestApi } from '@/lib/api/nest';
-import { queryKey } from '@/hooks/keys/query-key';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Alert } from 'react-native';
+
+import { queryKey } from '@/hooks/keys/query-key';
+import { nestApi } from '@/lib/api/nest';
 
 export function useDeleteContent() {
   const { getToken, userId } = useAuth();

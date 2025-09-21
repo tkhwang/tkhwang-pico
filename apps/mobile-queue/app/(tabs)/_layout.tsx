@@ -1,11 +1,12 @@
 import { Tabs } from 'expo-router';
-import { Icon } from '@/components/ui/icon';
-import { Layers, Download, Brain, Settings } from 'lucide-react-native';
+import * as SplashScreen from 'expo-splash-screen';
+import { Brain, Download, Layers, Settings } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import * as React from 'react';
-import * as SplashScreen from 'expo-splash-screen';
 import { Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+import { Icon } from '@/components/ui/icon';
 
 const ANDROID_TAB_BAR_HEIGHT = 60;
 const IOS_TAB_BAR_HEIGHT = 80;
@@ -43,7 +44,8 @@ export default function TabLayout() {
           fontSize: 12,
           fontWeight: '500',
         },
-      }}>
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{

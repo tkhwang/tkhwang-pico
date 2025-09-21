@@ -1,0 +1,46 @@
+{
+  "name": "@tkhwang-pico/config-eslint-prettier",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "files": [
+    "eslint/flat/base.mjs",
+    "eslint/flat/react.mjs",
+    "eslint/flat/next.mjs",
+    "eslint/flat/expo.mjs",
+    "eslint/flat/nest.mjs",
+    "eslint/flat/node.mjs",
+    "prettier/prettier.base.cjs",
+    "prettier/prettier.tailwind.cjs",
+    "README.md"
+  ],
+  "peerDependencies": {
+    "@eslint/js": "^9.0.0",
+    "@next/eslint-plugin-next": "^14.0.0 || ^15.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0 || ^7.0.0 || ^8.0.0",
+    "@typescript-eslint/parser": "^6.0.0 || ^7.0.0 || ^8.0.0",
+    "eslint": "^9.0.0",
+    "eslint-config-prettier": "^9.0.0 || ^10.0.0",
+    "eslint-plugin-import": "^2.29.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "eslint-plugin-react": "^7.33.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-native": "^4.0.0",
+    "eslint-plugin-simple-import-sort": "^12.0.0",
+    "globals": "^15.0.0 || ^16.0.0",
+    "prettier": "^3.0.0",
+    "prettier-plugin-tailwindcss": "^0.5.0 || ^0.6.0",
+    "typescript-eslint": "^7.0.0 || ^8.0.0"
+  },
+  "exports": {
+    ".": "./eslint/flat/base.mjs",
+    "./eslint/base": "./eslint/flat/base.mjs",
+    "./eslint/react": "./eslint/flat/react.mjs",
+    "./eslint/next": "./eslint/flat/next.mjs",
+    "./eslint/expo": "./eslint/flat/expo.mjs",
+    "./eslint/nest": "./eslint/flat/nest.mjs",
+    "./eslint/node": "./eslint/flat/node.mjs",
+    "./prettier/base": "./prettier/prettier.base.cjs",
+    "./prettier/tailwind": "./prettier/prettier.tailwind.cjs"
+  }
+}

@@ -16,12 +16,8 @@ describe('Url Value Object', () => {
       });
 
       it('should handle URLs with various components', () => {
-        const url = Url.create(
-          'https://user:pass@example.com:8080/path?query=1#hash',
-        );
-        expect(url.href).toBe(
-          'https://user:pass@example.com:8080/path?query=1#hash',
-        );
+        const url = Url.create('https://user:pass@example.com:8080/path?query=1#hash');
+        expect(url.href).toBe('https://user:pass@example.com:8080/path?query=1#hash');
         expect(url.hostname).toBe('example.com');
         expect(url.pathname).toBe('/path');
       });
@@ -46,9 +42,7 @@ describe('Url Value Object', () => {
     let url: Url;
 
     beforeEach(() => {
-      url = Url.create(
-        'https://www.example.com:8080/path/to/resource?query=1&test=2#section',
-      );
+      url = Url.create('https://www.example.com:8080/path/to/resource?query=1&test=2#section');
     });
 
     describe('hostname', () => {
@@ -217,9 +211,7 @@ describe('Url Value Object', () => {
       });
 
       it('should remove UTM parameters', () => {
-        const url = Url.create(
-          'https://example.com?utm_source=test&utm_medium=email&keep=this',
-        );
+        const url = Url.create('https://example.com?utm_source=test&utm_medium=email&keep=this');
         const canonical = url.toCanonical();
         expect(canonical.href).toContain('keep=this');
         expect(canonical.href).not.toContain('utm_source');
@@ -233,9 +225,7 @@ describe('Url Value Object', () => {
       });
 
       it('should handle all transformations together', () => {
-        const url = Url.create(
-          'https://www.example.com/path/?utm_source=test#section',
-        );
+        const url = Url.create('https://www.example.com/path/?utm_source=test#section');
         const canonical = url.toCanonical();
         expect(canonical.href).toBe('https://example.com/path');
       });
@@ -344,21 +334,19 @@ describe('Url Value Object', () => {
       });
 
       it('should use domain fallback when no baseUrl', () => {
-        expect(
-          Url.normalizeImageUrl('/images/photo.jpg', null, 'example.com'),
-        ).toBe('https://example.com/images/photo.jpg');
+        expect(Url.normalizeImageUrl('/images/photo.jpg', null, 'example.com')).toBe(
+          'https://example.com/images/photo.jpg',
+        );
       });
 
       it('should use http for localhost domain', () => {
-        expect(
-          Url.normalizeImageUrl('/images/photo.jpg', null, 'localhost'),
-        ).toBe('http://localhost/images/photo.jpg');
+        expect(Url.normalizeImageUrl('/images/photo.jpg', null, 'localhost')).toBe(
+          'http://localhost/images/photo.jpg',
+        );
       });
 
       it('should return original URL if cannot normalize', () => {
-        expect(Url.normalizeImageUrl('relative/path.jpg', null, null)).toBe(
-          'relative/path.jpg',
-        );
+        expect(Url.normalizeImageUrl('relative/path.jpg', null, null)).toBe('relative/path.jpg');
       });
 
       it('should handle data URLs', () => {
