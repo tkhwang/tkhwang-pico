@@ -14,6 +14,16 @@ import {
   getThumbnailUrl,
 } from '@/utils/content-formatters';
 
+const getFaviconUrl = (metadata: unknown): string | null => {
+  if (!metadata || typeof metadata !== 'object' || Array.isArray(metadata)) {
+    return null;
+  }
+
+  const { favicon_url } = metadata as { favicon_url?: unknown };
+
+  return typeof favicon_url === 'string' ? favicon_url : null;
+};
+
 interface ContentItemProps {
   item: UserContentWithDetails;
   onPress?: (item: UserContentWithDetails) => void;
@@ -44,6 +54,7 @@ export function ContentItem({
   };
 
   const thumbnailUrl = getThumbnailUrl(content);
+  const faviconUrl = getFaviconUrl(content.metadata);
 
   // Create checkbox slot
   const checkboxSlot = (
@@ -85,7 +96,7 @@ export function ContentItem({
       leftSlot={checkboxSlot}
       metadataProps={{
         domain: content.domain || 'CONTENT',
-        faviconUrl: (content.metadata as any)?.favicon_url || null,
+        faviconUrl,
         date:
           showCompletedTime && item.completed_at
             ? `Completed at ${formatArchiveDate(item.completed_at).time}`
