@@ -1,5 +1,7 @@
 # Repository Guidelines
 
+> **IMPORTANT:** Get my approval before implementing it.
+
 ## Project Structure & Module Organization
 - Yarn-based monorepo with core apps in `apps/`: `web` (Next.js), `mobile-queue` (Expo), `nest` (NestJS API), `langchain` (LangGraph tools), and `mastra` (Mastra workflows).
 - Shared code lives in `packages/`; app-specific utilities stay near their consumers (for example, `apps/web/lib`, `apps/mobile-queue/components`).

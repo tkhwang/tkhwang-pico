@@ -2,6 +2,10 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## ⚠️ CRITICAL IMPLEMENTATION GUIDELINES
+
+**MANDATORY - Approval Required Before Implementation**: Always get explicit approval from the user before implementing any changes or features. You must present the implementation plan first for review and confirmation. DO NOT proceed with actual code changes until approval is received.
+
 ## Project Overview
 
 PICO (Personal Intelligent Companion Operator) is a cross-platform monorepo with AI agent system architecture using Yarn workspaces. The project includes:
