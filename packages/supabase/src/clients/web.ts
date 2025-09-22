@@ -63,7 +63,9 @@ export function createWebClientWithAuth(
         return token || null;
       } catch (error) {
         console.error("Failed to get Clerk token:", error);
-        return null;
+        throw new SupabaseAuthError(
+          `Failed to get Clerk token: ${error instanceof Error ? error.message : "Unknown error"}`
+        );
       }
     },
   });
