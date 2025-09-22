@@ -5,16 +5,25 @@
   },
   "exports": {
     ".": {
-      "types": "./src/index.ts"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
     },
     "./clients": {
-      "types": "./src/clients/index.ts"
+      "types": "./dist/clients/index.d.ts",
+      "import": "./dist/clients/index.js",
+      "default": "./dist/clients/index.js"
     },
     "./types": {
-      "types": "./src/types/index.ts"
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/types/index.js",
+      "default": "./dist/types/index.js"
     }
   },
-  "main": "./src/index.ts",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.js",
   "name": "@tkhwang-pico/supabase",
   "peerDependencies": {
     "@supabase/ssr": "^0.0.10",
@@ -22,6 +31,7 @@
   },
   "private": true,
   "scripts": {
+    "build": "tsc -p tsconfig.json",
     "generate-types": "npx supabase gen types typescript --project-id hgkmrremnwapjdbebvqo --schema public > ./src/types/supabase-database.types.ts",
     "typecheck": "tsc --noEmit",
     "supabase:start": "supabase start",
@@ -35,6 +45,6 @@
     "supabase:migration:list": "supabase migration list"
   },
   "sideEffects": false,
-  "types": "./src/index.ts",
+  "types": "./dist/index.d.ts",
   "version": "1.0.0"
 }

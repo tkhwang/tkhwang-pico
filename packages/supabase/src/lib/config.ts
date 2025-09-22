@@ -1,10 +1,12 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
+import type { createBrowserClient } from "@supabase/ssr";
 import type { Database } from "../types/supabase-database.types";
 
 /**
  * Base Supabase client type with database schema
  */
-export type SupabaseClientWithDatabase = SupabaseClient<Database>;
+export type SupabaseClientWithDatabase = ReturnType<
+  typeof createBrowserClient<Database>
+>;
 
 /**
  * Common configuration for all Supabase clients
