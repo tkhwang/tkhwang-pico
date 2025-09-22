@@ -86,6 +86,7 @@
     "ios": "expo start -c --ios",
     "lint": "eslint \"{app,components,consts,hooks,lib,providers,supabase,utils}/**/*.{ts,tsx}\"",
     "lint:fix": "eslint \"{app,components,consts,hooks,lib,providers,supabase,utils}/**/*.{ts,tsx}\" --fix",
+    "type-check": "tsc --noEmit",
     "web": "expo start -c --web"
   },
   "version": "1.0.0"

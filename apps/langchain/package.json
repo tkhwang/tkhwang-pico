@@ -12,6 +12,8 @@
   "description": "PICO AI using LangChain/LangGraph AI",
   "devDependencies": {
     "@eslint/js": "^9.18.0",
+    "@tkhwang-pico/config-eslint-prettier": "*",
+    "@tkhwang-pico/config-typescript": "*",
     "@types/jest": "^29.5.12",
     "@types/node": "^22.10.7",
     "@typescript-eslint/eslint-plugin": "^8.20.0",
@@ -29,9 +31,7 @@
     "ts-jest": "^29.4.1",
     "tsx": "^4.15.7",
     "typescript": "^5.3.3",
-    "typescript-eslint": "^8.20.0",
-    "@tkhwang-pico/config-eslint-prettier": "*",
-    "@tkhwang-pico/config-typescript": "*"
+    "typescript-eslint": "^8.20.0"
   },
   "engines": {
     "node": ">=18.18"
@@ -51,7 +51,8 @@
     "format": "prettier --write .",
     "lint": "eslint src",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --testPathPattern=\\.test\\.ts$ --testPathIgnorePatterns=\\.int\\.test\\.ts$",
-    "test:int": "node --experimental-vm-modules node_modules/jest/bin/jest.js --testPathPattern=\\.int\\.test\\.ts$"
+    "test:int": "node --experimental-vm-modules node_modules/jest/bin/jest.js --testPathPattern=\\.int\\.test\\.ts$",
+    "type-check": "tsc --noEmit"
   },
   "type": "module",
   "version": "0.0.1"
