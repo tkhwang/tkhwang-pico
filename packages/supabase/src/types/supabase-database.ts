@@ -1,4 +1,4 @@
-import { Database } from "./database.types";
+import { Database } from "./supabase-database.types";
 
 export type Content = Database["public"]["Tables"]["contents"]["Row"];
 export type UserContent = Database["public"]["Tables"]["user_contents"]["Row"];

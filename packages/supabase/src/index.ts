@@ -1,3 +1,5 @@
 // Export all Supabase types
-export * from "./supabase/database.types";
-export * from "./supabase/database";
+export * from "./types";
+
+// Export client factories
+export * from "./clients";
