@@ -99,6 +99,28 @@ const serviceClient = factory.getServiceClient();
 const userClient = factory.getClientForUser(jwt);
 ```
 
+### Unified Factory Entry Point
+
+```typescript
+import {
+  createSupabaseClientFactory,
+  type SupabaseFactoryOptions,
+} from "@tkhwang-pico/supabase/clients";
+
+const factoryOptions: SupabaseFactoryOptions = {
+  platform: "web",
+  runtime: "server",
+  mode: "auth",
+  cookies,
+  auth: { token: await getToken({ template: "supabase" }) },
+};
+
+const { client, helpers } = createSupabaseClientFactory(factoryOptions);
+
+// helpers.runtime === 'server'
+// helpers.getClerkToken(fn) 로 추가 토큰 유틸 사용 가능
+```
+
 ## Environment Variables
 
 ### Web App

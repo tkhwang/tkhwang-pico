@@ -5,6 +5,7 @@ export * from "../lib/config";
 export * from "./web";
 export * from "./mobile";
 export * from "./server";
+export * from "./client-factory";
 
 // Re-export commonly used types from @supabase/supabase-js
 export type {
@@ -17,6 +18,4 @@ export type {
 } from "@supabase/supabase-js";
 
 // Re-export SSR types for web platform
-export type {
-  CookieMethodsServer,
-} from "@supabase/ssr";
+export type { CookieMethodsServer } from "@supabase/ssr";
