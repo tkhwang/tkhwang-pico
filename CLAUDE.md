@@ -12,6 +12,8 @@ PICO (Personal Intelligent Companion Operator) is a cross-platform monorepo with
 - **Nest.js backend** (`apps/nest/`) - Node.js backend service
 - **LangChain system** (`apps/langchain/`) - Alternative AI agent implementation using LangChain.js
 - **Supabase package** (`packages/supabase/`) - Shared Supabase types and utilities for server and client usage
+- **Common package** (`packages/common/`) - Shared utilities and common code across applications
+- **Configuration packages** (`packages/config-*/`) - Shared TypeScript and ESLint/Prettier configurations
 - **Shared UI components** using shadcn/ui patterns adapted for each platform
 
 ## Development Commands
@@ -50,7 +52,6 @@ yarn dev               # Start Next.js dev server with Turbopack
 yarn build             # Build for production
 yarn start             # Start production server
 yarn lint              # Run ESLint
-yarn type-check        # Run TypeScript type checking
 ```
 
 ### Mastra AI System (`apps/mastra/`)
@@ -61,27 +62,50 @@ yarn build             # Build Mastra agent system
 yarn start             # Start production Mastra server
 yarn lint              # Run ESLint
 yarn lint:fix          # Run ESLint with auto-fix
-yarn type-check        # Run TypeScript type checking
 ```
 
 ### Nest.js Backend (`apps/nest/`)
 
 ```bash
-yarn dev               # Start Nest.js development server
+yarn start:dev         # Start Nest.js development server with watch mode
+yarn start:debug       # Start with debug mode and watch
 yarn build             # Build for production
 yarn start             # Start production server
-yarn lint              # Run ESLint
-yarn type-check        # Run TypeScript type checking
+yarn start:prod        # Start production server from dist
+yarn lint              # Run ESLint with auto-fix
+yarn format            # Format code with Prettier
+yarn test              # Run Jest tests
+yarn test:cov          # Run tests with coverage
+yarn test:e2e          # Run end-to-end tests
+yarn test:watch        # Run tests in watch mode
+yarn test:debug        # Run tests in debug mode
 ```
 
 ### LangChain System (`apps/langchain/`)
 
 ```bash
-yarn dev               # Start LangChain development server
-yarn build             # Build LangChain agent system
-yarn start             # Start production server
-yarn lint              # Run ESLint
-yarn type-check        # Run TypeScript type checking
+yarn dev               # Start LangChain development server (tsx src/index.ts)
+yarn build             # Build TypeScript to dist directory
+yarn clean             # Remove dist directory
+yarn lint              # Run ESLint on src directory
+yarn format            # Format code with Prettier
+yarn test              # Run Jest tests (excluding integration tests)
+yarn test:int          # Run integration tests
+```
+
+### Package-Level Commands
+
+#### Supabase Package (`packages/supabase/`)
+
+```bash
+yarn generate-types    # Generate TypeScript types from Supabase schema
+yarn typecheck         # Type check without emitting files
+```
+
+#### Common Package (`packages/common/`)
+
+```bash
+yarn typecheck         # Type check without emitting files
 ```
 
 ## Architecture & Patterns
@@ -333,13 +357,19 @@ All apps enforce consistent import ordering:
 
 ## Testing & Quality
 
-Currently no test infrastructure is configured. When adding tests:
+### Current Test Infrastructure
 
-- **Mastra**: Consider Jest for agent logic and vector database operations
+- **Nest.js Backend**: Full Jest testing setup with unit, coverage, e2e, and debug modes
+- **LangChain System**: Jest with separate unit and integration test suites
+- **Mobile & Web Apps**: No test infrastructure currently configured
+- **Mastra AI System**: No tests configured (placeholder script exists)
+
+### When Adding Tests
+
 - **Mobile**: Consider Expo testing tools or React Native Testing Library
 - **Web**: Jest + React Testing Library would be appropriate
 - **E2E**: Playwright could work for web, Detox for mobile
-- **AI Agents**: Test routing logic and agent responses with mock data
+- **AI Agents**: Test routing logic and agent responses with mock data using existing Jest setup in LangChain
 
 ## Package Resolution
 
@@ -389,7 +419,7 @@ The Mastra system uses LibSQL with in-memory storage by default. When configured
 ### Supabase Integration
 
 - **RLS policies**: Ensure proper JWT configuration for Clerk-Supabase integration
-- **Type generation**: Run `yarn generate-types` after schema changes
+- **Type generation**: Run `yarn generate-types` from `packages/supabase/` after schema changes
 
 ### Monorepo Dependencies
 
