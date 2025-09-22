@@ -18,7 +18,7 @@
     "@supabase/ssr": "latest",
     "@supabase/supabase-js": "latest",
     "@tanstack/react-query": "^5.85.5",
-    "@tkhwang-pico/common": "*",
+    "@tkhwang-pico/supabase": "*",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.23.12",
@@ -35,6 +35,8 @@
     "@eslint/eslintrc": "^3",
     "@tanstack/eslint-plugin-query": "^5.83.1",
     "@tanstack/react-query-devtools": "^5.85.5",
+    "@tkhwang-pico/config-eslint-prettier": "*",
+    "@tkhwang-pico/config-typescript": "*",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
@@ -52,9 +54,7 @@
     "tailwindcss": "^3.4.1",
     "tailwindcss-animate": "^1.0.7",
     "typescript": "^5",
-    "typescript-eslint": "^8.20.0",
-    "@tkhwang-pico/config-eslint-prettier": "*",
-    "@tkhwang-pico/config-typescript": "*"
+    "typescript-eslint": "^8.20.0"
   },
   "name": "@tkhwang-pico/web",
   "private": true,
@@ -62,7 +62,8 @@
     "build": "next build",
     "dev": "next dev --turbopack",
     "lint": "next lint",
-    "start": "next start"
+    "start": "next start",
+    "type-check": "tsc --noEmit"
   },
   "version": "0.0.1"
 }

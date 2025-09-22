@@ -17,11 +17,11 @@
   "description": "",
   "devDependencies": {
     "@eslint/js": "^9.18.0",
+    "@tkhwang-pico/config-eslint-prettier": "*",
+    "@tkhwang-pico/config-typescript": "*",
     "@types/node": "^24.3.0",
     "@typescript-eslint/eslint-plugin": "^8.20.0",
     "@typescript-eslint/parser": "^8.20.0",
-    "@tkhwang-pico/config-eslint-prettier": "*",
-    "@tkhwang-pico/config-typescript": "*",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-import": "^2.29.1",
@@ -46,7 +46,8 @@
     "lint": "eslint \"src/**/*.{ts,tsx}\"",
     "lint:fix": "eslint \"src/**/*.{ts,tsx}\" --fix",
     "start": "mastra start",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "type-check": "tsc --noEmit"
   },
   "type": "module",
   "version": "1.0.0"

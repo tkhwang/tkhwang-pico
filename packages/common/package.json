@@ -1,24 +1,20 @@
 {
-  "devDependencies": {
-    "typescript": "^5.0.0",
-    "@tkhwang-pico/config-typescript": "*"
-  },
+  "name": "@tkhwang-pico/common",
+  "version": "1.0.0",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
   "exports": {
     ".": {
       "types": "./src/index.ts"
-    },
-    "./supabase": {
-      "types": "./src/supabase/database.types.ts"
     }
   },
-  "main": "./src/index.ts",
-  "name": "@tkhwang-pico/common",
-  "private": true,
+  "sideEffects": false,
   "scripts": {
-    "generate-types": "npx supabase gen types typescript --project-id hgkmrremnwapjdbebvqo --schema public >./src/supabase/database.types.ts",
     "typecheck": "tsc --noEmit"
   },
-  "sideEffects": false,
-  "types": "./src/index.ts",
-  "version": "1.0.0"
+  "devDependencies": {
+    "@tkhwang-pico/config-typescript": "*",
+    "typescript": "^5.0.0"
+  }
 }

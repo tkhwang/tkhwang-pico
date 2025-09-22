@@ -1,4 +1,4 @@
-import type { UserContentWithDetails } from '@tkhwang-pico/common';
+import type { UserContentWithDetails } from '@tkhwang-pico/supabase';
 import { Circle, CircleCheckBig, Heart } from 'lucide-react-native';
 import React from 'react';
 import { TouchableOpacity, View } from 'react-native';

@@ -1,5 +1,5 @@
 import { useUser } from '@clerk/clerk-expo';
-import type { Recommendation } from '@tkhwang-pico/common';
+import type { Recommendation } from '@tkhwang-pico/supabase';
 
 import { queryKey } from '@/hooks/keys/query-key';
 import { useSupabaseQuery } from '@/hooks/queries/supabase/use-supabase-query';

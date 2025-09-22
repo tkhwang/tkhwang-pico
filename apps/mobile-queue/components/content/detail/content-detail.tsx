@@ -4,7 +4,7 @@ import {
   BottomSheetModal,
   BottomSheetScrollView,
 } from '@gorhom/bottom-sheet';
-import type { Recommendation, UserContentWithDetails } from '@tkhwang-pico/common';
+import type { Recommendation, UserContentWithDetails } from '@tkhwang-pico/supabase';
 import { Calendar, CheckCircle, Circle, Clock, FileText, Sparkles, Tag } from 'lucide-react-native';
 import React from 'react';
 import { Alert, Platform, View } from 'react-native';

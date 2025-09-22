@@ -1,0 +1,40 @@
+{
+  "devDependencies": {
+    "@tkhwang-pico/config-typescript": "*",
+    "typescript": "^5.0.0"
+  },
+  "exports": {
+    ".": {
+      "types": "./src/index.ts"
+    },
+    "./clients": {
+      "types": "./src/clients/index.ts"
+    },
+    "./types": {
+      "types": "./src/types/index.ts"
+    }
+  },
+  "main": "./src/index.ts",
+  "name": "@tkhwang-pico/supabase",
+  "peerDependencies": {
+    "@supabase/ssr": "^0.0.10",
+    "@supabase/supabase-js": "^2.0.0"
+  },
+  "private": true,
+  "scripts": {
+    "generate-types": "npx supabase gen types typescript --project-id hgkmrremnwapjdbebvqo --schema public > ./src/types/supabase-database.types.ts",
+    "typecheck": "tsc --noEmit",
+    "supabase:start": "supabase start",
+    "supabase:stop": "supabase stop",
+    "supabase:status": "supabase status",
+    "supabase:db:push": "supabase db push",
+    "supabase:db:reset": "supabase db reset",
+    "supabase:functions:deploy": "supabase functions deploy",
+    "supabase:functions:serve": "supabase functions serve",
+    "supabase:migration:new": "supabase migration new",
+    "supabase:migration:list": "supabase migration list"
+  },
+  "sideEffects": false,
+  "types": "./src/index.ts",
+  "version": "1.0.0"
+}

@@ -1,7 +1,7 @@
 import {
   type PreferenceType,
   type UserContentPreferenceTyped as UserContentPreference,
-} from '@tkhwang-pico/common';
+} from '@tkhwang-pico/supabase';
 
 import { createSupabaseClientWithClerkAuth } from '@/utils/supabase';
 

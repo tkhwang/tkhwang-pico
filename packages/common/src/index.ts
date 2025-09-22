@@ -1,3 +1,2 @@
-// Export all Supabase types
-export * from "./supabase/database.types";
-export * from "./supabase/database";
+// Placeholder for shared utilities.
+export {};

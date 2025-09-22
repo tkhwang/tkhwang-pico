@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { QUERY_SIMILAR_CONTENTS_DEFAULT_LIMIT } from 'src/consts/app-consts';
 
-import type { Content, SimilarContentRecommendation } from '@tkhwang-pico/common';
+import type { Content, SimilarContentRecommendation } from '@tkhwang-pico/supabase';
 
 import { SupabaseService } from './supabase.service';
 

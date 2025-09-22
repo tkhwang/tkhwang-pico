@@ -1,7 +1,7 @@
 import { useUser } from '@clerk/clerk-expo';
 import { FlashList } from '@shopify/flash-list';
 import { useQueryClient } from '@tanstack/react-query';
-import type { Recommendation } from '@tkhwang-pico/common';
+import type { Recommendation } from '@tkhwang-pico/supabase';
 import React, { useCallback, useMemo, useState } from 'react';
 import { RefreshControl, ScrollView, View } from 'react-native';
 

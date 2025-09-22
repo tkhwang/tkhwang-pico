@@ -1,4 +1,4 @@
-import type { Recommendation } from '@tkhwang-pico/common';
+import type { Recommendation } from '@tkhwang-pico/supabase';
 import { Circle, ThumbsDown, ThumbsUp, X } from 'lucide-react-native';
 import React, { useCallback } from 'react';
 import { Alert, type LayoutChangeEvent, TouchableOpacity, View } from 'react-native';

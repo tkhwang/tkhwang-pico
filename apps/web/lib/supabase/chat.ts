@@ -5,7 +5,7 @@ import type {
   Tables,
   TablesInsert,
   TablesUpdate,
-} from "@tkhwang-pico/common/supabase";
+} from "@tkhwang-pico/supabase";
 
 export type Thread = Tables<"threads">;
 export type Message = Tables<"messages">;

@@ -4,7 +4,7 @@ import type {
   PreferenceType,
   UserContentPreferenceTyped,
   UserContentWithDetails,
-} from '@tkhwang-pico/common';
+} from '@tkhwang-pico/supabase';
 import { Alert } from 'react-native';
 
 import { queryKey } from '@/hooks/keys/query-key';
