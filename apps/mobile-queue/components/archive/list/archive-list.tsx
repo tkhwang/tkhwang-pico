@@ -1,5 +1,5 @@
 import { FlashList } from '@shopify/flash-list';
-import type { UserContentWithDetails } from '@tkhwang-pico/common';
+import type { UserContentWithDetails } from '@tkhwang-pico/supabase';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { RefreshControl, ScrollView, View } from 'react-native';
 

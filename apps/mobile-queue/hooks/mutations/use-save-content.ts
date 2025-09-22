@@ -1,6 +1,6 @@
 import { useAuth, useUser } from '@clerk/clerk-expo';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { Content, UserContentWithDetails } from '@tkhwang-pico/common';
+import type { Content, UserContentWithDetails } from '@tkhwang-pico/supabase';
 import { Alert } from 'react-native';
 
 import { SAVE_CONTENT_DELAY_MS } from '@/consts/app-consts';

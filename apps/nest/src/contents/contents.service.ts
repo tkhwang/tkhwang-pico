@@ -8,7 +8,7 @@ import {
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { QUERY_SIMILAR_CONTENTS_DEFAULT_LIMIT } from 'src/consts/app-consts';
 
-import type { SimilarContentRecommendation } from '@tkhwang-pico/common';
+import type { SimilarContentRecommendation } from '@tkhwang-pico/supabase';
 
 import { HtmlCacheService } from '../cache/html-cache.service';
 import { EVENTS } from '../common/constants/events';

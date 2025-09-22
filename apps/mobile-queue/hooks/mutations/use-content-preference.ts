@@ -1,6 +1,6 @@
 import { useAuth, useUser } from '@clerk/clerk-expo';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { PreferenceType, Recommendation } from '@tkhwang-pico/common';
+import type { PreferenceType, Recommendation } from '@tkhwang-pico/supabase';
 import { Alert } from 'react-native';
 
 import { queryKey } from '@/hooks/keys/query-key';

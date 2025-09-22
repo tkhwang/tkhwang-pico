@@ -1,4 +1,4 @@
-import type { Recommendation } from '@tkhwang-pico/common';
+import type { Recommendation } from '@tkhwang-pico/supabase';
 import { ExternalLink, Sparkles } from 'lucide-react-native';
 import React from 'react';
 import { View } from 'react-native';

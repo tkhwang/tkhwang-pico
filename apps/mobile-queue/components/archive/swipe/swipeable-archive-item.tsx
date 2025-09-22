@@ -1,4 +1,4 @@
-import type { UserContentWithDetails } from '@tkhwang-pico/common';
+import type { UserContentWithDetails } from '@tkhwang-pico/supabase';
 import { Circle, Heart, RotateCcw, Trash2, X } from 'lucide-react-native';
 import React, { useCallback } from 'react';
 import { Alert, TouchableOpacity, View } from 'react-native';

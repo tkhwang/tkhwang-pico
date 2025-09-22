@@ -1,4 +1,4 @@
-import type { Recommendation } from '@tkhwang-pico/common';
+import type { Recommendation } from '@tkhwang-pico/supabase';
 
 import { nestApi } from './nest';
 

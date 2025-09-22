@@ -47,7 +47,7 @@ cd apps/mobile-queue && yarn build:ios      # iOS production build
 cd apps/mobile-queue && yarn build:android  # Android build
 
 # Type generation for shared types
-cd packages/common && yarn generate-types   # Supabase schema types
+cd packages/supabase && yarn generate-types   # Supabase schema types
 ```
 
 ## Architecture Overview
@@ -98,7 +98,7 @@ Each app requires specific environment variables:
 ### Cross-Platform Development
 - **Mobile components render on web**: Via `react-native-web` compatibility
 - **Platform-specific styling**: `web:` and `native:` prefixes in Tailwind
-- **Shared types**: Use `@tkhwang-pico/common` workspace for cross-app types
+- **Shared types**: Use `@tkhwang-pico/supabase` workspace for cross-app types
 
 ### Styling & Theming
 - **Mobile**: NativeWind v4 (Tailwind for React Native) with platform variants
@@ -118,7 +118,7 @@ Each app requires specific environment variables:
 
 ### Monorepo Management
 - **Dependencies**: Always run `yarn` from repository root after package changes
-- **Type Safety**: Use workspace protocol for shared packages: `@tkhwang-pico/common`
+- **Type Safety**: Use workspace protocol for shared packages: `@tkhwang-pico/supabase`
 
 ## Deployment Configuration
 

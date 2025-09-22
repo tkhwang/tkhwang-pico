@@ -11,7 +11,7 @@ PICO (Personal Intelligent Companion Operator) is a cross-platform monorepo with
 - **Mastra AI agent system** (`apps/mastra/`) - Intelligent routing and specialized AI agents (weather, fallback)
 - **Nest.js backend** (`apps/nest/`) - Node.js backend service
 - **LangChain system** (`apps/langchain/`) - Alternative AI agent implementation using LangChain.js
-- **Common package** (`packages/common/`) - Shared types and utilities across apps
+- **Supabase package** (`packages/supabase/`) - Shared Supabase types and utilities for server and client usage
 - **Shared UI components** using shadcn/ui patterns adapted for each platform
 
 ## Development Commands
@@ -394,7 +394,7 @@ The Mastra system uses LibSQL with in-memory storage by default. When configured
 ### Monorepo Dependencies
 
 - **Workspace resolution**: Always run `yarn` from repository root after package changes
-- **Cross-package imports**: Use workspace protocol `@tkhwang-pico/common` for shared code
+- **Cross-package imports**: Use workspace protocol `@tkhwang-pico/supabase` for shared code
 - **React version conflicts**: Enforced via root `resolutions` to React 19.0.0
 
 ### AI Agent Integration
