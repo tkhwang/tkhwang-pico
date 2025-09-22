@@ -4,7 +4,10 @@
   "private": true,
   "packageManager": "yarn@1.22.22",
   "scripts": {
-    "clean": "rm -rf node_modules apps/*/node_modules apps/*/dist apps/*/build apps/web/.next apps/mobile-queue/.expo "
+    "clean": "rm -rf node_modules apps/*/node_modules apps/*/dist apps/*/build apps/web/.next apps/mobile-queue/.expo ",
+    "prepare": "husky",
+    "type-check": "yarn workspaces foreach run type-check",
+    "lint": "yarn workspaces foreach run lint"
   },
   "workspaces": [
     "apps/*",
@@ -13,5 +16,31 @@
   "resolutions": {
     "react": "19.0.0",
     "react-dom": "19.0.0"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^16.1.6"
+  },
+  "lint-staged": {
+    "apps/web/**/*.{js,jsx,ts,tsx}": [
+      "yarn workspace @tkhwang-pico/web lint --fix",
+      "yarn workspace @tkhwang-pico/web type-check"
+    ],
+    "apps/mobile-queue/**/*.{js,jsx,ts,tsx}": [
+      "yarn workspace @tkhwang-pico/mobile-queue lint --fix",
+      "yarn workspace @tkhwang-pico/mobile-queue type-check"
+    ],
+    "apps/mastra/**/*.{js,ts}": [
+      "yarn workspace @tkhwang-pico/mastra lint --fix",
+      "yarn workspace @tkhwang-pico/mastra type-check"
+    ],
+    "apps/nest/**/*.{js,ts}": [
+      "yarn workspace nest lint --fix",
+      "yarn workspace nest type-check"
+    ],
+    "apps/langchain/**/*.{js,ts}": [
+      "yarn workspace @tkhwang-pico/langchain lint --fix",
+      "yarn workspace @tkhwang-pico/langchain type-check"
+    ]
   }
 }
