@@ -23,7 +23,16 @@
   "private": true,
   "scripts": {
     "generate-types": "npx supabase gen types typescript --project-id hgkmrremnwapjdbebvqo --schema public > ./src/types/supabase-database.types.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "supabase:start": "supabase start",
+    "supabase:stop": "supabase stop",
+    "supabase:status": "supabase status",
+    "supabase:db:push": "supabase db push",
+    "supabase:db:reset": "supabase db reset",
+    "supabase:functions:deploy": "supabase functions deploy",
+    "supabase:functions:serve": "supabase functions serve",
+    "supabase:migration:new": "supabase migration new",
+    "supabase:migration:list": "supabase migration list"
   },
   "sideEffects": false,
   "types": "./src/index.ts",
