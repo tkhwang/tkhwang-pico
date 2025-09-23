@@ -1,10 +1,10 @@
 # Repository Guidelines
 
-> **IMPORTANT:** Get my approval before implementing it.
+**IMPORTANT:** Get my approval before implementing it.
 
 ## AI Reference Responses
 
-> **IMPORTANT:** Always respond in Korean
+**IMPORTANT:** Always respond in Korean
 
 ## Project Structure & Module Organization
 
