@@ -220,6 +220,7 @@ Uses ESLint Flat Config with TypeScript ESLint and platform-specific rules:
   - `eslint/flat/react.mjs` - React-specific rules
 
 **Prettier Configs**:
+
 - `prettier/prettier.base.cjs` - Standard Prettier configuration
 - `prettier/prettier.tailwind.cjs` - Tailwind CSS class sorting
 
@@ -378,6 +379,7 @@ All apps enforce consistent import ordering:
 ## Package Resolution
 
 The monorepo enforces specific React versions across all packages:
+
 - React: 19.0.0
 - React DOM: 19.0.0
 
