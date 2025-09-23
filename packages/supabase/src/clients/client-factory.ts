@@ -1,7 +1,7 @@
 import { getMobileSupabaseConfig } from "./mobile";
-import { createServerFactoryResult } from "./platforms/server";
-import { createMobileFactoryResult } from "./platforms/mobile";
-import { createWebFactoryResult } from "./platforms/web";
+import { buildServerFactory } from "./platform-resolvers/server.factory";
+import { buildMobileFactory } from "./platform-resolvers/mobile.factory";
+import { buildWebFactory } from "./platform-resolvers/web.factory";
 import { getServerSupabaseConfig } from "./server";
 import { getWebSupabaseConfig } from "./web";
 import { SupabaseConfigError } from "../lib/config";
@@ -12,11 +12,11 @@ export function createSupabaseClientFactory(
 ): SupabaseFactoryResult {
   switch (options.platform) {
     case "web":
-      return createWebFactoryResult(options);
+      return buildWebFactory(options);
     case "server":
-      return createServerFactoryResult(options);
+      return buildServerFactory(options);
     case "mobile":
-      return createMobileFactoryResult(options);
+      return buildMobileFactory(options);
     default: {
       const exhaustiveCheck: never = options;
       throw new SupabaseConfigError(

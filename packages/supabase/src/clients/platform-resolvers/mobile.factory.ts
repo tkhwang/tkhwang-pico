@@ -10,7 +10,7 @@ import {
 } from "../../lib/config";
 import type { MobileFactoryOptions, MobileFactoryResult } from "../../types";
 
-export function createMobileFactoryResult(
+export function buildMobileFactory(
   options: MobileFactoryOptions
 ): MobileFactoryResult {
   const mode = options.mode ?? "public";
@@ -25,7 +25,7 @@ export function createMobileFactoryResult(
   if (mode === "auth") {
     if (!options.auth) {
       throw new SupabaseAuthError(
-        "mobile auth 모드에는 auth 토큰이 필요합니다."
+        "Auth mode for mobile clients requires an auth token."
       );
     }
 
@@ -57,5 +57,5 @@ export function createMobileFactoryResult(
     };
   }
 
-  throw new SupabaseConfigError(`지원되지 않는 mobile 모드입니다: ${mode}`);
+  throw new SupabaseConfigError(`Unsupported mobile mode: ${mode}`);
 }

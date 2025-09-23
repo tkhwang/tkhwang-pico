@@ -11,7 +11,7 @@ import {
 } from "../../lib/config";
 import type { ServerFactoryOptions, ServerFactoryResult } from "../../types";
 
-export function createServerFactoryResult(
+export function buildServerFactory(
   options: ServerFactoryOptions
 ): ServerFactoryResult {
   const mode = options.mode ?? "service";
@@ -40,7 +40,7 @@ export function createServerFactoryResult(
   if (mode === "auth") {
     if (!options.auth) {
       throw new SupabaseAuthError(
-        "server auth 모드에는 auth 토큰이 필요합니다."
+        "Auth mode for server clients requires an auth token."
       );
     }
 
@@ -68,5 +68,5 @@ export function createServerFactoryResult(
     };
   }
 
-  throw new SupabaseConfigError(`지원되지 않는 server 모드입니다: ${mode}`);
+  throw new SupabaseConfigError(`Unsupported server mode: ${mode}`);
 }

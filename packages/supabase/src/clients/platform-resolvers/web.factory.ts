@@ -20,7 +20,7 @@ function resolveWebRuntime(runtime?: WebRuntime): WebRuntime {
   return runtime ?? "browser";
 }
 
-export function createWebFactoryResult(
+export function buildWebFactory(
   options: WebFactoryOptions
 ): WebFactoryResult {
   const runtime = resolveWebRuntime(options.runtime);
@@ -30,7 +30,7 @@ export function createWebFactoryResult(
   if (runtime === "browser") {
     if (mode !== "auth") {
       throw new SupabaseConfigError(
-        "브라우저 런타임에서는 auth 모드만 지원합니다."
+        "Auth mode is the only supported option in the browser runtime."
       );
     }
     const session: ClerkSession | null = options.session ?? null;
@@ -49,7 +49,7 @@ export function createWebFactoryResult(
 
   if (!options.cookies) {
     throw new SupabaseConfigError(
-      "서버 런타임에서는 cookies 객체가 필요합니다."
+      "Cookies instance is required when using the server runtime."
     );
   }
 
@@ -58,7 +58,7 @@ export function createWebFactoryResult(
   if (mode === "auth") {
     if (!options.auth) {
       throw new SupabaseAuthError(
-        "서버 auth 모드에서는 auth 토큰 구성이 필요합니다."
+        "Auth mode on the server runtime requires an auth token."
       );
     }
 
@@ -84,7 +84,7 @@ export function createWebFactoryResult(
   }
 
   if (mode !== "public") {
-    throw new SupabaseConfigError(`지원되지 않는 web 모드입니다: ${mode}`);
+    throw new SupabaseConfigError(`Unsupported web mode: ${mode}`);
   }
 
   const client = createWebServerClient(cookies, options.config);
