@@ -19,6 +19,11 @@
       "import": "./dist/clients/index.js",
       "types": "./dist/clients/index.d.ts"
     },
+    "./repositories": {
+      "default": "./dist/repositories/index.js",
+      "import": "./dist/repositories/index.js",
+      "types": "./dist/repositories/index.d.ts"
+    },
     "./types": {
       "default": "./dist/types/index.js",
       "import": "./dist/types/index.js",
