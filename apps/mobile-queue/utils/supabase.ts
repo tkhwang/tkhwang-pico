@@ -1,23 +1,7 @@
 import 'react-native-url-polyfill/auto';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { createClient } from '@supabase/supabase-js';
-import type { Database } from '@tkhwang-pico/supabase';
-
-const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
-
-if (!supabaseUrl) throw new Error('Missing EXPO_PUBLIC_SUPABASE_URL');
-if (!supabaseAnonKey) throw new Error('Missing EXPO_PUBLIC_SUPABASE_ANON_KEY');
-
-// export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
-//   auth: {
-//     storage: AsyncStorage,
-//     autoRefreshToken: true,
-//     persistSession: true,
-//     detectSessionInUrl: false,
-//   },
-// });
+import { createSupabaseClientFactory } from '@tkhwang-pico/supabase';
 
 /**
  * Create an authenticated Supabase client with Clerk token
@@ -28,17 +12,17 @@ export function createSupabaseClientWithClerkAuth(clerkToken: string | null) {
     throw new Error('Authentication required');
   }
 
-  return createClient<Database>(supabaseUrl!, supabaseAnonKey!, {
-    global: {
-      headers: {
-        Authorization: `Bearer ${clerkToken}`,
-      },
-    },
-    auth: {
+  const { client } = createSupabaseClientFactory({
+    platform: 'mobile',
+    mode: 'auth',
+    auth: { token: clerkToken },
+    options: {
       storage: AsyncStorage,
       autoRefreshToken: false,
       persistSession: false,
       detectSessionInUrl: false,
     },
   });
+
+  return client;
 }

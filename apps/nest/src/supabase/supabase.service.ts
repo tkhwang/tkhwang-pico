@@ -1,14 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
-import type { Database } from '@tkhwang-pico/supabase';
+import {
+  createSupabaseClientFactory,
+  type SupabaseClientWithDatabase,
+} from '@tkhwang-pico/supabase/clients';
+import type { ServerFactoryResult } from '@tkhwang-pico/supabase/types';
 
 @Injectable()
 export class SupabaseService {
-  public readonly serviceClient: SupabaseClient<Database>;
-  private readonly supabaseUrl: string;
-  private readonly supabaseAnonKey?: string;
+  public readonly serviceClient: SupabaseClientWithDatabase;
+  private readonly helpers: ServerFactoryResult['helpers'];
 
   constructor(private configService: ConfigService) {
     const supabaseUrl = this.configService.get<string>('SUPABASE_URL');
@@ -19,27 +21,29 @@ export class SupabaseService {
       throw new Error('Supabase URL and Service Role Key are required');
     }
 
-    this.supabaseUrl = supabaseUrl;
-    this.supabaseAnonKey = supabaseAnonKey;
-    this.serviceClient = createClient<Database>(supabaseUrl, supabaseKey, {
-      auth: {
-        persistSession: false,
-        autoRefreshToken: false,
+    const result = createSupabaseClientFactory({
+      platform: 'server',
+      mode: 'service',
+      config: {
+        url: supabaseUrl,
+        serviceRoleKey: supabaseKey,
+        anonKey: supabaseAnonKey,
       },
     });
+
+    if (result.platform !== 'server') {
+      throw new Error('Failed to initialize Supabase server client');
+    }
+
+    this.serviceClient = result.client;
+    this.helpers = result.helpers;
   }
 
   /**
    * Create a user-scoped client that enforces RLS by forwarding the user's JWT.
    * Requires SUPABASE_ANON_KEY to be set.
    */
-  getClientForUser(jwt: string): SupabaseClient<Database> {
-    if (!this.supabaseAnonKey) {
-      throw new Error('SUPABASE_ANON_KEY is required to create user-scoped clients');
-    }
-    return createClient<Database>(this.supabaseUrl, this.supabaseAnonKey, {
-      global: { headers: { Authorization: `Bearer ${jwt}` } },
-      auth: { persistSession: false, autoRefreshToken: false },
-    });
+  getClientForUser(jwt: string): SupabaseClientWithDatabase {
+    return this.helpers.getClientForUser(jwt);
   }
 }
