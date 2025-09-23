@@ -19,8 +19,10 @@ declare -a PATTERNS=(
   "packages/*/dist"
   "packages/*/build"
   "packages/*/coverage"
+  "apps/*/tsconfig.tsbuildinfo"
+  "packages/*/tsconfig.tsbuildinfo"
   ".turbo"
-  ".expo"
+  ".expo" 
 )
 
 if [[ ${#PATTERNS[@]} -eq 0 ]]; then
@@ -32,7 +34,7 @@ CLEANED=false
 for pattern in "${PATTERNS[@]}"; do
   for target in $pattern; do
     if [[ -e "$target" ]]; then
-      echo "Removing: $target"
+      echo "[*] Removing: $target"
       rm -rf "$target"
       CLEANED=true
     fi
