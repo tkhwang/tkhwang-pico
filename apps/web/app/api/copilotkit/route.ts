@@ -1,12 +1,12 @@
+import { MastraAgent } from "@ag-ui/mastra";
 import {
   CopilotRuntime,
-  ExperimentalEmptyAdapter,
   copilotRuntimeNextJSAppRouterEndpoint,
+  ExperimentalEmptyAdapter,
 } from "@copilotkit/runtime";
-
-import { MastraAgent } from "@ag-ui/mastra";
 import { MastraClient } from "@mastra/client-js";
-import { NextRequest } from "next/server";
+import { type NextRequest } from "next/server";
+
 import { getConfig } from "@/lib/config";
 
 const serviceAdapter = new ExperimentalEmptyAdapter();

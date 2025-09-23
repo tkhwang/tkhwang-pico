@@ -1,11 +1,12 @@
-import { createClient } from "@supabase/supabase-js";
-import type { SupabaseClientOptions } from "@supabase/supabase-js";
+import type { SupabaseClientOptions } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js';
+
 import {
   type AuthConfig,
   type SupabaseClientWithDatabase,
   SupabaseConfigError,
   validateAuthToken,
-} from "../lib/config";
+} from '../lib/config';
 
 /**
  * Server platform Supabase configuration from environment variables
@@ -20,14 +21,12 @@ export interface ServerSupabaseConfig {
 /**
  * Validates server Supabase configuration
  */
-function validateServerSupabaseConfig(
-  config: Partial<ServerSupabaseConfig>
-): ServerSupabaseConfig {
+function validateServerSupabaseConfig(config: Partial<ServerSupabaseConfig>): ServerSupabaseConfig {
   if (!config.url) {
-    throw new SupabaseConfigError("Missing Supabase URL");
+    throw new SupabaseConfigError('Missing Supabase URL');
   }
   if (!config.serviceRoleKey) {
-    throw new SupabaseConfigError("Missing Supabase service role key");
+    throw new SupabaseConfigError('Missing Supabase service role key');
   }
   return config as ServerSupabaseConfig;
 }
@@ -53,22 +52,16 @@ export function getServerSupabaseConfig(): ServerSupabaseConfig {
 export function createServerServiceClient(
   config?: Partial<ServerSupabaseConfig>
 ): SupabaseClientWithDatabase {
-  const supabaseConfig = config
-    ? validateServerSupabaseConfig(config)
-    : getServerSupabaseConfig();
+  const supabaseConfig = config ? validateServerSupabaseConfig(config) : getServerSupabaseConfig();
 
-  const clientOptions: SupabaseClientOptions<"public"> = {
+  const clientOptions: SupabaseClientOptions<'public'> = {
     auth: {
       persistSession: false,
       autoRefreshToken: false,
     },
   };
 
-  return createClient(
-    supabaseConfig.url,
-    supabaseConfig.serviceRoleKey,
-    clientOptions
-  );
+  return createClient(supabaseConfig.url, supabaseConfig.serviceRoleKey, clientOptions);
 }
 
 /**
@@ -81,17 +74,13 @@ export function createServerClientWithAuth(
   config?: Partial<ServerSupabaseConfig>
 ): SupabaseClientWithDatabase {
   const token = validateAuthToken(authConfig.token);
-  const supabaseConfig = config
-    ? validateServerSupabaseConfig(config)
-    : getServerSupabaseConfig();
+  const supabaseConfig = config ? validateServerSupabaseConfig(config) : getServerSupabaseConfig();
 
   if (!supabaseConfig.anonKey) {
-    throw new SupabaseConfigError(
-      "SUPABASE_ANON_KEY is required to create user-scoped clients"
-    );
+    throw new SupabaseConfigError('SUPABASE_ANON_KEY is required to create user-scoped clients');
   }
 
-  const clientOptions: SupabaseClientOptions<"public"> = {
+  const clientOptions: SupabaseClientOptions<'public'> = {
     global: {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -103,11 +92,7 @@ export function createServerClientWithAuth(
     },
   };
 
-  return createClient(
-    supabaseConfig.url,
-    supabaseConfig.anonKey,
-    clientOptions
-  );
+  return createClient(supabaseConfig.url, supabaseConfig.anonKey, clientOptions);
 }
 
 /**
@@ -118,28 +103,20 @@ export function createServerClientWithAuth(
 export function createServerClient(
   config?: Partial<ServerSupabaseConfig>
 ): SupabaseClientWithDatabase {
-  const supabaseConfig = config
-    ? validateServerSupabaseConfig(config)
-    : getServerSupabaseConfig();
+  const supabaseConfig = config ? validateServerSupabaseConfig(config) : getServerSupabaseConfig();
 
   if (!supabaseConfig.anonKey) {
-    throw new SupabaseConfigError(
-      "SUPABASE_ANON_KEY is required to create public client"
-    );
+    throw new SupabaseConfigError('SUPABASE_ANON_KEY is required to create public client');
   }
 
-  const clientOptions: SupabaseClientOptions<"public"> = {
+  const clientOptions: SupabaseClientOptions<'public'> = {
     auth: {
       persistSession: false,
       autoRefreshToken: false,
     },
   };
 
-  return createClient(
-    supabaseConfig.url,
-    supabaseConfig.anonKey,
-    clientOptions
-  );
+  return createClient(supabaseConfig.url, supabaseConfig.anonKey, clientOptions);
 }
 
 /**
@@ -151,9 +128,7 @@ export class SupabaseClientFactory {
   public readonly serviceClient: SupabaseClientWithDatabase;
 
   constructor(config?: Partial<ServerSupabaseConfig>) {
-    this.config = config
-      ? validateServerSupabaseConfig(config)
-      : getServerSupabaseConfig();
+    this.config = config ? validateServerSupabaseConfig(config) : getServerSupabaseConfig();
     this.serviceClient = createServerServiceClient(this.config);
   }
 

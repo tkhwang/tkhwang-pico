@@ -1,20 +1,34 @@
 {
   "devDependencies": {
+    "@tkhwang-pico/config-eslint-prettier": "*",
     "@tkhwang-pico/config-typescript": "*",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "eslint": "^9.0.0",
+    "globals": "^16.0.0",
     "typescript": "^5.0.0"
   },
   "exports": {
     ".": {
-      "types": "./src/index.ts"
+      "default": "./dist/index.js",
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
     },
     "./clients": {
-      "types": "./src/clients/index.ts"
+      "default": "./dist/clients/index.js",
+      "import": "./dist/clients/index.js",
+      "types": "./dist/clients/index.d.ts"
     },
     "./types": {
-      "types": "./src/types/index.ts"
+      "default": "./dist/types/index.js",
+      "import": "./dist/types/index.js",
+      "types": "./dist/types/index.d.ts"
     }
   },
-  "main": "./src/index.ts",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.js",
   "name": "@tkhwang-pico/supabase",
   "peerDependencies": {
     "@supabase/ssr": "^0.0.10",
@@ -22,19 +36,22 @@
   },
   "private": true,
   "scripts": {
+    "build": "tsc -p tsconfig.json",
     "generate-types": "npx supabase gen types typescript --project-id hgkmrremnwapjdbebvqo --schema public > ./src/types/supabase-database.types.ts",
-    "typecheck": "tsc --noEmit",
-    "supabase:start": "supabase start",
-    "supabase:stop": "supabase stop",
-    "supabase:status": "supabase status",
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix",
     "supabase:db:push": "supabase db push",
     "supabase:db:reset": "supabase db reset",
     "supabase:functions:deploy": "supabase functions deploy",
     "supabase:functions:serve": "supabase functions serve",
+    "supabase:migration:list": "supabase migration list",
     "supabase:migration:new": "supabase migration new",
-    "supabase:migration:list": "supabase migration list"
+    "supabase:start": "supabase start",
+    "supabase:status": "supabase status",
+    "supabase:stop": "supabase stop",
+    "typecheck": "tsc --noEmit"
   },
   "sideEffects": false,
-  "types": "./src/index.ts",
+  "types": "./dist/index.d.ts",
   "version": "1.0.0"
 }

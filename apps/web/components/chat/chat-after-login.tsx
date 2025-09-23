@@ -1,9 +1,12 @@
 "use client";
 
-import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
+
+import PicoInput from "@/components/input/pico-input";
 import { AppSidebar } from "@/components/sidebar/app-sidebar";
+import { ThemeSwitcher } from "@/components/theme-switcher";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -17,12 +20,10 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { ThemeSwitcher } from "@/components/theme-switcher";
-import PicoInput from "@/components/input/pico-input";
-import { useAuth } from "@/providers/auth-provider";
-import { generateThreadTitle } from "@/lib/supabase/chat";
-import { useSaveMessage } from "@/hooks/mutations/use-save-message";
 import { useCreateThread } from "@/hooks/mutations/use-create-thread";
+import { useSaveMessage } from "@/hooks/mutations/use-save-message";
+import { generateThreadTitle } from "@/lib/supabase/chat";
+import { useAuth } from "@/providers/auth-provider";
 
 export function ChatAfterLogin() {
   const [inputValue, setInputValue] = useState("");
@@ -65,7 +66,7 @@ export function ChatAfterLogin() {
     } catch (error) {
       console.error(
         "[-][ChatAfterLogin] Failed to create thread and save message:",
-        error
+        error,
       );
 
       // No message was pre-saved; no orphan-message cleanup required

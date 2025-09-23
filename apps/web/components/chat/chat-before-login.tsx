@@ -1,8 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import Navbar02Page from "@/components/navbar-02/navbar-02";
+
 import PicoInput from "@/components/input/pico-input";
+import Navbar02Page from "@/components/navbar-02/navbar-02";
 
 export function ChatBeforeLogin() {
   const router = useRouter();

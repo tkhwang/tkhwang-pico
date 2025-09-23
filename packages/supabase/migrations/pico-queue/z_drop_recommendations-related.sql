@@ -12,6 +12,14 @@ drop policy if exists user_embeddings_rw on public.user_embeddings;
 drop policy if exists user_preferences_rw on public.user_content_preferences;
 drop policy if exists debug_failed_contents_select on public.debug_failed_contents;
 
+-- Disable RLS before removing tables
+alter table if exists public.contents disable row level security;
+alter table if exists public.user_contents disable row level security;
+alter table if exists public.content_embeddings disable row level security;
+alter table if exists public.user_embeddings disable row level security;
+alter table if exists public.user_content_preferences disable row level security;
+alter table if exists public.debug_failed_contents disable row level security;
+
 -- Drop triggers first (before functions they depend on)
 drop trigger if exists trg_auto_completed_timestamp on public.user_contents;
 drop trigger if exists trg_set_content_domain on public.contents;
@@ -35,3 +43,8 @@ drop table if exists public.contents cascade;
 drop type if exists content_todo_status;
 drop type if exists embedding_scope;
 drop type if exists content_status;
+
+-- Drop extensions
+drop extension if exists pg_trgm;
+drop extension if exists pgcrypto;
+drop extension if exists vector;

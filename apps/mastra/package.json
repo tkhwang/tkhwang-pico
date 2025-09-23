@@ -45,6 +45,7 @@
     "dev": "mastra dev",
     "lint": "eslint \"src/**/*.{ts,tsx}\"",
     "lint:fix": "eslint \"src/**/*.{ts,tsx}\" --fix",
+    "prebuild": "yarn workspace @tkhwang-pico/supabase build",
     "start": "mastra start",
     "test": "echo \"Error: no test specified\" && exit 1",
     "type-check": "tsc --noEmit"

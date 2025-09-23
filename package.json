@@ -4,10 +4,11 @@
   "private": true,
   "packageManager": "yarn@1.22.22",
   "scripts": {
-    "clean": "rm -rf node_modules apps/*/node_modules apps/*/dist apps/*/build apps/web/.next apps/mobile-queue/.expo ",
+    "clean": "bash scripts/clean.sh",
     "prepare": "husky",
     "type-check": "yarn workspaces foreach run type-check",
-    "lint": "yarn workspaces foreach run lint"
+    "lint": "yarn workspaces foreach run lint",
+    "postinstall": "yarn workspace @tkhwang-pico/supabase build"
   },
   "workspaces": [
     "apps/*",

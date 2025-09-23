@@ -22,13 +22,13 @@ export const getConfig = () => {
   // Validate required environment variables
   if (!common.webUrl) {
     throw new Error(
-      "NEXT_PUBLIC_WEB_URL environment variable is not configured"
+      "NEXT_PUBLIC_WEB_URL environment variable is not configured",
     );
   }
 
   if (!mastra.mastraUrl) {
     throw new Error(
-      "NEXT_PUBLIC_MASTRA_URL environment variable is not configured"
+      "NEXT_PUBLIC_MASTRA_URL environment variable is not configured",
     );
   }
 
@@ -38,7 +38,7 @@ export const getConfig = () => {
 
   if (!copilotKit.publicLicenseKey) {
     throw new Error(
-      "NEXT_PUBLIC_COPILOTKIT_LICENSE_KEY environment variable is not configured"
+      "NEXT_PUBLIC_COPILOTKIT_LICENSE_KEY environment variable is not configured",
     );
   }
 
