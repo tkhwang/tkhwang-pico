@@ -1,13 +1,14 @@
-import { createClient } from "@supabase/supabase-js";
-import type { SupabaseClientOptions } from "@supabase/supabase-js";
+import type { SupabaseClientOptions } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js';
+
 import {
   type AuthConfig,
   type BaseSupabaseConfig,
-  type SupabaseClientWithDatabase,
   SupabaseAuthError,
+  type SupabaseClientWithDatabase,
   validateAuthToken,
   validateBaseConfig,
-} from "../lib/config";
+} from '../lib/config';
 
 /**
  * Mobile platform Supabase configuration from environment variables
@@ -59,11 +60,9 @@ export function createMobileClientWithAuth(
   config?: Partial<MobileSupabaseConfig>
 ): SupabaseClientWithDatabase {
   const token = validateAuthToken(authConfig.token);
-  const supabaseConfig = config
-    ? validateBaseConfig(config)
-    : getMobileSupabaseConfig();
+  const supabaseConfig = config ? validateBaseConfig(config) : getMobileSupabaseConfig();
 
-  const clientOptions: SupabaseClientOptions<"public"> = {
+  const clientOptions: SupabaseClientOptions<'public'> = {
     global: {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -77,11 +76,7 @@ export function createMobileClientWithAuth(
     },
   };
 
-  return createClient(
-    supabaseConfig.url,
-    supabaseConfig.anonKey,
-    clientOptions
-  );
+  return createClient(supabaseConfig.url, supabaseConfig.anonKey, clientOptions);
 }
 
 /**
@@ -92,11 +87,9 @@ export function createMobileClient(
   options?: MobileClientOptions,
   config?: Partial<MobileSupabaseConfig>
 ): SupabaseClientWithDatabase {
-  const supabaseConfig = config
-    ? validateBaseConfig(config)
-    : getMobileSupabaseConfig();
+  const supabaseConfig = config ? validateBaseConfig(config) : getMobileSupabaseConfig();
 
-  const clientOptions: SupabaseClientOptions<"public"> = {
+  const clientOptions: SupabaseClientOptions<'public'> = {
     auth: {
       storage: options?.storage,
       autoRefreshToken: options?.autoRefreshToken ?? true,
@@ -105,11 +98,7 @@ export function createMobileClient(
     },
   };
 
-  return createClient(
-    supabaseConfig.url,
-    supabaseConfig.anonKey,
-    clientOptions
-  );
+  return createClient(supabaseConfig.url, supabaseConfig.anonKey, clientOptions);
 }
 
 /**
@@ -123,7 +112,7 @@ export function createSupabaseClientWithClerkAuth(
   config?: Partial<MobileSupabaseConfig>
 ): SupabaseClientWithDatabase {
   if (!clerkToken) {
-    throw new SupabaseAuthError("Clerk token is required");
+    throw new SupabaseAuthError('Clerk token is required');
   }
 
   return createMobileClientWithAuth({ token: clerkToken }, options, config);

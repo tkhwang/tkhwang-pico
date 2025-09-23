@@ -1,47 +1,38 @@
+import { SupabaseAuthError, SupabaseConfigError, validateAuthToken } from '../../lib/config';
+import type { ServerFactoryOptions, ServerFactoryResult } from '../../types';
 import {
   createServerClient,
   createServerClientWithAuth,
   createServerServiceClient,
   SupabaseClientFactory,
-} from "../server";
-import {
-  SupabaseAuthError,
-  SupabaseConfigError,
-  validateAuthToken,
-} from "../../lib/config";
-import type { ServerFactoryOptions, ServerFactoryResult } from "../../types";
+} from '../server';
 
-export function buildServerFactory(
-  options: ServerFactoryOptions
-): ServerFactoryResult {
-  const mode = options.mode ?? "service";
+export function buildServerFactory(options: ServerFactoryOptions): ServerFactoryResult {
+  const mode = options.mode ?? 'service';
   const config = options.config;
 
   const helpersFactory = () => new SupabaseClientFactory(config);
 
   const helpers = {
     getClientFactory: helpersFactory,
-    getClientForUser: (jwt: string) =>
-      createServerClientWithAuth({ token: jwt }, config),
+    getClientForUser: (jwt: string) => createServerClientWithAuth({ token: jwt }, config),
     getPublicClient: () => createServerClient(config),
     getServiceClient: () => createServerServiceClient(config),
   };
 
-  if (mode === "service") {
+  if (mode === 'service') {
     const client = createServerServiceClient(config);
     return {
-      platform: "server",
+      platform: 'server',
       mode,
       client,
       helpers,
     };
   }
 
-  if (mode === "auth") {
+  if (mode === 'auth') {
     if (!options.auth) {
-      throw new SupabaseAuthError(
-        "Auth mode for server clients requires an auth token."
-      );
+      throw new SupabaseAuthError('Auth mode for server clients requires an auth token.');
     }
 
     const validatedAuth = {
@@ -51,17 +42,17 @@ export function buildServerFactory(
     const client = createServerClientWithAuth(validatedAuth, config);
 
     return {
-      platform: "server",
+      platform: 'server',
       mode,
       client,
       helpers,
     };
   }
 
-  if (mode === "public") {
+  if (mode === 'public') {
     const client = createServerClient(config);
     return {
-      platform: "server",
+      platform: 'server',
       mode,
       client,
       helpers,

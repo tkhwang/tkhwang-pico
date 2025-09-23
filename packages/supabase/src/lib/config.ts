@@ -1,12 +1,11 @@
-import type { createBrowserClient } from "@supabase/ssr";
-import type { Database } from "../types/supabase-database.types";
+import type { createBrowserClient } from '@supabase/ssr';
+
+import type { Database } from '../types/supabase-database.types';
 
 /**
  * Base Supabase client type with database schema
  */
-export type SupabaseClientWithDatabase = ReturnType<
-  typeof createBrowserClient<Database>
->;
+export type SupabaseClientWithDatabase = ReturnType<typeof createBrowserClient<Database>>;
 
 /**
  * Common configuration for all Supabase clients
@@ -37,7 +36,7 @@ export interface ServerConfig extends BaseSupabaseConfig {
 export class SupabaseConfigError extends Error {
   constructor(message: string) {
     super(`Supabase Configuration Error: ${message}`);
-    this.name = "SupabaseConfigError";
+    this.name = 'SupabaseConfigError';
   }
 }
 
@@ -47,21 +46,19 @@ export class SupabaseConfigError extends Error {
 export class SupabaseAuthError extends Error {
   constructor(message: string) {
     super(`Supabase Authentication Error: ${message}`);
-    this.name = "SupabaseAuthError";
+    this.name = 'SupabaseAuthError';
   }
 }
 
 /**
  * Validates base Supabase configuration
  */
-export function validateBaseConfig(
-  config: Partial<BaseSupabaseConfig>
-): BaseSupabaseConfig {
+export function validateBaseConfig(config: Partial<BaseSupabaseConfig>): BaseSupabaseConfig {
   if (!config.url) {
-    throw new SupabaseConfigError("Missing Supabase URL");
+    throw new SupabaseConfigError('Missing Supabase URL');
   }
   if (!config.anonKey) {
-    throw new SupabaseConfigError("Missing Supabase anonymous key");
+    throw new SupabaseConfigError('Missing Supabase anonymous key');
   }
   return config as BaseSupabaseConfig;
 }
@@ -71,7 +68,7 @@ export function validateBaseConfig(
  */
 export function validateAuthToken(token: string | null | undefined): string {
   if (!token) {
-    throw new SupabaseAuthError("Authentication token is required");
+    throw new SupabaseAuthError('Authentication token is required');
   }
   return token;
 }
@@ -79,12 +76,10 @@ export function validateAuthToken(token: string | null | undefined): string {
 /**
  * Validates server configuration
  */
-export function validateServerConfig(
-  config: Partial<ServerConfig>
-): ServerConfig {
+export function validateServerConfig(config: Partial<ServerConfig>): ServerConfig {
   const baseConfig = validateBaseConfig(config);
   if (!config.serviceRoleKey) {
-    throw new SupabaseConfigError("Missing Supabase service role key");
+    throw new SupabaseConfigError('Missing Supabase service role key');
   }
   return {
     ...baseConfig,

@@ -1,13 +1,14 @@
-import { createBrowserClient, createServerClient } from "@supabase/ssr";
-import type { CookieMethodsServer } from "@supabase/ssr";
+import type { CookieMethodsServer } from '@supabase/ssr';
+import { createBrowserClient, createServerClient } from '@supabase/ssr';
+
 import {
   type AuthConfig,
   type BaseSupabaseConfig,
-  type SupabaseClientWithDatabase,
   SupabaseAuthError,
+  type SupabaseClientWithDatabase,
   validateAuthToken,
   validateBaseConfig,
-} from "../lib/config";
+} from '../lib/config';
 
 /**
  * Web platform Supabase configuration from environment variables
@@ -47,24 +48,20 @@ export function createWebClientWithAuth(
   config?: Partial<WebSupabaseConfig>
 ): SupabaseClientWithDatabase {
   if (!session) {
-    throw new SupabaseAuthError(
-      "Clerk session is required for authenticated client"
-    );
+    throw new SupabaseAuthError('Clerk session is required for authenticated client');
   }
 
-  const supabaseConfig = config
-    ? validateBaseConfig(config)
-    : getWebSupabaseConfig();
+  const supabaseConfig = config ? validateBaseConfig(config) : getWebSupabaseConfig();
 
   return createBrowserClient(supabaseConfig.url, supabaseConfig.anonKey, {
     accessToken: async () => {
       try {
-        const token = await session.getToken({ template: "supabase" });
+        const token = await session.getToken({ template: 'supabase' });
         return token || null;
       } catch (error) {
-        console.error("Failed to get Clerk token:", error);
+        console.error('Failed to get Clerk token:', error);
         throw new SupabaseAuthError(
-          `Failed to get Clerk token: ${error instanceof Error ? error.message : "Unknown error"}`
+          `Failed to get Clerk token: ${error instanceof Error ? error.message : 'Unknown error'}`
         );
       }
     },
@@ -79,9 +76,7 @@ export function createWebServerClient(
   cookies: ServerCookieMethods,
   config?: Partial<WebSupabaseConfig>
 ): SupabaseClientWithDatabase {
-  const supabaseConfig = config
-    ? validateBaseConfig(config)
-    : getWebSupabaseConfig();
+  const supabaseConfig = config ? validateBaseConfig(config) : getWebSupabaseConfig();
 
   return createServerClient(supabaseConfig.url, supabaseConfig.anonKey, {
     cookies,
@@ -98,9 +93,7 @@ export function createWebServerClientWithAuth(
   config?: Partial<WebSupabaseConfig>
 ): SupabaseClientWithDatabase {
   const token = validateAuthToken(authConfig.token);
-  const supabaseConfig = config
-    ? validateBaseConfig(config)
-    : getWebSupabaseConfig();
+  const supabaseConfig = config ? validateBaseConfig(config) : getWebSupabaseConfig();
 
   return createServerClient(supabaseConfig.url, supabaseConfig.anonKey, {
     cookies,
@@ -112,15 +105,13 @@ export function createWebServerClientWithAuth(
  * Utility to get Clerk token from auth function
  * Use this helper in server components and API routes
  */
-export async function getClerkToken(
-  getToken: () => Promise<string | null>
-): Promise<string> {
+export async function getClerkToken(getToken: () => Promise<string | null>): Promise<string> {
   try {
     const token = await getToken();
     return validateAuthToken(token);
   } catch (error) {
     throw new SupabaseAuthError(
-      `Failed to get Clerk token: ${error instanceof Error ? error.message : "Unknown error"}`
+      `Failed to get Clerk token: ${error instanceof Error ? error.message : 'Unknown error'}`
     );
   }
 }

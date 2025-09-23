@@ -1,7 +1,7 @@
-import { Database } from "./supabase-database.types";
+import { type Database } from './supabase-database.types';
 
-export type Content = Database["public"]["Tables"]["contents"]["Row"];
-export type UserContent = Database["public"]["Tables"]["user_contents"]["Row"];
+export type Content = Database['public']['Tables']['contents']['Row'];
+export type UserContent = Database['public']['Tables']['user_contents']['Row'];
 
 // Extended type with content details
 export interface UserContentWithDetails extends UserContent {
@@ -10,9 +10,8 @@ export interface UserContentWithDetails extends UserContent {
 }
 
 // Todo filter type based on database enum with 'all' option
-export type ContentTodoStatus =
-  Database["public"]["Enums"]["content_todo_status"];
-export type TodoFilterType = ContentTodoStatus | "all";
+export type ContentTodoStatus = Database['public']['Enums']['content_todo_status'];
+export type TodoFilterType = ContentTodoStatus | 'all';
 
 // Recommendation type for recommendation feed
 export interface Recommendation {
@@ -26,16 +25,14 @@ export interface Recommendation {
 export type SimilarContentRecommendation = Recommendation;
 
 // User Content Preferences types
-export type PreferenceType = "liked" | "not_interested" | "blocked";
+export type PreferenceType = 'liked' | 'not_interested' | 'blocked';
 
-export type UserContentPreference =
-  Database["public"]["Tables"]["user_content_preferences"]["Row"];
+export type UserContentPreference = Database['public']['Tables']['user_content_preferences']['Row'];
 
 export type UserContentPreferenceInsert =
-  Database["public"]["Tables"]["user_content_preferences"]["Insert"];
+  Database['public']['Tables']['user_content_preferences']['Insert'];
 
 // Type-safe preference with proper enum
-export interface UserContentPreferenceTyped
-  extends Omit<UserContentPreference, "preference_type"> {
+export interface UserContentPreferenceTyped extends Omit<UserContentPreference, 'preference_type'> {
   preference_type: PreferenceType;
 }
