@@ -13,7 +13,7 @@ import {
 /**
  * Web platform Supabase configuration from environment variables
  */
-export interface WebSupabaseConfig extends BaseSupabaseConfig {}
+export type WebSupabaseConfig = BaseSupabaseConfig;
 
 /**
  * Clerk session interface for web authentication
@@ -25,7 +25,7 @@ export interface ClerkSession {
 /**
  * Server-side cookie methods for SSR
  */
-export interface ServerCookieMethods extends CookieMethodsServer {}
+export type ServerCookieMethods = CookieMethodsServer;
 
 /**
  * Get Supabase configuration from Next.js environment variables
