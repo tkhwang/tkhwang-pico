@@ -1,8 +1,10 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useAuth } from "@/providers/auth-provider";
-import { deleteThread, type ThreadWithLastMessage } from "@/lib/supabase/chat";
+import type { ThreadWithLastMessage } from "@tkhwang-pico/supabase";
+
 import { queryKey } from "@/hooks/keys/query-key";
 import { useSupabaseMutation } from "@/hooks/mutations/supabase/use-supabase-mutation";
+import { deleteThread } from "@/lib/supabase/threads";
+import { useAuth } from "@/providers/auth-provider";
 
 interface DeleteThreadContext {
   previousThreads: ThreadWithLastMessage[] | undefined;
@@ -34,7 +36,7 @@ export function useDeleteThread() {
         // Optimistically update by removing the thread
         queryClient.setQueryData<ThreadWithLastMessage[]>(
           queryKey.threads.byUserId(user?.id),
-          (old) => old?.filter((thread) => thread.id !== threadId) ?? []
+          (old) => old?.filter((thread) => thread.id !== threadId) ?? [],
         );
 
         return { previousThreads };
@@ -44,7 +46,7 @@ export function useDeleteThread() {
         if (context?.previousThreads) {
           queryClient.setQueryData(
             queryKey.threads.byUserId(user?.id),
-            context.previousThreads
+            context.previousThreads,
           );
         }
       },
@@ -54,6 +56,6 @@ export function useDeleteThread() {
           queryKey: queryKey.threads.byUserId(user?.id),
         });
       },
-    }
+    },
   );
 }

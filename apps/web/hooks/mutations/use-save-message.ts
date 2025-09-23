@@ -1,13 +1,11 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
+import type { Message, SaveMessageParams } from "@tkhwang-pico/supabase";
+
 import { queryKey } from "@/hooks/keys/query-key";
-import {
-  saveMessage,
-  type SaveMessageParams,
-  type Message,
-} from "@/lib/supabase/chat";
 import { useSupabaseMutation } from "@/hooks/mutations/supabase/use-supabase-mutation";
+import { saveMessage } from "@/lib/supabase/messages";
 
 export function useSaveMessage(providedThreadId?: string) {
   const queryClient = useQueryClient();
@@ -35,6 +33,6 @@ export function useSaveMessage(providedThreadId?: string) {
           });
         }
       },
-    }
+    },
   );
 }

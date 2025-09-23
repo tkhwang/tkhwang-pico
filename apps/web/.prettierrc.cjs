@@ -1,1 +1,1 @@
-module.exports = require('@tkhwang-pico/config-eslint-prettier/prettier/prettier.base.cjs');
+module.exports = require("@tkhwang-pico/config-eslint-prettier/prettier/base");
