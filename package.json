@@ -7,7 +7,8 @@
     "clean": "bash scripts/clean.sh",
     "prepare": "husky",
     "type-check": "yarn workspaces foreach run type-check",
-    "lint": "yarn workspaces foreach run lint"
+    "lint": "yarn workspaces foreach run lint",
+    "postinstall": "yarn workspace @tkhwang-pico/supabase build"
   },
   "workspaces": [
     "apps/*",
