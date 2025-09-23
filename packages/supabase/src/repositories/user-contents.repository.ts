@@ -61,10 +61,13 @@ export class UserContentsRepository extends BaseRepository {
       preferenceMap.set(preference.content_id, contentPreferences);
     });
 
-    return (data || []).map((item) => ({
-      ...(item as UserContentWithDetails),
-      preferences: preferenceMap.get(item.content_id) ?? [],
-    }));
+    return (data || []).map(
+      (item) =>
+        ({
+          ...item,
+          preferences: preferenceMap.get(item.content_id) ?? [],
+        }) as UserContentWithDetails,
+    );
   }
 
   async toggleTodoStatus(userContentId: string): Promise<ContentTodoStatus> {
