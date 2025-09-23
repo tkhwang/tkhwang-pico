@@ -57,7 +57,7 @@ export function getMobileSupabaseConfig(): MobileSupabaseConfig {
 export function createMobileClientWithAuth(
   authConfig: AuthConfig,
   options?: MobileClientOptions,
-  config?: Partial<MobileSupabaseConfig>
+  config?: Partial<MobileSupabaseConfig>,
 ): SupabaseClientWithDatabase {
   const token = validateAuthToken(authConfig.token);
   const supabaseConfig = config ? validateBaseConfig(config) : getMobileSupabaseConfig();
@@ -85,7 +85,7 @@ export function createMobileClientWithAuth(
  */
 export function createMobileClient(
   options?: MobileClientOptions,
-  config?: Partial<MobileSupabaseConfig>
+  config?: Partial<MobileSupabaseConfig>,
 ): SupabaseClientWithDatabase {
   const supabaseConfig = config ? validateBaseConfig(config) : getMobileSupabaseConfig();
 
@@ -109,7 +109,7 @@ export function createMobileClient(
 export function createSupabaseClientWithClerkAuth(
   clerkToken: string | null,
   options?: MobileClientOptions,
-  config?: Partial<MobileSupabaseConfig>
+  config?: Partial<MobileSupabaseConfig>,
 ): SupabaseClientWithDatabase {
   if (!clerkToken) {
     throw new SupabaseAuthError('Clerk token is required');

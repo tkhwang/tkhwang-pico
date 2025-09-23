@@ -4,7 +4,7 @@ import type { PreferenceType, Recommendation } from '@tkhwang-pico/supabase';
 import { Alert } from 'react-native';
 
 import { queryKey } from '@/hooks/keys/query-key';
-import { setContentPreference } from '@/lib/supabase/preferences';
+import { setContentPreference } from '@/lib/supabase/user-contents-preferences';
 
 interface SetPreferenceParams {
   contentId: string;

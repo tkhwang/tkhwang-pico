@@ -1,11 +1,10 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useAuth } from "@/providers/auth-provider";
-import {
-  updateThreadTitle,
-  type ThreadWithLastMessage,
-} from "@/lib/supabase/chat";
+import type { ThreadWithLastMessage } from "@tkhwang-pico/supabase";
+
 import { queryKey } from "@/hooks/keys/query-key";
 import { useSupabaseMutation } from "@/hooks/mutations/supabase/use-supabase-mutation";
+import { updateThreadTitle } from "@/lib/supabase/threads";
+import { useAuth } from "@/providers/auth-provider";
 
 interface UpdateThreadTitleParams {
   threadId: string;
@@ -49,8 +48,8 @@ export function useUpdateThreadTitle() {
           queryKey.threads.byUserId(user?.id),
           (old) =>
             old?.map((thread) =>
-              thread.id === threadId ? { ...thread, title } : thread
-            ) ?? []
+              thread.id === threadId ? { ...thread, title } : thread,
+            ) ?? [],
         );
 
         return { previousThreads };
@@ -60,7 +59,7 @@ export function useUpdateThreadTitle() {
         if (context?.previousThreads) {
           queryClient.setQueryData(
             queryKey.threads.byUserId(user?.id),
-            context.previousThreads
+            context.previousThreads,
           );
         }
       },
@@ -70,6 +69,6 @@ export function useUpdateThreadTitle() {
           queryKey: queryKey.threads.byUserId(user?.id),
         });
       },
-    }
+    },
   );
 }

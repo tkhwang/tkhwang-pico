@@ -328,12 +328,32 @@ export interface Database {
     };
     Views: Record<never, never>;
     Functions: {
+      armor: {
+        Args: { '': string };
+        Returns: string;
+      };
       binary_quantize: {
         Args: { '': string } | { '': unknown };
         Returns: unknown;
       };
       current_clerk_user_id: {
         Args: Record<PropertyKey, never>;
+        Returns: string;
+      };
+      dearmor: {
+        Args: { '': string };
+        Returns: string;
+      };
+      gen_random_bytes: {
+        Args: { '': number };
+        Returns: string;
+      };
+      gen_random_uuid: {
+        Args: Record<PropertyKey, never>;
+        Returns: string;
+      };
+      gen_salt: {
+        Args: { '': string };
         Returns: string;
       };
       gtrgm_compress: {
@@ -408,6 +428,14 @@ export interface Database {
         Args: { '': string } | { '': unknown } | { '': unknown };
         Returns: string;
       };
+      pgp_armor_headers: {
+        Args: { '': string };
+        Returns: Record<string, unknown>[];
+      };
+      pgp_key_id: {
+        Args: { '': string };
+        Returns: string;
+      };
       recommend_feed: {
         Args: { p_lang?: string; p_limit?: number; p_model?: string };
         Returns: {
@@ -461,6 +489,10 @@ export interface Database {
       sparsevec_typmod_in: {
         Args: { '': unknown[] };
         Returns: number;
+      };
+      toggle_user_content_status: {
+        Args: { p_user_content_id: string };
+        Returns: Database['public']['Enums']['content_todo_status'];
       };
       vector_avg: {
         Args: { '': number[] };

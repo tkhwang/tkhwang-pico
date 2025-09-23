@@ -360,3 +360,33 @@ $$;
 
 revoke all on function public.recommend_feed(int,text,text) from public;
 grant execute on function public.recommend_feed(int,text,text) to authenticated;
+
+-- 사용자 todo 상태 토글: 단일 UPDATE로 원자적 토글 수행
+create or replace function public.toggle_user_content_status(
+  p_user_content_id uuid
+)
+returns content_todo_status
+language plpgsql
+set search_path = public
+as $$
+declare
+  v_new_status public.content_todo_status;
+begin
+  update public.user_contents
+     set todo_status = case
+                         when todo_status = 'completed' then 'pending'
+                         else 'completed'
+                       end::public.content_todo_status
+   where id = p_user_content_id
+   returning todo_status into v_new_status;
+
+  if v_new_status is null then
+    raise exception 'user_contents row % not found or not accessible', p_user_content_id;
+  end if;
+
+  return v_new_status;
+end;
+$$;
+
+revoke all on function public.toggle_user_content_status(uuid) from public;
+grant execute on function public.toggle_user_content_status(uuid) to authenticated;

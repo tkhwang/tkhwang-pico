@@ -14,8 +14,8 @@ import { useSetContentPreference } from '@/hooks/mutations/use-content-preferenc
 import { useDeleteContent } from '@/hooks/mutations/use-delete-content';
 import { useReopenContent } from '@/hooks/mutations/use-reopen-content';
 import { useSaveContent } from '@/hooks/mutations/use-save-content';
-import { useToggleContent } from '@/hooks/mutations/use-toggle-content';
 import { useToggleContentPreference } from '@/hooks/mutations/use-toggle-content-preference';
+import { useToggleUserContentStatus } from '@/hooks/mutations/use-toggle-user-content-status';
 import { useUserContents } from '@/hooks/queries/use-user-contents';
 import { isContentLiked } from '@/utils/content-helpers';
 
@@ -34,7 +34,7 @@ export function ArchiveList() {
 
   const deleteContentMutation = useDeleteContent();
   const reopenContentMutation = useReopenContent();
-  const toggleContentMutation = useToggleContent();
+  const toggleContentMutation = useToggleUserContentStatus();
   const togglePreferenceMutation = useToggleContentPreference();
   const saveContentMutation = useSaveContent();
   const setPreferenceMutation = useSetContentPreference();
@@ -71,14 +71,14 @@ export function ArchiveList() {
     (id: string) => {
       reopenContentMutation.mutate(id);
     },
-    [reopenContentMutation]
+    [reopenContentMutation],
   );
 
   const handleDelete = useCallback(
     (contentId: string) => {
       deleteContentMutation.mutate(contentId);
     },
-    [deleteContentMutation]
+    [deleteContentMutation],
   );
 
   const handleLike = useCallback(
@@ -88,14 +88,14 @@ export function ArchiveList() {
         preferenceType: 'liked',
       });
     },
-    [togglePreferenceMutation]
+    [togglePreferenceMutation],
   );
 
   const handleAddToQueue = useCallback(
     (url: string, _contentId: string) => {
       saveContentMutation.mutate(url);
     },
-    [saveContentMutation]
+    [saveContentMutation],
   );
 
   const handleNotInterested = useCallback(
@@ -105,7 +105,7 @@ export function ArchiveList() {
         preferenceType: 'not_interested',
       });
     },
-    [setPreferenceMutation]
+    [setPreferenceMutation],
   );
 
   const handleToggleComplete = useCallback(
@@ -113,7 +113,7 @@ export function ArchiveList() {
       toggleContentMutation.mutate(id);
       handleModalClose(); // Close modal after toggle
     },
-    [toggleContentMutation, handleModalClose]
+    [toggleContentMutation, handleModalClose],
   );
 
   // Group contents by date

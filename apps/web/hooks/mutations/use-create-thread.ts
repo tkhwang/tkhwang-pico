@@ -1,12 +1,13 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useAuth } from "@/providers/auth-provider";
-import {
-  createThread,
-  type ThreadWithLastMessage,
-  type CreateThreadParams,
-} from "@/lib/supabase/chat";
+import type {
+  CreateThreadParams,
+  ThreadWithLastMessage,
+} from "@tkhwang-pico/supabase";
+
 import { queryKey } from "@/hooks/keys/query-key";
 import { useSupabaseMutation } from "@/hooks/mutations/supabase/use-supabase-mutation";
+import { createThread } from "@/lib/supabase/threads";
+import { useAuth } from "@/providers/auth-provider";
 
 interface CreateThreadContext {
   previousThreads: ThreadWithLastMessage[] | undefined;
@@ -68,7 +69,7 @@ export function useCreateThread() {
         // Optimistically add the new thread at the beginning
         queryClient.setQueryData<ThreadWithLastMessage[]>(
           queryKey.threads.byUserId(user?.id),
-          (old) => [optimisticThread, ...(old || [])]
+          (old) => [optimisticThread, ...(old || [])],
         );
 
         return { previousThreads, optimisticThread };
@@ -81,8 +82,8 @@ export function useCreateThread() {
             old?.map((thread) =>
               thread.id === context?.optimisticThread.id
                 ? { ...newThread, messageCount: 0 }
-                : thread
-            ) || []
+                : thread,
+            ) || [],
         );
       },
       onError: (_, __, context) => {
@@ -90,7 +91,7 @@ export function useCreateThread() {
         if (context?.previousThreads) {
           queryClient.setQueryData(
             queryKey.threads.byUserId(user?.id),
-            context.previousThreads
+            context.previousThreads,
           );
         }
       },
@@ -100,6 +101,6 @@ export function useCreateThread() {
           queryKey: queryKey.threads.byUserId(user?.id),
         });
       },
-    }
+    },
   );
 }

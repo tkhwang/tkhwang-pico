@@ -10,7 +10,7 @@ import { useSetContentPreference } from '@/hooks/mutations/use-content-preferenc
 import { useDeleteContent } from '@/hooks/mutations/use-delete-content';
 import { useSaveContent } from '@/hooks/mutations/use-save-content';
 import { useToggleContentPreference } from '@/hooks/mutations/use-toggle-content-preference';
-import { useToggleTodo } from '@/hooks/mutations/use-toggle-todo';
+import { useToggleUserContentStatus } from '@/hooks/mutations/use-toggle-user-content-status';
 import { useUserContents } from '@/hooks/queries/use-user-contents';
 import { isContentLiked } from '@/utils/content-helpers';
 
@@ -27,7 +27,7 @@ export function ContentList() {
   const [modalVisible, setModalVisible] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>('bigCard');
 
-  const toggleTodoMutation = useToggleTodo();
+  const toggleTodoMutation = useToggleUserContentStatus();
   const deleteContentMutation = useDeleteContent();
   const togglePreferenceMutation = useToggleContentPreference();
   const saveContentMutation = useSaveContent();
@@ -46,14 +46,14 @@ export function ContentList() {
     (id: string) => {
       toggleTodoMutation.mutate(id);
     },
-    [toggleTodoMutation]
+    [toggleTodoMutation],
   );
 
   const handleDelete = useCallback(
     (contentId: string) => {
       deleteContentMutation.mutate(contentId);
     },
-    [deleteContentMutation]
+    [deleteContentMutation],
   );
 
   const handleLike = useCallback(
@@ -63,14 +63,14 @@ export function ContentList() {
         preferenceType: 'liked',
       });
     },
-    [togglePreferenceMutation]
+    [togglePreferenceMutation],
   );
 
   const handleAddToQueue = useCallback(
     (url: string, _contentId: string) => {
       saveContentMutation.mutate(url);
     },
-    [saveContentMutation]
+    [saveContentMutation],
   );
 
   const handleNotInterested = useCallback(
@@ -80,7 +80,7 @@ export function ContentList() {
         preferenceType: 'not_interested',
       });
     },
-    [setPreferenceMutation]
+    [setPreferenceMutation],
   );
 
   const handleItemPress = useCallback((item: UserContentWithDetails) => {

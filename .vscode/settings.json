@@ -41,11 +41,38 @@
     }
   ],
   "deno.enable": false,
-  "deno.enablePaths": ["./apps/mobile-queue/supabase/functions"],
+  "deno.enablePaths": ["./packages/supabase/functions"],
   "typescript.preferences.includePackageJsonAutoImports": "on",
   "typescript.preferences.preferTypeOnlyAutoImports": true,
   "typescript.preferences.importModuleSpecifier": "non-relative",
   "typescript.suggest.autoImports": true,
   "typescript.updateImportsOnFileMove.enabled": "always",
-  "javascript.preferences.importModuleSpecifier": "non-relative"
+  "javascript.preferences.importModuleSpecifier": "non-relative",
+
+  "typescript.tsserver.pluginPaths": [],
+  "typescript.tsserver.experimental.enableProjectDiagnostics": false,
+
+  "files.watcherExclude": {
+    "**/node_modules/**": true,
+    "**/apps/*/node_modules/**": true,
+    "**/packages/*/node_modules/**": true
+  },
+
+  "typescript.tsserver.watchOptions": {
+    "excludeDirectories": [
+      "**/node_modules",
+      "node_modules",
+      "apps/*/node_modules",
+      "packages/*/node_modules"
+    ]
+  },
+
+  "problems.decorations.enabled": true,
+  "problems.showCurrentInStatus": true,
+
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/bower_components": true,
+    "**/*.code-search": true
+  }
 }

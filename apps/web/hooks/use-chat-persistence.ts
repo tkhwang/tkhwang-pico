@@ -1,15 +1,16 @@
-import { useEffect, useRef, useState } from "react";
 import {
   useCopilotChat,
   useCopilotMessagesContext,
 } from "@copilotkit/react-core";
 import { MessageRole, TextMessage } from "@copilotkit/runtime-client-gql";
-import { copilotRoleToString } from "@/utils/copilotkit";
-import { useAuth } from "@/providers/auth-provider";
-import { convertToCopilotMessages } from "@/utils/copilotkit";
-import { useMessagesByThreadId } from "@/hooks/queries/use-message-by-thread-id";
-import { type Thread } from "../lib/supabase/chat";
+import type { Thread } from "@tkhwang-pico/supabase";
+import { useEffect, useRef, useState } from "react";
+
 import { useSaveMessage } from "@/hooks/mutations/use-save-message";
+import { useMessagesByThreadId } from "@/hooks/queries/use-message-by-thread-id";
+import { useAuth } from "@/providers/auth-provider";
+import { copilotRoleToString } from "@/utils/copilotkit";
+import { convertToCopilotMessages } from "@/utils/copilotkit";
 
 function hasSubstantiveContent(content: string): boolean {
   const trimmed = content.trim();
@@ -59,7 +60,7 @@ export function useChatPersistence({
       // Check if this is an initial message case (user message but no assistant response)
       const userMessages = threadMessages.filter((m) => m.role === "user");
       const assistantMessages = threadMessages.filter(
-        (m) => m.role === "assistant"
+        (m) => m.role === "assistant",
       );
       const isInitialMessage =
         userMessages.length === 1 && assistantMessages.length === 0;
@@ -80,17 +81,17 @@ export function useChatPersistence({
       const seeded = new Set<string>(threadMessages.map((m) => m.id));
       syncedIdsRef.current = seeded;
     },
-    [data, setMessages, threadId, appendMessage]
+    [data, setMessages, threadId, appendMessage],
   );
 
   useEffect(
     function reflectQueryError() {
       if (!queryError) return;
       setError(
-        queryError instanceof Error ? queryError.message : String(queryError)
+        queryError instanceof Error ? queryError.message : String(queryError),
       );
     },
-    [queryError]
+    [queryError],
   );
 
   //Save messages to DB when they change
@@ -105,7 +106,7 @@ export function useChatPersistence({
               m instanceof TextMessage &&
               hasSubstantiveContent(m.content) &&
               copilotRoleToString(m.role) === "assistant" &&
-              !syncedIdsRef.current.has(m.id)
+              !syncedIdsRef.current.has(m.id),
           );
           for (const m of unsynced) {
             await saveMessageMutate({
@@ -119,7 +120,7 @@ export function useChatPersistence({
         } catch (err) {
           console.error("Failed to auto-save messages:", err);
           setError(
-            err instanceof Error ? err.message : "Failed to save messages"
+            err instanceof Error ? err.message : "Failed to save messages",
           );
         }
       };
@@ -127,7 +128,7 @@ export function useChatPersistence({
       const id = setTimeout(run, 400);
       return () => clearTimeout(id);
     },
-    [user, thread, visibleMessages, saveMessageMutate]
+    [user, thread, visibleMessages, saveMessageMutate],
   );
 
   return {

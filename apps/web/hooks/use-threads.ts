@@ -1,10 +1,8 @@
-import { useEffect, useState, useCallback } from "react";
+import type { ThreadWithLastMessage } from "@tkhwang-pico/supabase";
+import { useCallback, useEffect, useState } from "react";
+
+import { deleteThread, getUserThreads } from "@/lib/supabase/threads";
 import { useAuth } from "@/providers/auth-provider";
-import {
-  getUserThreads,
-  deleteThread,
-  type ThreadWithLastMessage,
-} from "../lib/supabase/chat";
 
 interface UseThreadsReturn {
   threads: ThreadWithLastMessage[];
@@ -53,12 +51,12 @@ export function useThreads(): UseThreadsReturn {
       } catch (err) {
         console.error("Failed to delete thread:", err);
         setError(
-          err instanceof Error ? err.message : "Failed to delete thread"
+          err instanceof Error ? err.message : "Failed to delete thread",
         );
         throw err; // Re-throw so the component can handle it
       }
     },
-    [session]
+    [session],
   );
 
   const refetch = useCallback(async () => {

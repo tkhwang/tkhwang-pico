@@ -20,7 +20,7 @@ export function buildWebFactory(options: WebFactoryOptions): WebFactoryResult {
   if (runtime === 'browser') {
     if (mode !== 'auth') {
       throw new SupabaseConfigError(
-        'Auth mode is the only supported option in the browser runtime.'
+        'Auth mode is the only supported option in the browser runtime.',
       );
     }
     const session: ClerkSession | null = options.session ?? null;

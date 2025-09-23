@@ -8,7 +8,7 @@ import type {
 import { Alert } from 'react-native';
 
 import { queryKey } from '@/hooks/keys/query-key';
-import { togglePreference } from '@/lib/supabase/preferences';
+import { togglePreference } from '@/lib/supabase/user-contents-preferences';
 
 interface ToggleContentPreferenceParams {
   contentId: string;
