@@ -1,5 +1,6 @@
+import { type NavigationMenuProps } from "@radix-ui/react-navigation-menu";
+
 import { NavigationMenu } from "@/components/ui/navigation-menu";
-import { NavigationMenuProps } from "@radix-ui/react-navigation-menu";
 
 export const NavMenu = (props: NavigationMenuProps) => (
   <NavigationMenu {...props}>

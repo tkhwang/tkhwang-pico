@@ -1,7 +1,7 @@
 "use client";
 
-import { ChatBeforeLogin } from "@/components/chat/chat-before-login";
 import { ChatAfterLogin } from "@/components/chat/chat-after-login";
+import { ChatBeforeLogin } from "@/components/chat/chat-before-login";
 import { useAuth } from "@/providers/auth-provider";
 
 export default function Home() {

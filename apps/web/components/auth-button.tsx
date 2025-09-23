@@ -1,6 +1,14 @@
 "use client";
 
-import { SignInButton, SignUpButton, UserButton, SignedIn, SignedOut, useUser } from "@clerk/nextjs";
+import {
+  SignedIn,
+  SignedOut,
+  SignInButton,
+  SignUpButton,
+  UserButton,
+  useUser,
+} from "@clerk/nextjs";
+
 import { Button } from "./ui/button";
 
 export function AuthButton() {
@@ -10,13 +18,14 @@ export function AuthButton() {
     <>
       <SignedIn>
         <div className="flex items-center gap-4">
-          Hey, {user?.emailAddresses[0]?.emailAddress || user?.firstName || 'there'}!
-          <UserButton 
+          Hey,{" "}
+          {user?.emailAddresses[0]?.emailAddress || user?.firstName || "there"}!
+          <UserButton
             afterSignOutUrl="/"
             appearance={{
               elements: {
-                avatarBox: "w-8 h-8"
-              }
+                avatarBox: "w-8 h-8",
+              },
             }}
           />
         </div>

@@ -1,11 +1,12 @@
-import { createAuthenticatedSupabaseClient } from "./client";
-import type { AuthClerkSession } from "../../types/auth";
 import type {
   Json,
   Tables,
   TablesInsert,
   TablesUpdate,
 } from "@tkhwang-pico/supabase";
+
+import type { AuthClerkSession } from "../../types/auth";
+import { createAuthenticatedSupabaseClient } from "./client";
 
 export type Thread = Tables<"threads">;
 export type Message = Tables<"messages">;
@@ -37,7 +38,7 @@ export interface ThreadWithLastMessage extends Thread {
  */
 export async function createThread(
   session: AuthClerkSession,
-  { userId, title, metadata = {} }: CreateThreadParams
+  { userId, title, metadata = {} }: CreateThreadParams,
 ): Promise<Thread> {
   const supabase = createAuthenticatedSupabaseClient(session);
 
@@ -61,7 +62,7 @@ export async function createThread(
  */
 export async function saveMessage(
   session: AuthClerkSession,
-  { threadId, role, content, metadata = {} }: SaveMessageParams
+  { threadId, role, content, metadata = {} }: SaveMessageParams,
 ): Promise<Message> {
   const supabase = createAuthenticatedSupabaseClient(session);
 
@@ -100,7 +101,7 @@ export async function saveMessage(
 export async function getUserThreads(
   session: AuthClerkSession,
   userId: string,
-  options: { limit?: number; offset?: number } = {}
+  options: { limit?: number; offset?: number } = {},
 ): Promise<ThreadWithLastMessage[]> {
   const supabase = createAuthenticatedSupabaseClient(session);
 
@@ -119,7 +120,7 @@ export async function getUserThreads(
         created_at,
         metadata
       )
-    `
+    `,
     )
     .eq("user_id", userId)
     // Ensure nested messages are chronologically ordered
@@ -153,7 +154,7 @@ export async function getUserThreads(
  */
 export async function getThreadWithMessages(
   session: AuthClerkSession,
-  threadId: string
+  threadId: string,
 ): Promise<{ thread: Thread; messages: Message[] } | null> {
   const supabase = createAuthenticatedSupabaseClient(session);
 
@@ -190,7 +191,7 @@ export async function getThreadWithMessages(
 export async function updateThreadTitle(
   session: AuthClerkSession,
   threadId: string,
-  title: string
+  title: string,
 ): Promise<Thread> {
   const supabase = createAuthenticatedSupabaseClient(session);
 
@@ -213,7 +214,7 @@ export async function updateThreadTitle(
  */
 export async function deleteThread(
   session: AuthClerkSession,
-  threadId: string
+  threadId: string,
 ): Promise<void> {
   const supabase = createAuthenticatedSupabaseClient(session);
 

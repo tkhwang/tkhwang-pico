@@ -1,10 +1,11 @@
 "use client";
 
-import { MoreHorizontal, Edit3, Trash2 } from "lucide-react";
+import { Edit3, MoreHorizontal, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { NavChatHistorySkeleton } from "@/components/sidebar/nav-chat-history-skeleton";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,7 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -22,11 +23,10 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { useThreadsByUserId } from "@/hooks/queries/use-threads-by-user-id";
 import { useDeleteThread } from "@/hooks/mutations/use-delete-thread";
 import { useUpdateThreadTitle } from "@/hooks/mutations/use-update-thread-title";
-import { Input } from "@/components/ui/input";
-import { NavChatHistorySkeleton } from "@/components/sidebar/nav-chat-history-skeleton";
+import { useThreadsByUserId } from "@/hooks/queries/use-threads-by-user-id";
+import { cn } from "@/lib/utils";
 
 export function NavChatHistory() {
   const router = useRouter();
@@ -61,7 +61,7 @@ export function NavChatHistory() {
     } catch (err) {
       console.error(
         "[-][NavChatHistory] handleDeleteChat: Failed to delete chat:",
-        err
+        err,
       );
     }
   };
@@ -85,7 +85,7 @@ export function NavChatHistory() {
     } catch (err) {
       console.error(
         "[-][NavChatHistory] submitRename: Failed to rename thread:",
-        err
+        err,
       );
       setEditingThreadId(null);
       setEditingTitle("");
@@ -143,7 +143,7 @@ export function NavChatHistory() {
                     className={cn(
                       "w-full justify-start",
                       isCurrentThread &&
-                        "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
+                        "bg-sidebar-accent text-sidebar-accent-foreground font-medium",
                     )}
                   >
                     <Link

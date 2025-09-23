@@ -1,5 +1,6 @@
-import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+
+import { createSupabaseClientFactory } from "@tkhwang-pico/supabase/clients";
 
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({
@@ -8,15 +9,16 @@ export async function updateSession(request: NextRequest) {
     },
   });
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return request.cookies.get(name)?.value;
-        },
-        set(name: string, value: string, options: CookieOptions) {
+  const { client: supabase } = createSupabaseClientFactory({
+    platform: "web",
+    runtime: "server",
+    mode: "public",
+    cookies: {
+      getAll() {
+        return request.cookies.getAll();
+      },
+      setAll(cookiesToSet) {
+        cookiesToSet.forEach(({ name, value, options }) => {
           request.cookies.set({
             name,
             value,
@@ -32,25 +34,10 @@ export async function updateSession(request: NextRequest) {
             value,
             ...options,
           });
-        },
-        remove(name: string, options: CookieOptions) {
-          // Expire the cookie on both the request and response
-          const expired = {
-            name,
-            value: "",
-            ...options,
-            maxAge: 0,
-            expires: new Date(0),
-          };
-          request.cookies.set(expired);
-          response = NextResponse.next({
-            request: { headers: request.headers },
-          });
-          response.cookies.set(expired);
-        },
+        });
       },
-    }
-  );
+    },
+  });
 
   await supabase.auth.getUser();
 

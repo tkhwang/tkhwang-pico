@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { Spinner } from "@/components/ui/shadcn-io/spinner";
 import { SquareCheckBig } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+
+import { Spinner } from "@/components/ui/shadcn-io/spinner";
 
 interface ChatGenericToolRenderProps {
   name: string;

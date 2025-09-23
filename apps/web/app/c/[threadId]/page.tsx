@@ -1,8 +1,12 @@
 "use client";
 
-import { CopilotChat } from "@copilotkit/react-ui";
 import { CopilotKit } from "@copilotkit/react-core";
+import { CopilotChat } from "@copilotkit/react-ui";
+import { use } from "react";
+
+import { ChatPageSkeleton } from "@/components/chat/chat-page-skeleton";
 import { AppSidebar } from "@/components/sidebar/app-sidebar";
+import { ThemeSwitcher } from "@/components/theme-switcher";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -16,13 +20,10 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { ThemeSwitcher } from "@/components/theme-switcher";
-import { use } from "react";
-import { getConfig } from "@/lib/config";
+import { useSaveMessage } from "@/hooks/mutations/use-save-message";
 import { useChatPersistence } from "@/hooks/use-chat-persistence";
 import { useCopilotActions } from "@/hooks/use-copilot-actions";
-import { ChatPageSkeleton } from "@/components/chat/chat-page-skeleton";
-import { useSaveMessage } from "@/hooks/mutations/use-save-message";
+import { getConfig } from "@/lib/config";
 
 interface ChatThreadPageProps {
   params: Promise<{
@@ -46,7 +47,7 @@ function ThreadChatInner({ threadId }: { threadId: string }) {
   if (persistenceError) {
     console.error(
       "[-][ThreadChatInner] Chat persistence error:",
-      persistenceError
+      persistenceError,
     );
   }
 

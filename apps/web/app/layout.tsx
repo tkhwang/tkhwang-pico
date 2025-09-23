@@ -1,14 +1,15 @@
 import "@copilotkit/react-ui/styles.css";
 import "./globals.css";
 
+import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "sonner";
-import { QueryProvider } from "@/providers/query-provider";
-import { AuthProvider } from "@/providers/auth-provider";
+
 import { getConfig } from "@/lib/config";
-import { ClerkProvider } from "@clerk/nextjs";
+import { AuthProvider } from "@/providers/auth-provider";
+import { QueryProvider } from "@/providers/query-provider";
 
 const config = getConfig();
 
@@ -40,9 +41,7 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <ClerkProvider>
-              <AuthProvider>
-                {children}
-              </AuthProvider>
+              <AuthProvider>{children}</AuthProvider>
             </ClerkProvider>
             <Toaster position="bottom-right" richColors />
           </ThemeProvider>
