@@ -11,9 +11,9 @@ function createRepository(clerkToken: string) {
   return new UserContentsRepository(supabase);
 }
 
-export async function toggleTodoStatus(
+export async function toggleUserContentsTodoStatus(
   clerkToken: string,
-  userContentId: string
+  userContentId: string,
 ): Promise<boolean> {
   const repository = createRepository(clerkToken);
   const newStatus = await repository.toggleTodoStatus(userContentId);
@@ -23,7 +23,7 @@ export async function toggleTodoStatus(
 export async function getUserContents(
   clerkToken: string,
   userId: string,
-  todoFilter: TodoFilterType = 'all'
+  todoFilter: TodoFilterType = 'all',
 ): Promise<UserContentWithDetails[]> {
   try {
     const repository = createRepository(clerkToken);
