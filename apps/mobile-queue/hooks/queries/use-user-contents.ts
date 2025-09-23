@@ -3,7 +3,7 @@ import type { TodoFilterType, UserContentWithDetails } from '@tkhwang-pico/supab
 
 import { queryKey } from '@/hooks/keys/query-key';
 import { useSupabaseQuery } from '@/hooks/queries/supabase/use-supabase-query';
-import { getUserContents } from '@/lib/supabase/contents';
+import { getUserContents } from '@/lib/supabase/user-contents';
 
 export function useUserContents(todoFilter: TodoFilterType = 'pending') {
   const { user } = useUser();

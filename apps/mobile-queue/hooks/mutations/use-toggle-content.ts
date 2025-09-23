@@ -2,7 +2,7 @@ import { useAuth } from '@clerk/clerk-expo';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { queryKey } from '@/hooks/keys/query-key';
-import { toggleTodoStatus } from '@/lib/supabase/todo';
+import { toggleTodoStatus } from '@/lib/supabase/user-contents';
 
 /**
  * Hook for toggling content status between pending and completed

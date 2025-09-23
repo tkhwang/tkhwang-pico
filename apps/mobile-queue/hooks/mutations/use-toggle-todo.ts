@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Alert } from 'react-native';
 
 import { queryKey } from '@/hooks/keys/query-key';
-import { toggleTodoStatus } from '@/lib/supabase/todo';
+import { toggleTodoStatus } from '@/lib/supabase/user-contents';
 
 export function useToggleTodo() {
   const { getToken, userId } = useAuth();

@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Alert } from 'react-native';
 
 import { queryKey } from '@/hooks/keys/query-key';
-import { markAsPending } from '@/lib/supabase/todo';
+import { markAsPending } from '@/lib/supabase/user-contents';
 
 /**
  * Hook for reopening completed content (moving back to reading list)
