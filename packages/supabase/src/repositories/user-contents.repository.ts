@@ -1,5 +1,3 @@
-import type { PostgrestError } from '@supabase/supabase-js';
-
 import type { SupabaseClientWithDatabase } from '../lib/config';
 import type {
   ContentTodoStatus,
@@ -7,13 +5,16 @@ import type {
   UserContentPreferenceTyped,
   UserContentWithDetails,
 } from '../types';
+import { BaseRepository } from './base.repository';
 
 export interface GetUserContentsOptions {
   filter?: TodoFilterType;
 }
 
-export class UserContentsRepository {
-  constructor(private readonly client: SupabaseClientWithDatabase) {}
+export class UserContentsRepository extends BaseRepository {
+  constructor(client: SupabaseClientWithDatabase) {
+    super(client);
+  }
 
   async getUserContents(
     userId: string,
@@ -105,11 +106,5 @@ export class UserContentsRepository {
     this.assertNoError(error, 'Error marking as pending');
 
     return true;
-  }
-
-  private assertNoError(error: PostgrestError | null, message: string): asserts error is null {
-    if (error) {
-      throw new Error(`${message}: ${error.message}`);
-    }
   }
 }

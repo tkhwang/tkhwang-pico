@@ -1,10 +1,11 @@
-import type { PostgrestError } from '@supabase/supabase-js';
-
 import type { SupabaseClientWithDatabase } from '../lib/config';
 import type { PreferenceType, UserContentPreferenceTyped } from '../types';
+import { BaseRepository } from './base.repository';
 
-export class UserContentsPreferencesRepository {
-  constructor(private readonly client: SupabaseClientWithDatabase) {}
+export class UserContentsPreferencesRepository extends BaseRepository {
+  constructor(client: SupabaseClientWithDatabase) {
+    super(client);
+  }
 
   async setContentPreference(
     userId: string,
@@ -123,11 +124,5 @@ export class UserContentsPreferencesRepository {
 
     const preference = await this.setContentPreference(userId, contentId, preferenceType, reason);
     return { action: 'set', preference };
-  }
-
-  private assertNoError(error: PostgrestError | null, message: string): asserts error is null {
-    if (error) {
-      throw new Error(`${message}: ${error.message}`);
-    }
   }
 }

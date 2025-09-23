@@ -1,7 +1,6 @@
-import type { PostgrestError } from '@supabase/supabase-js';
-
 import type { SupabaseClientWithDatabase } from '../lib/config';
 import type { Json, Tables, TablesInsert, TablesUpdate } from '../types';
+import { BaseRepository } from './base.repository';
 import type { Message } from './messages.repository';
 
 export type Thread = Tables<'threads'>;
@@ -24,8 +23,10 @@ export interface ThreadWithMessagesResult {
   messages: Message[];
 }
 
-export class ThreadsRepository {
-  constructor(private readonly client: SupabaseClientWithDatabase) {}
+export class ThreadsRepository extends BaseRepository {
+  constructor(client: SupabaseClientWithDatabase) {
+    super(client);
+  }
 
   async createThread({ userId, title, metadata = {} }: CreateThreadParams): Promise<Thread> {
     const { data, error } = await this.client
@@ -147,11 +148,5 @@ export class ThreadsRepository {
     const { error } = await this.client.from('threads').delete().eq('id', threadId);
 
     this.assertNoError(error, 'Failed to delete thread');
-  }
-
-  private assertNoError(error: PostgrestError | null, message: string): asserts error is null {
-    if (error) {
-      throw new Error(`${message}: ${error.message}`);
-    }
   }
 }

@@ -1,7 +1,6 @@
-import type { PostgrestError } from '@supabase/supabase-js';
-
 import type { SupabaseClientWithDatabase } from '../lib/config';
 import type { Json, Tables, TablesInsert } from '../types';
+import { BaseRepository } from './base.repository';
 
 export type Message = Tables<'messages'>;
 export type MessageInsert = TablesInsert<'messages'>;
@@ -13,8 +12,10 @@ export interface SaveMessageParams {
   metadata?: Json;
 }
 
-export class MessagesRepository {
-  constructor(private readonly client: SupabaseClientWithDatabase) {}
+export class MessagesRepository extends BaseRepository {
+  constructor(client: SupabaseClientWithDatabase) {
+    super(client);
+  }
 
   async saveMessage({
     threadId,
@@ -57,11 +58,5 @@ export class MessagesRepository {
     this.assertNoError(error, 'Failed to get messages');
 
     return (data || []) as Message[];
-  }
-
-  private assertNoError(error: PostgrestError | null, message: string): asserts error is null {
-    if (error) {
-      throw new Error(`${message}: ${error.message}`);
-    }
   }
 }
