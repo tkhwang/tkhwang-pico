@@ -3,7 +3,7 @@ import type { PostgrestError } from '@supabase/supabase-js';
 import type { SupabaseClientWithDatabase } from '../lib/config';
 import type { PreferenceType, UserContentPreferenceTyped } from '../types';
 
-export class UserContentPreferencesRepository {
+export class UserContentsPreferencesRepository {
   constructor(private readonly client: SupabaseClientWithDatabase) {}
 
   async setContentPreference(

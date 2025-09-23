@@ -12,7 +12,7 @@ export interface GetUserContentsOptions {
   filter?: TodoFilterType;
 }
 
-export class UserContentRepository {
+export class UserContentsRepository {
   constructor(private readonly client: SupabaseClientWithDatabase) {}
 
   async getUserContents(
