@@ -74,27 +74,17 @@ export class UserContentsRepository {
 
   async toggleTodoStatus(userContentId: string): Promise<ContentTodoStatus> {
     try {
-      const { data: currentItem, error: fetchError } = await this.client
-        .from('user_contents')
-        .select('todo_status')
-        .eq('id', userContentId)
-        .single();
+      const { data, error } = await this.client.rpc('toggle_user_content_status', {
+        p_user_content_id: userContentId,
+      });
 
-      this.assertNoError(fetchError, 'Error fetching current status');
+      this.assertNoError(error, 'Failed to toggle todo status');
 
-      const newStatus: ContentTodoStatus =
-        (currentItem?.todo_status as ContentTodoStatus) === 'completed' ? 'pending' : 'completed';
+      if (!data) {
+        throw new Error('Failed to toggle todo status: No data returned from RPC.');
+      }
 
-      const { error: updateError } = await this.client
-        .from('user_contents')
-        .update({
-          todo_status: newStatus,
-        })
-        .eq('id', userContentId);
-
-      this.assertNoError(updateError, 'Error updating todo status');
-
-      return newStatus;
+      return data;
     } catch (error) {
       console.error('Failed to toggle todo status:', error);
       throw error;

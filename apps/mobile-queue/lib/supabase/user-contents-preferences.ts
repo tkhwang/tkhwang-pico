@@ -20,7 +20,7 @@ export async function setContentPreference(
   userId: string,
   contentId: string,
   preferenceType: PreferenceType,
-  reason?: string
+  reason?: string,
 ): Promise<UserContentPreferenceTyped> {
   const repository = createRepository(clerkToken);
   return repository.setContentPreference(userId, contentId, preferenceType, reason);
@@ -32,7 +32,7 @@ export async function setContentPreference(
 export async function getContentPreference(
   clerkToken: string,
   userId: string,
-  contentId: string
+  contentId: string,
 ): Promise<UserContentPreferenceTyped | null> {
   const repository = createRepository(clerkToken);
   return repository.getContentPreference(userId, contentId);
@@ -44,7 +44,7 @@ export async function getContentPreference(
 export async function getUserPreferences(
   clerkToken: string,
   userId: string,
-  preferenceType?: PreferenceType
+  preferenceType?: PreferenceType,
 ): Promise<UserContentPreferenceTyped[]> {
   const repository = createRepository(clerkToken);
   return repository.getUserPreferences(userId, preferenceType);
@@ -56,7 +56,7 @@ export async function getUserPreferences(
 export async function removeContentPreference(
   clerkToken: string,
   userId: string,
-  contentId: string
+  contentId: string,
 ): Promise<void> {
   const repository = createRepository(clerkToken);
   await repository.removeContentPreference(userId, contentId);
@@ -70,7 +70,7 @@ export async function hasPreference(
   clerkToken: string,
   userId: string,
   contentId: string,
-  preferenceType: PreferenceType
+  preferenceType: PreferenceType,
 ): Promise<boolean> {
   const repository = createRepository(clerkToken);
   return repository.hasPreference(userId, contentId, preferenceType);
@@ -86,7 +86,7 @@ export async function togglePreference(
   userId: string,
   contentId: string,
   preferenceType: PreferenceType,
-  reason?: string
+  reason?: string,
 ): Promise<{ action: 'set' | 'removed'; preference?: UserContentPreferenceTyped }> {
   const repository = createRepository(clerkToken);
   return repository.togglePreference(userId, contentId, preferenceType, reason);
