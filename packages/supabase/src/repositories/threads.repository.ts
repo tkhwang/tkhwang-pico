@@ -71,16 +71,13 @@ export class ThreadsRepository extends BaseRepository {
 
     this.throwIfError(error, 'Failed to get user threads');
 
-    const threadsWithLastMessage = (data || []).map((thread) => {
-      const { messages = [], ...threadWithoutMessages } = thread as Thread & {
-        messages?: Message[];
-      };
-      const lastMessage = messages[messages.length - 1];
-
+    const threadsWithLastMessage = (data || []).map((item) => {
+      const { messages, ...thread } = item;
+      const validMessages = (messages || []) as Message[];
       return {
-        ...(threadWithoutMessages as Thread),
-        lastMessage,
-        messageCount: messages.length,
+        ...thread,
+        lastMessage: validMessages[validMessages.length - 1],
+        messageCount: validMessages.length,
       } satisfies ThreadWithLastMessage;
     });
 
