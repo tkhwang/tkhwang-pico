@@ -10,7 +10,7 @@ export class UserContentsPreferencesRepository {
     userId: string,
     contentId: string,
     preferenceType: PreferenceType,
-    reason?: string
+    reason?: string,
   ): Promise<UserContentPreferenceTyped> {
     try {
       const { data, error } = await this.client
@@ -22,7 +22,7 @@ export class UserContentsPreferencesRepository {
             preference_type: preferenceType,
             reason: reason || null,
           },
-          { onConflict: 'user_id,content_id' }
+          { onConflict: 'user_id,content_id' },
         )
         .select()
         .single();
@@ -45,7 +45,7 @@ export class UserContentsPreferencesRepository {
 
   async getContentPreference(
     userId: string,
-    contentId: string
+    contentId: string,
   ): Promise<UserContentPreferenceTyped | null> {
     try {
       const { data, error } = await this.client
@@ -77,7 +77,7 @@ export class UserContentsPreferencesRepository {
 
   async getUserPreferences(
     userId: string,
-    preferenceType?: PreferenceType
+    preferenceType?: PreferenceType,
   ): Promise<UserContentPreferenceTyped[]> {
     try {
       let query = this.client
@@ -122,7 +122,7 @@ export class UserContentsPreferencesRepository {
   async hasPreference(
     userId: string,
     contentId: string,
-    preferenceType: PreferenceType
+    preferenceType: PreferenceType,
   ): Promise<boolean> {
     const preference = await this.getContentPreference(userId, contentId);
     return preference?.preference_type === preferenceType;
@@ -132,7 +132,7 @@ export class UserContentsPreferencesRepository {
     userId: string,
     contentId: string,
     preferenceType: PreferenceType,
-    reason?: string
+    reason?: string,
   ): Promise<{ action: 'set' | 'removed'; preference?: UserContentPreferenceTyped }> {
     try {
       const existing = await this.getContentPreference(userId, contentId);

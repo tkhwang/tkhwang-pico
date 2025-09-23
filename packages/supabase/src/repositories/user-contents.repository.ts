@@ -17,7 +17,7 @@ export class UserContentsRepository {
 
   async getUserContents(
     userId: string,
-    { filter = 'all' }: GetUserContentsOptions = {}
+    { filter = 'all' }: GetUserContentsOptions = {},
   ): Promise<UserContentWithDetails[]> {
     try {
       let query = this.client
@@ -26,7 +26,7 @@ export class UserContentsRepository {
           `
           *,
           contents:contents!content_id(*)
-        `
+        `,
         )
         .eq('user_id', userId);
 

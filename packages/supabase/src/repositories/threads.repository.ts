@@ -45,7 +45,7 @@ export class ThreadsRepository {
 
   async getUserThreads(
     userId: string,
-    options: { limit?: number; offset?: number } = {}
+    options: { limit?: number; offset?: number } = {},
   ): Promise<ThreadWithLastMessage[]> {
     const { limit = 50, offset = 0 } = options;
 
@@ -61,7 +61,7 @@ export class ThreadsRepository {
           created_at,
           metadata
         )
-      `
+      `,
       )
       .eq('user_id', userId)
       .order('created_at', { foreignTable: 'messages', ascending: true })
@@ -87,7 +87,11 @@ export class ThreadsRepository {
   }
 
   async getThreadById(threadId: string): Promise<Thread | null> {
-    const { data, error } = await this.client.from('threads').select('*').eq('id', threadId).single();
+    const { data, error } = await this.client
+      .from('threads')
+      .select('*')
+      .eq('id', threadId)
+      .single();
 
     if (error) {
       if (error.code === 'PGRST116') {

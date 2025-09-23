@@ -50,7 +50,7 @@ export function getServerSupabaseConfig(): ServerSupabaseConfig {
  * Warning: This client bypasses Row Level Security policies
  */
 export function createServerServiceClient(
-  config?: Partial<ServerSupabaseConfig>
+  config?: Partial<ServerSupabaseConfig>,
 ): SupabaseClientWithDatabase {
   const supabaseConfig = config ? validateServerSupabaseConfig(config) : getServerSupabaseConfig();
 
@@ -71,7 +71,7 @@ export function createServerServiceClient(
  */
 export function createServerClientWithAuth(
   authConfig: AuthConfig,
-  config?: Partial<ServerSupabaseConfig>
+  config?: Partial<ServerSupabaseConfig>,
 ): SupabaseClientWithDatabase {
   const token = validateAuthToken(authConfig.token);
   const supabaseConfig = config ? validateServerSupabaseConfig(config) : getServerSupabaseConfig();
@@ -101,7 +101,7 @@ export function createServerClientWithAuth(
  * Requires SUPABASE_ANON_KEY to be set in environment
  */
 export function createServerClient(
-  config?: Partial<ServerSupabaseConfig>
+  config?: Partial<ServerSupabaseConfig>,
 ): SupabaseClientWithDatabase {
   const supabaseConfig = config ? validateServerSupabaseConfig(config) : getServerSupabaseConfig();
 

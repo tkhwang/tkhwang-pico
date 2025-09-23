@@ -8,7 +8,7 @@ import { getServerSupabaseConfig } from './server';
 import { getWebSupabaseConfig } from './web';
 
 export function createSupabaseClientFactory(
-  options: SupabaseFactoryOptions
+  options: SupabaseFactoryOptions,
 ): SupabaseFactoryResult {
   switch (options.platform) {
     case 'web':
@@ -25,13 +25,13 @@ export function createSupabaseClientFactory(
 }
 
 export function getSupabaseConfigForPlatform(
-  platform: 'web'
+  platform: 'web',
 ): ReturnType<typeof getWebSupabaseConfig>;
 export function getSupabaseConfigForPlatform(
-  platform: 'server'
+  platform: 'server',
 ): ReturnType<typeof getServerSupabaseConfig>;
 export function getSupabaseConfigForPlatform(
-  platform: 'mobile'
+  platform: 'mobile',
 ): ReturnType<typeof getMobileSupabaseConfig>;
 export function getSupabaseConfigForPlatform(platform: 'web' | 'server' | 'mobile') {
   switch (platform) {
