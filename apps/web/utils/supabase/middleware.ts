@@ -1,9 +1,8 @@
-import { NextResponse, type NextRequest } from "next/server";
-
 import { createSupabaseClientFactory } from "@tkhwang-pico/supabase/clients";
+import { type NextRequest, NextResponse } from "next/server";
 
 export async function updateSession(request: NextRequest) {
-  let response = NextResponse.next({
+  const response = NextResponse.next({
     request: {
       headers: request.headers,
     },
@@ -19,16 +18,6 @@ export async function updateSession(request: NextRequest) {
       },
       setAll(cookiesToSet) {
         cookiesToSet.forEach(({ name, value, options }) => {
-          request.cookies.set({
-            name,
-            value,
-            ...options,
-          });
-          response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
-          });
           response.cookies.set({
             name,
             value,

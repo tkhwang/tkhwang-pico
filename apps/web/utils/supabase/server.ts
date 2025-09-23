@@ -1,6 +1,5 @@
-import { cookies } from "next/headers";
-
 import { createSupabaseClientFactory } from "@tkhwang-pico/supabase/clients";
+import { cookies } from "next/headers";
 
 export async function createClient() {
   const cookieStore = await cookies();
@@ -17,7 +16,7 @@ export async function createClient() {
         cookiesToSet.forEach(({ name, value, options }) => {
           try {
             cookieStore.set({ name, value, ...options });
-          } catch (error) {
+          } catch {
             // The `set` method was called from a Server Component.
             // This can be ignored if you have middleware refreshing
             // user sessions.
