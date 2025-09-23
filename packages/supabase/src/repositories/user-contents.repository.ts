@@ -45,8 +45,8 @@ export class UserContentsRepository extends BaseRepository {
       this.client.from('user_content_preferences').select('*').eq('user_id', userId),
     ]);
 
-    this.assertNoError(error, 'Error fetching user contents');
-    this.assertNoError(preferencesError, 'Error fetching content preferences');
+    this.throwIfError(error, 'Error fetching user contents');
+    this.throwIfError(preferencesError, 'Error fetching content preferences');
 
     const preferenceMap = new Map<string, UserContentPreferenceTyped[]>();
     preferenceData?.forEach((preference) => {
@@ -72,7 +72,7 @@ export class UserContentsRepository extends BaseRepository {
       p_user_content_id: userContentId,
     });
 
-    this.assertNoError(error, 'Failed to toggle todo status');
+    this.throwIfError(error, 'Failed to toggle todo status');
 
     if (!data) {
       throw new Error('Failed to toggle todo status: No data returned from RPC.');
@@ -89,7 +89,7 @@ export class UserContentsRepository extends BaseRepository {
       .select('id')
       .single();
 
-    this.assertNoError(error, 'Error marking as complete');
+    this.throwIfError(error, 'Error marking as complete');
 
     return true;
   }
@@ -103,7 +103,7 @@ export class UserContentsRepository extends BaseRepository {
       })
       .eq('id', userContentId);
 
-    this.assertNoError(error, 'Error marking as pending');
+    this.throwIfError(error, 'Error marking as pending');
 
     return true;
   }

@@ -9,7 +9,7 @@ export abstract class BaseRepository {
     this.client = client;
   }
 
-  protected assertNoError(error: PostgrestError | null, message: string): asserts error is null {
+  protected throwIfError(error: PostgrestError | null, message: string): asserts error is null {
     if (error) {
       throw new Error(`${message}: ${error.message}`);
     }

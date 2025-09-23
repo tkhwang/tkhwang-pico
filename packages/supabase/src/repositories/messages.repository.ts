@@ -34,7 +34,7 @@ export class MessagesRepository extends BaseRepository {
       .select()
       .single();
 
-    this.assertNoError(error, 'Failed to save message');
+    this.throwIfError(error, 'Failed to save message');
 
     const { error: bumpError } = await this.client
       .from('threads')
@@ -55,7 +55,7 @@ export class MessagesRepository extends BaseRepository {
       .eq('thread_id', threadId)
       .order('created_at', { ascending: true });
 
-    this.assertNoError(error, 'Failed to get messages');
+    this.throwIfError(error, 'Failed to get messages');
 
     return (data || []) as Message[];
   }

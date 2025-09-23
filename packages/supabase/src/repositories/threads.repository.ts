@@ -39,7 +39,7 @@ export class ThreadsRepository extends BaseRepository {
       .select()
       .single();
 
-    this.assertNoError(error, 'Failed to create thread');
+    this.throwIfError(error, 'Failed to create thread');
 
     return data as Thread;
   }
@@ -69,7 +69,7 @@ export class ThreadsRepository extends BaseRepository {
       .order('updated_at', { ascending: false })
       .range(offset, offset + limit - 1);
 
-    this.assertNoError(error, 'Failed to get user threads');
+    this.throwIfError(error, 'Failed to get user threads');
 
     const threadsWithLastMessage = (data || []).map((thread) => {
       const { messages = [], ...threadWithoutMessages } = thread as Thread & {
@@ -139,7 +139,7 @@ export class ThreadsRepository extends BaseRepository {
       .select()
       .single();
 
-    this.assertNoError(error, 'Failed to update thread title');
+    this.throwIfError(error, 'Failed to update thread title');
 
     return data as Thread;
   }
@@ -147,6 +147,6 @@ export class ThreadsRepository extends BaseRepository {
   async deleteThread(threadId: string): Promise<void> {
     const { error } = await this.client.from('threads').delete().eq('id', threadId);
 
-    this.assertNoError(error, 'Failed to delete thread');
+    this.throwIfError(error, 'Failed to delete thread');
   }
 }

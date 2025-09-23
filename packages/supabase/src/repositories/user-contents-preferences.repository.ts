@@ -27,7 +27,7 @@ export class UserContentsPreferencesRepository extends BaseRepository {
       .select()
       .single();
 
-    this.assertNoError(error, 'Error setting content preference');
+    this.throwIfError(error, 'Error setting content preference');
 
     if (!data) {
       throw new Error('No data returned from preference upsert');
@@ -54,7 +54,7 @@ export class UserContentsPreferencesRepository extends BaseRepository {
       return null;
     }
 
-    this.assertNoError(error, 'Error getting content preference');
+    this.throwIfError(error, 'Error getting content preference');
 
     if (!data) {
       return null;
@@ -82,7 +82,7 @@ export class UserContentsPreferencesRepository extends BaseRepository {
 
     const { data, error } = await query;
 
-    this.assertNoError(error, 'Error getting user preferences');
+    this.throwIfError(error, 'Error getting user preferences');
 
     return (data || []).map((preference) => ({
       ...preference,
@@ -97,7 +97,7 @@ export class UserContentsPreferencesRepository extends BaseRepository {
       .eq('user_id', userId)
       .eq('content_id', contentId);
 
-    this.assertNoError(error, 'Error removing content preference');
+    this.throwIfError(error, 'Error removing content preference');
   }
 
   async hasPreference(
