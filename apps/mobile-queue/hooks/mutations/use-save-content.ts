@@ -5,7 +5,7 @@ import { Alert } from 'react-native';
 
 import { SAVE_CONTENT_DELAY_MS } from '@/consts/app-consts';
 import { queryKey } from '@/hooks/keys/query-key';
-import { saveContent } from '@/lib/api/contents';
+import { saveContent } from '@/services/api/contents';
 
 interface UseSaveContentOptions {
   onMutate?: () => any;

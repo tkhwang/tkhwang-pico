@@ -3,7 +3,7 @@ import type { Recommendation } from '@tkhwang-pico/supabase';
 
 import { queryKey } from '@/hooks/keys/query-key';
 import { useSupabaseQuery } from '@/hooks/queries/supabase/use-supabase-query';
-import { getRecommendations } from '@/lib/api/recommendations';
+import { getRecommendations } from '@/services/api/recommendations';
 
 interface UseRecommendationsOptions {
   limit?: number;
