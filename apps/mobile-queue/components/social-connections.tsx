@@ -104,14 +104,14 @@ export function SocialConnections() {
             key={strategy.type}
             className={cn(
               'h-12 w-full flex-row items-center justify-start gap-3 rounded-lg pl-1',
-              strategy.backgroundColor
+              strategy.backgroundColor,
             )}
             onPress={onSocialLoginPress(strategy.type)}
           >
             <View
               className={cn(
                 'h-10 w-10 items-center justify-center rounded-full',
-                strategy.type === 'oauth_apple' ? 'bg-transparent' : 'bg-white'
+                strategy.type === 'oauth_apple' ? 'bg-transparent' : 'bg-white',
               )}
             >
               <Image

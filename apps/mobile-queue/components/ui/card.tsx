@@ -9,7 +9,7 @@ function Card({ className, ...props }: ViewProps & React.RefAttributes<View>) {
       <View
         className={cn(
           'flex flex-col gap-6 rounded-xl border border-border bg-card py-6 shadow-sm shadow-black/5',
-          className
+          className,
         )}
         {...props}
       />

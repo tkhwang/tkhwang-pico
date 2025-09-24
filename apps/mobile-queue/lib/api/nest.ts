@@ -74,7 +74,7 @@ export async function nestApi<T = any>(endpoint: string, options: RequestOptions
       // Provide more context for network errors
       if (error.message === 'Network request failed') {
         throw new Error(
-          `Network request failed. Please check if the server is running at ${NEST_API_URL}`
+          `Network request failed. Please check if the server is running at ${NEST_API_URL}`,
         );
       }
       throw error;

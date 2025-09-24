@@ -34,7 +34,7 @@ interface SimilarContentsOptions {
 export async function getSimilarContents(
   token: string,
   contentId: string,
-  options?: SimilarContentsOptions
+  options?: SimilarContentsOptions,
 ): Promise<SimilarContentRecommendation[]> {
   const params = new URLSearchParams();
 

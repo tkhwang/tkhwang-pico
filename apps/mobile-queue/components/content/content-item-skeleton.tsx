@@ -17,7 +17,7 @@ export function ContentItemSkeleton() {
           duration: 1500,
           useNativeDriver: true,
         }),
-      ])
+      ]),
     ).start();
   }, [fadeAnim]);
 

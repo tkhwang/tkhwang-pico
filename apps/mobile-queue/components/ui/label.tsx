@@ -19,7 +19,7 @@ function Label({
         Platform.select({
           web: 'cursor-default leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-50 group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50',
         }),
-        disabled && 'opacity-50'
+        disabled && 'opacity-50',
       )}
       onPress={onPress}
       onLongPress={onLongPress}
@@ -31,7 +31,7 @@ function Label({
         className={cn(
           'text-sm font-medium text-foreground',
           Platform.select({ web: 'leading-none' }),
-          className
+          className,
         )}
         {...props}
       />

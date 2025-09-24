@@ -34,7 +34,7 @@ export function getApiUrl(): string {
     // User needs to set EXPO_PUBLIC_NEST_API_URL_ANDROID
     console.warn(
       '⚠️ Running on Android physical device. ' +
-        "Please set EXPO_PUBLIC_NEST_API_URL_ANDROID with your machine's IP address"
+        "Please set EXPO_PUBLIC_NEST_API_URL_ANDROID with your machine's IP address",
     );
     return baseUrl; // Will fail, but provides clear error message
   }

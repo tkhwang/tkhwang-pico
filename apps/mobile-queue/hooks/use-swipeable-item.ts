@@ -68,7 +68,7 @@ export function useSwipeableItem({
   const distanceLimit = Math.max(
     maxSwipeDistance,
     normalizedLeftOpenValue,
-    normalizedRightOpenValue
+    normalizedRightOpenValue,
   );
 
   const closingThreshold = swipeThreshold / 2;
@@ -153,7 +153,7 @@ export function useSwipeableItem({
       translateX.value,
       [0, swipeThreshold, distanceLimit],
       [0.8, 1, 1.2],
-      Extrapolation.CLAMP
+      Extrapolation.CLAMP,
     );
     return {
       transform: [{ scale }],
@@ -165,7 +165,7 @@ export function useSwipeableItem({
       translateX.value,
       [0, -swipeThreshold, -distanceLimit],
       [0.8, 1, 1.2],
-      Extrapolation.CLAMP
+      Extrapolation.CLAMP,
     );
     return {
       transform: [{ scale }],

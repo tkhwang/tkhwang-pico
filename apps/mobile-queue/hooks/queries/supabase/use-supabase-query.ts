@@ -7,7 +7,7 @@ import { type QueryKey, useQuery, type UseQueryOptions } from '@tanstack/react-q
 export function useSupabaseQuery<TData, TError = Error>(
   queryKey: QueryKey,
   queryFn: (clerkToken: string) => Promise<TData>,
-  options?: Omit<UseQueryOptions<TData, TError>, 'queryKey' | 'queryFn'>
+  options?: Omit<UseQueryOptions<TData, TError>, 'queryKey' | 'queryFn'>,
 ) {
   const { getToken, isSignedIn } = useAuth();
 

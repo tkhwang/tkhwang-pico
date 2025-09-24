@@ -74,7 +74,7 @@ export function ContentDetail({
         opacity={0.5}
       />
     ),
-    []
+    [],
   );
 
   const renderHandle = React.useCallback(
@@ -83,7 +83,7 @@ export function ContentDetail({
         <View className="h-1 w-12 rounded-full bg-gray-300 dark:bg-gray-600" />
       </View>
     ),
-    []
+    [],
   );
 
   const handleDismiss = React.useCallback(() => {
