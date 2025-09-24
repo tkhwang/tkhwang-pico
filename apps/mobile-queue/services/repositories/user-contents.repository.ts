@@ -25,12 +25,7 @@ export class UserContentsRepository {
     userId: string,
     todoFilter: TodoFilterType = 'all',
   ): Promise<UserContentWithDetails[]> {
-    try {
-      return await this.repository.getUserContents(userId, { filter: todoFilter });
-    } catch (error) {
-      console.error('Failed to fetch user contents:', error);
-      throw error;
-    }
+    return this.repository.getUserContents(userId, { filter: todoFilter });
   }
 
   /**
