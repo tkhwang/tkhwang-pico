@@ -1,6 +1,6 @@
 import type { SupabaseClientWithDatabase } from '../lib/config';
 import type { Json, Tables, TablesInsert, TablesUpdate } from '../types';
-import { BaseRepository } from './base.repository';
+import { BaseRepository, type RepositoryLogger } from './base.repository';
 import type { Message } from './messages.repository';
 
 export type Thread = Tables<'threads'>;
@@ -24,8 +24,8 @@ export interface ThreadWithMessagesResult {
 }
 
 export class ThreadsRepository extends BaseRepository {
-  constructor(client: SupabaseClientWithDatabase) {
-    super(client);
+  constructor(client: SupabaseClientWithDatabase, logger?: RepositoryLogger) {
+    super(client, logger);
   }
 
   async createThread({ userId, title, metadata = {} }: CreateThreadParams): Promise<Thread> {
