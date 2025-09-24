@@ -3,8 +3,8 @@ import { OnEvent } from '@nestjs/event-emitter';
 
 import { HtmlCacheService } from '../cache/html-cache.service';
 import { EVENTS } from '../common/constants/events';
-import { ContentsRepository } from '../supabase/contents.repository';
-import { UserContentsRepository } from '../supabase/user-contents.repository';
+import { ContentsRepository } from '../supabase/repositories/contents.repository';
+import { UserContentsRepository } from '../supabase/repositories/user-contents.repository';
 
 import { IngestEmbeddingService } from './ingest-embedding.service';
 import { IngestExtractService } from './ingest-extract.service';

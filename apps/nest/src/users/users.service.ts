@@ -5,8 +5,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 
+import { UserContentsRepository } from '../supabase/repositories/user-contents.repository';
 import { SupabaseService } from '../supabase/supabase.service';
-import { UserContentsRepository } from '../supabase/user-contents.repository';
 
 @Injectable()
 export class UsersService {
