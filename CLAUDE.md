@@ -29,6 +29,7 @@ yarn                    # Install all dependencies
 yarn clean              # Clean all node_modules, build artifacts, and caches
 yarn type-check         # Type check all workspaces
 yarn lint               # Lint all workspaces
+yarn lint-staged        # Run lint-staged for pre-commit hooks
 ```
 
 ### Mobile App (`apps/mobile-queue/`)
@@ -104,6 +105,7 @@ yarn test:int          # Run integration tests
 ```bash
 yarn generate-types    # Generate TypeScript types from Supabase schema
 yarn typecheck         # Type check without emitting files
+yarn build             # Build the package (required for other apps to use)
 ```
 
 #### Common Package (`packages/common/`)
@@ -318,9 +320,10 @@ OPENAI_API_KEY=your_openai_api_key
 
 1. Set up environment variables in `.env.local` files for each app
 2. Install dependencies: `yarn` (from root)
-3. Start Mastra server: `cd apps/mastra && yarn dev`
-4. Start web app: `cd apps/web && yarn dev`
-5. For mobile: `cd apps/mobile-queue && yarn dev`
+3. Build shared packages: `yarn workspace @tkhwang-pico/supabase build`
+4. Start Mastra server: `cd apps/mastra && yarn dev`
+5. Start web app: `cd apps/web && yarn dev`
+6. For mobile: `cd apps/mobile-queue && yarn dev`
 
 The web app validates required environment variables on startup and will throw descriptive errors for missing configuration.
 
@@ -359,6 +362,10 @@ All apps enforce consistent import ordering:
 - **Web**: Next.js patterns, React hooks, TanStack Query exhaustive deps
 - **Mobile**: React Native patterns, Expo conventions, platform-specific imports
 - **Backend**: Node.js patterns, async/await best practices
+
+### Pre-commit Hooks
+
+The repository uses Husky with lint-staged to run linting on staged files before commit.
 
 ## Testing & Quality
 
@@ -426,6 +433,7 @@ The Mastra system uses LibSQL with in-memory storage by default. When configured
 
 - **RLS policies**: Ensure proper JWT configuration for Clerk-Supabase integration
 - **Type generation**: Run `yarn generate-types` from `packages/supabase/` after schema changes
+- **Build shared packages**: Always run `yarn workspace @tkhwang-pico/supabase build` after changes
 
 ### Monorepo Dependencies
 
