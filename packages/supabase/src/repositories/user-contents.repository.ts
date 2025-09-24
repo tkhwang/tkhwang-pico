@@ -5,15 +5,15 @@ import type {
   UserContentPreferenceTyped,
   UserContentWithDetails,
 } from '../types';
-import { BaseRepository } from './base.repository';
+import { BaseRepository, type RepositoryLogger } from './base.repository';
 
 export interface GetUserContentsOptions {
   filter?: TodoFilterType;
 }
 
 export class UserContentsRepository extends BaseRepository {
-  constructor(client: SupabaseClientWithDatabase) {
-    super(client);
+  constructor(client: SupabaseClientWithDatabase, logger?: RepositoryLogger) {
+    super(client, logger);
   }
 
   async getUserContents(

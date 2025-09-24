@@ -1,6 +1,6 @@
 import type { SupabaseClientWithDatabase } from '../lib/config';
 import type { Json, Tables, TablesInsert } from '../types';
-import { BaseRepository } from './base.repository';
+import { BaseRepository, type RepositoryLogger } from './base.repository';
 
 export type Message = Tables<'messages'>;
 export type MessageInsert = TablesInsert<'messages'>;
@@ -13,8 +13,8 @@ export interface SaveMessageParams {
 }
 
 export class MessagesRepository extends BaseRepository {
-  constructor(client: SupabaseClientWithDatabase) {
-    super(client);
+  constructor(client: SupabaseClientWithDatabase, logger?: RepositoryLogger) {
+    super(client, logger);
   }
 
   async saveMessage({
@@ -42,7 +42,7 @@ export class MessagesRepository extends BaseRepository {
       .eq('id', threadId);
 
     if (bumpError) {
-      console.warn('Failed to bump thread.updated_at', bumpError);
+      this.logger.warn('Failed to bump thread.updated_at', bumpError);
     }
 
     return data as Message;
