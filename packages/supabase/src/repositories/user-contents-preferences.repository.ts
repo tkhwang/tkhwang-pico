@@ -1,10 +1,10 @@
 import type { SupabaseClientWithDatabase } from '../lib/config';
 import type { PreferenceType, UserContentPreferenceTyped } from '../types';
-import { BaseRepository } from './base.repository';
+import { BaseRepository, type RepositoryLogger } from './base.repository';
 
 export class UserContentsPreferencesRepository extends BaseRepository {
-  constructor(client: SupabaseClientWithDatabase) {
-    super(client);
+  constructor(client: SupabaseClientWithDatabase, logger?: RepositoryLogger) {
+    super(client, logger);
   }
 
   async setContentPreference(

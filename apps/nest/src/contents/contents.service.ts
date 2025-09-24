@@ -8,15 +8,15 @@ import {
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { QUERY_SIMILAR_CONTENTS_DEFAULT_LIMIT } from 'src/consts/app-consts';
 
-import type { SimilarContentRecommendation } from '@tkhwang-pico/supabase';
+import { type SimilarContentRecommendation } from '@tkhwang-pico/supabase';
 
 import { HtmlCacheService } from '../cache/html-cache.service';
 import { EVENTS } from '../common/constants/events';
 import { IngestExtractService } from '../ingest/ingest-extract.service';
 import { Url } from '../shared/domain/value-objects/url.value-object';
-import { ContentsRepository } from '../supabase/contents.repository';
-import { DebugRepository } from '../supabase/debug.repository';
-import { UserContentsRepository } from '../supabase/user-contents.repository';
+import { ContentsRepository } from '../supabase/repositories/contents.repository';
+import { DebugFailedContentsRepository } from '../supabase/repositories/debug-failed-contents.repository';
+import { UserContentsRepository } from '../supabase/repositories/user-contents.repository';
 
 @Injectable()
 export class ContentsService {
@@ -26,7 +26,7 @@ export class ContentsService {
     private readonly htmlCache: HtmlCacheService,
     private readonly contentsRepository: ContentsRepository,
     private readonly userContentsRepository: UserContentsRepository,
-    private readonly debugRepository: DebugRepository,
+    private readonly debugFailedContentsRepository: DebugFailedContentsRepository,
   ) {}
 
   async saveUrl({ url, userId }: { url: string; userId: string }) {
@@ -48,7 +48,7 @@ export class ContentsService {
       html = await this.ingestExtractService.fetchHtml(canonicalUrl);
     } catch (fetchError) {
       // Save debug info for failed fetch
-      await this.debugRepository.saveFailedContent({
+      await this.debugFailedContentsRepository.saveFailedContent({
         url: canonicalUrl,
         user_id: userId,
         error_message: fetchError instanceof Error ? fetchError.message : 'Failed to fetch URL',
