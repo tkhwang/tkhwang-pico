@@ -129,7 +129,7 @@ export function useSaveContent(options?: UseSaveContentOptions) {
       Alert.alert(
         'Failed to save content',
         error.message || 'Please check your connection and try again.',
-        [{ text: 'OK' }]
+        [{ text: 'OK' }],
       );
 
       // Call user's onError with userContext

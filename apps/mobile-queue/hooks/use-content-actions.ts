@@ -44,7 +44,7 @@ export function useContentActions() {
   const deleteContent = (
     contentId: string,
     onDelete?: (contentId: string) => void,
-    onSuccess?: () => void
+    onSuccess?: () => void,
   ) => {
     Alert.alert('Delete Content', 'Are you sure you want to delete this content?', [
       { text: 'Cancel', style: 'cancel' },

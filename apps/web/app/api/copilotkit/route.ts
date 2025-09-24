@@ -1,13 +1,13 @@
-import { MastraAgent } from "@ag-ui/mastra";
+import { MastraAgent } from '@ag-ui/mastra';
 import {
   CopilotRuntime,
   copilotRuntimeNextJSAppRouterEndpoint,
   ExperimentalEmptyAdapter,
-} from "@copilotkit/runtime";
-import { MastraClient } from "@mastra/client-js";
-import { type NextRequest } from "next/server";
+} from '@copilotkit/runtime';
+import { MastraClient } from '@mastra/client-js';
+import { type NextRequest } from 'next/server';
 
-import { getConfig } from "@/lib/config";
+import { getConfig } from '@/lib/config';
 
 const serviceAdapter = new ExperimentalEmptyAdapter();
 
@@ -40,12 +40,12 @@ export const POST = async (req: NextRequest) => {
     const { handleRequest } = copilotRuntimeNextJSAppRouterEndpoint({
       runtime,
       serviceAdapter,
-      endpoint: "/api/copilotkit",
+      endpoint: '/api/copilotkit',
     });
     return handleRequest(req);
   } catch (err) {
-    console.error("Failed to initialize CopilotRuntime:", err);
-    return new Response("Copilot runtime initialization failed", {
+    console.error('Failed to initialize CopilotRuntime:', err);
+    return new Response('Copilot runtime initialization failed', {
       status: 500,
     });
   }

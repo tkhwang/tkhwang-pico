@@ -1,14 +1,11 @@
-import { openai } from "@ai-sdk/openai";
-import { Agent } from "@mastra/core";
+import { openai } from '@ai-sdk/openai';
+import { Agent } from '@mastra/core';
 
-import {
-  detectLanguage,
-  generateFallbackMessage,
-} from "../tools/fallback-tools";
+import { detectLanguage, generateFallbackMessage } from '../tools/fallback-tools';
 
 export const fallbackAgent = new Agent({
-  id: "fallbackAgent",
-  name: "Fallback Agent",
+  id: 'fallbackAgent',
+  name: 'Fallback Agent',
   instructions: `
     You are a fallback agent that handles requests when no other specialized agent can process them.
 
@@ -19,7 +16,7 @@ export const fallbackAgent = new Agent({
 
     Always respond politely and helpfully, explaining what services are available.
   `,
-  model: openai("gpt-4o-mini"),
+  model: openai('gpt-4o-mini'),
   tools: {
     detectLanguage,
     generateFallbackMessage,

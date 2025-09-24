@@ -1,10 +1,10 @@
-"use server";
+'use server';
 
-import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
+import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
 
-import { getConfig } from "@/lib/config";
-import { createClient } from "@/utils/supabase/server";
+import { getConfig } from '@/lib/config';
+import { createClient } from '@/utils/supabase/server';
 
 export async function login(formData: FormData) {
   const supabase = await createClient();
@@ -12,18 +12,18 @@ export async function login(formData: FormData) {
   // type-casting here for convenience
   // in practice, you should validate your inputs
   const data = {
-    email: formData.get("email") as string,
-    password: formData.get("password") as string,
+    email: formData.get('email') as string,
+    password: formData.get('password') as string,
   };
 
   const { error } = await supabase.auth.signInWithPassword(data);
 
   if (error) {
-    redirect("/error");
+    redirect('/error');
   }
 
-  revalidatePath("/", "layout");
-  redirect("/");
+  revalidatePath('/', 'layout');
+  redirect('/');
 }
 
 export async function signup(formData: FormData) {
@@ -31,15 +31,15 @@ export async function signup(formData: FormData) {
 
   // type-casting here for convenience
   // in practice, you should validate your inputs
-  const firstName = formData.get("first-name") as string;
-  const lastName = formData.get("last-name") as string;
+  const firstName = formData.get('first-name') as string;
+  const lastName = formData.get('last-name') as string;
   const data = {
-    email: formData.get("email") as string,
-    password: formData.get("password") as string,
+    email: formData.get('email') as string,
+    password: formData.get('password') as string,
     options: {
       data: {
-        full_name: `${firstName + " " + lastName}`,
-        email: formData.get("email") as string,
+        full_name: `${firstName + ' ' + lastName}`,
+        email: formData.get('email') as string,
       },
     },
   };
@@ -47,11 +47,11 @@ export async function signup(formData: FormData) {
   const { error } = await supabase.auth.signUp(data);
 
   if (error) {
-    redirect("/error");
+    redirect('/error');
   }
 
-  revalidatePath("/", "layout");
-  redirect("/");
+  revalidatePath('/', 'layout');
+  redirect('/');
 }
 
 export async function signout() {
@@ -59,29 +59,29 @@ export async function signout() {
   const { error } = await supabase.auth.signOut();
   if (error) {
     console.log(error);
-    redirect("/error");
+    redirect('/error');
   }
 
-  redirect("/auth/login");
+  redirect('/auth/login');
 }
 
 export async function signInWithGoogle() {
   const supabase = await createClient();
 
   const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: "google",
+    provider: 'google',
     options: {
       redirectTo: `${getConfig().common.webUrl}/auth/callback`,
       queryParams: {
-        access_type: "offline",
-        prompt: "consent",
+        access_type: 'offline',
+        prompt: 'consent',
       },
     },
   });
 
   if (error) {
     console.log(error);
-    redirect("/error");
+    redirect('/error');
   }
 
   redirect(data.url);
@@ -91,7 +91,7 @@ export async function signInWithKakao() {
   const supabase = await createClient();
 
   const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: "kakao",
+    provider: 'kakao',
     options: {
       redirectTo: `${getConfig().common.webUrl}/auth/callback`,
     },
@@ -99,7 +99,7 @@ export async function signInWithKakao() {
 
   if (error) {
     console.log(error);
-    redirect("/error");
+    redirect('/error');
   }
 
   redirect(data.url);

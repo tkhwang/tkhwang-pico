@@ -1,6 +1,6 @@
 import { Tabs } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { Brain, Download, Layers, Settings } from 'lucide-react-native';
+import { Brain, Compass, Layers, Settings } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import * as React from 'react';
 import { Platform } from 'react-native';
@@ -51,7 +51,16 @@ export default function TabLayout() {
         options={{
           title: 'Queue',
           headerShown: false,
-          tabBarIcon: ({ color, size }) => <Icon as={Layers} color={color} size={size} />,
+          tabBarIcon: ({ color, size, focused }) => (
+            <Icon
+              as={Layers}
+              color={color}
+              size={size}
+              fill={focused ? color : 'none'}
+              fillOpacity={focused ? 0.2 : 1}
+              strokeWidth={focused ? 1.1 : 1.5}
+            />
+          ),
         }}
       />
       <Tabs.Screen
@@ -59,7 +68,16 @@ export default function TabLayout() {
         options={{
           title: 'Discover',
           headerShown: false,
-          tabBarIcon: ({ color, size }) => <Icon as={Download} color={color} size={size} />,
+          tabBarIcon: ({ color, size, focused }) => (
+            <Icon
+              as={Compass}
+              color={color}
+              size={size}
+              fill={focused ? color : 'none'}
+              fillOpacity={focused ? 0.2 : 1}
+              strokeWidth={focused ? 1.1 : 1.5}
+            />
+          ),
         }}
       />
       <Tabs.Screen
@@ -67,7 +85,16 @@ export default function TabLayout() {
         options={{
           title: 'Archive',
           headerShown: false,
-          tabBarIcon: ({ color, size }) => <Icon as={Brain} color={color} size={size} />,
+          tabBarIcon: ({ color, size, focused }) => (
+            <Icon
+              as={Brain}
+              color={color}
+              size={size}
+              fill={focused ? color : 'none'}
+              fillOpacity={focused ? 0.2 : 1}
+              strokeWidth={focused ? 1.1 : 1.5}
+            />
+          ),
         }}
       />
       <Tabs.Screen
@@ -75,7 +102,16 @@ export default function TabLayout() {
         options={{
           title: 'Settings',
           headerShown: false,
-          tabBarIcon: ({ color, size }) => <Icon as={Settings} color={color} size={size} />,
+          tabBarIcon: ({ color, size, focused }) => (
+            <Icon
+              as={Settings}
+              color={color}
+              size={size}
+              fill={focused ? color : 'none'}
+              fillOpacity={focused ? 0.2 : 1}
+              strokeWidth={focused ? 1.1 : 1.5}
+            />
+          ),
         }}
       />
     </Tabs>

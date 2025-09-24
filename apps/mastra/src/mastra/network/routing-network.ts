@@ -1,13 +1,13 @@
-import { openai } from "@ai-sdk/openai";
-import { NewAgentNetwork } from "@mastra/core/network/vNext";
+import { openai } from '@ai-sdk/openai';
+import { NewAgentNetwork } from '@mastra/core/network/vNext';
 
-import { fallbackAgent } from "../agents/fallback-agent";
-import { weatherAgent } from "../agents/weather-agent";
-import { weatherWorkflow } from "../workflows/weather-workflow";
+import { fallbackAgent } from '../agents/fallback-agent';
+import { weatherAgent } from '../agents/weather-agent';
+import { weatherWorkflow } from '../workflows/weather-workflow';
 
 export const routingNetwork = new NewAgentNetwork({
-  id: "routing-network",
-  name: "Intelligent Routing Network",
+  id: 'routing-network',
+  name: 'Intelligent Routing Network',
   instructions: `
     You are an intelligent routing network that handles user requests by analyzing intent and executing the most appropriate agent or workflow.
 
@@ -48,7 +48,7 @@ export const routingNetwork = new NewAgentNetwork({
     2. Generate appropriate fallback message with current capabilities
     3. Provide helpful guidance about available services
   `,
-  model: openai("gpt-4o-mini"),
+  model: openai('gpt-4o-mini'),
   agents: {
     weatherAgent,
     fallbackAgent,

@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { LoginButton } from "@/components/auth/login-button";
-import { PicoLogo } from "@/components/pico-logo";
-import { ThemeSwitcher } from "@/components/theme-switcher";
+import { LoginButton } from '@/components/auth/login-button';
+import { PicoLogo } from '@/components/pico-logo';
+import { ThemeSwitcher } from '@/components/theme-switcher';
 
-import { NavMenu } from "./nav-menu";
-import { NavigationSheet } from "./navigation-sheet";
+import { NavMenu } from './nav-menu';
+import { NavigationSheet } from './navigation-sheet';
 
 const Navbar02Page = () => {
   return (

@@ -73,7 +73,7 @@ export function useToggleContentPreference(options?: UseToggleContentPreferenceO
 
       queryClient.setQueriesData<UserContentWithDetails[]>(
         { queryKey: userContentsKey, exact: false },
-        (old) => updatePreferences(old, contentId, preferenceType, optimisticPreference, 'toggle')
+        (old) => updatePreferences(old, contentId, preferenceType, optimisticPreference, 'toggle'),
       );
 
       return { previousUserContents };
@@ -99,8 +99,8 @@ export function useToggleContentPreference(options?: UseToggleContentPreferenceO
               variables.contentId,
               variables.preferenceType,
               serverPreference,
-              result.action === 'set' ? 'set' : 'remove'
-            )
+              result.action === 'set' ? 'set' : 'remove',
+            ),
         );
 
         queryClient.invalidateQueries({
@@ -139,7 +139,7 @@ function updatePreferences(
   contentId: string,
   preferenceType: PreferenceType,
   preference: UserContentPreferenceTyped | undefined,
-  mode: UpdateMode
+  mode: UpdateMode,
 ): UserContentWithDetails[] | undefined {
   if (!items) return items;
 

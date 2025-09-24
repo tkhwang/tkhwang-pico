@@ -31,7 +31,7 @@ export function useSwipeActionFeedback() {
     async (
       actionType: SwipeActionType,
       onAction: () => void | Promise<void>,
-      onComplete: () => void
+      onComplete: () => void,
     ) => {
       if (isProcessing) return;
 
@@ -61,7 +61,7 @@ export function useSwipeActionFeedback() {
         throw err;
       }
     },
-    [isProcessing, triggerFeedback]
+    [isProcessing, triggerFeedback],
   );
 
   useEffect(() => {

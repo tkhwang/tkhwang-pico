@@ -1,19 +1,19 @@
-"use client";
+'use client';
 
-import { Edit3, MoreHorizontal, Trash2 } from "lucide-react";
-import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
-import { useState } from "react";
+import { Edit3, MoreHorizontal, Trash2 } from 'lucide-react';
+import Link from 'next/link';
+import { useParams, useRouter } from 'next/navigation';
+import { useState } from 'react';
 
-import { NavChatHistorySkeleton } from "@/components/sidebar/nav-chat-history-skeleton";
+import { NavChatHistorySkeleton } from '@/components/sidebar/nav-chat-history-skeleton';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
+} from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -22,11 +22,11 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "@/components/ui/sidebar";
-import { useDeleteThread } from "@/hooks/mutations/use-delete-thread";
-import { useUpdateThreadTitle } from "@/hooks/mutations/use-update-thread-title";
-import { useThreadsByUserId } from "@/hooks/queries/use-threads-by-user-id";
-import { cn } from "@/lib/utils";
+} from '@/components/ui/sidebar';
+import { useDeleteThread } from '@/hooks/mutations/use-delete-thread';
+import { useUpdateThreadTitle } from '@/hooks/mutations/use-update-thread-title';
+import { useThreadsByUserId } from '@/hooks/queries/use-threads-by-user-id';
+import { cn } from '@/lib/utils';
 
 export function NavChatHistory() {
   const router = useRouter();
@@ -36,16 +36,14 @@ export function NavChatHistory() {
   const currentThreadId = params.threadId as string;
 
   const [editingThreadId, setEditingThreadId] = useState<string | null>(null);
-  const [editingTitle, setEditingTitle] = useState("");
+  const [editingTitle, setEditingTitle] = useState('');
 
   const { data: threads = [], isLoading, error } = useThreadsByUserId();
-  const { mutateAsync: deleteThreadById, isPending: isDeletePending } =
-    useDeleteThread();
-  const { mutateAsync: updateThreadTitleMutation, isPending: isUpdating } =
-    useUpdateThreadTitle();
+  const { mutateAsync: deleteThreadById, isPending: isDeletePending } = useDeleteThread();
+  const { mutateAsync: updateThreadTitleMutation, isPending: isUpdating } = useUpdateThreadTitle();
 
   const handleEditChat = (threadId: string) => {
-    const currentTitle = threads.find((t) => t.id === threadId)?.title || "";
+    const currentTitle = threads.find((t) => t.id === threadId)?.title || '';
     setEditingThreadId(threadId);
     setEditingTitle(currentTitle);
   };
@@ -56,53 +54,45 @@ export function NavChatHistory() {
     try {
       await deleteThreadById(threadId);
       if (currentThreadId === threadId) {
-        router.push("/");
+        router.push('/');
       }
     } catch (err) {
-      console.error(
-        "[-][NavChatHistory] handleDeleteChat: Failed to delete chat:",
-        err,
-      );
+      console.error('[-][NavChatHistory] handleDeleteChat: Failed to delete chat:', err);
     }
   };
 
   const submitRename = async () => {
     if (!editingThreadId) return;
     const newTitle = editingTitle.trim();
-    const original = threads.find((t) => t.id === editingThreadId)?.title || "";
+    const original = threads.find((t) => t.id === editingThreadId)?.title || '';
     if (newTitle === original.trim()) {
       setEditingThreadId(null);
-      setEditingTitle("");
+      setEditingTitle('');
       return;
     }
     try {
       await updateThreadTitleMutation({
         threadId: editingThreadId,
-        title: newTitle || "",
+        title: newTitle || '',
       });
       setEditingThreadId(null);
-      setEditingTitle("");
+      setEditingTitle('');
     } catch (err) {
-      console.error(
-        "[-][NavChatHistory] submitRename: Failed to rename thread:",
-        err,
-      );
+      console.error('[-][NavChatHistory] submitRename: Failed to rename thread:', err);
       setEditingThreadId(null);
-      setEditingTitle("");
+      setEditingTitle('');
     }
   };
 
   const cancelRename = () => {
     setEditingThreadId(null);
-    setEditingTitle("");
+    setEditingTitle('');
   };
 
   if (error) {
     return (
       <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-        <SidebarGroupLabel className="text-sm text-gray-500">
-          Chats
-        </SidebarGroupLabel>
+        <SidebarGroupLabel className="text-sm text-gray-500">Chats</SidebarGroupLabel>
         <div className="text-sm text-red-500 p-2">Failed to load chats</div>
       </SidebarGroup>
     );
@@ -110,9 +100,7 @@ export function NavChatHistory() {
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-      <SidebarGroupLabel className="text-sm text-gray-500">
-        Chats
-      </SidebarGroupLabel>
+      <SidebarGroupLabel className="text-sm text-gray-500">Chats</SidebarGroupLabel>
       <SidebarMenu>
         {isLoading ? (
           <NavChatHistorySkeleton />
@@ -130,8 +118,8 @@ export function NavChatHistory() {
                       disabled={isUpdating}
                       onBlur={submitRename}
                       onKeyDown={(e) => {
-                        if (e.key === "Enter") submitRename();
-                        if (e.key === "Escape") cancelRename();
+                        if (e.key === 'Enter') submitRename();
+                        if (e.key === 'Escape') cancelRename();
                       }}
                       className="h-8 border-border/40 focus-visible:ring-0 focus-visible:border-border/60 shadow-none"
                       aria-label="Edit chat title"
@@ -141,18 +129,16 @@ export function NavChatHistory() {
                   <SidebarMenuButton
                     asChild
                     className={cn(
-                      "w-full justify-start",
+                      'w-full justify-start',
                       isCurrentThread &&
-                        "bg-sidebar-accent text-sidebar-accent-foreground font-medium",
+                        'bg-sidebar-accent text-sidebar-accent-foreground font-medium',
                     )}
                   >
                     <Link
                       href={`/c/${thread.id}`}
-                      aria-label={`Open chat: ${thread.title || "New Chat"}`}
+                      aria-label={`Open chat: ${thread.title || 'New Chat'}`}
                     >
-                      <span className="sidebar-text-truncate">
-                        {thread.title || "New Chat"}
-                      </span>
+                      <span className="sidebar-text-truncate">{thread.title || 'New Chat'}</span>
                     </Link>
                   </SidebarMenuButton>
                 )}
@@ -165,8 +151,8 @@ export function NavChatHistory() {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
                     className="w-48 rounded-xl p-2"
-                    side={isMobile ? "bottom" : "right"}
-                    align={isMobile ? "end" : "start"}
+                    side={isMobile ? 'bottom' : 'right'}
+                    align={isMobile ? 'end' : 'start'}
                   >
                     <DropdownMenuItem
                       onClick={() => handleEditChat(thread.id)}
@@ -183,7 +169,7 @@ export function NavChatHistory() {
                       disabled={isDeletePending}
                     >
                       <Trash2 className="text-muted-foreground" />
-                      <span>{isDeletePending ? "Deleting..." : "Delete"}</span>
+                      <span>{isDeletePending ? 'Deleting...' : 'Delete'}</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>

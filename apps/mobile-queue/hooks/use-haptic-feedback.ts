@@ -44,7 +44,7 @@ export function useHapticFeedback(defaultDuration = DEFAULT_HAPTIC_DURATION_MS) 
         }
       }
     },
-    [defaultDuration]
+    [defaultDuration],
   );
 
   const executeWithHapticFeedback = useCallback(
@@ -52,7 +52,7 @@ export function useHapticFeedback(defaultDuration = DEFAULT_HAPTIC_DURATION_MS) 
       await triggerFeedback(duration);
       return fn();
     },
-    [triggerFeedback]
+    [triggerFeedback],
   );
 
   return {

@@ -49,7 +49,7 @@ export function RecommendList() {
 
   const validRecommendations = useMemo(
     () => recommendations.filter((r) => !!r.contents),
-    [recommendations]
+    [recommendations],
   );
 
   const handleItemPress = useCallback((recommendation: Recommendation) => {
@@ -84,7 +84,7 @@ export function RecommendList() {
         },
       });
     },
-    [saveContentMutation, user?.id, queryClient]
+    [saveContentMutation, user?.id, queryClient],
   );
 
   const handleNotInterested = useCallback(
@@ -94,7 +94,7 @@ export function RecommendList() {
         preferenceType: 'not_interested',
       });
     },
-    [setPreferenceMutation]
+    [setPreferenceMutation],
   );
 
   const renderItem = useCallback(
@@ -108,7 +108,7 @@ export function RecommendList() {
         />
       );
     },
-    [handleItemPress, handleAddToQueue, handleNotInterested]
+    [handleItemPress, handleAddToQueue, handleNotInterested],
   );
 
   if (isLoading && !refreshing) {

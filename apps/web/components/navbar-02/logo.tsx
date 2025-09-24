@@ -1,6 +1,6 @@
-import { type ComponentProps } from "react";
+import { type ComponentProps } from 'react';
 
-export const Logo = (props: ComponentProps<"svg">) => (
+export const Logo = (props: ComponentProps<'svg'>) => (
   <svg
     id="logo-7"
     width="124"

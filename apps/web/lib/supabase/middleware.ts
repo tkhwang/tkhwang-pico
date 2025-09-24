@@ -1,7 +1,7 @@
-import { createSupabaseClientFactory } from "@tkhwang-pico/supabase/clients";
-import { type NextRequest, NextResponse } from "next/server";
+import { createSupabaseClientFactory } from '@tkhwang-pico/supabase/clients';
+import { type NextRequest, NextResponse } from 'next/server';
 
-import { hasEnvVars } from "../utils";
+import { hasEnvVars } from '../utils';
 
 export async function updateSession(request: NextRequest) {
   const supabaseResponse = NextResponse.next({
@@ -17,9 +17,9 @@ export async function updateSession(request: NextRequest) {
   // With Fluid compute, don't put this client in a global environment
   // variable. Always create a new one on each request.
   const { client: supabase } = createSupabaseClientFactory({
-    platform: "web",
-    runtime: "server",
-    mode: "public",
+    platform: 'web',
+    runtime: 'server',
+    mode: 'public',
     cookies: {
       getAll() {
         return request.cookies.getAll();
@@ -42,14 +42,14 @@ export async function updateSession(request: NextRequest) {
   const user = data?.claims;
 
   if (
-    request.nextUrl.pathname !== "/" &&
+    request.nextUrl.pathname !== '/' &&
     !user &&
-    !request.nextUrl.pathname.startsWith("/auth/login") &&
-    !request.nextUrl.pathname.startsWith("/auth")
+    !request.nextUrl.pathname.startsWith('/auth/login') &&
+    !request.nextUrl.pathname.startsWith('/auth')
   ) {
     // no user, potentially respond by redirecting the user to the login page
     const url = request.nextUrl.clone();
-    url.pathname = "/auth/login";
+    url.pathname = '/auth/login';
     return NextResponse.redirect(url);
   }
 

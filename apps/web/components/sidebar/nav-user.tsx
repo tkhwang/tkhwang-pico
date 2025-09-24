@@ -1,23 +1,23 @@
-"use client";
+'use client';
 
-import { useAuth } from "@clerk/nextjs";
-import { ChevronsUpDown, LogOut, Settings, User } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useAuth } from '@clerk/nextjs';
+import { ChevronsUpDown, LogOut, Settings, User } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from '@/components/ui/dropdown-menu';
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "@/components/ui/sidebar";
+} from '@/components/ui/sidebar';
 
 export function NavUser({
   user,
@@ -47,19 +47,15 @@ export function NavUser({
                 <AvatarFallback className="rounded-lg">CN</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden min-w-0">
-                <span className="sidebar-text-truncate font-medium">
-                  {user.name}
-                </span>
-                <span className="sidebar-text-truncate text-xs">
-                  {user.email}
-                </span>
+                <span className="sidebar-text-truncate font-medium">{user.name}</span>
+                <span className="sidebar-text-truncate text-xs">{user.email}</span>
               </div>
               <ChevronsUpDown className="ml-auto size-4 group-data-[collapsible=icon]:hidden" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
             className="w-[var(--radix-dropdown-menu-trigger-width)] min-w-56 rounded-lg"
-            side={isMobile ? "bottom" : "top"}
+            side={isMobile ? 'bottom' : 'top'}
             align="start"
             sideOffset={4}
           >
@@ -75,7 +71,7 @@ export function NavUser({
             <DropdownMenuItem
               onClick={async () => {
                 await signOut();
-                router.push("/auth/login");
+                router.push('/auth/login');
               }}
             >
               <LogOut />

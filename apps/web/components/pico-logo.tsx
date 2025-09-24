@@ -1,6 +1,6 @@
-import { Bot } from "lucide-react";
-import Link from "next/link";
-import React from "react";
+import { Bot } from 'lucide-react';
+import Link from 'next/link';
+import React from 'react';
 
 export const PicoLogo = () => {
   return (

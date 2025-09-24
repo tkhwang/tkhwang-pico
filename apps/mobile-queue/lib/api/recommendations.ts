@@ -15,7 +15,7 @@ interface GetRecommendationsParams {
  */
 export async function getRecommendations(
   token: string,
-  params?: GetRecommendationsParams
+  params?: GetRecommendationsParams,
 ): Promise<Recommendation[]> {
   const queryParams = new URLSearchParams();
   if (params?.limit) queryParams.append('limit', params.limit.toString());
