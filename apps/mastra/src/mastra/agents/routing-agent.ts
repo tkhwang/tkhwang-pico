@@ -1,17 +1,17 @@
-import { openai } from "@ai-sdk/openai";
-import { Agent } from "@mastra/core";
+import { openai } from '@ai-sdk/openai';
+import { Agent } from '@mastra/core';
 
 import {
   checkRequestIntent,
   detectLanguage,
   generateFallbackMessage,
   handleUserRequest,
-} from "../tools/routing-tools";
-import { weatherTool } from "../tools/weather-tool";
+} from '../tools/routing-tools';
+import { weatherTool } from '../tools/weather-tool';
 
 export const routingAgent = new Agent({
-  id: "routingAgent",
-  name: "Routing Agent",
+  id: 'routingAgent',
+  name: 'Routing Agent',
   instructions: `
     You are the primary interface for the intelligent routing network system.
 
@@ -32,7 +32,7 @@ export const routingAgent = new Agent({
     Do NOT skip any tools or combine steps.
     IMPORTANT: Only call handleUserRequest for non-weather, non-fallback requests.
   `,
-  model: openai("gpt-4o-mini"),
+  model: openai('gpt-4o-mini'),
   tools: {
     checkRequestIntent,
     detectLanguage,
