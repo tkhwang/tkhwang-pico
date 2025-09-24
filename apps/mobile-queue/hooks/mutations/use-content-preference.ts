@@ -4,7 +4,7 @@ import type { PreferenceType, Recommendation } from '@tkhwang-pico/supabase';
 import { Alert } from 'react-native';
 
 import { queryKey } from '@/hooks/keys/query-key';
-import { setContentPreference } from '@/lib/supabase/user-contents-preferences';
+import { UserContentsPreferencesRepository } from '@/services/repositories';
 
 interface SetPreferenceParams {
   contentId: string;
@@ -36,7 +36,8 @@ export function useSetContentPreference(options?: UseSetContentPreferenceOptions
       if (!token) throw new Error('Authentication token not available');
       if (!user?.id) throw new Error('User not found');
 
-      return setContentPreference(token, user.id, contentId, preferenceType, reason);
+      const repository = new UserContentsPreferencesRepository(token);
+      return repository.setContentPreference(user.id, contentId, preferenceType, reason);
     },
 
     onMutate: async ({ contentId, preferenceType }) => {

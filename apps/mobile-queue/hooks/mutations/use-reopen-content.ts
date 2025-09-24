@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Alert } from 'react-native';
 
 import { queryKey } from '@/hooks/keys/query-key';
-import { markAsPending } from '@/lib/supabase/user-contents';
+import { UserContentsRepository } from '@/services/repositories';
 
 /**
  * Hook for reopening completed content (moving back to reading list)
@@ -18,7 +18,8 @@ export function useReopenContent() {
       const token = await getToken({ template: 'supabase' });
       if (!token) throw new Error('Authentication token not available');
 
-      return markAsPending(token, userContentId);
+      const repository = new UserContentsRepository(token);
+      return repository.markAsPending(userContentId);
     },
 
     onSuccess: () => {

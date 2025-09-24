@@ -2,6 +2,11 @@ import type { SupabaseClientWithDatabase } from '../lib/config';
 import type { PreferenceType, UserContentPreferenceTyped } from '../types';
 import { BaseRepository, type RepositoryLogger } from './base.repository';
 
+export interface TogglePreferenceResult {
+  action: 'set' | 'removed';
+  preference?: UserContentPreferenceTyped;
+}
+
 export class UserContentsPreferencesRepository extends BaseRepository {
   constructor(client: SupabaseClientWithDatabase, logger?: RepositoryLogger) {
     super(client, logger);
@@ -114,7 +119,7 @@ export class UserContentsPreferencesRepository extends BaseRepository {
     contentId: string,
     preferenceType: PreferenceType,
     reason?: string,
-  ): Promise<{ action: 'set' | 'removed'; preference?: UserContentPreferenceTyped }> {
+  ): Promise<TogglePreferenceResult> {
     const existing = await this.getContentPreference(userId, contentId);
 
     if (existing && existing.preference_type === preferenceType) {

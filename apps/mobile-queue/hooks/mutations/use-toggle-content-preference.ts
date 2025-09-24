@@ -2,21 +2,20 @@ import { useAuth, useUser } from '@clerk/clerk-expo';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type {
   PreferenceType,
+  TogglePreferenceResult,
   UserContentPreferenceTyped,
   UserContentWithDetails,
 } from '@tkhwang-pico/supabase';
 import { Alert } from 'react-native';
 
 import { queryKey } from '@/hooks/keys/query-key';
-import { togglePreference } from '@/lib/supabase/user-contents-preferences';
+import { UserContentsPreferencesRepository } from '@/services/repositories';
 
 interface ToggleContentPreferenceParams {
   contentId: string;
   preferenceType: PreferenceType;
   reason?: string;
 }
-
-type TogglePreferenceResult = Awaited<ReturnType<typeof togglePreference>>;
 
 interface UseToggleContentPreferenceOptions {
   onSuccess?: (result: TogglePreferenceResult) => void;
@@ -48,7 +47,8 @@ export function useToggleContentPreference(options?: UseToggleContentPreferenceO
       if (!token) throw new Error('Authentication token not available');
       if (!user?.id) throw new Error('User not found');
 
-      return togglePreference(token, user.id, contentId, preferenceType, reason);
+      const repository = new UserContentsPreferencesRepository(token);
+      return repository.togglePreference(user.id, contentId, preferenceType, reason);
     },
 
     onMutate: async ({ contentId, preferenceType, reason }) => {

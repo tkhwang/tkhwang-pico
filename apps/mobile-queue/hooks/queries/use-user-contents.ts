@@ -3,7 +3,7 @@ import type { TodoFilterType, UserContentWithDetails } from '@tkhwang-pico/supab
 
 import { queryKey } from '@/hooks/keys/query-key';
 import { useSupabaseQuery } from '@/hooks/queries/supabase/use-supabase-query';
-import { getUserContents } from '@/lib/supabase/user-contents';
+import { UserContentsRepository } from '@/services/repositories';
 
 export function useUserContents(todoFilter: TodoFilterType = 'pending') {
   const { user } = useUser();
@@ -13,7 +13,8 @@ export function useUserContents(todoFilter: TodoFilterType = 'pending') {
     async (clerkToken): Promise<UserContentWithDetails[]> => {
       if (!user?.id) return [];
 
-      return await getUserContents(clerkToken, user.id, todoFilter);
+      const repository = new UserContentsRepository(clerkToken);
+      return await repository.getUserContents(user.id, todoFilter);
     },
     {
       enabled: !!user?.id,

@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Alert } from 'react-native';
 
 import { queryKey } from '@/hooks/keys/query-key';
-import { nestApi } from '@/lib/api/nest';
+import { nestApi } from '@/services/api/nest';
 
 export function useDeleteContent() {
   const { getToken, userId } = useAuth();
