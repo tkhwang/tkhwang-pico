@@ -1,26 +1,24 @@
-import { type EmailOtpType } from "@supabase/supabase-js";
-import { type NextRequest, NextResponse } from "next/server";
+import { type EmailOtpType } from '@supabase/supabase-js';
+import { type NextRequest, NextResponse } from 'next/server';
 
-import { createClient } from "@/utils/supabase/server";
+import { createClient } from '@/utils/supabase/server';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
-  const token_hash = searchParams.get("token_hash");
-  const type = searchParams.get("type") as EmailOtpType | null;
+  const token_hash = searchParams.get('token_hash');
+  const type = searchParams.get('type') as EmailOtpType | null;
 
-  const nextParam = searchParams.get("next") ?? "/";
+  const nextParam = searchParams.get('next') ?? '/';
   let redirectTo: URL;
   try {
     const candidate = new URL(nextParam, request.url);
     redirectTo =
-      candidate.origin === new URL(request.url).origin
-        ? candidate
-        : new URL("/", request.url);
+      candidate.origin === new URL(request.url).origin ? candidate : new URL('/', request.url);
   } catch {
-    redirectTo = new URL("/", request.url);
+    redirectTo = new URL('/', request.url);
   }
-  redirectTo.searchParams.delete("token_hash");
-  redirectTo.searchParams.delete("type");
+  redirectTo.searchParams.delete('token_hash');
+  redirectTo.searchParams.delete('type');
 
   if (token_hash && type) {
     const supabase = await createClient();
@@ -30,11 +28,11 @@ export async function GET(request: NextRequest) {
       token_hash,
     });
     if (!error) {
-      redirectTo.searchParams.delete("next");
+      redirectTo.searchParams.delete('next');
       return NextResponse.redirect(redirectTo);
     }
   }
 
-  redirectTo.pathname = "/auth/error";
+  redirectTo.pathname = '/auth/error';
   return NextResponse.redirect(redirectTo);
 }

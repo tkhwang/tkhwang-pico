@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useRouter } from "next/navigation";
-import React from "react";
+import { useRouter } from 'next/navigation';
+import React from 'react';
 
-import { Button } from "../ui/button";
+import { Button } from '../ui/button';
 
 export const LoginButton = () => {
   const router = useRouter();
@@ -12,7 +12,7 @@ export const LoginButton = () => {
     <Button
       variant="outline"
       onClick={() => {
-        router.push("/auth/login");
+        router.push('/auth/login');
       }}
     >
       Login

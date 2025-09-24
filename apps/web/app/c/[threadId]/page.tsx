@@ -1,29 +1,25 @@
-"use client";
+'use client';
 
-import { CopilotKit } from "@copilotkit/react-core";
-import { CopilotChat } from "@copilotkit/react-ui";
-import { use } from "react";
+import { CopilotKit } from '@copilotkit/react-core';
+import { CopilotChat } from '@copilotkit/react-ui';
+import { use } from 'react';
 
-import { ChatPageSkeleton } from "@/components/chat/chat-page-skeleton";
-import { AppSidebar } from "@/components/sidebar/app-sidebar";
-import { ThemeSwitcher } from "@/components/theme-switcher";
+import { ChatPageSkeleton } from '@/components/chat/chat-page-skeleton';
+import { AppSidebar } from '@/components/sidebar/app-sidebar';
+import { ThemeSwitcher } from '@/components/theme-switcher';
 import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { Separator } from "@/components/ui/separator";
-import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
-import { useSaveMessage } from "@/hooks/mutations/use-save-message";
-import { useChatPersistence } from "@/hooks/use-chat-persistence";
-import { useCopilotActions } from "@/hooks/use-copilot-actions";
-import { getConfig } from "@/lib/config";
+} from '@/components/ui/breadcrumb';
+import { Separator } from '@/components/ui/separator';
+import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
+import { useSaveMessage } from '@/hooks/mutations/use-save-message';
+import { useChatPersistence } from '@/hooks/use-chat-persistence';
+import { useCopilotActions } from '@/hooks/use-copilot-actions';
+import { getConfig } from '@/lib/config';
 
 interface ChatThreadPageProps {
   params: Promise<{
@@ -45,10 +41,7 @@ function ThreadChatInner({ threadId }: { threadId: string }) {
   useCopilotActions();
 
   if (persistenceError) {
-    console.error(
-      "[-][ThreadChatInner] Chat persistence error:",
-      persistenceError,
-    );
+    console.error('[-][ThreadChatInner] Chat persistence error:', persistenceError);
   }
 
   return (
@@ -58,12 +51,12 @@ function ThreadChatInner({ threadId }: { threadId: string }) {
         instructions="You are assisting the user as PICO, a personal intelligent companion operator."
         className="h-full w-full"
         labels={{
-          title: thread?.title || "Your Assistant",
+          title: thread?.title || 'Your Assistant',
         }}
         onSubmitMessage={async (message: string) => {
           const content = message.trim();
           if (!content) return;
-          await saveMessageMutate({ threadId, role: "user", content });
+          await saveMessageMutate({ threadId, role: 'user', content });
         }}
       />
     </div>
@@ -97,9 +90,7 @@ export default function ChatThreadPage({ params }: ChatThreadPageProps) {
                 />
                 <Breadcrumb>
                   <BreadcrumbList>
-                    <BreadcrumbItem className="hidden md:block">
-                      PICO
-                    </BreadcrumbItem>
+                    <BreadcrumbItem className="hidden md:block">PICO</BreadcrumbItem>
                     <BreadcrumbSeparator className="hidden md:block" />
                     <BreadcrumbItem>
                       <BreadcrumbPage>Chat</BreadcrumbPage>

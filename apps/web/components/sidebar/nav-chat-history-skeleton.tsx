@@ -1,4 +1,4 @@
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from '@/components/ui/skeleton';
 
 export function NavChatHistorySkeleton() {
   return (
@@ -8,14 +8,14 @@ export function NavChatHistorySkeleton() {
           <Skeleton
             className={`h-3 bg-gray-300 dark:bg-gray-600 ${
               index === 0
-                ? "w-3/5"
+                ? 'w-3/5'
                 : index === 1
-                  ? "w-4/5"
+                  ? 'w-4/5'
                   : index === 2
-                    ? "w-2/5"
+                    ? 'w-2/5'
                     : index === 3
-                      ? "w-3/4"
-                      : "w-1/2"
+                      ? 'w-3/4'
+                      : 'w-1/2'
             }`}
           />
         </div>

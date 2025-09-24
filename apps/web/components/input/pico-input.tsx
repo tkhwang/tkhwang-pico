@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { CloudSun, Search } from "lucide-react";
+import { CloudSun, Search } from 'lucide-react';
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 interface PicoInputProps {
   onInputClick?: () => void;
@@ -26,9 +26,7 @@ export default function PicoInput({
       <div className="container mx-auto px-4 py-8 md:px-6 2xl:max-w-[1400px]">
         <div className="text-center">
           <div className="flex items-center justify-center">
-            <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
-              PICO
-            </h1>
+            <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">PICO</h1>
           </div>
           <p className="mt-3 text-sm text-muted-foreground sm:text-base">
             Your everyday AI to search, plan, and get things done.
@@ -53,15 +51,13 @@ export default function PicoInput({
                     name="article"
                     className="h-full"
                     id="article"
-                    placeholder={
-                      disabled ? "Creating thread..." : "Ask PICO anything"
-                    }
+                    placeholder={disabled ? 'Creating thread...' : 'Ask PICO anything'}
                     autoComplete="off"
                     autoCorrect="off"
                     autoCapitalize="off"
                     spellCheck={false}
                     onClick={onInputClick}
-                    value={value || ""}
+                    value={value || ''}
                     onChange={(e) => onChange?.(e.target.value)}
                     disabled={disabled}
                   />
@@ -127,7 +123,7 @@ export default function PicoInput({
             {/* End SVG Element */}
           </div>
           <div className="mt-10 flex flex-wrap justify-center gap-2 sm:mt-20">
-            <Button variant={"outline"}>
+            <Button variant={'outline'}>
               <CloudSun className="mr-2 h-auto w-3 flex-shrink-0" />
               Weather
             </Button>

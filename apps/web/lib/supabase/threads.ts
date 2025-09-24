@@ -5,11 +5,11 @@ import type {
   ThreadUpdate as SupabaseThreadUpdate,
   ThreadWithLastMessage,
   ThreadWithMessagesResult,
-} from "@tkhwang-pico/supabase";
-import { ThreadsRepository } from "@tkhwang-pico/supabase";
+} from '@tkhwang-pico/supabase';
+import { ThreadsRepository } from '@tkhwang-pico/supabase';
 
-import type { AuthClerkSession } from "../../types/auth";
-import { createAuthenticatedSupabaseClient } from "./client";
+import type { AuthClerkSession } from '../../types/auth';
+import { createAuthenticatedSupabaseClient } from './client';
 
 function createThreadsRepository(session: AuthClerkSession) {
   const supabase = createAuthenticatedSupabaseClient(session);
@@ -65,10 +65,7 @@ export async function updateThreadTitle(
 /**
  * 스레드와 관련 메시지를 모두 삭제합니다.
  */
-export async function deleteThread(
-  session: AuthClerkSession,
-  threadId: string,
-): Promise<void> {
+export async function deleteThread(session: AuthClerkSession, threadId: string): Promise<void> {
   const threads = createThreadsRepository(session);
   await threads.deleteThread(threadId);
 }
@@ -79,23 +76,20 @@ export async function deleteThread(
 export function generateThreadTitle(firstUserMessage: string): string {
   const maxLength = 60;
 
-  const cleaned = firstUserMessage
-    .trim()
-    .replace(/\n+/g, " ")
-    .replace(/\s+/g, " ");
+  const cleaned = firstUserMessage.trim().replace(/\n+/g, ' ').replace(/\s+/g, ' ');
 
   if (cleaned.length <= maxLength) {
     return cleaned;
   }
 
   const truncated = cleaned.substring(0, maxLength);
-  const lastSpaceIndex = truncated.lastIndexOf(" ");
+  const lastSpaceIndex = truncated.lastIndexOf(' ');
 
   if (lastSpaceIndex > maxLength * 0.7) {
-    return truncated.substring(0, lastSpaceIndex) + "...";
+    return truncated.substring(0, lastSpaceIndex) + '...';
   }
 
-  return truncated + "...";
+  return truncated + '...';
 }
 
 export type Thread = SupabaseThread;
@@ -105,4 +99,4 @@ export type {
   CreateThreadParams,
   ThreadWithLastMessage,
   ThreadWithMessagesResult,
-} from "@tkhwang-pico/supabase";
+} from '@tkhwang-pico/supabase';

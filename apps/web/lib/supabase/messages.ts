@@ -2,11 +2,11 @@ import type {
   Message as SupabaseMessage,
   MessageInsert as SupabaseMessageInsert,
   SaveMessageParams,
-} from "@tkhwang-pico/supabase";
-import { MessagesRepository } from "@tkhwang-pico/supabase";
+} from '@tkhwang-pico/supabase';
+import { MessagesRepository } from '@tkhwang-pico/supabase';
 
-import type { AuthClerkSession } from "../../types/auth";
-import { createAuthenticatedSupabaseClient } from "./client";
+import type { AuthClerkSession } from '../../types/auth';
+import { createAuthenticatedSupabaseClient } from './client';
 
 function createMessagesRepository(session: AuthClerkSession) {
   const supabase = createAuthenticatedSupabaseClient(session);
@@ -26,4 +26,4 @@ export async function saveMessage(
 
 export type Message = SupabaseMessage;
 export type MessageInsert = SupabaseMessageInsert;
-export type { SaveMessageParams } from "@tkhwang-pico/supabase";
+export type { SaveMessageParams } from '@tkhwang-pico/supabase';
