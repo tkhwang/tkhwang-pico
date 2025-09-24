@@ -2,7 +2,7 @@ import { useAuth } from '@clerk/clerk-expo';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { queryKey } from '@/hooks/keys/query-key';
-import { toggleUserContentsTodoStatus } from '@/lib/supabase/user-contents';
+import { UserContentsRepository } from '@/services/repositories';
 
 export function useToggleUserContentStatus() {
   const { getToken, userId } = useAuth();
@@ -13,7 +13,8 @@ export function useToggleUserContentStatus() {
       const token = await getToken({ template: 'supabase' });
       if (!token) throw new Error('Authentication token not available');
 
-      return toggleUserContentsTodoStatus(token, userContentId);
+      const repository = new UserContentsRepository(token);
+      return repository.toggleTodoStatus(userContentId);
     },
     onSuccess: () => {
       if (userId) {

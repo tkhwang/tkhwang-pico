@@ -8,7 +8,7 @@ import type {
 import { Alert } from 'react-native';
 
 import { queryKey } from '@/hooks/keys/query-key';
-import { togglePreference } from '@/lib/supabase/user-contents-preferences';
+import { UserContentsPreferencesRepository } from '@/services/repositories';
 
 interface ToggleContentPreferenceParams {
   contentId: string;
@@ -16,7 +16,10 @@ interface ToggleContentPreferenceParams {
   reason?: string;
 }
 
-type TogglePreferenceResult = Awaited<ReturnType<typeof togglePreference>>;
+interface TogglePreferenceResult {
+  action: 'set' | 'removed';
+  preference?: UserContentPreferenceTyped;
+}
 
 interface UseToggleContentPreferenceOptions {
   onSuccess?: (result: TogglePreferenceResult) => void;
@@ -48,7 +51,8 @@ export function useToggleContentPreference(options?: UseToggleContentPreferenceO
       if (!token) throw new Error('Authentication token not available');
       if (!user?.id) throw new Error('User not found');
 
-      return togglePreference(token, user.id, contentId, preferenceType, reason);
+      const repository = new UserContentsPreferencesRepository(token);
+      return repository.togglePreference(user.id, contentId, preferenceType, reason);
     },
 
     onMutate: async ({ contentId, preferenceType, reason }) => {
