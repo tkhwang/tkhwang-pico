@@ -2,6 +2,7 @@ import type { SupabaseClientWithDatabase } from '../lib/config';
 import type {
   ContentTodoStatus,
   TodoFilterType,
+  UserContent,
   UserContentPreferenceTyped,
   UserContentWithDetails,
 } from '../types';
@@ -11,9 +12,140 @@ export interface GetUserContentsOptions {
   filter?: TodoFilterType;
 }
 
+export interface FindUserContentsFilters {
+  archived?: boolean;
+  todo_status?: ContentTodoStatus;
+  limit?: number;
+  offset?: number;
+}
+
+export interface UpdateUserContentInput {
+  archived?: boolean;
+  todo_status?: ContentTodoStatus;
+  note?: string | null;
+  labels?: string[] | null;
+  completed_at?: string | null;
+}
+
 export class UserContentsRepository extends BaseRepository {
   constructor(client: SupabaseClientWithDatabase, logger?: RepositoryLogger) {
     super(client, logger);
+  }
+
+  async linkUserContent(userId: string, contentId: string): Promise<void> {
+    const { error } = await this.client.from('user_contents').upsert(
+      {
+        user_id: userId,
+        content_id: contentId,
+      },
+      { onConflict: 'user_id,content_id' },
+    );
+
+    if (error) {
+      this.logger.error(`Failed to link user content: ${error.message}`);
+      throw error;
+    }
+  }
+
+  async deleteByContentId(contentId: string): Promise<void> {
+    const { error } = await this.client.from('user_contents').delete().eq('content_id', contentId);
+
+    if (error) {
+      this.logger.error(
+        `Failed to delete user_contents for content ${contentId}: ${error.message}`,
+      );
+      // Best-effort cleanup; keep processing even on failure
+    }
+  }
+
+  async deleteByUserAndContent(userId: string, contentId: string): Promise<void> {
+    const { error } = await this.client
+      .from('user_contents')
+      .delete()
+      .eq('user_id', userId)
+      .eq('content_id', contentId);
+
+    if (error) {
+      this.logger.error(
+        `Failed to delete user_content for user ${userId} and content ${contentId}: ${error.message}`,
+      );
+      throw error;
+    }
+  }
+
+  async deleteByUserId(userId: string): Promise<void> {
+    const { error } = await this.client.from('user_contents').delete().eq('user_id', userId);
+
+    if (error) {
+      this.logger.error(`Failed to delete user_contents for user ${userId}: ${error.message}`);
+      throw error;
+    }
+  }
+
+  async findByUserId(
+    userId: string,
+    filters?: FindUserContentsFilters,
+  ): Promise<UserContentWithDetails[]> {
+    let query = this.client.from('user_contents').select('*, contents(*)').eq('user_id', userId);
+
+    if (filters?.archived !== undefined) {
+      query = query.eq('archived', filters.archived);
+    }
+
+    if (filters?.todo_status) {
+      query = query.eq('todo_status', filters.todo_status);
+    }
+
+    if (typeof filters?.limit === 'number') {
+      query = query.limit(filters.limit);
+    }
+
+    if (typeof filters?.offset === 'number') {
+      const rangeLimit = typeof filters?.limit === 'number' ? filters.limit : 10;
+      query = query.range(filters.offset, filters.offset + rangeLimit - 1);
+    }
+
+    const { data, error } = await query.order('saved_at', { ascending: false });
+
+    if (error) {
+      this.logger.error(`Failed to find user contents: ${error.message}`);
+      throw error;
+    }
+
+    return (data || []) as UserContentWithDetails[];
+  }
+
+  async findByUserAndContent(userId: string, contentId: string): Promise<UserContent | null> {
+    const { data, error } = await this.client
+      .from('user_contents')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('content_id', contentId)
+      .maybeSingle();
+
+    if (error) {
+      this.logger.error(`Failed to find user content link: ${error.message}`);
+      throw error;
+    }
+
+    return (data as UserContent | null) ?? null;
+  }
+
+  async updateUserContent(
+    userId: string,
+    contentId: string,
+    updates: UpdateUserContentInput,
+  ): Promise<void> {
+    const { error } = await this.client
+      .from('user_contents')
+      .update(updates)
+      .eq('user_id', userId)
+      .eq('content_id', contentId);
+
+    if (error) {
+      this.logger.error(`Failed to update user content: ${error.message}`);
+      throw error;
+    }
   }
 
   async getUserContents(
