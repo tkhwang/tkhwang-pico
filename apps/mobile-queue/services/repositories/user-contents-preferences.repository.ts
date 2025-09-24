@@ -1,4 +1,8 @@
-import type { PreferenceType, UserContentPreferenceTyped } from '@tkhwang-pico/supabase';
+import type {
+  PreferenceType,
+  TogglePreferenceResult,
+  UserContentPreferenceTyped,
+} from '@tkhwang-pico/supabase';
 import { UserContentsPreferencesRepository as BaseUserContentsPreferencesRepository } from '@tkhwang-pico/supabase';
 
 import { createSupabaseClientWithClerkAuth } from '@/utils/supabase';
@@ -80,7 +84,7 @@ export class UserContentsPreferencesRepository {
     contentId: string,
     preferenceType: PreferenceType,
     reason?: string,
-  ): Promise<{ action: 'set' | 'removed'; preference?: UserContentPreferenceTyped }> {
+  ): Promise<TogglePreferenceResult> {
     return this.repository.togglePreference(userId, contentId, preferenceType, reason);
   }
 }

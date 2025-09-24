@@ -2,6 +2,7 @@ import { useAuth, useUser } from '@clerk/clerk-expo';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type {
   PreferenceType,
+  TogglePreferenceResult,
   UserContentPreferenceTyped,
   UserContentWithDetails,
 } from '@tkhwang-pico/supabase';
@@ -14,11 +15,6 @@ interface ToggleContentPreferenceParams {
   contentId: string;
   preferenceType: PreferenceType;
   reason?: string;
-}
-
-interface TogglePreferenceResult {
-  action: 'set' | 'removed';
-  preference?: UserContentPreferenceTyped;
 }
 
 interface UseToggleContentPreferenceOptions {
