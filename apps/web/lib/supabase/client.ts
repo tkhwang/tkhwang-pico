@@ -1,6 +1,5 @@
-import type { SupabaseClient } from '@supabase/supabase-js';
-import type { Database, SupabaseFactoryOptions } from '@tkhwang-pico/supabase';
-import { createSupabaseClientFactory } from '@tkhwang-pico/supabase/clients';
+import type { SupabaseClientWithDatabase } from '@tkhwang-pico/supabase';
+import { createWebClientWithAuth } from '@tkhwang-pico/supabase';
 
 import { type AuthClerkSession } from '@/types/auth';
 
@@ -10,19 +9,10 @@ import { type AuthClerkSession } from '@/types/auth';
  */
 export function createAuthenticatedSupabaseClient(
   session: AuthClerkSession,
-): SupabaseClient<Database> {
+): SupabaseClientWithDatabase {
   if (!session) {
     throw new Error('Authentication required');
   }
 
-  const options: SupabaseFactoryOptions = {
-    platform: 'web',
-    runtime: 'browser',
-    mode: 'auth',
-    session,
-  };
-
-  const { client } = createSupabaseClientFactory(options);
-
-  return client;
+  return createWebClientWithAuth(session);
 }
