@@ -29,7 +29,7 @@ export function FabModal({ visible, onClose, onSuccess }: FabModalProps) {
   const [url, setUrl] = useState('');
   const inputRef = useRef<TextInput>(null);
 
-  const saveContentMutation = useSaveContent({
+  const { mutate, reset, isPending, isSuccess } = useSaveContent({
     onSuccess: () => {
       setUrl('');
       Keyboard.dismiss(); // Only dismiss keyboard on success
@@ -41,28 +41,28 @@ export function FabModal({ visible, onClose, onSuccess }: FabModalProps) {
   const handleSubmitUrl = async () => {
     if (!url.trim()) return;
 
-    // Validate URL format
     const urlPattern = /^https?:\/\/.+/;
     if (!urlPattern.test(url.trim())) {
       Alert.alert('Invalid URL', 'Please enter a valid URL starting with http:// or https://');
       return;
     }
 
-    saveContentMutation.mutate(url.trim());
+    mutate(url.trim());
   };
 
-  // Reset form when modal closes, auto-focus when opens
   useEffect(() => {
     if (!visible) {
       setUrl('');
-      saveContentMutation.reset();
-    } else {
-      // Auto-focus input when modal opens
-      setTimeout(() => {
-        inputRef.current?.focus();
-      }, 100);
+      reset();
+      return;
     }
-  }, [saveContentMutation, visible]);
+
+    const focusTimer = setTimeout(() => {
+      inputRef.current?.focus();
+    }, 100);
+
+    return () => clearTimeout(focusTimer);
+  }, [reset, visible]);
 
   const handleCloseModal = () => {
     setUrl('');
@@ -127,16 +127,16 @@ export function FabModal({ visible, onClose, onSuccess }: FabModalProps) {
                   {/* Submit Button */}
                   <Button
                     onPress={handleSubmitUrl}
-                    disabled={!url.trim() || saveContentMutation.isPending}
+                    disabled={!url.trim() || isPending}
                     className="mb-6 h-12 rounded-lg bg-blue-500 active:bg-blue-600 disabled:opacity-50"
                   >
                     <Text className="font-semibold text-white">
-                      {saveContentMutation.isPending ? 'Saving...' : 'Add Content'}
+                      {isPending ? 'Saving...' : 'Add Content'}
                     </Text>
                   </Button>
 
                   {/* Success Message */}
-                  {saveContentMutation.isSuccess && (
+                  {isSuccess && (
                     <View className="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800">
                       <View className="flex-row items-center">
                         <Text className="mr-2 text-2xl">✅</Text>
