@@ -1,6 +1,6 @@
 import { Role as copilotKitRole, TextMessage } from '@copilotkit/runtime-client-gql';
 
-import type { Message } from '@/lib/supabase/messages';
+import type { Message } from '@/services/repositories/messages.repository';
 import type { DatabaseRole } from '@/types/role';
 
 type CopilotKitRole = (typeof copilotKitRole)[keyof typeof copilotKitRole];
