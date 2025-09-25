@@ -19,7 +19,7 @@ import { useSwipeActionFeedback } from '@/hooks/use-swipe-action-feedback';
 import { useSwipeableItem } from '@/hooks/use-swipeable-item';
 import { isContentLiked } from '@/utils/content-helpers';
 
-interface SwipeableArchiveItemProps {
+interface SwipeableCompletedItemProps {
   item: UserContentWithDetails;
   onReopen?: (id: string) => void;
   onDelete?: (contentId: string) => void;
@@ -27,13 +27,13 @@ interface SwipeableArchiveItemProps {
   onLike?: (contentId: string) => void;
 }
 
-export function SwipeableArchiveItem({
+export function SwipeableCompletedItem({
   item,
   onReopen,
   onDelete,
   onPress,
   onLike,
-}: SwipeableArchiveItemProps) {
+}: SwipeableCompletedItemProps) {
   const isLiked = isContentLiked(item);
   const { isProcessing, actionCompleted, executeWithFeedback } = useSwipeActionFeedback();
 
@@ -156,6 +156,23 @@ export function SwipeableArchiveItem({
         >
           <TouchableOpacity
             activeOpacity={0.8}
+            onPress={handleReopen}
+            disabled={isProcessing}
+            className={`items-center justify-center ${leftReopenStyles.bg}`}
+            style={{ width: SWIPE_ACTION_BUTTON_WIDTH }}
+          >
+            <AnimatedViewTyped style={leftIconStyle}>
+              <Icon
+                as={actionCompleted === 'reopen' ? Circle : RotateCcw}
+                className={`h-6 w-6 ${leftReopenStyles.icon}`}
+              />
+            </AnimatedViewTyped>
+            <Text className={`mt-1 text-xs font-semibold ${leftReopenStyles.text}`}>
+              {leftReopenStyles.label}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            activeOpacity={0.8}
             onPress={handleLike}
             disabled={isProcessing}
             className={`items-center justify-center ${leftLikeStyles.bg}`}
@@ -170,23 +187,6 @@ export function SwipeableArchiveItem({
             </AnimatedViewTyped>
             <Text className={`mt-1 text-xs font-semibold ${leftLikeStyles.text}`}>
               {leftLikeStyles.label}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            activeOpacity={0.8}
-            onPress={handleReopen}
-            disabled={isProcessing}
-            className={`items-center justify-center ${leftReopenStyles.bg}`}
-            style={{ width: SWIPE_ACTION_BUTTON_WIDTH }}
-          >
-            <AnimatedViewTyped style={leftIconStyle}>
-              <Icon
-                as={actionCompleted === 'reopen' ? Circle : RotateCcw}
-                className={`h-6 w-6 ${leftReopenStyles.icon}`}
-              />
-            </AnimatedViewTyped>
-            <Text className={`mt-1 text-xs font-semibold ${leftReopenStyles.text}`}>
-              {leftReopenStyles.label}
             </Text>
           </TouchableOpacity>
         </View>

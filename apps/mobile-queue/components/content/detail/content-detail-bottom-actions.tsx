@@ -94,21 +94,6 @@ export function ContentDetailBottomActions({
           </>
         ) : (
           <>
-            {/* Like Button */}
-            <TouchableOpacity
-              onPress={onLike}
-              className={`flex-1 items-center justify-center rounded-lg px-2 py-3 ${likeStyles.container}`}
-            >
-              <Icon
-                as={Heart}
-                className={`mb-1 h-5 w-5 ${likeStyles.icon}`}
-                fill={isLiked ? 'currentColor' : 'none'}
-              />
-              <Text className={`text-xs font-semibold ${likeStyles.text}`}>
-                {isLiked ? 'Unlike' : 'Like'}
-              </Text>
-            </TouchableOpacity>
-
             {/* Toggle Complete Button */}
             <TouchableOpacity
               onPress={onToggleComplete}
@@ -122,6 +107,21 @@ export function ContentDetailBottomActions({
                 {isCompleted
                   ? ACTION_STYLES.complete.completed.label
                   : ACTION_STYLES.complete.pending.label}
+              </Text>
+            </TouchableOpacity>
+
+            {/* Like Button */}
+            <TouchableOpacity
+              onPress={onLike}
+              className={`flex-1 items-center justify-center rounded-lg px-2 py-3 ${likeStyles.container}`}
+            >
+              <Icon
+                as={Heart}
+                className={`mb-1 h-5 w-5 ${likeStyles.icon}`}
+                fill={isLiked ? 'currentColor' : 'none'}
+              />
+              <Text className={`text-xs font-semibold ${likeStyles.text}`}>
+                {isLiked ? 'Unlike' : 'Like'}
               </Text>
             </TouchableOpacity>
 

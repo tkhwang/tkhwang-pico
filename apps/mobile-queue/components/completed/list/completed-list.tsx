@@ -1,13 +1,15 @@
 import { FlashList } from '@shopify/flash-list';
 import type { UserContentWithDetails } from '@tkhwang-pico/supabase';
+import { Calendar } from 'lucide-react-native';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { RefreshControl, ScrollView, View } from 'react-native';
 
-import { ArchiveListSkeleton } from '@/components/archive/list/archive-list-skeleton';
-import { SwipeableArchiveItem } from '@/components/archive/swipe/swipeable-archive-item';
+import { CompletedListSkeleton } from '@/components/completed/list/completed-list-skeleton';
+import { SwipeableCompletedItem } from '@/components/completed/swipe/swipeable-completed-item';
 import { ContentItemList } from '@/components/content/content-item-list';
 import { ContentItemSmallCard } from '@/components/content/content-item-small-card';
 import { ContentDetail } from '@/components/content/detail/content-detail';
+import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
 import { type ViewMode, ViewModeToggle } from '@/components/ui/view-mode-toggle';
 import { useSetContentPreference } from '@/hooks/mutations/use-content-preference';
@@ -24,7 +26,7 @@ interface GroupedContent {
   items: UserContentWithDetails[];
 }
 
-export function ArchiveList() {
+export function CompletedList() {
   const { data: contents = [], isLoading, error, refetch } = useUserContents('completed');
 
   const [refreshing, setRefreshing] = useState(false);
@@ -140,7 +142,7 @@ export function ArchiveList() {
     }));
   }, [contents]);
 
-  if (isLoading && !refreshing) return <ArchiveListSkeleton />;
+  if (isLoading && !refreshing) return <CompletedListSkeleton />;
 
   if (error) {
     return (
@@ -176,7 +178,7 @@ export function ArchiveList() {
           />
         }
       >
-        <Text className="mb-4 text-4xl">📅</Text>
+        <Icon as={Calendar} size={48} className="mb-4 text-gray-400 dark:text-gray-600" />
         <Text className="mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100">
           No completed contents yet
         </Text>
@@ -191,9 +193,10 @@ export function ArchiveList() {
     return (
       <View className="mb-6">
         {/* Date section header */}
-        <View className="mb-3">
+        <View className="mb-3 flex-row items-center gap-2">
+          <Icon as={Calendar} size={18} className="text-gray-500 dark:text-gray-300" />
           <Text className="text-sm font-semibold text-gray-700 dark:text-gray-200">
-            📅 {item.date}
+            {item.date}
           </Text>
         </View>
 
@@ -234,7 +237,7 @@ export function ArchiveList() {
           // Default bigCard view with swipeable
           item.items.map((content, index) => (
             <View key={content.id} className={index > 0 ? 'mt-2' : ''}>
-              <SwipeableArchiveItem
+              <SwipeableCompletedItem
                 item={content}
                 onPress={handleItemPress}
                 onReopen={handleReopen}

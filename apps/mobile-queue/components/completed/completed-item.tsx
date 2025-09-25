@@ -9,13 +9,13 @@ import { Text } from '@/components/ui/text';
 import { useContentActions } from '@/hooks/use-content-actions';
 import { formatArchiveDate } from '@/utils/content-formatters';
 
-interface ArchiveCardProps {
+interface CompletedCardProps {
   item: UserContentWithDetails;
   isFirstOfDay?: boolean;
   onPress?: (item: UserContentWithDetails) => void;
 }
 
-export function ArchiveCard({ item, isFirstOfDay = false, onPress }: ArchiveCardProps) {
+export function CompletedCard({ item, isFirstOfDay = false, onPress }: CompletedCardProps) {
   const { openURL } = useContentActions();
   const content = item.contents;
   const isLiked =
@@ -153,7 +153,7 @@ export function ArchiveItem({ items, onPress }: ArchiveItemProps) {
       <View>
         {items.map((item, index) => (
           <View key={item.id} className={index > 0 ? 'mt-3' : ''}>
-            <ArchiveCard item={item} isFirstOfDay={index === 0} onPress={onPress} />
+            <CompletedCard item={item} isFirstOfDay={index === 0} onPress={onPress} />
           </View>
         ))}
       </View>

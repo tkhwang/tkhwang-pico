@@ -1,10 +1,10 @@
 import { useAuth } from '@clerk/clerk-expo';
 import { useEffect } from 'react';
 
-import { Home } from '@/components/home';
+import { Dashboard } from '@/components/dashboard';
 import { MainLayout } from '@/components/main-layout';
 
-export default function HomeScreen() {
+export default function DashboardScreen() {
   const { getToken } = useAuth();
 
   useEffect(() => {
@@ -23,7 +23,7 @@ export default function HomeScreen() {
 
   return (
     <MainLayout>
-      <Home />
+      <Dashboard />
     </MainLayout>
   );
 }
