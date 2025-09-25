@@ -1,6 +1,6 @@
 import { Tabs } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { Brain, Compass, Layers, Settings } from 'lucide-react-native';
+import { Brain, Compass, Layers, LayoutDashboard, Settings } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import * as React from 'react';
 import { Platform } from 'react-native';
@@ -49,6 +49,23 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
+          title: 'Dashboard',
+          headerShown: false,
+          tabBarIcon: ({ color, size, focused }) => (
+            <Icon
+              as={LayoutDashboard}
+              color={color}
+              size={size}
+              fill={focused ? color : 'none'}
+              fillOpacity={focused ? 0.2 : 1}
+              strokeWidth={focused ? 1.1 : 1.5}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="queue"
+        options={{
           title: 'Queue',
           headerShown: false,
           tabBarIcon: ({ color, size, focused }) => (
@@ -81,7 +98,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="archive"
+        name="completed"
         options={{
           title: 'Archive',
           headerShown: false,

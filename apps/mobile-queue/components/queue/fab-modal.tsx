@@ -62,7 +62,7 @@ export function FabModal({ visible, onClose, onSuccess }: FabModalProps) {
         inputRef.current?.focus();
       }, 100);
     }
-  }, [visible]);
+  }, [saveContentMutation, visible]);
 
   const handleCloseModal = () => {
     setUrl('');
