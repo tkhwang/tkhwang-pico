@@ -1,10 +1,7 @@
-import {
-  Role as copilotKitRole,
-  TextMessage,
-} from "@copilotkit/runtime-client-gql";
+import { Role as copilotKitRole, TextMessage } from '@copilotkit/runtime-client-gql';
 
-import type { Message } from "@/lib/supabase/messages";
-import type { DatabaseRole } from "@/types/role";
+import type { Message } from '@/lib/supabase/messages';
+import type { DatabaseRole } from '@/types/role';
 
 type CopilotKitRole = (typeof copilotKitRole)[keyof typeof copilotKitRole];
 
@@ -16,12 +13,12 @@ type CopilotKitRole = (typeof copilotKitRole)[keyof typeof copilotKitRole];
  * @return {*}  {DatabaseRole}
  */
 const toDbRoleMap: Partial<Record<CopilotKitRole, DatabaseRole>> = {
-  [copilotKitRole.User]: "user",
-  [copilotKitRole.Assistant]: "assistant",
-  [copilotKitRole.System]: "system",
+  [copilotKitRole.User]: 'user',
+  [copilotKitRole.Assistant]: 'assistant',
+  [copilotKitRole.System]: 'system',
 };
 export function copilotRoleToString(role: CopilotKitRole): DatabaseRole {
-  return toDbRoleMap[role] ?? "assistant";
+  return toDbRoleMap[role] ?? 'assistant';
 }
 
 /**

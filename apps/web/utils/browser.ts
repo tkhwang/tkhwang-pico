@@ -3,7 +3,7 @@
  * @returns {boolean} True if running in browser, false if running in server
  */
 export function isBrowser(): boolean {
-  return typeof window !== "undefined";
+  return typeof window !== 'undefined';
 }
 
 /**
@@ -11,5 +11,5 @@ export function isBrowser(): boolean {
  * @returns {boolean} True if running in server, false if running in browser
  */
 export function isServer(): boolean {
-  return typeof window === "undefined";
+  return typeof window === 'undefined';
 }
