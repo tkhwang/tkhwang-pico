@@ -3,8 +3,8 @@ import type { UserContentWithDetails } from '@tkhwang-pico/supabase';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { RefreshControl, ScrollView, View } from 'react-native';
 
-import { ArchiveListSkeleton } from '@/components/archive/list/archive-list-skeleton';
-import { SwipeableArchiveItem } from '@/components/archive/swipe/swipeable-archive-item';
+import { CompletedListSkeleton } from '@/components/completed/list/completed-list-skeleton';
+import { SwipeableCompletedItem } from '@/components/completed/swipe/swipeable-completed-item';
 import { ContentItemList } from '@/components/content/content-item-list';
 import { ContentItemSmallCard } from '@/components/content/content-item-small-card';
 import { ContentDetail } from '@/components/content/detail/content-detail';
@@ -24,7 +24,7 @@ interface GroupedContent {
   items: UserContentWithDetails[];
 }
 
-export function ArchiveList() {
+export function CompletedList() {
   const { data: contents = [], isLoading, error, refetch } = useUserContents('completed');
 
   const [refreshing, setRefreshing] = useState(false);
@@ -140,7 +140,7 @@ export function ArchiveList() {
     }));
   }, [contents]);
 
-  if (isLoading && !refreshing) return <ArchiveListSkeleton />;
+  if (isLoading && !refreshing) return <CompletedListSkeleton />;
 
   if (error) {
     return (
@@ -234,7 +234,7 @@ export function ArchiveList() {
           // Default bigCard view with swipeable
           item.items.map((content, index) => (
             <View key={content.id} className={index > 0 ? 'mt-2' : ''}>
-              <SwipeableArchiveItem
+              <SwipeableCompletedItem
                 item={content}
                 onPress={handleItemPress}
                 onReopen={handleReopen}

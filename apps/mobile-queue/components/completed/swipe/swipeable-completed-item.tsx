@@ -19,7 +19,7 @@ import { useSwipeActionFeedback } from '@/hooks/use-swipe-action-feedback';
 import { useSwipeableItem } from '@/hooks/use-swipeable-item';
 import { isContentLiked } from '@/utils/content-helpers';
 
-interface SwipeableArchiveItemProps {
+interface SwipeableCompletedItemProps {
   item: UserContentWithDetails;
   onReopen?: (id: string) => void;
   onDelete?: (contentId: string) => void;
@@ -27,13 +27,13 @@ interface SwipeableArchiveItemProps {
   onLike?: (contentId: string) => void;
 }
 
-export function SwipeableArchiveItem({
+export function SwipeableCompletedItem({
   item,
   onReopen,
   onDelete,
   onPress,
   onLike,
-}: SwipeableArchiveItemProps) {
+}: SwipeableCompletedItemProps) {
   const isLiked = isContentLiked(item);
   const { isProcessing, actionCompleted, executeWithFeedback } = useSwipeActionFeedback();
 
