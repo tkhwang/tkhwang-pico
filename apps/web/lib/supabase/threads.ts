@@ -8,8 +8,8 @@ import type {
 } from '@tkhwang-pico/supabase';
 import { ThreadsRepository } from '@tkhwang-pico/supabase';
 
+import { createAuthenticatedSupabaseClient } from '../../services/supabase-client';
 import type { AuthClerkSession } from '../../types/auth';
-import { createAuthenticatedSupabaseClient } from './client';
 
 function createThreadsRepository(session: AuthClerkSession) {
   const supabase = createAuthenticatedSupabaseClient(session);
