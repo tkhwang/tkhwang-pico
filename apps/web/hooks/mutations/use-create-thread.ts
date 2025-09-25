@@ -1,13 +1,10 @@
-import { useQueryClient } from "@tanstack/react-query";
-import type {
-  CreateThreadParams,
-  ThreadWithLastMessage,
-} from "@tkhwang-pico/supabase";
+import { useQueryClient } from '@tanstack/react-query';
+import type { CreateThreadParams, ThreadWithLastMessage } from '@tkhwang-pico/supabase';
 
-import { queryKey } from "@/hooks/keys/query-key";
-import { useSupabaseMutation } from "@/hooks/mutations/supabase/use-supabase-mutation";
-import { createThread } from "@/lib/supabase/threads";
-import { useAuth } from "@/providers/auth-provider";
+import { queryKey } from '@/hooks/keys/query-key';
+import { useSupabaseMutation } from '@/hooks/mutations/supabase/use-supabase-mutation';
+import { useAuth } from '@/providers/auth-provider';
+import { ThreadsRepository } from '@/services/repositories/threads.repository';
 
 interface CreateThreadContext {
   previousThreads: ThreadWithLastMessage[] | undefined;
@@ -21,13 +18,14 @@ export function useCreateThread() {
   return useSupabaseMutation<
     ThreadWithLastMessage,
     Error,
-    Omit<CreateThreadParams, "userId">,
+    Omit<CreateThreadParams, 'userId'>,
     CreateThreadContext
   >(
-    async (session, params: Omit<CreateThreadParams, "userId">) => {
-      if (!user?.id) throw new Error("User not authenticated");
+    async (session, params: Omit<CreateThreadParams, 'userId'>) => {
+      if (!user?.id) throw new Error('User not authenticated');
 
-      return await createThread(session, { ...params, userId: user.id });
+      const threadsRepository = new ThreadsRepository(session);
+      return await threadsRepository.createThread({ ...params, userId: user.id });
     },
     {
       onMutate: async (params) => {
@@ -35,12 +33,12 @@ export function useCreateThread() {
           return {
             previousThreads: undefined,
             optimisticThread: {
-              id: "",
-              user_id: "",
-              title: "",
+              id: '',
+              user_id: '',
+              title: '',
               metadata: {},
-              created_at: "",
-              updated_at: "",
+              created_at: '',
+              updated_at: '',
               messageCount: 0,
             },
           };
@@ -51,15 +49,15 @@ export function useCreateThread() {
         });
 
         // Snapshot the previous value
-        const previousThreads = queryClient.getQueryData<
-          ThreadWithLastMessage[]
-        >(queryKey.threads.byUserId(user?.id));
+        const previousThreads = queryClient.getQueryData<ThreadWithLastMessage[]>(
+          queryKey.threads.byUserId(user?.id),
+        );
 
         // Create optimistic thread
         const optimisticThread: ThreadWithLastMessage = {
           id: `temp-${Date.now()}`,
-          user_id: user?.id || "",
-          title: params.title || "New Chat",
+          user_id: user?.id || '',
+          title: params.title || 'New Chat',
           metadata: params.metadata || {},
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
@@ -89,10 +87,7 @@ export function useCreateThread() {
       onError: (_, __, context) => {
         // Rollback on error
         if (context?.previousThreads) {
-          queryClient.setQueryData(
-            queryKey.threads.byUserId(user?.id),
-            context.previousThreads,
-          );
+          queryClient.setQueryData(queryKey.threads.byUserId(user?.id), context.previousThreads);
         }
       },
       onSettled: () => {

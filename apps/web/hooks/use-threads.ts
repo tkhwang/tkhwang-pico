@@ -1,8 +1,8 @@
-import type { ThreadWithLastMessage } from "@tkhwang-pico/supabase";
-import { useCallback, useEffect, useState } from "react";
+import type { ThreadWithLastMessage } from '@tkhwang-pico/supabase';
+import { useCallback, useEffect, useState } from 'react';
 
-import { deleteThread, getUserThreads } from "@/lib/supabase/threads";
-import { useAuth } from "@/providers/auth-provider";
+import { useAuth } from '@/providers/auth-provider';
+import { ThreadsRepository } from '@/services/repositories/threads.repository';
 
 interface UseThreadsReturn {
   threads: ThreadWithLastMessage[];
@@ -28,11 +28,12 @@ export function useThreads(): UseThreadsReturn {
     setError(null);
 
     try {
-      const userThreads = await getUserThreads(session, user.id);
+      const threadsRepository = new ThreadsRepository(session);
+      const userThreads = await threadsRepository.getUserThreads(user.id);
       setThreads(userThreads);
     } catch (err) {
-      console.error("Failed to fetch threads:", err);
-      setError(err instanceof Error ? err.message : "Failed to fetch threads");
+      console.error('Failed to fetch threads:', err);
+      setError(err instanceof Error ? err.message : 'Failed to fetch threads');
     } finally {
       setIsLoading(false);
     }
@@ -41,18 +42,17 @@ export function useThreads(): UseThreadsReturn {
   const deleteThreadById = useCallback(
     async (threadId: string) => {
       if (!session) {
-        throw new Error("User not authenticated");
+        throw new Error('User not authenticated');
       }
 
       try {
-        await deleteThread(session, threadId);
+        const threadsRepository = new ThreadsRepository(session);
+        await threadsRepository.deleteThread(threadId);
         // Remove thread from local state
         setThreads((prev) => prev.filter((thread) => thread.id !== threadId));
       } catch (err) {
-        console.error("Failed to delete thread:", err);
-        setError(
-          err instanceof Error ? err.message : "Failed to delete thread",
-        );
+        console.error('Failed to delete thread:', err);
+        setError(err instanceof Error ? err.message : 'Failed to delete thread');
         throw err; // Re-throw so the component can handle it
       }
     },
