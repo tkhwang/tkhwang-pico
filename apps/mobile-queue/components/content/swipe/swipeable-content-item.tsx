@@ -14,7 +14,7 @@ import {
   SWIPE_ACTION_BUTTON_WIDTH,
   SWIPE_MENU_DAMPING,
 } from '@/consts/app-consts';
-import { ACTION_STYLES, COMPLETION_STYLES, DELETE_STYLES } from '@/consts/app-styles';
+import { ACTION_STYLES } from '@/consts/app-styles';
 import { useSwipeActionFeedback } from '@/hooks/use-swipe-action-feedback';
 import { useSwipeableItem } from '@/hooks/use-swipeable-item';
 import { isContentLiked } from '@/utils/content-helpers';
@@ -172,6 +172,20 @@ export function SwipeableContentItem({
       >
         <TouchableOpacity
           activeOpacity={0.8}
+          onPress={handleCompletePress}
+          disabled={isProcessing}
+          className={`items-center justify-center ${completionStyles.bg}`}
+          style={{ width: SWIPE_ACTION_BUTTON_WIDTH }}
+        >
+          <AnimatedViewTyped style={leftIconStyle}>
+            <Icon as={LeftIcon} className={`h-6 w-6 ${completionStyles.icon}`} />
+          </AnimatedViewTyped>
+          <Text className={`mt-1 text-xs font-semibold ${completionStyles.text}`}>
+            {completionStyles.label}
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          activeOpacity={0.8}
           onPress={handleLikePress}
           disabled={isProcessing}
           className={`items-center justify-center ${likeStyles.bg}`}
@@ -186,20 +200,6 @@ export function SwipeableContentItem({
           </AnimatedViewTyped>
           <Text className={`mt-1 text-xs font-semibold ${likeStyles.text}`}>
             {likeStyles.label}
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          activeOpacity={0.8}
-          onPress={handleCompletePress}
-          disabled={isProcessing}
-          className={`items-center justify-center ${completionStyles.bg}`}
-          style={{ width: SWIPE_ACTION_BUTTON_WIDTH }}
-        >
-          <AnimatedViewTyped style={leftIconStyle}>
-            <Icon as={LeftIcon} className={`h-6 w-6 ${completionStyles.icon}`} />
-          </AnimatedViewTyped>
-          <Text className={`mt-1 text-xs font-semibold ${completionStyles.text}`}>
-            {completionStyles.label}
           </Text>
         </TouchableOpacity>
       </AnimatedViewTyped>

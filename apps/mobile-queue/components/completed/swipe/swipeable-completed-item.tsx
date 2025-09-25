@@ -156,6 +156,23 @@ export function SwipeableCompletedItem({
         >
           <TouchableOpacity
             activeOpacity={0.8}
+            onPress={handleReopen}
+            disabled={isProcessing}
+            className={`items-center justify-center ${leftReopenStyles.bg}`}
+            style={{ width: SWIPE_ACTION_BUTTON_WIDTH }}
+          >
+            <AnimatedViewTyped style={leftIconStyle}>
+              <Icon
+                as={actionCompleted === 'reopen' ? Circle : RotateCcw}
+                className={`h-6 w-6 ${leftReopenStyles.icon}`}
+              />
+            </AnimatedViewTyped>
+            <Text className={`mt-1 text-xs font-semibold ${leftReopenStyles.text}`}>
+              {leftReopenStyles.label}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            activeOpacity={0.8}
             onPress={handleLike}
             disabled={isProcessing}
             className={`items-center justify-center ${leftLikeStyles.bg}`}
@@ -170,23 +187,6 @@ export function SwipeableCompletedItem({
             </AnimatedViewTyped>
             <Text className={`mt-1 text-xs font-semibold ${leftLikeStyles.text}`}>
               {leftLikeStyles.label}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            activeOpacity={0.8}
-            onPress={handleReopen}
-            disabled={isProcessing}
-            className={`items-center justify-center ${leftReopenStyles.bg}`}
-            style={{ width: SWIPE_ACTION_BUTTON_WIDTH }}
-          >
-            <AnimatedViewTyped style={leftIconStyle}>
-              <Icon
-                as={actionCompleted === 'reopen' ? Circle : RotateCcw}
-                className={`h-6 w-6 ${leftReopenStyles.icon}`}
-              />
-            </AnimatedViewTyped>
-            <Text className={`mt-1 text-xs font-semibold ${leftReopenStyles.text}`}>
-              {leftReopenStyles.label}
             </Text>
           </TouchableOpacity>
         </View>
