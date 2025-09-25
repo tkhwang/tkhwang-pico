@@ -1,0 +1,21 @@
+{
+  "$schema": "https://railway.com/railway.schema.json",
+  "build": {
+    "buildCommand": "yarn workspace @tkhwang-pico/nest build",
+    "builder": "RAILPACK"
+  },
+  "deploy": {
+    "multiRegionConfig": {
+      "us-west2": {
+        "numReplicas": 1
+      }
+    },
+    "numReplicas": 1,
+    "restartPolicyMaxRetries": 10,
+    "restartPolicyType": "ON_FAILURE",
+    "runtime": "V2",
+    "sleepApplication": false,
+    "startCommand": "yarn workspace @tkhwang-pico/nest start:prod",
+    "useLegacyStacker": false
+  }
+}
