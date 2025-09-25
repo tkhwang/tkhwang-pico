@@ -15,7 +15,7 @@
     "restartPolicyType": "ON_FAILURE",
     "runtime": "V2",
     "sleepApplication": false,
-    "startCommand": "yarn workspace @tkhwang-pico/nest start",
+    "startCommand": "yarn workspace @tkhwang-pico/nest start:prod",
     "useLegacyStacker": false
   }
 }
