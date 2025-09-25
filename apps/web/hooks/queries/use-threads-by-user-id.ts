@@ -1,9 +1,9 @@
-import type { ThreadWithLastMessage } from "@tkhwang-pico/supabase";
+import type { ThreadWithLastMessage } from '@tkhwang-pico/supabase';
 
-import { queryKey } from "@/hooks/keys/query-key";
-import { useSupabaseQuery } from "@/hooks/queries/supabase/use-supabase-query";
-import { getUserThreads } from "@/lib/supabase/threads";
-import { useAuth } from "@/providers/auth-provider";
+import { queryKey } from '@/hooks/keys/query-key';
+import { useSupabaseQuery } from '@/hooks/queries/supabase/use-supabase-query';
+import { useAuth } from '@/providers/auth-provider';
+import { ThreadsRepository } from '@/services/repositories/threads.repository';
 
 export function useThreadsByUserId() {
   const { user } = useAuth();
@@ -13,7 +13,8 @@ export function useThreadsByUserId() {
     async (session): Promise<ThreadWithLastMessage[]> => {
       if (!user?.id) return [];
 
-      return await getUserThreads(session, user.id);
+      const threadsRepository = new ThreadsRepository(session);
+      return await threadsRepository.getUserThreads(user.id);
     },
     {
       enabled: !!user?.id,

@@ -1,10 +1,10 @@
-import { useQueryClient } from "@tanstack/react-query";
-import type { ThreadWithLastMessage } from "@tkhwang-pico/supabase";
+import { useQueryClient } from '@tanstack/react-query';
+import type { ThreadWithLastMessage } from '@tkhwang-pico/supabase';
 
-import { queryKey } from "@/hooks/keys/query-key";
-import { useSupabaseMutation } from "@/hooks/mutations/supabase/use-supabase-mutation";
-import { deleteThread } from "@/lib/supabase/threads";
-import { useAuth } from "@/providers/auth-provider";
+import { queryKey } from '@/hooks/keys/query-key';
+import { useSupabaseMutation } from '@/hooks/mutations/supabase/use-supabase-mutation';
+import { useAuth } from '@/providers/auth-provider';
+import { ThreadsRepository } from '@/services/repositories/threads.repository';
 
 interface DeleteThreadContext {
   previousThreads: ThreadWithLastMessage[] | undefined;
@@ -16,7 +16,8 @@ export function useDeleteThread() {
 
   return useSupabaseMutation<void, Error, string, DeleteThreadContext>(
     async (session, threadId) => {
-      await deleteThread(session, threadId);
+      const threadsRepository = new ThreadsRepository(session);
+      await threadsRepository.deleteThread(threadId);
     },
     {
       onMutate: async (threadId) => {
@@ -29,9 +30,9 @@ export function useDeleteThread() {
         });
 
         // Snapshot the previous value
-        const previousThreads = queryClient.getQueryData<
-          ThreadWithLastMessage[]
-        >(queryKey.threads.byUserId(user?.id));
+        const previousThreads = queryClient.getQueryData<ThreadWithLastMessage[]>(
+          queryKey.threads.byUserId(user?.id),
+        );
 
         // Optimistically update by removing the thread
         queryClient.setQueryData<ThreadWithLastMessage[]>(
@@ -44,10 +45,7 @@ export function useDeleteThread() {
       onError: (_, __, context) => {
         // Rollback on error
         if (context?.previousThreads) {
-          queryClient.setQueryData(
-            queryKey.threads.byUserId(user?.id),
-            context.previousThreads,
-          );
+          queryClient.setQueryData(queryKey.threads.byUserId(user?.id), context.previousThreads);
         }
       },
       onSettled: () => {

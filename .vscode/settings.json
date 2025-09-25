@@ -32,13 +32,8 @@
     "typescriptreact"
   ],
   "eslint.workingDirectories": [
-    {
-      "directory": "apps/mobile-queue",
-      "changeProcessCWD": true
-    },
-    {
-      "mode": "auto"
-    }
+    { "pattern": "apps/*/" },
+    { "pattern": "packages/*/" }
   ],
   "deno.enable": false,
   "deno.enablePaths": ["./packages/supabase/functions"],

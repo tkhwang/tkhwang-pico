@@ -1,10 +1,10 @@
-import { useQueryClient } from "@tanstack/react-query";
-import type { ThreadWithLastMessage } from "@tkhwang-pico/supabase";
+import { useQueryClient } from '@tanstack/react-query';
+import type { ThreadWithLastMessage } from '@tkhwang-pico/supabase';
 
-import { queryKey } from "@/hooks/keys/query-key";
-import { useSupabaseMutation } from "@/hooks/mutations/supabase/use-supabase-mutation";
-import { updateThreadTitle } from "@/lib/supabase/threads";
-import { useAuth } from "@/providers/auth-provider";
+import { queryKey } from '@/hooks/keys/query-key';
+import { useSupabaseMutation } from '@/hooks/mutations/supabase/use-supabase-mutation';
+import { useAuth } from '@/providers/auth-provider';
+import { ThreadsRepository } from '@/services/repositories/threads.repository';
 
 interface UpdateThreadTitleParams {
   threadId: string;
@@ -19,14 +19,10 @@ export function useUpdateThreadTitle() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  return useSupabaseMutation<
-    void,
-    Error,
-    UpdateThreadTitleParams,
-    UpdateThreadTitleContext
-  >(
+  return useSupabaseMutation<void, Error, UpdateThreadTitleParams, UpdateThreadTitleContext>(
     async (session, { threadId, title }) => {
-      await updateThreadTitle(session, threadId, title);
+      const threadsRepository = new ThreadsRepository(session);
+      await threadsRepository.updateThreadTitle(threadId, title);
     },
     {
       onMutate: async ({ threadId, title }) => {
@@ -39,17 +35,15 @@ export function useUpdateThreadTitle() {
         });
 
         // Snapshot the previous value
-        const previousThreads = queryClient.getQueryData<
-          ThreadWithLastMessage[]
-        >(queryKey.threads.byUserId(user?.id));
+        const previousThreads = queryClient.getQueryData<ThreadWithLastMessage[]>(
+          queryKey.threads.byUserId(user?.id),
+        );
 
         // Optimistically update the thread title
         queryClient.setQueryData<ThreadWithLastMessage[]>(
           queryKey.threads.byUserId(user?.id),
           (old) =>
-            old?.map((thread) =>
-              thread.id === threadId ? { ...thread, title } : thread,
-            ) ?? [],
+            old?.map((thread) => (thread.id === threadId ? { ...thread, title } : thread)) ?? [],
         );
 
         return { previousThreads };
@@ -57,10 +51,7 @@ export function useUpdateThreadTitle() {
       onError: (_, __, context) => {
         // Rollback on error
         if (context?.previousThreads) {
-          queryClient.setQueryData(
-            queryKey.threads.byUserId(user?.id),
-            context.previousThreads,
-          );
+          queryClient.setQueryData(queryKey.threads.byUserId(user?.id), context.previousThreads);
         }
       },
       onSettled: () => {

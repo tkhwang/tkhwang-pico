@@ -1,27 +1,25 @@
-"use client";
+'use client';
 
-import type { Message, Thread } from "@tkhwang-pico/supabase";
+import type { Message, Thread } from '@tkhwang-pico/supabase';
 
-import { queryKey } from "@/hooks/keys/query-key";
-import { useSupabaseQuery } from "@/hooks/queries/supabase/use-supabase-query";
-import { getThreadWithMessages } from "@/lib/supabase/threads";
+import { queryKey } from '@/hooks/keys/query-key';
+import { useSupabaseQuery } from '@/hooks/queries/supabase/use-supabase-query';
+import { ThreadsRepository } from '@/services/repositories/threads.repository';
 
 export interface ThreadWithMessagesResult {
   thread: Thread;
   messages: Message[];
 }
 
-export function useMessagesByThreadId(
-  threadId: string | undefined,
-  enabled?: boolean,
-) {
+export function useMessagesByThreadId(threadId: string | undefined, enabled?: boolean) {
   return useSupabaseQuery(
     queryKey.messages.byThreadId(threadId),
     async (session) => {
-      if (!threadId) throw new Error("threadId is required");
+      if (!threadId) throw new Error('threadId is required');
 
-      const result = await getThreadWithMessages(session, threadId);
-      if (!result) throw new Error("Thread not found");
+      const threadsRepository = new ThreadsRepository(session);
+      const result = await threadsRepository.getThreadWithMessages(threadId);
+      if (!result) throw new Error('Thread not found');
       return result;
     },
     {

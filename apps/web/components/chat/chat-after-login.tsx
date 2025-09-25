@@ -18,8 +18,8 @@ import { Separator } from '@/components/ui/separator';
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { useCreateThread } from '@/hooks/mutations/use-create-thread';
 import { useSaveMessage } from '@/hooks/mutations/use-save-message';
-import { generateThreadTitle } from '@/lib/supabase/threads';
 import { useAuth } from '@/providers/auth-provider';
+import { generateThreadTitle } from '@/services/repositories/threads.repository';
 
 export function ChatAfterLogin() {
   const [inputValue, setInputValue] = useState('');

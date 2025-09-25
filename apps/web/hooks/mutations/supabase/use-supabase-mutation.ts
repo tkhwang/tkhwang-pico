@@ -1,30 +1,23 @@
-"use client";
+'use client';
 
-import { useMutation, type UseMutationOptions } from "@tanstack/react-query";
-import { useAuth } from "@/providers/auth-provider";
-import type { AuthClerkSession } from "@/types/auth";
+import { useMutation, type UseMutationOptions } from '@tanstack/react-query';
+
+import { useAuth } from '@/providers/auth-provider';
+import type { AuthClerkSession } from '@/types/auth';
 
 /**
  * Common hook for Supabase mutations with automatic session management
  */
-export function useSupabaseMutation<
-  TData,
-  TError = Error,
-  TVariables = void,
-  TContext = unknown,
->(
-  mutationFn: (
-    session: NonNullable<AuthClerkSession>,
-    variables: TVariables
-  ) => Promise<TData>,
-  options?: UseMutationOptions<TData, TError, TVariables, TContext>
+export function useSupabaseMutation<TData, TError = Error, TVariables = void, TContext = unknown>(
+  mutationFn: (session: NonNullable<AuthClerkSession>, variables: TVariables) => Promise<TData>,
+  options?: UseMutationOptions<TData, TError, TVariables, TContext>,
 ) {
   const { session } = useAuth();
 
   return useMutation<TData, TError, TVariables, TContext>({
     mutationFn: (variables) => {
       if (!session) {
-        throw new Error("User not authenticated");
+        throw new Error('User not authenticated');
       }
       return mutationFn(session, variables);
     },

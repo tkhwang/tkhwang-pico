@@ -1,13 +1,13 @@
-import { createSupabaseClientFactory } from "@tkhwang-pico/supabase/clients";
-import { cookies } from "next/headers";
+import { createSupabaseClientFactory } from '@tkhwang-pico/supabase/clients';
+import { cookies } from 'next/headers';
 
 export async function createClient() {
   const cookieStore = await cookies();
 
   const { client } = createSupabaseClientFactory({
-    platform: "web",
-    runtime: "server",
-    mode: "public",
+    platform: 'web',
+    runtime: 'server',
+    mode: 'public',
     cookies: {
       getAll() {
         return cookieStore.getAll();
