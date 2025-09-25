@@ -1,0 +1,12 @@
+{
+  "$schema": "https://schema.railpack.com",
+  "deploy": {
+    "inputs": [
+      {
+        "exclude": ["apps/web/**", "apps/mobile-queue/**", "docs/**", ".git/**", "node_modules/**"],
+        "include": ["apps/nest/package.json", "apps/nest/dist/**"],
+        "step": "build"
+      }
+    ]
+  }
+}
