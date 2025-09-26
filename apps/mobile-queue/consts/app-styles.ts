@@ -1,5 +1,7 @@
 import type { Enums } from '@tkhwang-pico/supabase';
 
+import { DEFAULT_PRIORITY, PRIORITY_VALUES, type PriorityValue } from '@/utils/priority';
+
 // Unified action styles for consistent theming across swipe actions and modal buttons
 
 // Core action styles - single source of truth
@@ -254,7 +256,9 @@ export const MODAL_ACTION_STYLES = {
  */
 type PriorityKey = Enums<'content_priority'>;
 
-export const PRIORITY_STYLES = {
+const BASE_PRIORITY_STYLES: Partial<
+  Record<PriorityValue, { badge: string; dot: string; text: string }>
+> = {
   low: {
     badge: 'bg-emerald-100 dark:bg-emerald-500/10',
     dot: 'bg-emerald-500 dark:bg-emerald-300',
@@ -270,4 +274,20 @@ export const PRIORITY_STYLES = {
     dot: 'bg-rose-500 dark:bg-rose-300',
     text: 'text-rose-700 dark:text-rose-200',
   },
-} satisfies Record<PriorityKey, { badge: string; dot: string; text: string }>;
+};
+
+const FALLBACK_PRIORITY_STYLE = BASE_PRIORITY_STYLES[DEFAULT_PRIORITY] ?? {
+  badge: 'bg-blue-100 dark:bg-blue-500/10',
+  dot: 'bg-blue-500 dark:bg-blue-300',
+  text: 'text-blue-700 dark:text-blue-200',
+};
+
+export const PRIORITY_STYLES = PRIORITY_VALUES.reduce<
+  Record<PriorityKey, { badge: string; dot: string; text: string }>
+>(
+  (acc, value) => {
+    acc[value] = BASE_PRIORITY_STYLES[value] ?? FALLBACK_PRIORITY_STYLE;
+    return acc;
+  },
+  {} as Record<PriorityKey, { badge: string; dot: string; text: string }>,
+);

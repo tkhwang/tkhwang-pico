@@ -6,11 +6,12 @@ import { Alert } from 'react-native';
 import { SAVE_CONTENT_DELAY_MS } from '@/consts/app-consts';
 import { queryKey } from '@/hooks/keys/query-key';
 import { saveContent } from '@/services/api/contents';
+import { DEFAULT_PRIORITY, type PriorityValue } from '@/utils/priority';
 
 interface SaveContentInput {
   url: string;
   scheduledFor?: string | null;
-  priority?: 'low' | 'normal' | 'high';
+  priority?: PriorityValue;
 }
 
 interface UseSaveContentOptions {
@@ -41,7 +42,7 @@ export function useSaveContent(options?: UseSaveContentOptions) {
         {
           url: input.url,
           scheduledFor: input.scheduledFor ?? null,
-          priority: input.priority ?? 'normal',
+          priority: input.priority ?? DEFAULT_PRIORITY,
         },
         token,
       );
@@ -111,7 +112,7 @@ export function useSaveContent(options?: UseSaveContentOptions) {
         note: null,
         todo_status: 'pending',
         completed_at: null,
-        priority: input.priority ?? 'normal',
+        priority: input.priority ?? DEFAULT_PRIORITY,
         scheduled_for: input.scheduledFor ?? null,
         contents: optimisticContent,
       };
@@ -188,8 +189,8 @@ export function useSaveContent(options?: UseSaveContentOptions) {
                     : it.scheduled_for,
                 priority:
                   context?.variables?.priority !== undefined
-                    ? (context.variables.priority ?? 'normal')
-                    : (it.priority ?? 'normal'),
+                    ? (context.variables.priority ?? DEFAULT_PRIORITY)
+                    : (it.priority ?? DEFAULT_PRIORITY),
               } as UserContentWithDetails;
             }
             return it;

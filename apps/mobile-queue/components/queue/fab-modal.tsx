@@ -2,7 +2,6 @@ import DateTimePicker, {
   DateTimePickerAndroid,
   type DateTimePickerEvent,
 } from '@react-native-community/datetimepicker';
-import type { Enums } from '@tkhwang-pico/supabase';
 import { Calendar } from 'lucide-react-native';
 import { useEffect, useRef, useState } from 'react';
 import {
@@ -34,6 +33,12 @@ import {
   isSameDayPreset,
   normalizeToStartOfDay,
 } from '@/utils/date';
+import {
+  DEFAULT_PRIORITY,
+  PRIORITY_LABELS,
+  PRIORITY_VALUES,
+  type PriorityValue,
+} from '@/utils/priority';
 
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
@@ -44,20 +49,12 @@ interface FabModalProps {
   onSuccess?: () => void;
 }
 
-type PriorityValue = Enums<'content_priority'>;
-
-const PRIORITY_LABELS: Record<PriorityValue, string> = {
-  low: 'Low',
-  normal: 'Normal',
-  high: 'High',
-};
-
-const PRIORITY_ORDER: PriorityValue[] = ['low', 'normal', 'high'];
+const PRIORITY_ORDER = [...PRIORITY_VALUES];
 
 export function FabModal({ visible, onClose, onSuccess }: FabModalProps) {
   const [url, setUrl] = useState('');
   const [scheduledDate, setScheduledDate] = useState<Date | null>(getDefaultSchedule());
-  const [priority, setPriority] = useState<PriorityValue>('normal');
+  const [priority, setPriority] = useState<PriorityValue>(DEFAULT_PRIORITY);
   const [isIosPickerVisible, setIosPickerVisible] = useState(false);
 
   const inputRef = useRef<TextInput>(null);
@@ -66,7 +63,7 @@ export function FabModal({ visible, onClose, onSuccess }: FabModalProps) {
     onSuccess: () => {
       setUrl('');
       setScheduledDate(getDefaultSchedule());
-      setPriority('normal');
+      setPriority(DEFAULT_PRIORITY);
       setIosPickerVisible(false);
       Keyboard.dismiss(); // Only dismiss keyboard on success
       onSuccess?.();
@@ -96,7 +93,7 @@ export function FabModal({ visible, onClose, onSuccess }: FabModalProps) {
     if (!visible) {
       setUrl('');
       setScheduledDate(getDefaultSchedule());
-      setPriority('normal');
+      setPriority(DEFAULT_PRIORITY);
       setIosPickerVisible(false);
       reset();
       return;
@@ -112,7 +109,7 @@ export function FabModal({ visible, onClose, onSuccess }: FabModalProps) {
   const handleCloseModal = () => {
     setUrl('');
     setScheduledDate(getDefaultSchedule());
-    setPriority('normal');
+    setPriority(DEFAULT_PRIORITY);
     setIosPickerVisible(false);
     onClose();
   };

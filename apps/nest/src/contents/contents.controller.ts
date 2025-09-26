@@ -30,6 +30,8 @@ export class ContentsController {
     return this.contentsService.saveUrl({
       url: saveContentDto.url,
       userId,
+      scheduledFor: saveContentDto.scheduledFor ?? null,
+      priority: saveContentDto.priority,
     });
   }
 

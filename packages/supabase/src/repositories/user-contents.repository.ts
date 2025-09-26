@@ -1,6 +1,8 @@
 import type { SupabaseClientWithDatabase } from '../lib/config';
 import type {
   ContentTodoStatus,
+  Enums,
+  TablesInsert,
   TodoFilterType,
   UserContent,
   UserContentPreferenceTyped,
@@ -27,19 +29,34 @@ export interface UpdateUserContentInput {
   completed_at?: string | null;
 }
 
+type ContentPriority = Enums<'content_priority'>;
+
+interface LinkUserContentOptions {
+  scheduledFor?: string | null;
+  priority?: ContentPriority;
+}
+
 export class UserContentsRepository extends BaseRepository {
   constructor(client: SupabaseClientWithDatabase, logger?: RepositoryLogger) {
     super(client, logger);
   }
 
-  async linkUserContent(userId: string, contentId: string): Promise<void> {
-    const { error } = await this.client.from('user_contents').upsert(
-      {
-        user_id: userId,
-        content_id: contentId,
-      },
-      { onConflict: 'user_id,content_id' },
-    );
+  async linkUserContent(
+    userId: string,
+    contentId: string,
+    options?: LinkUserContentOptions,
+  ): Promise<void> {
+    const upsertData: TablesInsert<'user_contents'> = {
+      user_id: userId,
+      content_id: contentId,
+    };
+
+    if (options?.scheduledFor !== undefined) upsertData.scheduled_for = options.scheduledFor;
+    if (options?.priority !== undefined) upsertData.priority = options.priority;
+
+    const { error } = await this.client
+      .from('user_contents')
+      .upsert(upsertData, { onConflict: 'user_id,content_id' });
 
     if (error) {
       this.logger.error(`Failed to link user content: ${error.message}`);
