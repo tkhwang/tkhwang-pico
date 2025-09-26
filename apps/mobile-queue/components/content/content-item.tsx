@@ -91,26 +91,30 @@ export function ContentItem({
     </View>
   );
 
+  const scheduleInfo = (
+    <View className="flex-row items-center gap-2">
+      <Icon
+        as={showCompletedTime ? CheckCircle : CalendarDays}
+        className={`h-3.5 w-3.5 ${
+          showCompletedTime
+            ? completedDate
+              ? 'text-emerald-500 dark:text-emerald-300'
+              : 'text-gray-400 dark:text-gray-500'
+            : scheduledDate
+              ? 'text-blue-500 dark:text-blue-300'
+              : 'text-gray-300 dark:text-gray-600'
+        }`}
+      />
+      <Text className={leftTextClass} numberOfLines={1}>
+        {scheduleLabel}
+      </Text>
+    </View>
+  );
+
   const bottomSlot = (
     <View className="mt-3 flex-row items-center justify-between">
-      <View className="flex-row items-center gap-2">
-        <Icon
-          as={showCompletedTime ? CheckCircle : CalendarDays}
-          className={`h-3.5 w-3.5 ${
-            showCompletedTime
-              ? completedDate
-                ? 'text-emerald-500 dark:text-emerald-300'
-                : 'text-gray-400 dark:text-gray-500'
-              : scheduledDate
-                ? 'text-blue-500 dark:text-blue-300'
-                : 'text-gray-300 dark:text-gray-600'
-          }`}
-        />
-        <Text className={leftTextClass} numberOfLines={1}>
-          {scheduleLabel}
-        </Text>
-      </View>
       {priorityBadge}
+      {scheduleInfo}
     </View>
   );
 
