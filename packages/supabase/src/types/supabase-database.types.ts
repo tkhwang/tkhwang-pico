@@ -362,6 +362,24 @@ export interface Database {
         Args: { '': string };
         Returns: string;
       };
+      get_user_contents: {
+        Args: { p_status?: Database['public']['Enums']['content_todo_status'] };
+        Returns: {
+          archived: boolean;
+          completed_at: string;
+          content_id: string;
+          contents: Json;
+          id: string;
+          labels: string[];
+          note: string;
+          preferences: Json;
+          priority: Database['public']['Enums']['content_priority'];
+          saved_at: string;
+          scheduled_for: string;
+          todo_status: Database['public']['Enums']['content_todo_status'];
+          user_id: string;
+        }[];
+      };
       gtrgm_compress: {
         Args: { '': unknown };
         Returns: unknown;
