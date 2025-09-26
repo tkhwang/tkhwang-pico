@@ -108,27 +108,33 @@ export function ContentItemList({
         </Text>
 
         {/* Metadata row */}
-        <View className="mt-0.5 flex-row items-center">
-          <SiteFavicon url={faviconUrl} size={10} className="mr-1" />
-          <Text className="text-xs text-gray-500 dark:text-gray-400" numberOfLines={1}>
-            {content.domain || 'CONTENT'}
-          </Text>
-          <Text className="mx-1 text-xs text-gray-400">•</Text>
-          {priorityBadge}
-          <Text className="mx-1 text-xs text-gray-400">•</Text>
-          <Icon
-            as={showCompletedTime ? CheckCircle : CalendarDays}
-            className={`h-3 w-3 ${scheduleIconClass}`}
-          />
-          <Text className={`text-xs font-medium ${scheduleTextClass}`} numberOfLines={1}>
-            {scheduleLabel}
-          </Text>
+        <View className="mt-0.5 flex-row items-center justify-between">
+          <View className="flex-1 flex-row items-center pr-3">
+            <SiteFavicon url={faviconUrl} size={10} className="mr-1" />
+            <Text className="flex-1 text-xs text-gray-500 dark:text-gray-400" numberOfLines={1}>
+              {content.domain || 'CONTENT'}
+            </Text>
+          </View>
+          <View className="shrink-0 flex-row items-center">
+            {priorityBadge}
+            <View className="ml-1.5 flex-row items-center">
+              <Icon
+                as={showCompletedTime ? CheckCircle : CalendarDays}
+                className={`mr-1 h-3 w-3 ${scheduleIconClass}`}
+              />
+              <Text className={`text-xs font-medium ${scheduleTextClass}`} numberOfLines={1}>
+                {scheduleLabel}
+              </Text>
+            </View>
+          </View>
         </View>
       </View>
 
       {/* Right side indicators */}
       <View className="flex-row items-center gap-1.5">
-        {isLiked && <Icon as={Heart} className="h-3.5 w-3.5 fill-rose-200 text-rose-500" />}
+        <View className="h-3.5 w-3.5 items-center justify-center">
+          {isLiked && <Icon as={Heart} className="h-3.5 w-3.5 fill-rose-200 text-rose-500" />}
+        </View>
         <View className="opacity-40">
           <Icon as={ExternalLink} className="h-3 w-3 text-gray-400 dark:text-gray-500" />
         </View>
