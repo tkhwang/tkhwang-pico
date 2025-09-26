@@ -31,9 +31,6 @@ export function RecommendList() {
   const [selectedItem, setSelectedItem] = useState<Recommendation | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
 
-  // Store the content ID being added to queue
-  const [addingContentId, setAddingContentId] = useState<string | null>(null);
-
   const saveContentMutation = useSaveContent();
 
   const setPreferenceMutation = useSetContentPreference();
@@ -64,25 +61,23 @@ export function RecommendList() {
 
   const handleAddToQueue = useCallback(
     (url: string, contentId: string) => {
-      setAddingContentId(contentId);
-      saveContentMutation.mutate(url, {
-        onSuccess: () => {
-          setAddingContentId(null);
-          // Evict after visual feedback completes
-          setTimeout(() => {
-            if (user?.id) {
-              const key = queryKey.recommendations.byUserId(user.id);
-              queryClient.setQueryData(key, (oldData: Recommendation[] | undefined) => {
-                if (!oldData) return oldData;
-                return oldData.filter((rec) => rec.content_id !== contentId);
-              });
-            }
-          }, SWIPE_ACTION_CARD_REMOVAL_DELAY_MS);
+      saveContentMutation.mutate(
+        { url },
+        {
+          onSuccess: () => {
+            // Evict after visual feedback completes
+            setTimeout(() => {
+              if (user?.id) {
+                const key = queryKey.recommendations.byUserId(user.id);
+                queryClient.setQueryData<Recommendation[]>(key, (oldData) => {
+                  if (!oldData) return oldData;
+                  return oldData.filter((rec) => rec.content_id !== contentId);
+                });
+              }
+            }, SWIPE_ACTION_CARD_REMOVAL_DELAY_MS);
+          },
         },
-        onError: () => {
-          setAddingContentId(null);
-        },
-      });
+      );
     },
     [saveContentMutation, user?.id, queryClient],
   );

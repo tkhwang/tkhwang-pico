@@ -95,7 +95,7 @@ export function CompletedList() {
 
   const handleAddToQueue = useCallback(
     (url: string, _contentId: string) => {
-      saveContentMutation.mutate(url);
+      saveContentMutation.mutate({ url });
     },
     [saveContentMutation],
   );

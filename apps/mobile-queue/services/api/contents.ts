@@ -1,9 +1,11 @@
-import type { SimilarContentRecommendation } from '@tkhwang-pico/supabase';
+import type { Enums, SimilarContentRecommendation } from '@tkhwang-pico/supabase';
 
 import { nestApi } from './nest';
 
-interface SaveContentRequest {
+export interface SaveContentRequest {
   url: string;
+  scheduledFor?: string | null;
+  priority?: Enums<'content_priority'>;
 }
 
 interface SaveContentResponse {
@@ -14,10 +16,13 @@ interface SaveContentResponse {
 /**
  * Save a new content URL to the backend
  */
-export async function saveContent(url: string, token: string): Promise<SaveContentResponse> {
+export async function saveContent(
+  payload: SaveContentRequest,
+  token: string,
+): Promise<SaveContentResponse> {
   const response = await nestApi<SaveContentResponse>('/contents/save', {
     method: 'POST',
-    body: { url } as SaveContentRequest,
+    body: payload,
     token,
   });
 

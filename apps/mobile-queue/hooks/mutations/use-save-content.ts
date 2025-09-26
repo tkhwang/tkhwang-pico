@@ -28,6 +28,7 @@ export function useSaveContent(options?: UseSaveContentOptions) {
     previousQueries?: [queryKey: unknown[], data: UserContentWithDetails[]][];
     optimisticId?: string;
     userContext?: unknown;
+    variables: SaveContentInput;
   }
 
   type SaveContentResult = Awaited<ReturnType<typeof saveContent>>;
@@ -36,16 +37,26 @@ export function useSaveContent(options?: UseSaveContentOptions) {
     mutationFn: async (input: SaveContentInput) => {
       const token = await getToken();
       if (!token) throw new Error('Authentication token not available');
-      // For now, we only pass the URL to the backend
-      // TODO: Update backend to accept scheduledFor and priority
-      return saveContent(input.url, token);
+      return saveContent(
+        {
+          url: input.url,
+          scheduledFor: input.scheduledFor ?? null,
+          priority: input.priority ?? 'normal',
+        },
+        token,
+      );
     },
     onMutate: async (input: SaveContentInput) => {
       const url = input.url;
       // Call user's onMutate first if provided
       const userContext = options?.onMutate?.();
 
-      if (!user?.id) return { previousQueries: undefined, userContext };
+      if (!user?.id)
+        return {
+          previousQueries: undefined,
+          userContext,
+          variables: input,
+        };
 
       const key = queryKey.userContents.byUserId(user.id);
       await queryClient.cancelQueries({ queryKey: key });
@@ -127,7 +138,7 @@ export function useSaveContent(options?: UseSaveContentOptions) {
         queryClient.setQueryData(specificQueryKey, nextItems);
       });
 
-      return { previousQueries, optimisticId, userContext };
+      return { previousQueries, optimisticId, userContext, variables: input };
     },
     onError: (error: Error, input, context) => {
       console.error('Failed to save content:', error);
@@ -171,6 +182,14 @@ export function useSaveContent(options?: UseSaveContentOptions) {
                 ...it,
                 content_id: data.contentId,
                 contents: updatedContents ?? it.contents,
+                scheduled_for:
+                  context?.variables?.scheduledFor !== undefined
+                    ? (context.variables.scheduledFor ?? null)
+                    : it.scheduled_for,
+                priority:
+                  context?.variables?.priority !== undefined
+                    ? (context.variables.priority ?? 'normal')
+                    : (it.priority ?? 'normal'),
               } as UserContentWithDetails;
             }
             return it;
