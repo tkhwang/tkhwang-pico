@@ -83,10 +83,11 @@ export function ContentItem({
     </View>
   );
 
-  const rightMetadataElement = <View className="items-end gap-1">{scheduleRightElement}</View>;
-
   const bottomSlot = (
-    <View className="mt-3 flex-row items-center justify-start">{priorityBadge}</View>
+    <View className="mt-3 flex-row items-center justify-between">
+      {priorityBadge}
+      {scheduleRightElement}
+    </View>
   );
 
   // Create checkbox slot
@@ -123,7 +124,6 @@ export function ContentItem({
         domain: content.domain || 'CONTENT',
         faviconUrl,
         readingTime: content.word_count ? formatReadingTime(content.word_count) : undefined,
-        rightElement: rightMetadataElement,
       }}
       bottomSlot={bottomSlot}
     />
