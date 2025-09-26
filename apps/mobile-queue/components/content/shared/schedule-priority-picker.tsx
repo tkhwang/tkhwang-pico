@@ -144,7 +144,7 @@ export function SchedulePriorityPicker({
   }, [onScheduledDateChange, scheduledDate, today]);
 
   return (
-    <View className={cn('gap-6', className)}>
+    <View className={cn('gap-4', className)}>
       <SchedulePriorityPreview
         scheduledDate={scheduledDate}
         priority={priority}
@@ -262,7 +262,7 @@ export function SchedulePriorityPicker({
           <TouchableOpacity
             onPress={showDatePicker}
             className={cn(
-              'flex-1 items-center justify-center rounded-md border border-gray-300 px-3 py-2 dark:border-gray-600',
+              'flex-1 items-center justify-center rounded-md border border-gray-300 px-3 py-3 dark:border-gray-600',
               !isTodaySelected &&
                 !isTomorrowSelected &&
                 !isThisWeekSelected &&

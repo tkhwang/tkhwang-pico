@@ -25,13 +25,10 @@ import { ContentThumbnail } from '@/components/content/sub/content-thumbnail';
 import { Icon } from '@/components/ui/icon';
 import { SiteFavicon } from '@/components/ui/site-favicon';
 import { Text } from '@/components/ui/text';
+import { ContentDate } from '@/domains/value-object/content-date';
 import { useContentActions } from '@/hooks/use-content-actions';
 import { useHapticFeedback } from '@/hooks/use-haptic-feedback';
-import {
-  formatFullDate,
-  formatReadingTimeWithSuffix,
-  getThumbnailUrl,
-} from '@/utils/content-formatters';
+import { formatReadingTimeWithSuffix, getThumbnailUrl } from '@/utils/content-formatters';
 import { normalizeToStartOfDay } from '@/utils/date';
 import { DEFAULT_PRIORITY, type PriorityValue } from '@/utils/priority';
 import { getFaviconUrl } from '@/utils/url';
@@ -161,6 +158,10 @@ export function ContentDetail({
   const priorityValue: PriorityValue = userContent
     ? ((userContent.priority ?? DEFAULT_PRIORITY) as PriorityValue)
     : DEFAULT_PRIORITY;
+  const savedAtLabel =
+    'saved_at' in item && item.saved_at
+      ? new ContentDate(item.saved_at).toSimpleString('en-US')
+      : null;
   const scheduledDatePreview = userContent?.scheduled_for
     ? (() => {
         const parsed = new Date(userContent.scheduled_for);
@@ -298,12 +299,10 @@ export function ContentDetail({
                   <Text className="text-xs text-gray-600 dark:text-gray-400">{content.domain}</Text>
                 </View>
               )}
-              {'saved_at' in item && item.saved_at && (
+              {savedAtLabel && (
                 <View className="mb-2 mr-3 flex-row items-center">
                   <Icon as={Calendar} className="mr-1 h-3.5 w-3.5 text-gray-400" />
-                  <Text className="text-xs text-gray-600 dark:text-gray-400">
-                    {formatFullDate(item.saved_at)}
-                  </Text>
+                  <Text className="text-xs text-gray-600 dark:text-gray-400">{savedAtLabel}</Text>
                 </View>
               )}
               {content.word_count !== null &&
