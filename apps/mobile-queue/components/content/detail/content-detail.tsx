@@ -5,9 +5,18 @@ import {
   BottomSheetScrollView,
 } from '@gorhom/bottom-sheet';
 import type { Recommendation, UserContentWithDetails } from '@tkhwang-pico/supabase';
-import { Calendar, CheckCircle, Circle, Clock, FileText, Sparkles, Tag } from 'lucide-react-native';
+import {
+  Calendar,
+  CheckCircle,
+  Circle,
+  Clock,
+  Edit2,
+  FileText,
+  Sparkles,
+  Tag,
+} from 'lucide-react-native';
 import React from 'react';
-import { Alert, Platform, View } from 'react-native';
+import { Alert, Platform, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ContentTags } from '@/components/content/sub/content-tags';
@@ -22,7 +31,9 @@ import {
   formatReadingTimeWithSuffix,
   getThumbnailUrl,
 } from '@/utils/content-formatters';
+import { getFaviconUrl } from '@/utils/url';
 
+import { ContentEditModal } from '../edit/content-edit-modal';
 import { ContentDetailBottomActions } from './content-detail-bottom-actions';
 
 interface ContentDetailProps {
@@ -61,6 +72,7 @@ export function ContentDetail({
   const sheetRef = React.useRef<BottomSheetModal>(null);
   const isPresentedRef = React.useRef(false);
   const hasContent = Boolean(item && item.contents);
+  const [showEditModal, setShowEditModal] = React.useState(false);
 
   const snapPoints = React.useMemo(() => ['70%'], []);
 
@@ -113,6 +125,7 @@ export function ContentDetail({
   const isCompleted = 'todo_status' in item ? item.todo_status === 'completed' : false;
   const isRecommendation = mode === 'recommend';
   const thumbnailUrl = getThumbnailUrl(content);
+  const faviconUrl = getFaviconUrl(content.metadata);
   const isLiked =
     'preferences' in item
       ? (item.preferences?.some((preference) => preference.preference_type === 'liked') ?? false)
@@ -172,160 +185,188 @@ export function ContentDetail({
   };
 
   return (
-    <BottomSheetModal
-      ref={sheetRef}
-      snapPoints={snapPoints}
-      enablePanDownToClose
-      enableDynamicSizing={false}
-      index={0}
-      handleComponent={renderHandle}
-      backdropComponent={renderBackdrop}
-      onDismiss={handleDismiss}
-      keyboardBehavior="interactive"
-      keyboardBlurBehavior="restore"
-      topInset={insets.top}
-      backgroundStyle={{ backgroundColor: 'transparent' }}
-      style={{ overflow: 'hidden' }}
-      android_keyboardInputMode="adjustResize"
-    >
-      <View className="flex-1 rounded-t-2xl bg-white dark:bg-gray-800">
-        {/* Header */}
-        <View className="flex-row items-center justify-center border-b border-gray-200 px-4 pb-3 pt-4 dark:border-gray-700">
-          {isRecommendation ? (
-            // Recommendation mode header
-            <View className="flex-row items-center gap-2">
-              <Icon as={Sparkles} className="h-5 w-5 text-purple-500" />
-              <Text className="text-base font-medium text-gray-700 dark:text-gray-300">
-                Recommendation
-              </Text>
-            </View>
-          ) : (
-            // Home mode header with toggle complete
-            <View className="flex-row items-center gap-2">
-              <View className="p-1">
-                <Icon
-                  as={isCompleted ? CheckCircle : Circle}
-                  className={`h-6 w-6 ${isCompleted ? 'text-green-500' : 'text-blue-500'}`}
-                />
+    <>
+      <BottomSheetModal
+        ref={sheetRef}
+        snapPoints={snapPoints}
+        enablePanDownToClose
+        enableDynamicSizing={false}
+        index={0}
+        handleComponent={renderHandle}
+        backdropComponent={renderBackdrop}
+        onDismiss={handleDismiss}
+        keyboardBehavior="interactive"
+        keyboardBlurBehavior="restore"
+        topInset={insets.top}
+        backgroundStyle={{ backgroundColor: 'transparent' }}
+        style={{ overflow: 'hidden' }}
+        android_keyboardInputMode="adjustResize"
+      >
+        <View className="flex-1 rounded-t-2xl bg-white dark:bg-gray-800">
+          {/* Header */}
+          <View className="flex-row items-center justify-between border-b border-gray-200 px-4 pb-3 pt-4 dark:border-gray-700">
+            {isRecommendation ? (
+              // Recommendation mode header
+              <View className="flex-1 flex-row items-center justify-center">
+                <View className="flex-row items-center gap-2">
+                  <Icon as={Sparkles} className="h-5 w-5 text-purple-500" />
+                  <Text className="text-base font-medium text-gray-700 dark:text-gray-300">
+                    Recommendation
+                  </Text>
+                </View>
               </View>
-              <Text className="text-base font-medium text-gray-700 dark:text-gray-300">
-                {isCompleted ? 'Completed' : 'Pending'}
-              </Text>
-            </View>
-          )}
-        </View>
+            ) : (
+              // Home mode header with toggle complete and edit button
+              <>
+                <View className="w-10" />
+                <View className="flex-1 flex-row items-center justify-center gap-2">
+                  <View className="p-1">
+                    <Icon
+                      as={isCompleted ? CheckCircle : Circle}
+                      className={`h-6 w-6 ${isCompleted ? 'text-green-500' : 'text-blue-500'}`}
+                    />
+                  </View>
+                  <Text className="text-base font-medium text-gray-700 dark:text-gray-300">
+                    {isCompleted ? 'Completed' : 'Pending'}
+                  </Text>
+                </View>
+                {/* Edit button - only show for UserContentWithDetails (has 'id' field) */}
+                {'id' in item ? (
+                  <TouchableOpacity onPress={() => setShowEditModal(true)} className="p-2">
+                    <Icon as={Edit2} className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                  </TouchableOpacity>
+                ) : (
+                  <View className="w-10" />
+                )}
+              </>
+            )}
+          </View>
 
-        {/* Content */}
-        <BottomSheetScrollView
-          className="flex-1 px-4 py-4"
-          showsVerticalScrollIndicator={false}
-          bounces
-          contentContainerStyle={{
-            paddingBottom: scrollBottomInset,
-          }}
-        >
-          {/* Title */}
-          <Text
-            className="mb-4 text-xl font-bold text-gray-900 dark:text-gray-100"
-            numberOfLines={3}
-            adjustsFontSizeToFit={false}
+          {/* Content */}
+          <BottomSheetScrollView
+            className="flex-1 px-4 py-4"
+            showsVerticalScrollIndicator={false}
+            bounces
+            contentContainerStyle={{
+              paddingBottom: scrollBottomInset,
+            }}
           >
-            {content.title || 'Untitled'}
-          </Text>
+            {/* Title */}
+            <Text
+              className="mb-4 text-xl font-bold text-gray-900 dark:text-gray-100"
+              numberOfLines={3}
+              adjustsFontSizeToFit={false}
+            >
+              {content.title || 'Untitled'}
+            </Text>
 
-          {/* Metadata */}
-          <View className="mb-1 flex-row flex-wrap">
-            {content.domain && (
-              <View className="mb-2 mr-3 flex-row items-center">
-                <SiteFavicon
-                  url={(content.metadata as any)?.favicon_url || null}
-                  size={14}
-                  className="mr-1"
-                />
-                <Text className="text-xs text-gray-600 dark:text-gray-400">{content.domain}</Text>
-              </View>
-            )}
-            {'saved_at' in item && item.saved_at && (
-              <View className="mb-2 mr-3 flex-row items-center">
-                <Icon as={Calendar} className="mr-1 h-3.5 w-3.5 text-gray-400" />
-                <Text className="text-xs text-gray-600 dark:text-gray-400">
-                  {formatFullDate(item.saved_at)}
-                </Text>
-              </View>
-            )}
-            {content.word_count !== null &&
-              content.word_count !== undefined &&
-              content.word_count > 0 && (
-                <View className="mb-2 flex-row items-center">
-                  <Icon as={Clock} className="mr-1 h-3.5 w-3.5 text-gray-400" />
+            {/* Metadata */}
+            <View className="mb-1 flex-row flex-wrap">
+              {content.domain && (
+                <View className="mb-2 mr-3 flex-row items-center">
+                  <SiteFavicon url={faviconUrl} size={14} className="mr-1" />
+                  <Text className="text-xs text-gray-600 dark:text-gray-400">{content.domain}</Text>
+                </View>
+              )}
+              {'saved_at' in item && item.saved_at && (
+                <View className="mb-2 mr-3 flex-row items-center">
+                  <Icon as={Calendar} className="mr-1 h-3.5 w-3.5 text-gray-400" />
                   <Text className="text-xs text-gray-600 dark:text-gray-400">
-                    {formatReadingTimeWithSuffix(content.word_count)}
+                    {formatFullDate(item.saved_at)}
                   </Text>
                 </View>
               )}
-          </View>
-
-          {/* Thumbnail */}
-          {thumbnailUrl && (
-            <View className="mb-4 items-center">
-              <ContentThumbnail imageUrl={thumbnailUrl} size="large" className="h-48 w-full" />
+              {content.word_count !== null &&
+                content.word_count !== undefined &&
+                content.word_count > 0 && (
+                  <View className="mb-2 flex-row items-center">
+                    <Icon as={Clock} className="mr-1 h-3.5 w-3.5 text-gray-400" />
+                    <Text className="text-xs text-gray-600 dark:text-gray-400">
+                      {formatReadingTimeWithSuffix(content.word_count)}
+                    </Text>
+                  </View>
+                )}
             </View>
-          )}
 
-          {/* Summary */}
-          {content.summary && (
-            <View className="mb-4">
-              <Text className="mb-1.5 text-sm font-semibold text-gray-700 dark:text-gray-300">
-                Summary
-              </Text>
-              <Text className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
-                {content.summary}
-              </Text>
-            </View>
-          )}
-
-          {/* Note - only for UserContentWithDetails */}
-          {'note' in item && item.note && (
-            <View className="mb-4 rounded-lg bg-blue-50 p-3 dark:bg-blue-900/20">
-              <View className="mb-1 flex-row items-center">
-                <Icon as={FileText} className="mr-1 h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
-                <Text className="text-xs font-semibold text-blue-600 dark:text-blue-400">Note</Text>
+            {/* Thumbnail */}
+            {thumbnailUrl && (
+              <View className="mb-4 items-center">
+                <ContentThumbnail imageUrl={thumbnailUrl} size="large" className="h-48 w-full" />
               </View>
-              <Text className="text-sm italic text-gray-700 dark:text-gray-300">{item.note}</Text>
-            </View>
-          )}
+            )}
 
-          {/* Tags (from content) */}
-          {content.tags && content.tags.length > 0 && (
-            <View className="mb-4">
-              <View className="mb-2 flex-row items-center">
-                <Icon as={Tag} className="mr-1 h-3.5 w-3.5 text-gray-400" />
-                <Text className="text-sm font-semibold text-gray-700 dark:text-gray-300">Tags</Text>
+            {/* Summary */}
+            {content.summary && (
+              <View className="mb-4">
+                <Text className="mb-1.5 text-sm font-semibold text-gray-700 dark:text-gray-300">
+                  Summary
+                </Text>
+                <Text className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+                  {content.summary}
+                </Text>
               </View>
-              <ContentTags
-                tags={content.tags}
-                expandable={true}
-                initialMaxTags={6}
-                className="flex-row flex-wrap"
-              />
-            </View>
-          )}
-        </BottomSheetScrollView>
+            )}
 
-        {/* Fixed Action Bar */}
-        <ContentDetailBottomActions
-          mode={mode}
-          isCompleted={isCompleted}
-          isLiked={isLiked}
-          sheetPaddingBottom={sheetPaddingBottom}
-          onToggleComplete={handleToggleComplete}
-          onLike={handleLike}
-          onDelete={handleDelete}
-          onOpenURL={handleOpenURL}
-          onAddToQueue={handleAddToQueue}
-          onNotInterested={handleNotInterested}
+            {/* Note - only for UserContentWithDetails */}
+            {'note' in item && item.note && (
+              <View className="mb-4 rounded-lg bg-blue-50 p-3 dark:bg-blue-900/20">
+                <View className="mb-1 flex-row items-center">
+                  <Icon
+                    as={FileText}
+                    className="mr-1 h-3.5 w-3.5 text-blue-600 dark:text-blue-400"
+                  />
+                  <Text className="text-xs font-semibold text-blue-600 dark:text-blue-400">
+                    Note
+                  </Text>
+                </View>
+                <Text className="text-sm italic text-gray-700 dark:text-gray-300">{item.note}</Text>
+              </View>
+            )}
+
+            {/* Tags (from content) */}
+            {content.tags && content.tags.length > 0 && (
+              <View className="mb-4">
+                <View className="mb-2 flex-row items-center">
+                  <Icon as={Tag} className="mr-1 h-3.5 w-3.5 text-gray-400" />
+                  <Text className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    Tags
+                  </Text>
+                </View>
+                <ContentTags
+                  tags={content.tags}
+                  expandable={true}
+                  initialMaxTags={6}
+                  className="flex-row flex-wrap"
+                />
+              </View>
+            )}
+          </BottomSheetScrollView>
+
+          {/* Fixed Action Bar */}
+          <ContentDetailBottomActions
+            mode={mode}
+            isCompleted={isCompleted}
+            isLiked={isLiked}
+            sheetPaddingBottom={sheetPaddingBottom}
+            onToggleComplete={handleToggleComplete}
+            onLike={handleLike}
+            onDelete={handleDelete}
+            onOpenURL={handleOpenURL}
+            onAddToQueue={handleAddToQueue}
+            onNotInterested={handleNotInterested}
+          />
+        </View>
+      </BottomSheetModal>
+
+      {/* Edit Modal */}
+      {item && 'id' in item && (
+        <ContentEditModal
+          visible={showEditModal}
+          item={item as UserContentWithDetails}
+          onClose={() => setShowEditModal(false)}
+          onSuccess={() => setShowEditModal(false)}
         />
-      </View>
-    </BottomSheetModal>
+      )}
+    </>
   );
 }
