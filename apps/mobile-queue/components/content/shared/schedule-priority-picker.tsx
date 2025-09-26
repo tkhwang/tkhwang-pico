@@ -2,16 +2,12 @@ import DateTimePicker, {
   DateTimePickerAndroid,
   type DateTimePickerEvent,
 } from '@react-native-community/datetimepicker';
-import { Calendar } from 'lucide-react-native';
 import React from 'react';
 import { Platform, TouchableOpacity, View } from 'react-native';
 
-import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
-import { PRIORITY_STYLES } from '@/consts/app-styles';
 import { cn } from '@/lib/utils';
 import {
-  formatScheduleLabel,
   getDefaultSchedule,
   getEndOfCurrentWeek,
   getNextWeekPreset,
@@ -25,6 +21,8 @@ import {
   PRIORITY_VALUES,
   type PriorityValue,
 } from '@/utils/priority';
+
+import { SchedulePriorityPreview } from './schedule-priority-preview';
 
 interface SchedulePriorityPickerProps {
   scheduledDate: Date | null;
@@ -61,12 +59,6 @@ export function SchedulePriorityPicker({
   const tomorrow = React.useMemo(() => getTomorrowPreset(today), [today]);
   const thisWeek = React.useMemo(() => getEndOfCurrentWeek(today), [today]);
   const nextWeek = React.useMemo(() => getNextWeekPreset(today), [today]);
-
-  const scheduleDisplay = React.useMemo(
-    () => formatScheduleLabel(scheduledDate, today),
-    [scheduledDate, today],
-  );
-  const priorityDisplay = React.useMemo(() => PRIORITY_LABELS[priority], [priority]);
 
   const isTodaySelected = scheduledDate ? isSameDayPreset(scheduledDate, today) : false;
   const isTomorrowSelected = scheduledDate ? isSameDayPreset(scheduledDate, tomorrow) : false;
@@ -151,35 +143,12 @@ export function SchedulePriorityPicker({
 
   return (
     <View className={cn('gap-6', className)}>
-      <View className="rounded-xl border border-gray-200 bg-white p-3 shadow-sm dark:border-gray-700 dark:bg-gray-900/80">
-        <Text className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
-          {previewTitle}
-        </Text>
-        <View className="mt-3 flex-row items-center justify-between">
-          <View className="flex-row items-center gap-2">
-            <Icon as={Calendar} size={18} className="text-gray-500 dark:text-gray-300" />
-            <Text className="text-sm font-medium text-gray-900 dark:text-gray-100">
-              {scheduleDisplay}
-            </Text>
-          </View>
-          <View
-            className={cn(
-              'flex-row items-center rounded-full px-3 py-1',
-              PRIORITY_STYLES[priority].badge,
-            )}
-          >
-            <View className={cn('mr-2 h-2.5 w-2.5 rounded-full', PRIORITY_STYLES[priority].dot)} />
-            <Text
-              className={cn(
-                'text-xs font-semibold uppercase tracking-wide',
-                PRIORITY_STYLES[priority].text,
-              )}
-            >
-              {priorityDisplay}
-            </Text>
-          </View>
-        </View>
-      </View>
+      <SchedulePriorityPreview
+        scheduledDate={scheduledDate}
+        priority={priority}
+        title={previewTitle}
+        referenceDate={today}
+      />
 
       <View>
         <Text className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">

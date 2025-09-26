@@ -19,6 +19,7 @@ import React from 'react';
 import { Alert, Platform, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { SchedulePriorityPreview } from '@/components/content/shared/schedule-priority-preview';
 import { ContentTags } from '@/components/content/sub/content-tags';
 import { ContentThumbnail } from '@/components/content/sub/content-thumbnail';
 import { Icon } from '@/components/ui/icon';
@@ -31,6 +32,8 @@ import {
   formatReadingTimeWithSuffix,
   getThumbnailUrl,
 } from '@/utils/content-formatters';
+import { normalizeToStartOfDay } from '@/utils/date';
+import { DEFAULT_PRIORITY, type PriorityValue } from '@/utils/priority';
 import { getFaviconUrl } from '@/utils/url';
 
 import { ContentEditModal } from '../edit/content-edit-modal';
@@ -130,6 +133,17 @@ export function ContentDetail({
     'preferences' in item
       ? (item.preferences?.some((preference) => preference.preference_type === 'liked') ?? false)
       : false;
+
+  const userContent = !isRecommendation && 'id' in item ? (item as UserContentWithDetails) : null;
+  const priorityValue: PriorityValue = userContent
+    ? ((userContent.priority ?? DEFAULT_PRIORITY) as PriorityValue)
+    : DEFAULT_PRIORITY;
+  const scheduledDatePreview = userContent?.scheduled_for
+    ? (() => {
+        const parsed = new Date(userContent.scheduled_for);
+        return Number.isNaN(parsed.getTime()) ? null : normalizeToStartOfDay(parsed);
+      })()
+    : null;
 
   const handleToggleComplete = async () => {
     await executeWithHapticFeedback(async () => {
@@ -292,6 +306,16 @@ export function ContentDetail({
             {thumbnailUrl && (
               <View className="mb-4 items-center">
                 <ContentThumbnail imageUrl={thumbnailUrl} size="large" className="h-48 w-full" />
+              </View>
+            )}
+
+            {userContent && (
+              <View className="mb-4">
+                <SchedulePriorityPreview
+                  scheduledDate={scheduledDatePreview}
+                  priority={priorityValue}
+                  title="Reading Settings"
+                />
               </View>
             )}
 
