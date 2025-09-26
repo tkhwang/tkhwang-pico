@@ -3,6 +3,7 @@ import {
   type BottomSheetBackdropProps,
   BottomSheetModal,
   BottomSheetScrollView,
+  BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import type { Recommendation, UserContentWithDetails } from '@tkhwang-pico/supabase';
 import {
@@ -19,9 +20,11 @@ import React from 'react';
 import { Alert, type LayoutChangeEvent, Platform, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { SchedulePriorityPicker } from '@/components/content/shared/schedule-priority-picker';
 import { SchedulePriorityPreview } from '@/components/content/shared/schedule-priority-preview';
 import { ContentTags } from '@/components/content/sub/content-tags';
 import { ContentThumbnail } from '@/components/content/sub/content-thumbnail';
+import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import { SiteFavicon } from '@/components/ui/site-favicon';
 import { Text } from '@/components/ui/text';
@@ -81,8 +84,17 @@ export function ContentDetail({
   const hasContent = Boolean(item && item.contents);
   const [showEditModal, setShowEditModal] = React.useState(false);
   const [readingRowWidth, setReadingRowWidth] = React.useState<number | null>(null);
+  const scheduleSheetRef = React.useRef<BottomSheetModal>(null);
+  const [scheduleDate, setScheduleDate] = React.useState<Date>(getDefaultSchedule());
+  const [schedulePriorityValue, setSchedulePriorityValue] =
+    React.useState<PriorityValue>(DEFAULT_PRIORITY);
+  const [pendingAdd, setPendingAdd] = React.useState<{ url: string; contentId: string } | null>(
+    null,
+  );
+  const [isScheduleSheetOpen, setScheduleSheetOpen] = React.useState(false);
 
   const snapPoints = React.useMemo(() => ['70%'], []);
+  const scheduleSnapPoints = React.useMemo(() => ['60%'], []);
   const readingRowSizes = React.useMemo(() => {
     if (readingRowWidth === null) {
       return null;
@@ -145,6 +157,59 @@ export function ContentDetail({
     }
   }, [visible, hasContent]);
 
+  const openScheduleSheet = React.useCallback((url: string, contentId: string) => {
+    setPendingAdd({ url, contentId });
+    setScheduleDate(getDefaultSchedule());
+    setSchedulePriorityValue(DEFAULT_PRIORITY);
+    setScheduleSheetOpen(true);
+    scheduleSheetRef.current?.present();
+  }, []);
+
+  const handleScheduleSheetDismiss = React.useCallback(() => {
+    setScheduleSheetOpen(false);
+    setPendingAdd(null);
+    setScheduleDate(getDefaultSchedule());
+    setSchedulePriorityValue(DEFAULT_PRIORITY);
+  }, []);
+
+  const handleScheduleDateChange = React.useCallback((date: Date | null) => {
+    setScheduleDate(date ?? getDefaultSchedule());
+  }, []);
+
+  const handleCancelAddToQueue = React.useCallback(() => {
+    scheduleSheetRef.current?.dismiss();
+  }, []);
+
+  const handleConfirmAddToQueue = React.useCallback(async () => {
+    if (!pendingAdd || !onAddToQueue) return;
+
+    await executeWithHapticFeedback(async () => {
+      try {
+        await Promise.resolve(
+          onAddToQueue({
+            url: pendingAdd.url,
+            contentId: pendingAdd.contentId,
+            scheduledFor: formatDateForApi(scheduleDate),
+            priority: schedulePriorityValue,
+          }),
+        );
+        setScheduleSheetOpen(false);
+        setPendingAdd(null);
+        sheetRef.current?.dismiss();
+        onClose();
+      } catch (error) {
+        console.error('Failed to add recommendation to queue', error);
+      }
+    });
+  }, [
+    executeWithHapticFeedback,
+    onAddToQueue,
+    onClose,
+    pendingAdd,
+    scheduleDate,
+    schedulePriorityValue,
+  ]);
+
   if (!hasContent || !item || !item.contents) {
     return null;
   }
@@ -199,23 +264,14 @@ export function ContentDetail({
 
   const handleAddToQueue = async () => {
     await executeWithHapticFeedback(async () => {
-      if (onAddToQueue) {
-        const url = content.canonical_url || content.url;
-        if (url) {
-          const scheduledFor = formatDateForApi(getDefaultSchedule());
-          await Promise.resolve(
-            onAddToQueue({
-              url,
-              contentId: item.content_id,
-              scheduledFor,
-              priority: DEFAULT_PRIORITY,
-            }),
-          );
-          onClose();
-        } else {
-          Alert.alert('Error', 'No URL available for this content');
-        }
+      if (!onAddToQueue) return;
+      const url = content.canonical_url || content.url;
+      if (!url) {
+        Alert.alert('Error', 'No URL available for this content');
+        return;
       }
+
+      openScheduleSheet(url, item.content_id);
     });
   };
 
@@ -439,6 +495,52 @@ export function ContentDetail({
           />
         </View>
       </BottomSheetModal>
+
+      {onAddToQueue && (
+        <BottomSheetModal
+          ref={scheduleSheetRef}
+          snapPoints={scheduleSnapPoints}
+          onDismiss={handleScheduleSheetDismiss}
+          backdropComponent={renderBackdrop}
+          enablePanDownToClose
+        >
+          <BottomSheetView className="flex-1 px-4 py-4">
+            <Text className="mb-1 text-base font-semibold text-gray-900 dark:text-gray-100">
+              Add to Queue
+            </Text>
+            <Text className="mb-4 text-xs text-gray-500 dark:text-gray-400">
+              Choose when to read and how important it is.
+            </Text>
+
+            <SchedulePriorityPicker
+              visible={isScheduleSheetOpen}
+              scheduledDate={scheduleDate}
+              onScheduledDateChange={handleScheduleDateChange}
+              priority={schedulePriorityValue}
+              onPriorityChange={setSchedulePriorityValue}
+              previewTitle="Preview"
+            />
+
+            <View className="mt-6 flex-row gap-2">
+              <Button
+                variant="outline"
+                className="flex-1"
+                onPress={handleCancelAddToQueue}
+                disabled={!pendingAdd}
+              >
+                <Text>Cancel</Text>
+              </Button>
+              <Button
+                className="flex-1 bg-blue-500"
+                onPress={handleConfirmAddToQueue}
+                disabled={!pendingAdd}
+              >
+                <Text className="font-semibold text-white">Save</Text>
+              </Button>
+            </View>
+          </BottomSheetView>
+        </BottomSheetModal>
+      )}
 
       {/* Edit Modal */}
       {item && 'id' in item && (
