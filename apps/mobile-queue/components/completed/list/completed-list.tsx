@@ -20,6 +20,7 @@ import { useToggleContentPreference } from '@/hooks/mutations/use-toggle-content
 import { useToggleUserContentStatus } from '@/hooks/mutations/use-toggle-user-content-status';
 import { useUserContents } from '@/hooks/queries/use-user-contents';
 import { isContentLiked } from '@/utils/content-helpers';
+import type { PriorityValue } from '@/utils/priority';
 
 interface GroupedContent {
   date: string;
@@ -94,8 +95,16 @@ export function CompletedList() {
   );
 
   const handleAddToQueue = useCallback(
-    (url: string, _contentId: string) => {
-      saveContentMutation.mutate({ url });
+    ({
+      url,
+      scheduledFor,
+      priority,
+    }: {
+      url: string;
+      scheduledFor: string;
+      priority: PriorityValue;
+    }) => {
+      saveContentMutation.mutate({ url, scheduledFor, priority });
     },
     [saveContentMutation],
   );

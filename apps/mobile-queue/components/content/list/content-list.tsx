@@ -13,6 +13,7 @@ import { useToggleContentPreference } from '@/hooks/mutations/use-toggle-content
 import { useToggleUserContentStatus } from '@/hooks/mutations/use-toggle-user-content-status';
 import { useUserContents } from '@/hooks/queries/use-user-contents';
 import { isContentLiked } from '@/utils/content-helpers';
+import type { PriorityValue } from '@/utils/priority';
 
 import { ContentItemList } from '../content-item-list';
 import { ContentItemSmallCard } from '../content-item-small-card';
@@ -67,8 +68,16 @@ export function ContentList() {
   );
 
   const handleAddToQueue = useCallback(
-    (url: string, _contentId: string) => {
-      saveContentMutation.mutate({ url });
+    ({
+      url,
+      scheduledFor,
+      priority,
+    }: {
+      url: string;
+      scheduledFor: string;
+      priority: PriorityValue;
+    }) => {
+      saveContentMutation.mutate({ url, scheduledFor, priority });
     },
     [saveContentMutation],
   );

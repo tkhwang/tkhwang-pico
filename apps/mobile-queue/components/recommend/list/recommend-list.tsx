@@ -11,6 +11,7 @@ import { queryKey } from '@/hooks/keys/query-key';
 import { useSetContentPreference } from '@/hooks/mutations/use-content-preference';
 import { useSaveContent } from '@/hooks/mutations/use-save-content';
 import { useRecommendations } from '@/hooks/queries/use-recommendations';
+import type { PriorityValue } from '@/utils/priority';
 
 import { ContentDetail } from '../../content/detail/content-detail';
 import { SwipeableRecommendItem } from '../swipe/swipeable-recommend-item';
@@ -60,9 +61,19 @@ export function RecommendList() {
   }, []);
 
   const handleAddToQueue = useCallback(
-    (url: string, contentId: string) => {
+    ({
+      url,
+      contentId,
+      scheduledFor,
+      priority,
+    }: {
+      url: string;
+      contentId: string;
+      scheduledFor: string;
+      priority: PriorityValue;
+    }) => {
       saveContentMutation.mutate(
-        { url },
+        { url, scheduledFor, priority },
         {
           onSuccess: () => {
             // Evict after visual feedback completes

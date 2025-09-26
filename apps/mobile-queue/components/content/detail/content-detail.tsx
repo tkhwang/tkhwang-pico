@@ -29,7 +29,7 @@ import { ContentDate } from '@/domains/value-object/content-date';
 import { useContentActions } from '@/hooks/use-content-actions';
 import { useHapticFeedback } from '@/hooks/use-haptic-feedback';
 import { formatReadingTimeWithSuffix, getThumbnailUrl } from '@/utils/content-formatters';
-import { normalizeToStartOfDay } from '@/utils/date';
+import { formatDateForApi, getDefaultSchedule, normalizeToStartOfDay } from '@/utils/date';
 import { DEFAULT_PRIORITY, type PriorityValue } from '@/utils/priority';
 import { getFaviconUrl } from '@/utils/url';
 
@@ -48,7 +48,12 @@ interface ContentDetailProps {
   onDelete?: (contentId: string) => void;
   onLike?: (contentId: string) => void;
   // Recommend mode callbacks
-  onAddToQueue?: (url: string, contentId: string) => void;
+  onAddToQueue?: (options: {
+    url: string;
+    contentId: string;
+    scheduledFor: string;
+    priority: PriorityValue;
+  }) => void | Promise<void>;
   onNotInterested?: (contentId: string) => void;
 }
 
@@ -197,7 +202,15 @@ export function ContentDetail({
       if (onAddToQueue) {
         const url = content.canonical_url || content.url;
         if (url) {
-          await Promise.resolve(onAddToQueue(url, item.content_id));
+          const scheduledFor = formatDateForApi(getDefaultSchedule());
+          await Promise.resolve(
+            onAddToQueue({
+              url,
+              contentId: item.content_id,
+              scheduledFor,
+              priority: DEFAULT_PRIORITY,
+            }),
+          );
           onClose();
         } else {
           Alert.alert('Error', 'No URL available for this content');
