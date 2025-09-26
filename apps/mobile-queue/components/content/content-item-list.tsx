@@ -1,13 +1,20 @@
 import type { UserContentWithDetails } from '@tkhwang-pico/supabase';
-import { CircleCheckBig, Clock, ExternalLink, Heart } from 'lucide-react-native';
+import {
+  CalendarDays,
+  CheckCircle,
+  CircleCheckBig,
+  ExternalLink,
+  Heart,
+} from 'lucide-react-native';
 import React from 'react';
 import { TouchableOpacity, View } from 'react-native';
 
 import { Icon } from '@/components/ui/icon';
 import { SiteFavicon } from '@/components/ui/site-favicon';
 import { Text } from '@/components/ui/text';
+import { ContentDate } from '@/domains/value-object/content-date';
 import { useContentActions } from '@/hooks/use-content-actions';
-import { formatArchiveDate, formatDate } from '@/utils/content-formatters';
+import { getFaviconUrl } from '@/utils/url';
 
 interface ContentItemListProps {
   item: UserContentWithDetails;
@@ -24,6 +31,7 @@ export function ContentItemList({
 }: ContentItemListProps) {
   const { openURL } = useContentActions();
   const content = item.contents;
+  const faviconUrl = getFaviconUrl(content?.metadata);
 
   if (!item || !content) {
     return null;
@@ -39,6 +47,28 @@ export function ContentItemList({
   };
 
   const isCompleted = item.todo_status === 'completed';
+  const scheduledDate = item.scheduled_for ? new ContentDate(item.scheduled_for) : null;
+  const completedDate = item.completed_at ? new ContentDate(item.completed_at) : null;
+
+  const scheduleLabel = showCompletedTime
+    ? (completedDate?.toSimpleString() ?? '')
+    : (scheduledDate?.toSimpleString() ?? '');
+
+  const scheduleIconClass = showCompletedTime
+    ? completedDate
+      ? 'text-emerald-500 dark:text-emerald-300'
+      : 'text-gray-400 dark:text-gray-500'
+    : scheduledDate
+      ? 'text-blue-500 dark:text-blue-300'
+      : 'text-gray-300 dark:text-gray-600';
+
+  const scheduleTextClass = showCompletedTime
+    ? completedDate
+      ? 'text-emerald-700 dark:text-emerald-300'
+      : 'text-gray-400 dark:text-gray-500'
+    : scheduledDate
+      ? 'text-gray-800 dark:text-gray-100'
+      : 'text-gray-400 dark:text-gray-500';
 
   return (
     <TouchableOpacity
@@ -66,22 +96,17 @@ export function ContentItemList({
 
         {/* Metadata row */}
         <View className="mt-0.5 flex-row items-center">
-          <SiteFavicon
-            url={(content.metadata as any)?.favicon_url || null}
-            size={10}
-            className="mr-1"
-          />
+          <SiteFavicon url={faviconUrl} size={10} className="mr-1" />
           <Text className="text-xs text-gray-500 dark:text-gray-400" numberOfLines={1}>
             {content.domain || 'CONTENT'}
           </Text>
           <Text className="mx-1 text-xs text-gray-400">•</Text>
-          <Icon as={Clock} size={10} className="mr-0.5 text-gray-400 dark:text-gray-500" />
-          <Text className="text-xs text-gray-500 dark:text-gray-400">
-            {showCompletedTime && item.completed_at
-              ? formatArchiveDate(item.completed_at).time
-              : item.saved_at
-                ? formatDate(item.saved_at)
-                : ''}
+          <Icon
+            as={showCompletedTime ? CheckCircle : CalendarDays}
+            className={`h-3 w-3 ${scheduleIconClass}`}
+          />
+          <Text className={`text-xs font-medium ${scheduleTextClass}`} numberOfLines={1}>
+            {scheduleLabel}
           </Text>
         </View>
       </View>

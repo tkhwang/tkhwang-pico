@@ -1,13 +1,17 @@
 import type { UserContentWithDetails } from '@tkhwang-pico/supabase';
-import { Circle, CircleCheckBig, Heart } from 'lucide-react-native';
+import { CalendarDays, Circle, CircleCheckBig, Heart } from 'lucide-react-native';
 import React from 'react';
 import { TouchableOpacity, View } from 'react-native';
 
 import { Icon } from '@/components/ui/icon';
 import { SiteFavicon } from '@/components/ui/site-favicon';
 import { Text } from '@/components/ui/text';
+import { PRIORITY_STYLES } from '@/consts/app-styles';
+import { ContentDate } from '@/domains/value-object/content-date';
 import { useContentActions } from '@/hooks/use-content-actions';
 import { getThumbnailUrl } from '@/utils/content-formatters';
+import { DEFAULT_PRIORITY, PRIORITY_LABELS, type PriorityValue } from '@/utils/priority';
+import { getFaviconUrl } from '@/utils/url';
 
 import { ContentThumbnail } from './sub/content-thumbnail';
 
@@ -25,6 +29,7 @@ export function ContentItemSmallCard({
 }: ContentItemSmallCardProps) {
   const { openURL } = useContentActions();
   const content = item.contents;
+  const faviconUrl = getFaviconUrl(content?.metadata);
 
   if (!item || !content) {
     return null;
@@ -41,6 +46,19 @@ export function ContentItemSmallCard({
 
   const thumbnailUrl = getThumbnailUrl(content);
   const isCompleted = item.todo_status === 'completed';
+  const priorityValue = (item.priority ?? DEFAULT_PRIORITY) as PriorityValue;
+  const priorityStyle = PRIORITY_STYLES[priorityValue];
+  const priorityBadge = (
+    <View className={`flex-row items-center rounded-full px-2 py-0.5 ${priorityStyle.badge}`}>
+      <View className={`mr-1 h-2 w-2 rounded-full ${priorityStyle.dot}`} />
+      <Text className={`text-[10px] font-semibold uppercase ${priorityStyle.text}`}>
+        {PRIORITY_LABELS[priorityValue]}
+      </Text>
+    </View>
+  );
+
+  const scheduledDate = item.scheduled_for ? new ContentDate(item.scheduled_for) : null;
+  const scheduleLabel = scheduledDate?.toSimpleString() ?? '—';
 
   return (
     <TouchableOpacity
@@ -50,6 +68,14 @@ export function ContentItemSmallCard({
       activeOpacity={0.7}
       className="flex-1 rounded-lg border border-gray-100 bg-white p-2.5 dark:border-gray-700 dark:bg-gray-800"
     >
+      {/* Domain with favicon */}
+      <View className="flex-row items-center">
+        <SiteFavicon url={faviconUrl} size={10} className="mr-1" />
+        <Text className="flex-1 text-xs text-gray-500 dark:text-gray-400" numberOfLines={1}>
+          {content.domain || 'CONTENT'}
+        </Text>
+      </View>
+
       {/* Thumbnail */}
       {thumbnailUrl ? (
         <ContentThumbnail
@@ -81,16 +107,15 @@ export function ContentItemSmallCard({
         {content.title || 'Untitled'}
       </Text>
 
-      {/* Domain with favicon */}
-      <View className="flex-row items-center">
-        <SiteFavicon
-          url={(content.metadata as any)?.favicon_url || null}
-          size={10}
-          className="mr-1"
-        />
-        <Text className="flex-1 text-xs text-gray-500 dark:text-gray-400" numberOfLines={1}>
-          {content.domain || 'CONTENT'}
-        </Text>
+      {/* Schedule & Priority */}
+      <View className="mt-2 flex-row items-center justify-between">
+        <View className="flex-row items-center gap-1">
+          <Icon as={CalendarDays} className="h-3.5 w-3.5 text-gray-400 dark:text-gray-500" />
+          <Text className="text-xs font-medium text-gray-600 dark:text-gray-300" numberOfLines={1}>
+            {scheduleLabel}
+          </Text>
+        </View>
+        {priorityBadge}
       </View>
     </TouchableOpacity>
   );
