@@ -18,6 +18,9 @@ do $$ begin
   if not exists (select 1 from pg_type where typname='content_todo_status') then
     create type content_todo_status as enum ('pending','completed');
   end if;
+  if not exists (select 1 from pg_type where typname='content_priority') then
+    create type content_priority as enum ('low','normal','high');
+  end if;
 end $$;
 
 -- ============================================================================
@@ -71,6 +74,8 @@ create table if not exists public.user_contents (
   user_id     text not null,  -- Clerk ID (e.g., user_***)
   content_id  uuid not null references public.contents(id) on delete cascade,
   todo_status content_todo_status not null default 'pending',
+  scheduled_for date,
+  priority    content_priority not null default 'normal',
   note        text,
   labels      text[] default '{}',
   archived    boolean not null default false,
@@ -83,6 +88,8 @@ create index if not exists idx_user_contents_content on public.user_contents(con
 create index if not exists idx_user_contents_archived on public.user_contents(archived);
 create index if not exists idx_user_contents_user_saved_at on public.user_contents(user_id, saved_at DESC);
 create index if not exists idx_user_contents_todo_status on public.user_contents(user_id, todo_status, saved_at DESC);
+create index if not exists idx_user_contents_user_scheduled_for on public.user_contents(user_id, scheduled_for);
+create index if not exists idx_user_contents_user_priority on public.user_contents(user_id, priority, saved_at DESC);
 
 -- ============================================================================
 -- Content Embeddings (벡터)
