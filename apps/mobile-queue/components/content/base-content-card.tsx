@@ -57,7 +57,6 @@ export function BaseContentCard({
   summary,
   note,
   author,
-  tags,
   labels,
   thumbnailUrl,
   thumbnailSize = 'medium',
@@ -76,7 +75,7 @@ export function BaseContentCard({
     <>
       {/* Metadata row at top */}
       {metadataProps && (
-        <View className="mb-3">
+        <View className="mb-2">
           <ContentMetadata {...metadataProps} />
         </View>
       )}
@@ -124,7 +123,7 @@ export function BaseContentCard({
           )}
 
           {/* Tags */}
-          {tags && <ContentTags tags={tags} />}
+          {/* {tags && <ContentTags tags={tags} />} */}
 
           {/* User labels */}
           {labels && <ContentTags tags={labels} variant="purple" />}
