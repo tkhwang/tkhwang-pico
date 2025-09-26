@@ -109,7 +109,7 @@ export function ContentItemSmallCard({
 
       {/* Title */}
       <Text
-        className="mb-1.5 text-sm font-medium text-gray-900 dark:text-gray-100"
+        className="mb-1.5 min-h-[40px] text-sm font-medium leading-tight text-gray-900 dark:text-gray-100"
         numberOfLines={2}
       >
         {content.title || 'Untitled'}
