@@ -1,3 +1,5 @@
+import type { Enums } from '@tkhwang-pico/supabase';
+
 // Unified action styles for consistent theming across swipe actions and modal buttons
 
 // Core action styles - single source of truth
@@ -246,3 +248,26 @@ export const MODAL_ACTION_STYLES = {
     text: ACTION_STYLES.notInterested.default.text,
   },
 } as const;
+
+/*
+ * Priority styles for the FAB modal
+ */
+type PriorityKey = Enums<'content_priority'>;
+
+export const PRIORITY_STYLES = {
+  low: {
+    badge: 'bg-emerald-100 dark:bg-emerald-500/10',
+    dot: 'bg-emerald-500 dark:bg-emerald-300',
+    text: 'text-emerald-700 dark:text-emerald-200',
+  },
+  normal: {
+    badge: 'bg-blue-100 dark:bg-blue-500/10',
+    dot: 'bg-blue-500 dark:bg-blue-300',
+    text: 'text-blue-700 dark:text-blue-200',
+  },
+  high: {
+    badge: 'bg-rose-100 dark:bg-rose-500/10',
+    dot: 'bg-rose-500 dark:bg-rose-300',
+    text: 'text-rose-700 dark:text-rose-200',
+  },
+} satisfies Record<PriorityKey, { badge: string; dot: string; text: string }>;
