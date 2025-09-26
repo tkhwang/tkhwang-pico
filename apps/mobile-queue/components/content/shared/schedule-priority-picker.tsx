@@ -66,14 +66,11 @@ export function SchedulePriorityPicker({
   const isNextWeekSelected = scheduledDate ? isSameDayPreset(scheduledDate, nextWeek) : false;
 
   const handleSelectDate = React.useCallback(
-    (date: Date | null) => {
-      if (date) {
-        onScheduledDateChange(normalizeToStartOfDay(date));
-      } else {
-        onScheduledDateChange(null);
-      }
+    (date?: Date | null) => {
+      const nextDate = date ? normalizeToStartOfDay(date) : today;
+      onScheduledDateChange(nextDate);
     },
-    [onScheduledDateChange],
+    [onScheduledDateChange, today],
   );
 
   const handleSelectToday = React.useCallback(
@@ -92,7 +89,6 @@ export function SchedulePriorityPicker({
     () => handleSelectDate(nextWeek),
     [handleSelectDate, nextWeek],
   );
-  const handleClearSchedule = React.useCallback(() => handleSelectDate(null), [handleSelectDate]);
 
   const handleAndroidDateChange = React.useCallback(
     (event: DateTimePickerEvent, date?: Date) => {
@@ -140,6 +136,12 @@ export function SchedulePriorityPicker({
       setIosPickerVisible(false);
     }
   }, [visible]);
+
+  React.useEffect(() => {
+    if (scheduledDate === null) {
+      onScheduledDateChange(today);
+    }
+  }, [onScheduledDateChange, scheduledDate, today]);
 
   return (
     <View className={cn('gap-6', className)}>
@@ -265,7 +267,6 @@ export function SchedulePriorityPicker({
                 !isTomorrowSelected &&
                 !isThisWeekSelected &&
                 !isNextWeekSelected &&
-                scheduledDate !== null &&
                 'border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-blue-500/10',
             )}
           >
@@ -276,28 +277,10 @@ export function SchedulePriorityPicker({
                   !isTomorrowSelected &&
                   !isThisWeekSelected &&
                   !isNextWeekSelected &&
-                  scheduledDate !== null &&
                   'text-blue-600 dark:text-blue-200',
               )}
             >
               Pick a date
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={handleClearSchedule}
-            className={cn(
-              'flex-1 items-center justify-center rounded-md border border-gray-300 px-3 py-2 dark:border-gray-600',
-              scheduledDate === null &&
-                'border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-blue-500/10',
-            )}
-          >
-            <Text
-              className={cn(
-                'text-sm font-medium text-gray-700 dark:text-gray-300',
-                scheduledDate === null && 'text-blue-600 dark:text-blue-200',
-              )}
-            >
-              No schedule
             </Text>
           </TouchableOpacity>
         </View>
