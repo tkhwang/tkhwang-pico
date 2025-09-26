@@ -4,7 +4,7 @@ import DateTimePicker, {
 } from '@react-native-community/datetimepicker';
 import type { Enums } from '@tkhwang-pico/supabase';
 import { Calendar } from 'lucide-react-native';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Alert,
   Keyboard,
@@ -139,10 +139,13 @@ export function FabModal({ visible, onClose, onSuccess }: FabModalProps) {
   };
 
   const showDatePicker = () => {
+    const minDate = getDefaultSchedule(); // Today is the minimum date
+
     if (Platform.OS === 'android') {
       DateTimePickerAndroid.open({
         mode: 'date',
         value: scheduledDate ?? getDefaultSchedule(),
+        minimumDate: minDate,
         onChange: handleAndroidDateChange,
       });
     } else {
@@ -275,7 +278,7 @@ export function FabModal({ visible, onClose, onSuccess }: FabModalProps) {
                       <TouchableOpacity
                         onPress={handleSelectToday}
                         className={cn(
-                          'flex-1 items-center justify-center rounded-md border border-gray-300 px-3 py-3 dark:border-gray-600',
+                          'flex-1 items-center justify-center rounded-md border border-gray-300 px-2 py-3 dark:border-gray-600',
                           isTodaySelected &&
                             'border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-blue-500/10',
                         )}
@@ -285,16 +288,22 @@ export function FabModal({ visible, onClose, onSuccess }: FabModalProps) {
                             'text-sm font-semibold text-gray-700 dark:text-gray-300',
                             isTodaySelected && 'text-blue-600 dark:text-blue-200',
                           )}
-                          numberOfLines={1}
-                          adjustsFontSizeToFit
                         >
                           Today
+                        </Text>
+                        <Text
+                          className={cn(
+                            'text-xs text-gray-500 dark:text-gray-400',
+                            isTodaySelected && 'text-blue-500 dark:text-blue-300',
+                          )}
+                        >
+                          {today.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                         </Text>
                       </TouchableOpacity>
                       <TouchableOpacity
                         onPress={handleSelectTomorrow}
                         className={cn(
-                          'flex-1 items-center justify-center rounded-md border border-gray-300 px-3 py-3 dark:border-gray-600',
+                          'flex-1 items-center justify-center rounded-md border border-gray-300 px-2 py-3 dark:border-gray-600',
                           isTomorrowSelected &&
                             'border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-blue-500/10',
                         )}
@@ -304,68 +313,74 @@ export function FabModal({ visible, onClose, onSuccess }: FabModalProps) {
                             'text-sm font-semibold text-gray-700 dark:text-gray-300',
                             isTomorrowSelected && 'text-blue-600 dark:text-blue-200',
                           )}
-                          numberOfLines={1}
-                          adjustsFontSizeToFit
                         >
                           Tomorrow
+                        </Text>
+                        <Text
+                          className={cn(
+                            'text-xs text-gray-500 dark:text-gray-400',
+                            isTomorrowSelected && 'text-blue-500 dark:text-blue-300',
+                          )}
+                        >
+                          {tomorrow.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                         </Text>
                       </TouchableOpacity>
                       <TouchableOpacity
                         onPress={handleSelectThisWeek}
                         className={cn(
-                          'flex-1 items-center justify-center rounded-md border border-gray-300 px-3 py-3 dark:border-gray-600',
+                          'flex-1 items-center justify-center rounded-md border border-gray-300 px-2 py-3 dark:border-gray-600',
                           isThisWeekSelected &&
                             'border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-blue-500/10',
                         )}
                       >
                         <Text
                           className={cn(
-                            'text-xs font-semibold uppercase text-gray-500 dark:text-gray-400',
-                            isThisWeekSelected && 'text-blue-500 dark:text-blue-200',
-                          )}
-                        >
-                          This
-                        </Text>
-                        <Text
-                          className={cn(
-                            'text-base font-semibold text-gray-700 dark:text-gray-100',
+                            'text-sm font-semibold text-gray-700 dark:text-gray-300',
                             isThisWeekSelected && 'text-blue-600 dark:text-blue-200',
                           )}
                         >
-                          Week
+                          This Week
+                        </Text>
+                        <Text
+                          className={cn(
+                            'text-xs text-gray-500 dark:text-gray-400',
+                            isThisWeekSelected && 'text-blue-500 dark:text-blue-300',
+                          )}
+                        >
+                          {thisWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                         </Text>
                       </TouchableOpacity>
                       <TouchableOpacity
                         onPress={handleSelectNextWeek}
                         className={cn(
-                          'flex-1 items-center justify-center rounded-md border border-gray-300 px-3 py-3 dark:border-gray-600',
+                          'flex-1 items-center justify-center rounded-md border border-gray-300 px-2 py-3 dark:border-gray-600',
                           isNextWeekSelected &&
                             'border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-blue-500/10',
                         )}
                       >
                         <Text
                           className={cn(
-                            'text-xs font-semibold uppercase text-gray-500 dark:text-gray-400',
-                            isNextWeekSelected && 'text-blue-500 dark:text-blue-200',
-                          )}
-                        >
-                          Next
-                        </Text>
-                        <Text
-                          className={cn(
-                            'text-base font-semibold text-gray-700 dark:text-gray-100',
+                            'text-sm font-semibold text-gray-700 dark:text-gray-300',
                             isNextWeekSelected && 'text-blue-600 dark:text-blue-200',
                           )}
                         >
-                          Week
+                          Next Week
+                        </Text>
+                        <Text
+                          className={cn(
+                            'text-xs text-gray-500 dark:text-gray-400',
+                            isNextWeekSelected && 'text-blue-500 dark:text-blue-300',
+                          )}
+                        >
+                          {nextWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                         </Text>
                       </TouchableOpacity>
                     </View>
-                    <View className="mt-2 flex-row flex-wrap gap-2">
+                    <View className="mt-2 flex-row gap-2">
                       <TouchableOpacity
                         onPress={showDatePicker}
                         className={cn(
-                          'rounded-md border border-gray-300 px-3 py-2 dark:border-gray-600',
+                          'flex-1 items-center justify-center rounded-md border border-gray-300 px-3 py-2 dark:border-gray-600',
                           !isTodaySelected &&
                             !isTomorrowSelected &&
                             !isThisWeekSelected &&
@@ -391,7 +406,7 @@ export function FabModal({ visible, onClose, onSuccess }: FabModalProps) {
                       <TouchableOpacity
                         onPress={handleClearSchedule}
                         className={cn(
-                          'rounded-md border border-gray-300 px-3 py-2 dark:border-gray-600',
+                          'flex-1 items-center justify-center rounded-md border border-gray-300 px-3 py-2 dark:border-gray-600',
                           scheduledDate === null &&
                             'border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-blue-500/10',
                         )}
@@ -414,6 +429,7 @@ export function FabModal({ visible, onClose, onSuccess }: FabModalProps) {
                           mode="date"
                           display="inline"
                           locale="en-US"
+                          minimumDate={getDefaultSchedule()}
                           onChange={handleIosDateChange}
                         />
                         <View className="mt-2 flex-row justify-end">
@@ -437,7 +453,7 @@ export function FabModal({ visible, onClose, onSuccess }: FabModalProps) {
                     >
                       Priority
                     </Text>
-                    <View className="flex-row flex-wrap gap-2">
+                    <View className="flex-row gap-2">
                       {PRIORITY_ORDER.map((value) => {
                         const selected = priority === value;
                         return (
@@ -445,7 +461,7 @@ export function FabModal({ visible, onClose, onSuccess }: FabModalProps) {
                             key={value}
                             onPress={() => setPriority(value)}
                             className={cn(
-                              'basis-[24%] items-center justify-center rounded-md border border-gray-300 px-3 py-3 dark:border-gray-600',
+                              'flex-1 items-center justify-center rounded-md border border-gray-300 px-3 py-3 dark:border-gray-600',
                               selected &&
                                 'border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-blue-500/10',
                             )}
