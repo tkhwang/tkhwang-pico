@@ -1,39 +1,19 @@
-export const startOfDay = (date: Date) =>
-  new Date(date.getFullYear(), date.getMonth(), date.getDate());
+import { addDays, endOfWeek, format, isSameDay, startOfDay } from 'date-fns';
 
-export const addDays = (date: Date, days: number) => {
-  const next = new Date(date);
-  next.setDate(next.getDate() + days);
-  return startOfDay(next);
-};
+const API_DATE_FORMAT = 'yyyy-MM-dd';
+const SCHEDULE_DISPLAY_FORMAT = 'eee, MMMM d, yyyy';
 
-export const isSameDay = (a: Date, b: Date) =>
-  a.getFullYear() === b.getFullYear() &&
-  a.getMonth() === b.getMonth() &&
-  a.getDate() === b.getDate();
+export const normalizeToStartOfDay = (date: Date) => startOfDay(date);
 
-export const formatDateForApi = (date: Date) =>
-  `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(
-    date.getDate(),
-  ).padStart(2, '0')}`;
+export const getDefaultSchedule = () => normalizeToStartOfDay(new Date());
 
-export const getDefaultSchedule = () => startOfDay(new Date());
+export const getTomorrowPreset = (reference: Date) => normalizeToStartOfDay(addDays(reference, 1));
 
-export const getUpcomingSaturday = (date: Date) => {
-  const day = date.getDay();
-  if (day === 0) {
-    // Sunday is already part of the current weekend
-    return startOfDay(date);
-  }
-  const daysUntilSaturday = (6 - day + 7) % 7;
-  return addDays(date, daysUntilSaturday);
-};
+export const getEndOfCurrentWeek = (reference: Date) => normalizeToStartOfDay(endOfWeek(reference));
 
-export const getEndOfWeek = (date: Date) => {
-  const day = date.getDay();
-  const daysUntilSunday = (7 - day) % 7;
-  return addDays(date, daysUntilSunday);
-};
+export const getNextWeekPreset = (reference: Date) => normalizeToStartOfDay(addDays(reference, 7));
+
+export const formatDateForApi = (date: Date) => format(date, API_DATE_FORMAT);
 
 export const formatScheduleLabel = (
   date: Date | null,
@@ -41,22 +21,19 @@ export const formatScheduleLabel = (
 ) => {
   if (!date) return 'No schedule';
 
-  const today = startOfDay(referenceDate);
+  const today = normalizeToStartOfDay(referenceDate);
   if (isSameDay(date, today)) return 'Today';
 
-  const tomorrow = addDays(today, 1);
+  const tomorrow = getTomorrowPreset(today);
   if (isSameDay(date, tomorrow)) return 'Tomorrow';
 
-  const thisWeek = getEndOfWeek(today);
-  if (isSameDay(date, thisWeek)) return 'This Week';
+  const thisWeekEnd = getEndOfCurrentWeek(today);
+  if (isSameDay(date, thisWeekEnd)) return 'This Week';
 
-  const nextWeek = addDays(today, 7);
+  const nextWeek = getNextWeekPreset(today);
   if (isSameDay(date, nextWeek)) return 'Next Week';
 
-  return date.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    weekday: 'short',
-  });
+  return format(date, SCHEDULE_DISPLAY_FORMAT);
 };
+
+export const isSameDayPreset = (first: Date, second: Date) => isSameDay(first, second);

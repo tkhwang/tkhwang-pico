@@ -25,13 +25,14 @@ import { PRIORITY_STYLES } from '@/consts/app-styles';
 import { useSaveContent } from '@/hooks/mutations/use-save-content';
 import { cn } from '@/lib/utils';
 import {
-  addDays,
   formatDateForApi,
   formatScheduleLabel,
   getDefaultSchedule,
-  getEndOfWeek,
-  isSameDay,
-  startOfDay,
+  getEndOfCurrentWeek,
+  getNextWeekPreset,
+  getTomorrowPreset,
+  isSameDayPreset,
+  normalizeToStartOfDay,
 } from '@/utils/date';
 
 import { Button } from '../ui/button';
@@ -118,16 +119,16 @@ export function FabModal({ visible, onClose, onSuccess }: FabModalProps) {
 
   const handleSelectDate = (date: Date | null) => {
     if (date) {
-      setScheduledDate(startOfDay(date));
+      setScheduledDate(normalizeToStartOfDay(date));
     } else {
       setScheduledDate(null);
     }
   };
 
   const handleSelectToday = () => handleSelectDate(getDefaultSchedule());
-  const handleSelectTomorrow = () => handleSelectDate(addDays(getDefaultSchedule(), 1));
-  const handleSelectThisWeek = () => handleSelectDate(getEndOfWeek(getDefaultSchedule()));
-  const handleSelectNextWeek = () => handleSelectDate(addDays(getDefaultSchedule(), 7));
+  const handleSelectTomorrow = () => handleSelectDate(getTomorrowPreset(getDefaultSchedule()));
+  const handleSelectThisWeek = () => handleSelectDate(getEndOfCurrentWeek(getDefaultSchedule()));
+  const handleSelectNextWeek = () => handleSelectDate(getNextWeekPreset(getDefaultSchedule()));
   const handleClearSchedule = () => handleSelectDate(null);
 
   const handleAndroidDateChange = (event: DateTimePickerEvent, date?: Date) => {
@@ -156,17 +157,17 @@ export function FabModal({ visible, onClose, onSuccess }: FabModalProps) {
   };
 
   const today = getDefaultSchedule();
-  const tomorrow = addDays(today, 1);
-  const thisWeek = getEndOfWeek(today);
-  const nextWeek = addDays(today, 7);
+  const tomorrow = getTomorrowPreset(today);
+  const thisWeek = getEndOfCurrentWeek(today);
+  const nextWeek = getNextWeekPreset(today);
 
-  const scheduleDisplay = formatScheduleLabel(scheduledDate);
+  const scheduleDisplay = formatScheduleLabel(scheduledDate, today);
   const priorityDisplay = PRIORITY_LABELS[priority];
 
-  const isTodaySelected = scheduledDate ? isSameDay(scheduledDate, today) : false;
-  const isTomorrowSelected = scheduledDate ? isSameDay(scheduledDate, tomorrow) : false;
-  const isThisWeekSelected = scheduledDate ? isSameDay(scheduledDate, thisWeek) : false;
-  const isNextWeekSelected = scheduledDate ? isSameDay(scheduledDate, nextWeek) : false;
+  const isTodaySelected = scheduledDate ? isSameDayPreset(scheduledDate, today) : false;
+  const isTomorrowSelected = scheduledDate ? isSameDayPreset(scheduledDate, tomorrow) : false;
+  const isThisWeekSelected = scheduledDate ? isSameDayPreset(scheduledDate, thisWeek) : false;
+  const isNextWeekSelected = scheduledDate ? isSameDayPreset(scheduledDate, nextWeek) : false;
 
   return (
     <Modal
