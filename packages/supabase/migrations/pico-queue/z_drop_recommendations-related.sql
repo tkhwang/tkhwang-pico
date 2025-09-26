@@ -42,6 +42,7 @@ drop table if exists public.contents cascade;
 
 -- Drop types
 drop type if exists content_todo_status;
+drop type if exists content_priority;
 drop type if exists embedding_scope;
 drop type if exists content_status;
 
