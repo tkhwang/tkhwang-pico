@@ -397,3 +397,69 @@ $$;
 
 revoke all on function public.toggle_user_content_status(uuid) from public;
 grant execute on function public.toggle_user_content_status(uuid) to authenticated;
+
+-- 사용자 콘텐츠 조회: 상태 필터 및 정렬 기준 통일
+create or replace function public.get_user_contents(
+  p_status public.content_todo_status default null
+)
+returns table (
+  id uuid,
+  user_id text,
+  content_id uuid,
+  todo_status public.content_todo_status,
+  scheduled_for date,
+  priority public.content_priority,
+  note text,
+  labels text[],
+  archived boolean,
+  completed_at timestamptz,
+  saved_at timestamptz,
+  contents jsonb,
+  preferences jsonb
+)
+language sql
+security definer
+set search_path = public
+as $$
+  with me as (
+    select public.current_clerk_user_id() as uid
+  )
+  select
+    uc.id,
+    uc.user_id,
+    uc.content_id,
+    uc.todo_status,
+    uc.scheduled_for,
+    uc.priority,
+    uc.note,
+    uc.labels,
+    uc.archived,
+    uc.completed_at,
+    uc.saved_at,
+    to_jsonb(c) as contents,
+    coalesce(
+      (
+        select jsonb_agg(to_jsonb(ucp) order by ucp.created_at desc)
+        from public.user_content_preferences ucp
+        where ucp.user_id = me.uid
+          and ucp.content_id = uc.content_id
+      ),
+      '[]'::jsonb
+    ) as preferences
+  from me
+  join public.user_contents uc on uc.user_id = me.uid
+  join public.contents c on c.id = uc.content_id
+  where me.uid is not null
+    and (p_status is null or uc.todo_status = p_status)
+  order by
+    coalesce(uc.scheduled_for::timestamptz, uc.saved_at) asc,
+    case uc.priority
+      when 'high' then 1
+      when 'normal' then 2
+      else 3
+    end,
+    uc.saved_at asc;
+$$;
+
+revoke all on function public.get_user_contents(public.content_todo_status) from public;
+grant execute on function public.get_user_contents(public.content_todo_status) to authenticated;

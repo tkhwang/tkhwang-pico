@@ -31,6 +31,7 @@ drop function if exists public.auto_set_completed_timestamp();
 drop function if exists public.set_content_domain();
 drop function if exists public.current_clerk_user_id();
 drop function if exists public.toggle_user_content_status(uuid);
+drop function if exists public.get_user_contents(public.content_todo_status);
 
 -- Drop tables (order matters due to foreign key constraints)
 drop table if exists public.debug_failed_contents cascade;
