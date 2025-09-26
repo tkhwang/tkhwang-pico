@@ -15,6 +15,7 @@ interface ContentMetadataProps {
   className?: string;
   rightElement?: React.ReactNode;
   showMatchSpectrum?: boolean;
+  badgeElement?: React.ReactNode;
 }
 
 /**
@@ -30,6 +31,7 @@ export function ContentMetadata({
   className = '',
   rightElement,
   showMatchSpectrum = false,
+  badgeElement,
 }: ContentMetadataProps) {
   const metadataItems = [
     domain && (
@@ -59,18 +61,23 @@ export function ContentMetadata({
           {metadataItems.length > 0 && (
             <View className="flex-row flex-wrap items-center">
               {metadataItems.map((item, index) => (
-                <React.Fragment key={index}>
-                  {item}
-                  {index < metadataItems.length - 1 && (
-                    <Text className="mx-1 text-xs text-gray-400">•</Text>
+                <View key={index} className="mr-2 flex-row items-center">
+                  {index > 0 && (
+                    <Text className="mr-2 text-xs text-gray-400 dark:text-gray-500">•</Text>
                   )}
-                </React.Fragment>
+                  {item}
+                </View>
               ))}
             </View>
           )}
         </View>
 
-        {rightElement && <View className="ml-2 flex-shrink-0">{rightElement}</View>}
+        {(badgeElement || rightElement) && (
+          <View className="ml-2 flex-shrink-0 items-end gap-1">
+            {badgeElement}
+            {rightElement}
+          </View>
+        )}
       </View>
     </View>
   );
