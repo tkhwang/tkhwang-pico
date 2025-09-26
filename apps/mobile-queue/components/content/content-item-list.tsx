@@ -12,8 +12,10 @@ import { TouchableOpacity, View } from 'react-native';
 import { Icon } from '@/components/ui/icon';
 import { SiteFavicon } from '@/components/ui/site-favicon';
 import { Text } from '@/components/ui/text';
+import { PRIORITY_STYLES } from '@/consts/app-styles';
 import { ContentDate } from '@/domains/value-object/content-date';
 import { useContentActions } from '@/hooks/use-content-actions';
+import { DEFAULT_PRIORITY, PRIORITY_LABELS, type PriorityValue } from '@/utils/priority';
 import { getFaviconUrl } from '@/utils/url';
 
 interface ContentItemListProps {
@@ -47,6 +49,8 @@ export function ContentItemList({
   };
 
   const isCompleted = item.todo_status === 'completed';
+  const priorityValue = (item.priority ?? DEFAULT_PRIORITY) as PriorityValue;
+  const priorityStyle = PRIORITY_STYLES[priorityValue];
   const scheduledDate = item.scheduled_for ? new ContentDate(item.scheduled_for) : null;
   const completedDate = item.completed_at ? new ContentDate(item.completed_at) : null;
 
@@ -69,6 +73,15 @@ export function ContentItemList({
     : scheduledDate
       ? 'text-gray-800 dark:text-gray-100'
       : 'text-gray-400 dark:text-gray-500';
+
+  const priorityBadge = (
+    <View className={`flex-row items-center rounded-full px-1.5 py-0.5 ${priorityStyle.badge}`}>
+      <View className={`mr-1 h-1.5 w-1.5 rounded-full ${priorityStyle.dot}`} />
+      <Text className={`text-[10px] font-semibold uppercase ${priorityStyle.text}`}>
+        {PRIORITY_LABELS[priorityValue]}
+      </Text>
+    </View>
+  );
 
   return (
     <TouchableOpacity
@@ -100,6 +113,8 @@ export function ContentItemList({
           <Text className="text-xs text-gray-500 dark:text-gray-400" numberOfLines={1}>
             {content.domain || 'CONTENT'}
           </Text>
+          <Text className="mx-1 text-xs text-gray-400">•</Text>
+          {priorityBadge}
           <Text className="mx-1 text-xs text-gray-400">•</Text>
           <Icon
             as={showCompletedTime ? CheckCircle : CalendarDays}

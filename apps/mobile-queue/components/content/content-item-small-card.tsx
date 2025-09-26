@@ -59,6 +59,14 @@ export function ContentItemSmallCard({
 
   const scheduledDate = item.scheduled_for ? new ContentDate(item.scheduled_for) : null;
   const scheduleLabel = scheduledDate?.toSimpleString() ?? '—';
+  const scheduleInfo = (
+    <View className="flex-row items-center gap-1">
+      <Icon as={CalendarDays} className="h-3.5 w-3.5 text-gray-400 dark:text-gray-500" />
+      <Text className="text-xs font-medium text-gray-600 dark:text-gray-300" numberOfLines={1}>
+        {scheduleLabel}
+      </Text>
+    </View>
+  );
 
   return (
     <TouchableOpacity
@@ -109,13 +117,8 @@ export function ContentItemSmallCard({
 
       {/* Schedule & Priority */}
       <View className="mt-2 flex-row items-center justify-between">
-        <View className="flex-row items-center gap-1">
-          <Icon as={CalendarDays} className="h-3.5 w-3.5 text-gray-400 dark:text-gray-500" />
-          <Text className="text-xs font-medium text-gray-600 dark:text-gray-300" numberOfLines={1}>
-            {scheduleLabel}
-          </Text>
-        </View>
         {priorityBadge}
+        {scheduleInfo}
       </View>
     </TouchableOpacity>
   );
