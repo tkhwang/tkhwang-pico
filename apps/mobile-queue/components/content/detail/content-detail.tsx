@@ -41,6 +41,14 @@ import { ContentDetailBottomActions } from './content-detail-bottom-actions';
 
 const GRID_GAP = 8;
 
+type ScheduleContext =
+  | { type: 'add'; url: string; contentId: string }
+  | { type: 'reopen'; userContentId: string };
+
+interface ScheduleOpenOptions {
+  reopenDetailOnCancel: boolean;
+}
+
 interface ContentDetailProps {
   visible: boolean;
   item: UserContentWithDetails | Recommendation | null;
@@ -58,6 +66,11 @@ interface ContentDetailProps {
     priority: PriorityValue;
   }) => void | Promise<void>;
   onNotInterested?: (contentId: string) => void;
+  onReopen?: (options: {
+    userContentId: string;
+    scheduledFor: string;
+    priority: PriorityValue;
+  }) => void | Promise<void>;
 }
 
 export function ContentDetail({
@@ -70,6 +83,7 @@ export function ContentDetail({
   onLike,
   onAddToQueue,
   onNotInterested,
+  onReopen,
 }: ContentDetailProps) {
   const { openURL, deleteContent } = useContentActions();
 
@@ -81,6 +95,11 @@ export function ContentDetail({
   const { executeWithHapticFeedback } = useHapticFeedback();
   const sheetRef = React.useRef<BottomSheetModal>(null);
   const isPresentedRef = React.useRef(false);
+  const skipOnCloseRef = React.useRef(false);
+  const allowAutoPresentRef = React.useRef(true);
+  const reopenDetailOnCancelRef = React.useRef(false);
+  const reopenDetailRequestedRef = React.useRef(false);
+  const schedulePresentTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   const hasContent = Boolean(item && item.contents);
   const [showEditModal, setShowEditModal] = React.useState(false);
   const [readingRowWidth, setReadingRowWidth] = React.useState<number | null>(null);
@@ -88,9 +107,7 @@ export function ContentDetail({
   const [scheduleDate, setScheduleDate] = React.useState<Date>(getDefaultSchedule());
   const [schedulePriorityValue, setSchedulePriorityValue] =
     React.useState<PriorityValue>(DEFAULT_PRIORITY);
-  const [pendingAdd, setPendingAdd] = React.useState<{ url: string; contentId: string } | null>(
-    null,
-  );
+  const [scheduleContext, setScheduleContext] = React.useState<ScheduleContext | null>(null);
   const [isScheduleSheetOpen, setScheduleSheetOpen] = React.useState(false);
 
   const snapPoints = React.useMemo(() => ['70%'], []);
@@ -140,7 +157,16 @@ export function ContentDetail({
 
   const handleDismiss = React.useCallback(() => {
     isPresentedRef.current = false;
+    if (skipOnCloseRef.current) {
+      skipOnCloseRef.current = false;
+      return;
+    }
+    if (!visible) {
+      allowAutoPresentRef.current = true;
+      return;
+    }
     if (visible) {
+      allowAutoPresentRef.current = true;
       onClose();
     }
   }, [onClose, visible]);
@@ -150,6 +176,9 @@ export function ContentDetail({
     if (!sheet) return;
 
     if (visible && hasContent && !isPresentedRef.current) {
+      if (!allowAutoPresentRef.current) {
+        return;
+      }
       sheet.present();
       isPresentedRef.current = true;
     } else if ((!visible || !hasContent) && isPresentedRef.current) {
@@ -157,55 +186,139 @@ export function ContentDetail({
     }
   }, [visible, hasContent]);
 
-  const openScheduleSheet = React.useCallback((url: string, contentId: string) => {
-    setPendingAdd({ url, contentId });
-    setScheduleDate(getDefaultSchedule());
-    setSchedulePriorityValue(DEFAULT_PRIORITY);
-    setScheduleSheetOpen(true);
-    scheduleSheetRef.current?.present();
+  React.useEffect(() => {
+    return () => {
+      if (schedulePresentTimeoutRef.current) {
+        clearTimeout(schedulePresentTimeoutRef.current);
+      }
+    };
   }, []);
+
+  const openScheduleSheet = React.useCallback(
+    (
+      context: ScheduleContext,
+      initialDate: Date,
+      initialPriority: PriorityValue,
+      options: ScheduleOpenOptions,
+    ) => {
+      if (schedulePresentTimeoutRef.current) {
+        clearTimeout(schedulePresentTimeoutRef.current);
+        schedulePresentTimeoutRef.current = null;
+      }
+
+      setScheduleContext(context);
+      setScheduleDate(normalizeToStartOfDay(initialDate));
+      setSchedulePriorityValue(initialPriority);
+      setScheduleSheetOpen(true);
+
+      reopenDetailOnCancelRef.current = options.reopenDetailOnCancel;
+      reopenDetailRequestedRef.current = false;
+      allowAutoPresentRef.current = false;
+
+      const detailSheet = sheetRef.current;
+      if (detailSheet && isPresentedRef.current) {
+        skipOnCloseRef.current = true;
+        detailSheet.dismiss();
+      }
+
+      schedulePresentTimeoutRef.current = setTimeout(() => {
+        schedulePresentTimeoutRef.current = null;
+        scheduleSheetRef.current?.present();
+      }, 60);
+    },
+    [],
+  );
 
   const handleScheduleSheetDismiss = React.useCallback(() => {
     setScheduleSheetOpen(false);
-    setPendingAdd(null);
+    setScheduleContext(null);
     setScheduleDate(getDefaultSchedule());
     setSchedulePriorityValue(DEFAULT_PRIORITY);
-  }, []);
+
+    const shouldReopenDetail = reopenDetailRequestedRef.current && reopenDetailOnCancelRef.current;
+
+    reopenDetailRequestedRef.current = false;
+    reopenDetailOnCancelRef.current = false;
+
+    if (shouldReopenDetail && visible && hasContent) {
+      allowAutoPresentRef.current = true;
+      if (schedulePresentTimeoutRef.current) {
+        clearTimeout(schedulePresentTimeoutRef.current);
+        schedulePresentTimeoutRef.current = null;
+      }
+
+      schedulePresentTimeoutRef.current = setTimeout(() => {
+        schedulePresentTimeoutRef.current = null;
+        const detailSheet = sheetRef.current;
+        if (!detailSheet) return;
+        detailSheet.present();
+        isPresentedRef.current = true;
+      }, 60);
+    }
+  }, [hasContent, visible]);
 
   const handleScheduleDateChange = React.useCallback((date: Date | null) => {
-    setScheduleDate(date ?? getDefaultSchedule());
+    if (!date) {
+      setScheduleDate(getDefaultSchedule());
+      return;
+    }
+    setScheduleDate(normalizeToStartOfDay(date));
   }, []);
 
-  const handleCancelAddToQueue = React.useCallback(() => {
+  const handleScheduleCancel = React.useCallback(() => {
+    reopenDetailRequestedRef.current = reopenDetailOnCancelRef.current;
+    allowAutoPresentRef.current = reopenDetailOnCancelRef.current;
     scheduleSheetRef.current?.dismiss();
   }, []);
 
-  const handleConfirmAddToQueue = React.useCallback(async () => {
-    if (!pendingAdd || !onAddToQueue) return;
+  const handleScheduleConfirm = React.useCallback(async () => {
+    if (!scheduleContext) return;
 
     await executeWithHapticFeedback(async () => {
       try {
-        await Promise.resolve(
-          onAddToQueue({
-            url: pendingAdd.url,
-            contentId: pendingAdd.contentId,
-            scheduledFor: formatDateForApi(scheduleDate),
-            priority: schedulePriorityValue,
-          }),
-        );
-        setScheduleSheetOpen(false);
-        setPendingAdd(null);
-        sheetRef.current?.dismiss();
+        const scheduledFor = formatDateForApi(scheduleDate);
+
+        if (scheduleContext.type === 'add') {
+          if (!onAddToQueue) return;
+          await Promise.resolve(
+            onAddToQueue({
+              url: scheduleContext.url,
+              contentId: scheduleContext.contentId,
+              scheduledFor,
+              priority: schedulePriorityValue,
+            }),
+          );
+        } else if (scheduleContext.type === 'reopen') {
+          if (onReopen) {
+            await Promise.resolve(
+              onReopen({
+                userContentId: scheduleContext.userContentId,
+                scheduledFor,
+                priority: schedulePriorityValue,
+              }),
+            );
+          } else if (onToggleComplete) {
+            await Promise.resolve(onToggleComplete(scheduleContext.userContentId));
+          }
+        }
+
+        reopenDetailOnCancelRef.current = false;
+        reopenDetailRequestedRef.current = false;
+        allowAutoPresentRef.current = false;
+
+        scheduleSheetRef.current?.dismiss();
         onClose();
       } catch (error) {
-        console.error('Failed to add recommendation to queue', error);
+        console.error('Failed to update reading schedule', error);
       }
     });
   }, [
     executeWithHapticFeedback,
     onAddToQueue,
     onClose,
-    pendingAdd,
+    onReopen,
+    onToggleComplete,
+    scheduleContext,
     scheduleDate,
     schedulePriorityValue,
   ]);
@@ -248,6 +361,30 @@ export function ContentDetail({
     });
   };
 
+  const handleReopenPress = async () => {
+    await executeWithHapticFeedback(async () => {
+      if (!userContent) return;
+
+      const initialDate = userContent.scheduled_for
+        ? (() => {
+            const parsed = new Date(userContent.scheduled_for);
+            return Number.isNaN(parsed.getTime())
+              ? getDefaultSchedule()
+              : normalizeToStartOfDay(parsed);
+          })()
+        : getDefaultSchedule();
+
+      const initialPriority = (userContent.priority ?? DEFAULT_PRIORITY) as PriorityValue;
+
+      openScheduleSheet(
+        { type: 'reopen', userContentId: userContent.id },
+        initialDate,
+        initialPriority,
+        { reopenDetailOnCancel: true },
+      );
+    });
+  };
+
   const handleDelete = async () => {
     await executeWithHapticFeedback(() => {
       deleteContent(item.content_id, onDelete, onClose);
@@ -271,7 +408,13 @@ export function ContentDetail({
         return;
       }
 
-      openScheduleSheet(url, item.content_id);
+      const defaultSchedule = getDefaultSchedule();
+      openScheduleSheet(
+        { type: 'add', url, contentId: item.content_id },
+        defaultSchedule,
+        DEFAULT_PRIORITY,
+        { reopenDetailOnCancel: true },
+      );
     });
   };
 
@@ -487,6 +630,7 @@ export function ContentDetail({
             isLiked={isLiked}
             sheetPaddingBottom={sheetPaddingBottom}
             onToggleComplete={handleToggleComplete}
+            onReopen={handleReopenPress}
             onLike={handleLike}
             onDelete={handleDelete}
             onOpenURL={handleOpenURL}
@@ -496,7 +640,7 @@ export function ContentDetail({
         </View>
       </BottomSheetModal>
 
-      {onAddToQueue && (
+      {(onAddToQueue || onReopen) && (
         <BottomSheetModal
           ref={scheduleSheetRef}
           snapPoints={scheduleSnapPoints}
@@ -506,10 +650,12 @@ export function ContentDetail({
         >
           <BottomSheetView className="flex-1 px-4 py-4">
             <Text className="mb-1 text-base font-semibold text-gray-900 dark:text-gray-100">
-              Add to Queue
+              {scheduleContext?.type === 'reopen' ? 'Reading Schedule' : 'Add to Queue'}
             </Text>
             <Text className="mb-4 text-xs text-gray-500 dark:text-gray-400">
-              Choose when to read and how important it is.
+              {scheduleContext?.type === 'reopen'
+                ? 'Choose when to revisit this content and how important it is.'
+                : 'Choose when to read and how important it is.'}
             </Text>
 
             <SchedulePriorityPicker
@@ -525,15 +671,15 @@ export function ContentDetail({
               <Button
                 variant="outline"
                 className="flex-1"
-                onPress={handleCancelAddToQueue}
-                disabled={!pendingAdd}
+                onPress={handleScheduleCancel}
+                disabled={!scheduleContext}
               >
                 <Text>Cancel</Text>
               </Button>
               <Button
                 className="flex-1 bg-blue-500"
-                onPress={handleConfirmAddToQueue}
-                disabled={!pendingAdd}
+                onPress={handleScheduleConfirm}
+                disabled={!scheduleContext}
               >
                 <Text className="font-semibold text-white">Save</Text>
               </Button>

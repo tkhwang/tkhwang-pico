@@ -310,6 +310,7 @@ export function CompletedList() {
           onLike={handleLike}
           onAddToQueue={handleAddToQueue}
           onNotInterested={handleNotInterested}
+          onReopen={handleReopen}
         />
       )}
     </View>

@@ -21,6 +21,7 @@ interface ContentDetailBottomActionsProps {
   sheetPaddingBottom: number;
   // Action handlers
   onToggleComplete: () => void | Promise<void>;
+  onReopen?: () => void | Promise<void>;
   onLike: () => void | Promise<void>;
   onDelete: () => void | Promise<void>;
   onOpenURL: () => void | Promise<void>;
@@ -34,6 +35,7 @@ export function ContentDetailBottomActions({
   isLiked,
   sheetPaddingBottom,
   onToggleComplete,
+  onReopen,
   onLike,
   onDelete,
   onOpenURL,
@@ -96,7 +98,7 @@ export function ContentDetailBottomActions({
           <>
             {/* Toggle Complete Button */}
             <TouchableOpacity
-              onPress={onToggleComplete}
+              onPress={isCompleted && onReopen ? onReopen : onToggleComplete}
               className={`flex-1 items-center justify-center rounded-lg px-2 py-3 ${completeStyles.container}`}
             >
               <Icon
