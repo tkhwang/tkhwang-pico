@@ -16,7 +16,7 @@ import {
   Tag,
 } from 'lucide-react-native';
 import React from 'react';
-import { Alert, Platform, TouchableOpacity, View } from 'react-native';
+import { Alert, type LayoutChangeEvent, Platform, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { SchedulePriorityPreview } from '@/components/content/shared/schedule-priority-preview';
@@ -38,6 +38,8 @@ import { getFaviconUrl } from '@/utils/url';
 
 import { ContentEditModal } from '../edit/content-edit-modal';
 import { ContentDetailBottomActions } from './content-detail-bottom-actions';
+
+const GRID_GAP = 8;
 
 interface ContentDetailProps {
   visible: boolean;
@@ -76,8 +78,29 @@ export function ContentDetail({
   const isPresentedRef = React.useRef(false);
   const hasContent = Boolean(item && item.contents);
   const [showEditModal, setShowEditModal] = React.useState(false);
+  const [readingRowWidth, setReadingRowWidth] = React.useState<number | null>(null);
 
   const snapPoints = React.useMemo(() => ['70%'], []);
+  const readingRowSizes = React.useMemo(() => {
+    if (readingRowWidth === null) {
+      return null;
+    }
+
+    const baseWidth = (readingRowWidth - GRID_GAP * 3) / 4;
+    if (!Number.isFinite(baseWidth) || baseWidth <= 0) {
+      return null;
+    }
+
+    return {
+      cardWidth: baseWidth * 3 + GRID_GAP * 2,
+      editWidth: baseWidth,
+    };
+  }, [readingRowWidth]);
+
+  const handleReadingRowLayout = React.useCallback((event: LayoutChangeEvent) => {
+    const { width } = event.nativeEvent.layout;
+    setReadingRowWidth((previous) => (previous === width ? previous : width));
+  }, []);
 
   const renderBackdrop = React.useCallback(
     (backdropProps: BottomSheetBackdropProps) => (
@@ -230,7 +253,7 @@ export function ContentDetail({
                 </View>
               </View>
             ) : (
-              // Home mode header with toggle complete and edit button
+              // Home mode header
               <>
                 <View className="w-10" />
                 <View className="flex-1 flex-row items-center justify-center gap-2">
@@ -244,14 +267,7 @@ export function ContentDetail({
                     {isCompleted ? 'Completed' : 'Pending'}
                   </Text>
                 </View>
-                {/* Edit button - only show for UserContentWithDetails (has 'id' field) */}
-                {'id' in item ? (
-                  <TouchableOpacity onPress={() => setShowEditModal(true)} className="p-2">
-                    <Icon as={Edit2} className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-                  </TouchableOpacity>
-                ) : (
-                  <View className="w-10" />
-                )}
+                <View className="w-10" />
               </>
             )}
           </View>
@@ -310,12 +326,42 @@ export function ContentDetail({
             )}
 
             {userContent && (
-              <View className="mb-4">
-                <SchedulePriorityPreview
-                  scheduledDate={scheduledDatePreview}
-                  priority={priorityValue}
-                  title="Reading Settings"
-                />
+              <View className="mb-4 flex-row" onLayout={handleReadingRowLayout}>
+                <View
+                  style={
+                    readingRowSizes
+                      ? {
+                          width: readingRowSizes.cardWidth,
+                          marginRight: GRID_GAP,
+                        }
+                      : {
+                          flexGrow: 3,
+                          flexShrink: 1,
+                          marginRight: GRID_GAP,
+                        }
+                  }
+                >
+                  <SchedulePriorityPreview
+                    scheduledDate={scheduledDatePreview}
+                    priority={priorityValue}
+                    title="Reading Settings"
+                  />
+                </View>
+                <TouchableOpacity
+                  onPress={() => setShowEditModal(true)}
+                  accessibilityRole="button"
+                  className="items-center justify-center rounded-lg bg-blue-50 px-2 py-3 dark:bg-blue-500/10"
+                  style={
+                    readingRowSizes
+                      ? { width: readingRowSizes.editWidth }
+                      : { flexGrow: 1, flexShrink: 1 }
+                  }
+                >
+                  <Icon as={Edit2} className="mb-1 h-5 w-5 text-blue-600 dark:text-blue-200" />
+                  <Text className="text-xs font-semibold text-blue-600 dark:text-blue-200">
+                    Edit
+                  </Text>
+                </TouchableOpacity>
               </View>
             )}
 
