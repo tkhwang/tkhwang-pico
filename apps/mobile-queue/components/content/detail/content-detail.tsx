@@ -521,19 +521,24 @@ export function ContentDetail({
             )}
 
             {userContent && (
-              <View className="mb-4 flex-row" onLayout={handleReadingRowLayout}>
+              <View
+                className="mb-4 flex-row"
+                onLayout={!isCompleted ? handleReadingRowLayout : undefined}
+              >
                 <View
                   style={
-                    readingRowSizes
+                    !isCompleted && readingRowSizes
                       ? {
                           width: readingRowSizes.cardWidth,
                           marginRight: GRID_GAP,
                         }
-                      : {
-                          flexGrow: 3,
-                          flexShrink: 1,
-                          marginRight: GRID_GAP,
-                        }
+                      : !isCompleted
+                        ? {
+                            flexGrow: 3,
+                            flexShrink: 1,
+                            marginRight: GRID_GAP,
+                          }
+                        : { flex: 1 }
                   }
                 >
                   <SchedulePriorityPreview
@@ -542,21 +547,23 @@ export function ContentDetail({
                     title="Reading Settings"
                   />
                 </View>
-                <TouchableOpacity
-                  onPress={() => setShowEditModal(true)}
-                  accessibilityRole="button"
-                  className="items-center justify-center rounded-lg bg-blue-50 px-2 py-3 dark:bg-blue-500/10"
-                  style={
-                    readingRowSizes
-                      ? { width: readingRowSizes.editWidth }
-                      : { flexGrow: 1, flexShrink: 1 }
-                  }
-                >
-                  <Icon as={Edit2} className="mb-1 h-5 w-5 text-blue-600 dark:text-blue-200" />
-                  <Text className="text-xs font-semibold text-blue-600 dark:text-blue-200">
-                    Edit
-                  </Text>
-                </TouchableOpacity>
+                {!isCompleted && (
+                  <TouchableOpacity
+                    onPress={() => setShowEditModal(true)}
+                    accessibilityRole="button"
+                    className="items-center justify-center rounded-lg bg-blue-50 px-2 py-3 dark:bg-blue-500/10"
+                    style={
+                      readingRowSizes
+                        ? { width: readingRowSizes.editWidth }
+                        : { flexGrow: 1, flexShrink: 1 }
+                    }
+                  >
+                    <Icon as={Edit2} className="mb-1 h-5 w-5 text-blue-600 dark:text-blue-200" />
+                    <Text className="text-xs font-semibold text-blue-600 dark:text-blue-200">
+                      Edit
+                    </Text>
+                  </TouchableOpacity>
+                )}
               </View>
             )}
 
