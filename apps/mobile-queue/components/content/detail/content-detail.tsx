@@ -99,7 +99,7 @@ export function ContentDetail({
   const allowAutoPresentRef = React.useRef(true);
   const reopenDetailOnCancelRef = React.useRef(false);
   const reopenDetailRequestedRef = React.useRef(false);
-  const schedulePresentTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pendingSchedulePresentRef = React.useRef(false);
   const hasContent = Boolean(item && item.contents);
   const [showEditModal, setShowEditModal] = React.useState(false);
   const [readingRowWidth, setReadingRowWidth] = React.useState<number | null>(null);
@@ -159,16 +159,17 @@ export function ContentDetail({
     isPresentedRef.current = false;
     if (skipOnCloseRef.current) {
       skipOnCloseRef.current = false;
+      if (pendingSchedulePresentRef.current) {
+        pendingSchedulePresentRef.current = false;
+        scheduleSheetRef.current?.present();
+      }
       return;
     }
+    allowAutoPresentRef.current = true;
     if (!visible) {
-      allowAutoPresentRef.current = true;
       return;
     }
-    if (visible) {
-      allowAutoPresentRef.current = true;
-      onClose();
-    }
+    onClose();
   }, [onClose, visible]);
 
   React.useEffect(() => {
@@ -186,14 +187,6 @@ export function ContentDetail({
     }
   }, [visible, hasContent]);
 
-  React.useEffect(() => {
-    return () => {
-      if (schedulePresentTimeoutRef.current) {
-        clearTimeout(schedulePresentTimeoutRef.current);
-      }
-    };
-  }, []);
-
   const openScheduleSheet = React.useCallback(
     (
       context: ScheduleContext,
@@ -201,11 +194,6 @@ export function ContentDetail({
       initialPriority: PriorityValue,
       options: ScheduleOpenOptions,
     ) => {
-      if (schedulePresentTimeoutRef.current) {
-        clearTimeout(schedulePresentTimeoutRef.current);
-        schedulePresentTimeoutRef.current = null;
-      }
-
       setScheduleContext(context);
       setScheduleDate(normalizeToStartOfDay(initialDate));
       setSchedulePriorityValue(initialPriority);
@@ -217,14 +205,14 @@ export function ContentDetail({
 
       const detailSheet = sheetRef.current;
       if (detailSheet && isPresentedRef.current) {
+        pendingSchedulePresentRef.current = true;
         skipOnCloseRef.current = true;
         detailSheet.dismiss();
+        return;
       }
 
-      schedulePresentTimeoutRef.current = setTimeout(() => {
-        schedulePresentTimeoutRef.current = null;
-        scheduleSheetRef.current?.present();
-      }, 60);
+      pendingSchedulePresentRef.current = false;
+      scheduleSheetRef.current?.present();
     },
     [],
   );
@@ -239,21 +227,15 @@ export function ContentDetail({
 
     reopenDetailRequestedRef.current = false;
     reopenDetailOnCancelRef.current = false;
+    pendingSchedulePresentRef.current = false;
 
     if (shouldReopenDetail && visible && hasContent) {
       allowAutoPresentRef.current = true;
-      if (schedulePresentTimeoutRef.current) {
-        clearTimeout(schedulePresentTimeoutRef.current);
-        schedulePresentTimeoutRef.current = null;
-      }
-
-      schedulePresentTimeoutRef.current = setTimeout(() => {
-        schedulePresentTimeoutRef.current = null;
-        const detailSheet = sheetRef.current;
-        if (!detailSheet) return;
+      const detailSheet = sheetRef.current;
+      if (detailSheet) {
         detailSheet.present();
         isPresentedRef.current = true;
-      }, 60);
+      }
     }
   }, [hasContent, visible]);
 
@@ -268,6 +250,7 @@ export function ContentDetail({
   const handleScheduleCancel = React.useCallback(() => {
     reopenDetailRequestedRef.current = reopenDetailOnCancelRef.current;
     allowAutoPresentRef.current = reopenDetailOnCancelRef.current;
+    pendingSchedulePresentRef.current = false;
     scheduleSheetRef.current?.dismiss();
   }, []);
 
@@ -305,6 +288,7 @@ export function ContentDetail({
         reopenDetailOnCancelRef.current = false;
         reopenDetailRequestedRef.current = false;
         allowAutoPresentRef.current = false;
+        pendingSchedulePresentRef.current = false;
 
         scheduleSheetRef.current?.dismiss();
         onClose();
