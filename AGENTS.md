@@ -37,3 +37,22 @@ Follow `emoji type(scope): summary`, e.g., `✨ feat(mobile/queue): add Content 
 ## Security & Configuration Tips
 
 Mirror `.env.example` locally and inject secrets via runtime tooling. Validate Node 18+ for LangChain, Node 20+ for Mastra, and ensure Yarn Plug'n'Play compatibility. Confirm Clerk, Supabase, and Mastra Cloud credentials in staging before promoting to production.
+
+For every request:
+
+1. Always refer to the documentation files stored under `/vooster-docs` (accessible via the relative paths below):
+<vooster-docs>
+- prd.md: ./vooster-docs/prd.md
+- architecture.md: ./vooster-docs/architecture.md
+- guideline.md: ./vooster-docs/guideline.md
+- step-by-step.md: ./vooster-docs/step-by-step.md
+- clean-code.md: ./vooster-docs/clean-code.md
+</vooster-docs>
+
+2. Use the relevant file(s) depending on the context of the request.
+3. Never ignore these files. Consider them for:
+    - Providing accurate information
+    - Ensuring consistency
+    - Following documented guidelines
+    - Making decisions or generating content
+
