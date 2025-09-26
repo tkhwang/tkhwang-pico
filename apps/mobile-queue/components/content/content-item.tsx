@@ -1,5 +1,5 @@
 import type { UserContentWithDetails } from '@tkhwang-pico/supabase';
-import { CalendarDays, CheckCircle, CircleCheckBig, Clock, Heart } from 'lucide-react-native';
+import { CalendarDays, CheckCircle, CircleCheckBig, Heart } from 'lucide-react-native';
 import React from 'react';
 import { View } from 'react-native';
 
@@ -65,57 +65,28 @@ export function ContentItem({
   );
 
   const scheduledDate = item.scheduled_for ? new ContentDate(item.scheduled_for) : null;
-  const savedDate = item.saved_at ? new ContentDate(item.saved_at) : null;
   const completedDate = item.completed_at ? new ContentDate(item.completed_at) : null;
 
   const scheduleLabel = showCompletedTime
     ? (completedDate?.toSimpleString() ?? '—')
     : (scheduledDate?.toSimpleString() ?? '—');
 
-  const leftTextClass = showCompletedTime
-    ? completedDate
-      ? 'text-xs font-medium text-emerald-700 dark:text-emerald-300'
-      : 'text-xs font-medium text-gray-400 dark:text-gray-500'
-    : scheduledDate
-      ? 'text-xs font-medium text-gray-800 dark:text-gray-100'
-      : 'text-xs font-medium text-gray-400 dark:text-gray-500';
-
-  const savedLabel = savedDate?.toSimpleString() ?? '—';
-
-  const savedRightElement = (
+  const scheduleRightElement = (
     <View className="flex-row items-center gap-1">
-      <Icon as={Clock} className="h-3.5 w-3.5 text-gray-400 dark:text-gray-500" />
-      <Text className="text-xs font-medium text-gray-500 dark:text-gray-400" numberOfLines={1}>
-        {savedLabel}
-      </Text>
-    </View>
-  );
-
-  const scheduleInfo = (
-    <View className="flex-row items-center gap-2">
       <Icon
         as={showCompletedTime ? CheckCircle : CalendarDays}
-        className={`h-3.5 w-3.5 ${
-          showCompletedTime
-            ? completedDate
-              ? 'text-emerald-500 dark:text-emerald-300'
-              : 'text-gray-400 dark:text-gray-500'
-            : scheduledDate
-              ? 'text-blue-500 dark:text-blue-300'
-              : 'text-gray-300 dark:text-gray-600'
-        }`}
+        className="h-3.5 w-3.5 text-gray-400 dark:text-gray-500"
       />
-      <Text className={leftTextClass} numberOfLines={1}>
+      <Text className="text-xs text-gray-400 dark:text-gray-500" numberOfLines={1}>
         {scheduleLabel}
       </Text>
     </View>
   );
 
+  const rightMetadataElement = <View className="items-end gap-1">{scheduleRightElement}</View>;
+
   const bottomSlot = (
-    <View className="mt-3 flex-row items-center justify-between">
-      {priorityBadge}
-      {scheduleInfo}
-    </View>
+    <View className="mt-3 flex-row items-center justify-start">{priorityBadge}</View>
   );
 
   // Create checkbox slot
@@ -152,7 +123,7 @@ export function ContentItem({
         domain: content.domain || 'CONTENT',
         faviconUrl,
         readingTime: content.word_count ? formatReadingTime(content.word_count) : undefined,
-        rightElement: savedRightElement,
+        rightElement: rightMetadataElement,
       }}
       bottomSlot={bottomSlot}
     />
