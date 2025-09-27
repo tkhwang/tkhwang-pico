@@ -94,10 +94,13 @@ export const bottomSheetReducer = (
       return nextState;
     }
     case 'OPEN_DETAIL': {
-      if (state.detailVisible) return state;
+      // If the detail sheet is already the only one visible, no state change is needed.
+      if (state.detailVisible && !state.schedule.visible) {
+        return state;
+      }
 
       const nextState: BottomSheetState = {
-        ...state,
+        ...createInitialState(),
         detailVisible: true,
         active: state.schedule.visible ? 'reading-schedule' : 'detail',
       };
