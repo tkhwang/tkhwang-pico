@@ -265,7 +265,9 @@ export interface Database {
           id: string;
           labels: string[] | null;
           note: string | null;
+          priority: Database['public']['Enums']['content_priority'];
           saved_at: string;
+          scheduled_for: string | null;
           todo_status: Database['public']['Enums']['content_todo_status'];
           user_id: string;
         };
@@ -276,7 +278,9 @@ export interface Database {
           id?: string;
           labels?: string[] | null;
           note?: string | null;
+          priority?: Database['public']['Enums']['content_priority'];
           saved_at?: string;
+          scheduled_for?: string | null;
           todo_status?: Database['public']['Enums']['content_todo_status'];
           user_id: string;
         };
@@ -287,7 +291,9 @@ export interface Database {
           id?: string;
           labels?: string[] | null;
           note?: string | null;
+          priority?: Database['public']['Enums']['content_priority'];
           saved_at?: string;
+          scheduled_for?: string | null;
           todo_status?: Database['public']['Enums']['content_todo_status'];
           user_id?: string;
         };
@@ -355,6 +361,24 @@ export interface Database {
       gen_salt: {
         Args: { '': string };
         Returns: string;
+      };
+      get_user_contents: {
+        Args: { p_status?: Database['public']['Enums']['content_todo_status'] };
+        Returns: {
+          archived: boolean;
+          completed_at: string;
+          content_id: string;
+          contents: Json;
+          id: string;
+          labels: string[];
+          note: string;
+          preferences: Json;
+          priority: Database['public']['Enums']['content_priority'];
+          saved_at: string;
+          scheduled_for: string;
+          todo_status: Database['public']['Enums']['content_todo_status'];
+          user_id: string;
+        }[];
       };
       gtrgm_compress: {
         Args: { '': unknown };
@@ -426,7 +450,7 @@ export interface Database {
       };
       l2_normalize: {
         Args: { '': string } | { '': unknown } | { '': unknown };
-        Returns: string;
+        Returns: unknown;
       };
       pgp_armor_headers: {
         Args: { '': string };
@@ -520,6 +544,7 @@ export interface Database {
       };
     };
     Enums: {
+      content_priority: 'low' | 'normal' | 'high';
       content_status: 'pending' | 'ready' | 'failed' | 'archived';
       content_todo_status: 'pending' | 'completed';
       embedding_scope: 'summary' | 'chunk' | 'title' | 'tags';
@@ -646,6 +671,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      content_priority: ['low', 'normal', 'high'],
       content_status: ['pending', 'ready', 'failed', 'archived'],
       content_todo_status: ['pending', 'completed'],
       embedding_scope: ['summary', 'chunk', 'title', 'tags'],

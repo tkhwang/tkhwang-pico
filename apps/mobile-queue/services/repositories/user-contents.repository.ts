@@ -25,7 +25,7 @@ export class UserContentsRepository {
     userId: string,
     todoFilter: TodoFilterType = 'all',
   ): Promise<UserContentWithDetails[]> {
-    return this.repository.getUserContents(userId, { filter: todoFilter });
+    return this.repository.getUserContents({ userId, filter: todoFilter });
   }
 
   /**

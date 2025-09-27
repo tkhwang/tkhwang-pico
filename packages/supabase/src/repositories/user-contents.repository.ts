@@ -1,15 +1,20 @@
 import type { SupabaseClientWithDatabase } from '../lib/config';
 import type {
+  Content,
   ContentTodoStatus,
+  Enums,
+  TablesInsert,
   TodoFilterType,
   UserContent,
   UserContentPreferenceTyped,
   UserContentWithDetails,
 } from '../types';
+import type { Database, Json } from '../types/supabase-database.types';
 import { BaseRepository, type RepositoryLogger } from './base.repository';
 
 export interface GetUserContentsOptions {
   filter?: TodoFilterType;
+  userId?: string;
 }
 
 export interface FindUserContentsFilters {
@@ -27,19 +32,69 @@ export interface UpdateUserContentInput {
   completed_at?: string | null;
 }
 
+type ContentPriority = Enums<'content_priority'>;
+
+type GetUserContentsRpcRow =
+  Database['public']['Functions']['get_user_contents']['Returns'][number];
+type PreferenceRow = Database['public']['Tables']['user_content_preferences']['Row'];
+
+const isJsonRecord = (value: Json): value is Record<string, Json> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value);
+
+const normalizeContent = (value: Json): Content | undefined =>
+  isJsonRecord(value) ? (value as unknown as Content) : undefined;
+
+const normalizePreferences = (value: Json): UserContentPreferenceTyped[] => {
+  if (!Array.isArray(value)) return [];
+
+  return value
+    .filter((preference): preference is Record<string, Json> => isJsonRecord(preference))
+    .map((preference) => {
+      const rawPreference = preference as PreferenceRow;
+      return {
+        ...rawPreference,
+        preference_type:
+          rawPreference.preference_type as UserContentPreferenceTyped['preference_type'],
+      } as UserContentPreferenceTyped;
+    });
+};
+
+const mapRpcRowToUserContent = (row: GetUserContentsRpcRow): UserContentWithDetails => {
+  const { contents, preferences, ...userContentFields } = row;
+
+  return {
+    ...(userContentFields as UserContent),
+    contents: normalizeContent(contents),
+    preferences: normalizePreferences(preferences),
+  };
+};
+
+interface LinkUserContentOptions {
+  scheduledFor?: string | null;
+  priority?: ContentPriority;
+}
+
 export class UserContentsRepository extends BaseRepository {
   constructor(client: SupabaseClientWithDatabase, logger?: RepositoryLogger) {
     super(client, logger);
   }
 
-  async linkUserContent(userId: string, contentId: string): Promise<void> {
-    const { error } = await this.client.from('user_contents').upsert(
-      {
-        user_id: userId,
-        content_id: contentId,
-      },
-      { onConflict: 'user_id,content_id' },
-    );
+  async linkUserContent(
+    userId: string,
+    contentId: string,
+    options?: LinkUserContentOptions,
+  ): Promise<void> {
+    const upsertData: TablesInsert<'user_contents'> = {
+      user_id: userId,
+      content_id: contentId,
+    };
+
+    if (options?.scheduledFor !== undefined) upsertData.scheduled_for = options.scheduledFor;
+    if (options?.priority !== undefined) upsertData.priority = options.priority;
+
+    const { error } = await this.client
+      .from('user_contents')
+      .upsert(upsertData, { onConflict: 'user_id,content_id' });
 
     if (error) {
       this.logger.error(`Failed to link user content: ${error.message}`);
@@ -148,58 +203,27 @@ export class UserContentsRepository extends BaseRepository {
     }
   }
 
-  async getUserContents(
-    userId: string,
-    { filter = 'all' }: GetUserContentsOptions = {},
-  ): Promise<UserContentWithDetails[]> {
-    let query = this.client
-      .from('user_contents')
-      .select(
-        `
-        *,
-        contents:contents!content_id(*)
-      `,
-      )
-      .eq('user_id', userId);
+  async getUserContents({ userId, filter = 'all' }: GetUserContentsOptions = {}): Promise<
+    UserContentWithDetails[]
+  > {
+    const statusFilter = filter === 'all' ? undefined : filter;
 
-    if (filter !== 'all') {
-      query = query.eq('todo_status', filter);
-    }
-
-    if (filter === 'completed') {
-      query = query.order('completed_at', { ascending: false });
-    } else {
-      query = query.order('saved_at', { ascending: false });
-    }
-
-    const [{ data, error }, { data: preferenceData, error: preferencesError }] = await Promise.all([
-      query,
-      this.client.from('user_content_preferences').select('*').eq('user_id', userId),
-    ]);
-
-    this.throwIfError(error, 'Error fetching user contents');
-    this.throwIfError(preferencesError, 'Error fetching content preferences');
-
-    const preferenceMap = new Map<string, UserContentPreferenceTyped[]>();
-    preferenceData?.forEach((preference) => {
-      const typedPreference: UserContentPreferenceTyped = {
-        ...preference,
-        preference_type:
-          preference.preference_type as UserContentPreferenceTyped['preference_type'],
-      };
-
-      const contentPreferences = preferenceMap.get(preference.content_id) ?? [];
-      contentPreferences.push(typedPreference);
-      preferenceMap.set(preference.content_id, contentPreferences);
+    const { data, error } = await this.client.rpc('get_user_contents', {
+      p_status: statusFilter,
     });
 
-    return (data || []).map(
-      (item) =>
-        ({
-          ...item,
-          preferences: preferenceMap.get(item.content_id) ?? [],
-        }) as UserContentWithDetails,
-    );
+    this.throwIfError(error, 'Error fetching user contents');
+
+    const rows = (data ?? []) as GetUserContentsRpcRow[];
+    const targetRows = userId ? rows.filter((row) => row.user_id === userId) : rows;
+
+    if (userId && targetRows.length !== rows.length) {
+      this.logger.warn(
+        `get_user_contents RPC returned rows for mismatched user. Expected ${userId}.`,
+      );
+    }
+
+    return targetRows.map(mapRpcRowToUserContent);
   }
 
   async toggleTodoStatus(userContentId: string): Promise<ContentTodoStatus> {

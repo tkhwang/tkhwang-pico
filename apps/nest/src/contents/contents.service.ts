@@ -8,7 +8,7 @@ import {
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { QUERY_SIMILAR_CONTENTS_DEFAULT_LIMIT } from 'src/consts/app-consts';
 
-import { type SimilarContentRecommendation } from '@tkhwang-pico/supabase';
+import { type Enums, type SimilarContentRecommendation } from '@tkhwang-pico/supabase';
 
 import { HtmlCacheService } from '../cache/html-cache.service';
 import { EVENTS } from '../common/constants/events';
@@ -29,7 +29,17 @@ export class ContentsService {
     private readonly debugFailedContentsRepository: DebugFailedContentsRepository,
   ) {}
 
-  async saveUrl({ url, userId }: { url: string; userId: string }) {
+  async saveUrl({
+    url,
+    userId,
+    scheduledFor,
+    priority,
+  }: {
+    url: string;
+    userId: string;
+    scheduledFor?: string | null;
+    priority?: Enums<'content_priority'>;
+  }) {
     let canonicalUrl: string;
     let redactedOriginalUrl: string;
     try {
@@ -75,7 +85,10 @@ export class ContentsService {
 
     // 4) user_contents upsert
     try {
-      await this.userContentsRepository.linkUserContent(userId, contents.id);
+      await this.userContentsRepository.linkUserContent(userId, contents.id, {
+        scheduledFor,
+        priority,
+      });
     } catch {
       throw new InternalServerErrorException('Failed to save user content link');
     }

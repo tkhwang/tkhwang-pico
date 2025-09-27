@@ -32,6 +32,7 @@ interface BaseContentCardProps {
     scoreColor?: string;
     rightElement?: React.ReactNode;
     showMatchSpectrum?: boolean;
+    badgeElement?: React.ReactNode;
   };
 
   // Style customization
@@ -56,7 +57,6 @@ export function BaseContentCard({
   summary,
   note,
   author,
-  tags,
   labels,
   thumbnailUrl,
   thumbnailSize = 'medium',
@@ -73,6 +73,13 @@ export function BaseContentCard({
 
   const content = (
     <>
+      {/* Metadata row at top */}
+      {metadataProps && (
+        <View className="mb-2">
+          <ContentMetadata {...metadataProps} />
+        </View>
+      )}
+
       {/* Top left slot (e.g., match spectrum) */}
       {topLeftSlot}
 
@@ -116,7 +123,7 @@ export function BaseContentCard({
           )}
 
           {/* Tags */}
-          {tags && <ContentTags tags={tags} />}
+          {/* {tags && <ContentTags tags={tags} />} */}
 
           {/* User labels */}
           {labels && <ContentTags tags={labels} variant="purple" />}
@@ -125,13 +132,6 @@ export function BaseContentCard({
         {/* Thumbnail */}
         <ContentThumbnail imageUrl={thumbnailUrl} size={thumbnailSize} />
       </View>
-
-      {/* Metadata row - moved to bottom */}
-      {metadataProps && (
-        <View className="mt-4">
-          <ContentMetadata {...metadataProps} />
-        </View>
-      )}
 
       {/* Bottom slot for additional content */}
       {bottomSlot}

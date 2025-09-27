@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Alert,
   Keyboard,
@@ -13,8 +13,11 @@ import {
   View,
 } from 'react-native';
 
+import { SchedulePriorityPicker } from '@/components/content/shared/schedule-priority-picker';
 import { Text } from '@/components/ui/text';
 import { useSaveContent } from '@/hooks/mutations/use-save-content';
+import { formatDateForApi, getDefaultSchedule } from '@/utils/date';
+import { DEFAULT_PRIORITY, type PriorityValue } from '@/utils/priority';
 
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
@@ -27,11 +30,16 @@ interface FabModalProps {
 
 export function FabModal({ visible, onClose, onSuccess }: FabModalProps) {
   const [url, setUrl] = useState('');
+  const [scheduledDate, setScheduledDate] = useState<Date | null>(getDefaultSchedule());
+  const [priority, setPriority] = useState<PriorityValue>(DEFAULT_PRIORITY);
+
   const inputRef = useRef<TextInput>(null);
 
   const { mutate, reset, isPending, isSuccess } = useSaveContent({
     onSuccess: () => {
       setUrl('');
+      setScheduledDate(getDefaultSchedule());
+      setPriority(DEFAULT_PRIORITY);
       Keyboard.dismiss(); // Only dismiss keyboard on success
       onSuccess?.();
       onClose();
@@ -47,12 +55,20 @@ export function FabModal({ visible, onClose, onSuccess }: FabModalProps) {
       return;
     }
 
-    mutate(url.trim());
+    const scheduledFor = scheduledDate ? formatDateForApi(scheduledDate) : null;
+
+    mutate({
+      url: url.trim(),
+      scheduledFor,
+      priority,
+    });
   };
 
   useEffect(() => {
     if (!visible) {
       setUrl('');
+      setScheduledDate(getDefaultSchedule());
+      setPriority(DEFAULT_PRIORITY);
       reset();
       return;
     }
@@ -66,6 +82,8 @@ export function FabModal({ visible, onClose, onSuccess }: FabModalProps) {
 
   const handleCloseModal = () => {
     setUrl('');
+    setScheduledDate(getDefaultSchedule());
+    setPriority(DEFAULT_PRIORITY);
     onClose();
   };
 
@@ -76,7 +94,7 @@ export function FabModal({ visible, onClose, onSuccess }: FabModalProps) {
       transparent={true}
       onRequestClose={handleCloseModal}
     >
-      {/* 외부 클릭 감지용 전체 영역 */}
+      {/* Overlay to detect outside taps */}
       <TouchableWithoutFeedback onPress={handleCloseModal}>
         <View className="flex-1 justify-end bg-black/50">
           {/* KeyboardAvoidingView for proper keyboard handling */}
@@ -84,7 +102,7 @@ export function FabModal({ visible, onClose, onSuccess }: FabModalProps) {
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
           >
-            {/* 실제 모달 콘텐츠 - 클릭 이벤트 차단 */}
+            {/* Modal content wrapper to block touch passthrough */}
             <Pressable className="max-h-[90%]">
               <View className="rounded-t-3xl bg-white dark:bg-gray-900">
                 {/* Modal Header */}
@@ -121,6 +139,15 @@ export function FabModal({ visible, onClose, onSuccess }: FabModalProps) {
                       autoFocus={true}
                       returnKeyType="done"
                       onSubmitEditing={handleSubmitUrl}
+                    />
+                    <SchedulePriorityPicker
+                      className="mt-3"
+                      visible={visible}
+                      scheduledDate={scheduledDate}
+                      onScheduledDateChange={setScheduledDate}
+                      priority={priority}
+                      onPriorityChange={setPriority}
+                      previewTitle="Reading Settings"
                     />
                   </View>
 

@@ -3,27 +3,51 @@ import {
   type BottomSheetBackdropProps,
   BottomSheetModal,
   BottomSheetScrollView,
+  BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import type { Recommendation, UserContentWithDetails } from '@tkhwang-pico/supabase';
-import { Calendar, CheckCircle, Circle, Clock, FileText, Sparkles, Tag } from 'lucide-react-native';
+import {
+  Calendar,
+  CheckCircle,
+  Circle,
+  Clock,
+  Edit2,
+  FileText,
+  Sparkles,
+  Tag,
+} from 'lucide-react-native';
 import React from 'react';
-import { Alert, Platform, View } from 'react-native';
+import { Alert, type LayoutChangeEvent, Platform, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { SchedulePriorityPicker } from '@/components/content/shared/schedule-priority-picker';
+import { SchedulePriorityPreview } from '@/components/content/shared/schedule-priority-preview';
 import { ContentTags } from '@/components/content/sub/content-tags';
 import { ContentThumbnail } from '@/components/content/sub/content-thumbnail';
+import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import { SiteFavicon } from '@/components/ui/site-favicon';
 import { Text } from '@/components/ui/text';
+import { ContentDate } from '@/domains/value-object/content-date';
 import { useContentActions } from '@/hooks/use-content-actions';
 import { useHapticFeedback } from '@/hooks/use-haptic-feedback';
-import {
-  formatFullDate,
-  formatReadingTimeWithSuffix,
-  getThumbnailUrl,
-} from '@/utils/content-formatters';
+import { formatReadingTimeWithSuffix, getThumbnailUrl } from '@/utils/content-formatters';
+import { formatDateForApi, getDefaultSchedule, normalizeToStartOfDay } from '@/utils/date';
+import { DEFAULT_PRIORITY, type PriorityValue } from '@/utils/priority';
+import { getFaviconUrl } from '@/utils/url';
 
+import { ContentEditModal } from '../edit/content-edit-modal';
 import { ContentDetailBottomActions } from './content-detail-bottom-actions';
+
+const GRID_GAP = 8;
+
+type ScheduleContext =
+  | { type: 'add'; url: string; contentId: string }
+  | { type: 'reopen'; userContentId: string };
+
+interface ScheduleOpenOptions {
+  reopenDetailOnCancel: boolean;
+}
 
 interface ContentDetailProps {
   visible: boolean;
@@ -35,8 +59,18 @@ interface ContentDetailProps {
   onDelete?: (contentId: string) => void;
   onLike?: (contentId: string) => void;
   // Recommend mode callbacks
-  onAddToQueue?: (url: string, contentId: string) => void;
+  onAddToQueue?: (options: {
+    url: string;
+    contentId: string;
+    scheduledFor: string;
+    priority: PriorityValue;
+  }) => void | Promise<void>;
   onNotInterested?: (contentId: string) => void;
+  onReopen?: (options: {
+    userContentId: string;
+    scheduledFor: string;
+    priority: PriorityValue;
+  }) => void | Promise<void>;
 }
 
 export function ContentDetail({
@@ -49,6 +83,7 @@ export function ContentDetail({
   onLike,
   onAddToQueue,
   onNotInterested,
+  onReopen,
 }: ContentDetailProps) {
   const { openURL, deleteContent } = useContentActions();
 
@@ -60,9 +95,43 @@ export function ContentDetail({
   const { executeWithHapticFeedback } = useHapticFeedback();
   const sheetRef = React.useRef<BottomSheetModal>(null);
   const isPresentedRef = React.useRef(false);
+  const skipOnCloseRef = React.useRef(false);
+  const allowAutoPresentRef = React.useRef(true);
+  const reopenDetailOnCancelRef = React.useRef(false);
+  const reopenDetailRequestedRef = React.useRef(false);
+  const pendingSchedulePresentRef = React.useRef(false);
   const hasContent = Boolean(item && item.contents);
+  const [showEditModal, setShowEditModal] = React.useState(false);
+  const [readingRowWidth, setReadingRowWidth] = React.useState<number | null>(null);
+  const scheduleSheetRef = React.useRef<BottomSheetModal>(null);
+  const [scheduleDate, setScheduleDate] = React.useState<Date>(getDefaultSchedule());
+  const [schedulePriorityValue, setSchedulePriorityValue] =
+    React.useState<PriorityValue>(DEFAULT_PRIORITY);
+  const [scheduleContext, setScheduleContext] = React.useState<ScheduleContext | null>(null);
+  const [isScheduleSheetOpen, setScheduleSheetOpen] = React.useState(false);
 
   const snapPoints = React.useMemo(() => ['70%'], []);
+  const scheduleSnapPoints = React.useMemo(() => ['60%'], []);
+  const readingRowSizes = React.useMemo(() => {
+    if (readingRowWidth === null) {
+      return null;
+    }
+
+    const baseWidth = (readingRowWidth - GRID_GAP * 3) / 4;
+    if (!Number.isFinite(baseWidth) || baseWidth <= 0) {
+      return null;
+    }
+
+    return {
+      cardWidth: baseWidth * 3 + GRID_GAP * 2,
+      editWidth: baseWidth,
+    };
+  }, [readingRowWidth]);
+
+  const handleReadingRowLayout = React.useCallback((event: LayoutChangeEvent) => {
+    const { width } = event.nativeEvent.layout;
+    setReadingRowWidth((previous) => (previous === width ? previous : width));
+  }, []);
 
   const renderBackdrop = React.useCallback(
     (backdropProps: BottomSheetBackdropProps) => (
@@ -88,9 +157,19 @@ export function ContentDetail({
 
   const handleDismiss = React.useCallback(() => {
     isPresentedRef.current = false;
-    if (visible) {
-      onClose();
+    if (skipOnCloseRef.current) {
+      skipOnCloseRef.current = false;
+      if (pendingSchedulePresentRef.current) {
+        pendingSchedulePresentRef.current = false;
+        scheduleSheetRef.current?.present();
+      }
+      return;
     }
+    allowAutoPresentRef.current = true;
+    if (!visible) {
+      return;
+    }
+    onClose();
   }, [onClose, visible]);
 
   React.useEffect(() => {
@@ -98,12 +177,135 @@ export function ContentDetail({
     if (!sheet) return;
 
     if (visible && hasContent && !isPresentedRef.current) {
+      if (!allowAutoPresentRef.current) {
+        return;
+      }
       sheet.present();
       isPresentedRef.current = true;
     } else if ((!visible || !hasContent) && isPresentedRef.current) {
       sheet.dismiss();
     }
   }, [visible, hasContent]);
+
+  const openScheduleSheet = React.useCallback(
+    (
+      context: ScheduleContext,
+      initialDate: Date,
+      initialPriority: PriorityValue,
+      options: ScheduleOpenOptions,
+    ) => {
+      setScheduleContext(context);
+      setScheduleDate(normalizeToStartOfDay(initialDate));
+      setSchedulePriorityValue(initialPriority);
+      setScheduleSheetOpen(true);
+
+      reopenDetailOnCancelRef.current = options.reopenDetailOnCancel;
+      reopenDetailRequestedRef.current = false;
+      allowAutoPresentRef.current = false;
+
+      const detailSheet = sheetRef.current;
+      if (detailSheet && isPresentedRef.current) {
+        pendingSchedulePresentRef.current = true;
+        skipOnCloseRef.current = true;
+        detailSheet.dismiss();
+        return;
+      }
+
+      pendingSchedulePresentRef.current = false;
+      scheduleSheetRef.current?.present();
+    },
+    [],
+  );
+
+  const handleScheduleSheetDismiss = React.useCallback(() => {
+    setScheduleSheetOpen(false);
+    setScheduleContext(null);
+    setScheduleDate(getDefaultSchedule());
+    setSchedulePriorityValue(DEFAULT_PRIORITY);
+
+    const shouldReopenDetail = reopenDetailRequestedRef.current && reopenDetailOnCancelRef.current;
+
+    reopenDetailRequestedRef.current = false;
+    reopenDetailOnCancelRef.current = false;
+    pendingSchedulePresentRef.current = false;
+
+    if (shouldReopenDetail && visible && hasContent) {
+      allowAutoPresentRef.current = true;
+      const detailSheet = sheetRef.current;
+      if (detailSheet) {
+        detailSheet.present();
+        isPresentedRef.current = true;
+      }
+    }
+  }, [hasContent, visible]);
+
+  const handleScheduleDateChange = React.useCallback((date: Date | null) => {
+    if (!date) {
+      setScheduleDate(getDefaultSchedule());
+      return;
+    }
+    setScheduleDate(normalizeToStartOfDay(date));
+  }, []);
+
+  const handleScheduleCancel = React.useCallback(() => {
+    reopenDetailRequestedRef.current = reopenDetailOnCancelRef.current;
+    allowAutoPresentRef.current = reopenDetailOnCancelRef.current;
+    pendingSchedulePresentRef.current = false;
+    scheduleSheetRef.current?.dismiss();
+  }, []);
+
+  const handleScheduleConfirm = React.useCallback(async () => {
+    if (!scheduleContext) return;
+
+    await executeWithHapticFeedback(async () => {
+      try {
+        const scheduledFor = formatDateForApi(scheduleDate);
+
+        if (scheduleContext.type === 'add') {
+          if (!onAddToQueue) return;
+          await Promise.resolve(
+            onAddToQueue({
+              url: scheduleContext.url,
+              contentId: scheduleContext.contentId,
+              scheduledFor,
+              priority: schedulePriorityValue,
+            }),
+          );
+        } else if (scheduleContext.type === 'reopen') {
+          if (onReopen) {
+            await Promise.resolve(
+              onReopen({
+                userContentId: scheduleContext.userContentId,
+                scheduledFor,
+                priority: schedulePriorityValue,
+              }),
+            );
+          } else if (onToggleComplete) {
+            await Promise.resolve(onToggleComplete(scheduleContext.userContentId));
+          }
+        }
+
+        reopenDetailOnCancelRef.current = false;
+        reopenDetailRequestedRef.current = false;
+        allowAutoPresentRef.current = false;
+        pendingSchedulePresentRef.current = false;
+
+        scheduleSheetRef.current?.dismiss();
+        onClose();
+      } catch (error) {
+        console.error('Failed to update reading schedule', error);
+      }
+    });
+  }, [
+    executeWithHapticFeedback,
+    onAddToQueue,
+    onClose,
+    onReopen,
+    onToggleComplete,
+    scheduleContext,
+    scheduleDate,
+    schedulePriorityValue,
+  ]);
 
   if (!hasContent || !item || !item.contents) {
     return null;
@@ -113,10 +315,26 @@ export function ContentDetail({
   const isCompleted = 'todo_status' in item ? item.todo_status === 'completed' : false;
   const isRecommendation = mode === 'recommend';
   const thumbnailUrl = getThumbnailUrl(content);
+  const faviconUrl = getFaviconUrl(content.metadata);
   const isLiked =
     'preferences' in item
       ? (item.preferences?.some((preference) => preference.preference_type === 'liked') ?? false)
       : false;
+
+  const userContent = !isRecommendation && 'id' in item ? (item as UserContentWithDetails) : null;
+  const priorityValue: PriorityValue = userContent
+    ? ((userContent.priority ?? DEFAULT_PRIORITY) as PriorityValue)
+    : DEFAULT_PRIORITY;
+  const savedAtLabel =
+    'saved_at' in item && item.saved_at
+      ? new ContentDate(item.saved_at).toSimpleString('en-US')
+      : null;
+  const scheduledDatePreview = userContent?.scheduled_for
+    ? (() => {
+        const parsed = new Date(userContent.scheduled_for);
+        return Number.isNaN(parsed.getTime()) ? null : normalizeToStartOfDay(parsed);
+      })()
+    : null;
 
   const handleToggleComplete = async () => {
     await executeWithHapticFeedback(async () => {
@@ -124,6 +342,30 @@ export function ContentDetail({
         await Promise.resolve(onToggleComplete(item.id));
         onClose();
       }
+    });
+  };
+
+  const handleReopenPress = async () => {
+    await executeWithHapticFeedback(async () => {
+      if (!userContent) return;
+
+      const initialDate = userContent.scheduled_for
+        ? (() => {
+            const parsed = new Date(userContent.scheduled_for);
+            return Number.isNaN(parsed.getTime())
+              ? getDefaultSchedule()
+              : normalizeToStartOfDay(parsed);
+          })()
+        : getDefaultSchedule();
+
+      const initialPriority = (userContent.priority ?? DEFAULT_PRIORITY) as PriorityValue;
+
+      openScheduleSheet(
+        { type: 'reopen', userContentId: userContent.id },
+        initialDate,
+        initialPriority,
+        { reopenDetailOnCancel: true },
+      );
     });
   };
 
@@ -143,15 +385,20 @@ export function ContentDetail({
 
   const handleAddToQueue = async () => {
     await executeWithHapticFeedback(async () => {
-      if (onAddToQueue) {
-        const url = content.canonical_url || content.url;
-        if (url) {
-          await Promise.resolve(onAddToQueue(url, item.content_id));
-          onClose();
-        } else {
-          Alert.alert('Error', 'No URL available for this content');
-        }
+      if (!onAddToQueue) return;
+      const url = content.canonical_url || content.url;
+      if (!url) {
+        Alert.alert('Error', 'No URL available for this content');
+        return;
       }
+
+      const defaultSchedule = getDefaultSchedule();
+      openScheduleSheet(
+        { type: 'add', url, contentId: item.content_id },
+        defaultSchedule,
+        DEFAULT_PRIORITY,
+        { reopenDetailOnCancel: true },
+      );
     });
   };
 
@@ -172,160 +419,275 @@ export function ContentDetail({
   };
 
   return (
-    <BottomSheetModal
-      ref={sheetRef}
-      snapPoints={snapPoints}
-      enablePanDownToClose
-      enableDynamicSizing={false}
-      index={0}
-      handleComponent={renderHandle}
-      backdropComponent={renderBackdrop}
-      onDismiss={handleDismiss}
-      keyboardBehavior="interactive"
-      keyboardBlurBehavior="restore"
-      topInset={insets.top}
-      backgroundStyle={{ backgroundColor: 'transparent' }}
-      style={{ overflow: 'hidden' }}
-      android_keyboardInputMode="adjustResize"
-    >
-      <View className="flex-1 rounded-t-2xl bg-white dark:bg-gray-800">
-        {/* Header */}
-        <View className="flex-row items-center justify-center border-b border-gray-200 px-4 pb-3 pt-4 dark:border-gray-700">
-          {isRecommendation ? (
-            // Recommendation mode header
-            <View className="flex-row items-center gap-2">
-              <Icon as={Sparkles} className="h-5 w-5 text-purple-500" />
-              <Text className="text-base font-medium text-gray-700 dark:text-gray-300">
-                Recommendation
-              </Text>
-            </View>
-          ) : (
-            // Home mode header with toggle complete
-            <View className="flex-row items-center gap-2">
-              <View className="p-1">
-                <Icon
-                  as={isCompleted ? CheckCircle : Circle}
-                  className={`h-6 w-6 ${isCompleted ? 'text-green-500' : 'text-blue-500'}`}
-                />
+    <>
+      <BottomSheetModal
+        ref={sheetRef}
+        snapPoints={snapPoints}
+        enablePanDownToClose
+        enableDynamicSizing={false}
+        index={0}
+        handleComponent={renderHandle}
+        backdropComponent={renderBackdrop}
+        onDismiss={handleDismiss}
+        keyboardBehavior="interactive"
+        keyboardBlurBehavior="restore"
+        topInset={insets.top}
+        backgroundStyle={{ backgroundColor: 'transparent' }}
+        style={{ overflow: 'hidden' }}
+        android_keyboardInputMode="adjustResize"
+      >
+        <View className="flex-1 rounded-t-2xl bg-white dark:bg-gray-800">
+          {/* Header */}
+          <View className="flex-row items-center justify-between border-b border-gray-200 px-4 pb-3 pt-4 dark:border-gray-700">
+            {isRecommendation ? (
+              // Recommendation mode header
+              <View className="flex-1 flex-row items-center justify-center">
+                <View className="flex-row items-center gap-2">
+                  <Icon as={Sparkles} className="h-5 w-5 text-purple-500" />
+                  <Text className="text-base font-medium text-gray-700 dark:text-gray-300">
+                    Recommendation
+                  </Text>
+                </View>
               </View>
-              <Text className="text-base font-medium text-gray-700 dark:text-gray-300">
-                {isCompleted ? 'Completed' : 'Pending'}
-              </Text>
-            </View>
-          )}
-        </View>
+            ) : (
+              // Home mode header
+              <>
+                <View className="w-10" />
+                <View className="flex-1 flex-row items-center justify-center gap-2">
+                  <View className="p-1">
+                    <Icon
+                      as={isCompleted ? CheckCircle : Circle}
+                      className={`h-6 w-6 ${isCompleted ? 'text-green-500' : 'text-blue-500'}`}
+                    />
+                  </View>
+                  <Text className="text-base font-medium text-gray-700 dark:text-gray-300">
+                    {isCompleted ? 'Completed' : 'Pending'}
+                  </Text>
+                </View>
+                <View className="w-10" />
+              </>
+            )}
+          </View>
 
-        {/* Content */}
-        <BottomSheetScrollView
-          className="flex-1 px-4 py-4"
-          showsVerticalScrollIndicator={false}
-          bounces
-          contentContainerStyle={{
-            paddingBottom: scrollBottomInset,
-          }}
-        >
-          {/* Title */}
-          <Text
-            className="mb-4 text-xl font-bold text-gray-900 dark:text-gray-100"
-            numberOfLines={3}
-            adjustsFontSizeToFit={false}
+          {/* Content */}
+          <BottomSheetScrollView
+            className="flex-1 px-4 py-4"
+            showsVerticalScrollIndicator={false}
+            bounces
+            contentContainerStyle={{
+              paddingBottom: scrollBottomInset,
+            }}
           >
-            {content.title || 'Untitled'}
-          </Text>
+            {/* Title */}
+            <Text
+              className="mb-4 text-xl font-bold text-gray-900 dark:text-gray-100"
+              numberOfLines={3}
+              adjustsFontSizeToFit={false}
+            >
+              {content.title || 'Untitled'}
+            </Text>
 
-          {/* Metadata */}
-          <View className="mb-1 flex-row flex-wrap">
-            {content.domain && (
-              <View className="mb-2 mr-3 flex-row items-center">
-                <SiteFavicon
-                  url={(content.metadata as any)?.favicon_url || null}
-                  size={14}
-                  className="mr-1"
-                />
-                <Text className="text-xs text-gray-600 dark:text-gray-400">{content.domain}</Text>
+            {/* Metadata */}
+            <View className="mb-1 flex-row flex-wrap">
+              {content.domain && (
+                <View className="mb-2 mr-3 flex-row items-center">
+                  <SiteFavicon url={faviconUrl} size={14} className="mr-1" />
+                  <Text className="text-xs text-gray-600 dark:text-gray-400">{content.domain}</Text>
+                </View>
+              )}
+              {savedAtLabel && (
+                <View className="mb-2 mr-3 flex-row items-center">
+                  <Icon as={Calendar} className="mr-1 h-3.5 w-3.5 text-gray-400" />
+                  <Text className="text-xs text-gray-600 dark:text-gray-400">{savedAtLabel}</Text>
+                </View>
+              )}
+              {content.word_count !== null &&
+                content.word_count !== undefined &&
+                content.word_count > 0 && (
+                  <View className="mb-2 flex-row items-center">
+                    <Icon as={Clock} className="mr-1 h-3.5 w-3.5 text-gray-400" />
+                    <Text className="text-xs text-gray-600 dark:text-gray-400">
+                      {formatReadingTimeWithSuffix(content.word_count)}
+                    </Text>
+                  </View>
+                )}
+            </View>
+
+            {/* Thumbnail */}
+            {thumbnailUrl && (
+              <View className="mb-4 items-center">
+                <ContentThumbnail imageUrl={thumbnailUrl} size="large" className="h-48 w-full" />
               </View>
             )}
-            {'saved_at' in item && item.saved_at && (
-              <View className="mb-2 mr-3 flex-row items-center">
-                <Icon as={Calendar} className="mr-1 h-3.5 w-3.5 text-gray-400" />
-                <Text className="text-xs text-gray-600 dark:text-gray-400">
-                  {formatFullDate(item.saved_at)}
+
+            {userContent && (
+              <View
+                className="mb-4 flex-row"
+                onLayout={!isCompleted ? handleReadingRowLayout : undefined}
+              >
+                <View
+                  style={
+                    !isCompleted && readingRowSizes
+                      ? {
+                          width: readingRowSizes.cardWidth,
+                          marginRight: GRID_GAP,
+                        }
+                      : !isCompleted
+                        ? {
+                            flexGrow: 3,
+                            flexShrink: 1,
+                            marginRight: GRID_GAP,
+                          }
+                        : { flex: 1 }
+                  }
+                >
+                  <SchedulePriorityPreview
+                    scheduledDate={scheduledDatePreview}
+                    priority={priorityValue}
+                    title="Reading Settings"
+                  />
+                </View>
+                {!isCompleted && (
+                  <TouchableOpacity
+                    onPress={() => setShowEditModal(true)}
+                    accessibilityRole="button"
+                    className="items-center justify-center rounded-lg bg-blue-50 px-2 py-3 dark:bg-blue-500/10"
+                    style={
+                      readingRowSizes
+                        ? { width: readingRowSizes.editWidth }
+                        : { flexGrow: 1, flexShrink: 1 }
+                    }
+                  >
+                    <Icon as={Edit2} className="mb-1 h-5 w-5 text-blue-600 dark:text-blue-200" />
+                    <Text className="text-xs font-semibold text-blue-600 dark:text-blue-200">
+                      Edit
+                    </Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+            )}
+
+            {/* Summary */}
+            {content.summary && (
+              <View className="mb-4">
+                <Text className="mb-1.5 text-sm font-semibold text-gray-700 dark:text-gray-300">
+                  Summary
+                </Text>
+                <Text className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+                  {content.summary}
                 </Text>
               </View>
             )}
-            {content.word_count !== null &&
-              content.word_count !== undefined &&
-              content.word_count > 0 && (
-                <View className="mb-2 flex-row items-center">
-                  <Icon as={Clock} className="mr-1 h-3.5 w-3.5 text-gray-400" />
-                  <Text className="text-xs text-gray-600 dark:text-gray-400">
-                    {formatReadingTimeWithSuffix(content.word_count)}
+
+            {/* Note - only for UserContentWithDetails */}
+            {'note' in item && item.note && (
+              <View className="mb-4 rounded-lg bg-blue-50 p-3 dark:bg-blue-900/20">
+                <View className="mb-1 flex-row items-center">
+                  <Icon
+                    as={FileText}
+                    className="mr-1 h-3.5 w-3.5 text-blue-600 dark:text-blue-400"
+                  />
+                  <Text className="text-xs font-semibold text-blue-600 dark:text-blue-400">
+                    Note
                   </Text>
                 </View>
-              )}
-          </View>
-
-          {/* Thumbnail */}
-          {thumbnailUrl && (
-            <View className="mb-4 items-center">
-              <ContentThumbnail imageUrl={thumbnailUrl} size="large" className="h-48 w-full" />
-            </View>
-          )}
-
-          {/* Summary */}
-          {content.summary && (
-            <View className="mb-4">
-              <Text className="mb-1.5 text-sm font-semibold text-gray-700 dark:text-gray-300">
-                Summary
-              </Text>
-              <Text className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
-                {content.summary}
-              </Text>
-            </View>
-          )}
-
-          {/* Note - only for UserContentWithDetails */}
-          {'note' in item && item.note && (
-            <View className="mb-4 rounded-lg bg-blue-50 p-3 dark:bg-blue-900/20">
-              <View className="mb-1 flex-row items-center">
-                <Icon as={FileText} className="mr-1 h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
-                <Text className="text-xs font-semibold text-blue-600 dark:text-blue-400">Note</Text>
+                <Text className="text-sm italic text-gray-700 dark:text-gray-300">{item.note}</Text>
               </View>
-              <Text className="text-sm italic text-gray-700 dark:text-gray-300">{item.note}</Text>
-            </View>
-          )}
+            )}
 
-          {/* Tags (from content) */}
-          {content.tags && content.tags.length > 0 && (
-            <View className="mb-4">
-              <View className="mb-2 flex-row items-center">
-                <Icon as={Tag} className="mr-1 h-3.5 w-3.5 text-gray-400" />
-                <Text className="text-sm font-semibold text-gray-700 dark:text-gray-300">Tags</Text>
+            {/* Tags (from content) */}
+            {content.tags && content.tags.length > 0 && (
+              <View className="mb-4">
+                <View className="mb-2 flex-row items-center">
+                  <Icon as={Tag} className="mr-1 h-3.5 w-3.5 text-gray-400" />
+                  <Text className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    Tags
+                  </Text>
+                </View>
+                <ContentTags
+                  tags={content.tags}
+                  expandable={true}
+                  initialMaxTags={6}
+                  className="flex-row flex-wrap"
+                />
               </View>
-              <ContentTags
-                tags={content.tags}
-                expandable={true}
-                initialMaxTags={6}
-                className="flex-row flex-wrap"
-              />
-            </View>
-          )}
-        </BottomSheetScrollView>
+            )}
+          </BottomSheetScrollView>
 
-        {/* Fixed Action Bar */}
-        <ContentDetailBottomActions
-          mode={mode}
-          isCompleted={isCompleted}
-          isLiked={isLiked}
-          sheetPaddingBottom={sheetPaddingBottom}
-          onToggleComplete={handleToggleComplete}
-          onLike={handleLike}
-          onDelete={handleDelete}
-          onOpenURL={handleOpenURL}
-          onAddToQueue={handleAddToQueue}
-          onNotInterested={handleNotInterested}
+          {/* Fixed Action Bar */}
+          <ContentDetailBottomActions
+            mode={mode}
+            isCompleted={isCompleted}
+            isLiked={isLiked}
+            sheetPaddingBottom={sheetPaddingBottom}
+            onToggleComplete={handleToggleComplete}
+            onReopen={handleReopenPress}
+            onLike={handleLike}
+            onDelete={handleDelete}
+            onOpenURL={handleOpenURL}
+            onAddToQueue={handleAddToQueue}
+            onNotInterested={handleNotInterested}
+          />
+        </View>
+      </BottomSheetModal>
+
+      {(onAddToQueue || onReopen) && (
+        <BottomSheetModal
+          ref={scheduleSheetRef}
+          snapPoints={scheduleSnapPoints}
+          onDismiss={handleScheduleSheetDismiss}
+          backdropComponent={renderBackdrop}
+          enablePanDownToClose
+        >
+          <BottomSheetView className="flex-1 px-4 py-4">
+            <Text className="mb-1 text-base font-semibold text-gray-900 dark:text-gray-100">
+              {scheduleContext?.type === 'reopen' ? 'Reading Schedule' : 'Add to Queue'}
+            </Text>
+            <Text className="mb-4 text-xs text-gray-500 dark:text-gray-400">
+              {scheduleContext?.type === 'reopen'
+                ? 'Choose when to revisit this content and how important it is.'
+                : 'Choose when to read and how important it is.'}
+            </Text>
+
+            <SchedulePriorityPicker
+              visible={isScheduleSheetOpen}
+              scheduledDate={scheduleDate}
+              onScheduledDateChange={handleScheduleDateChange}
+              priority={schedulePriorityValue}
+              onPriorityChange={setSchedulePriorityValue}
+              previewTitle="Preview"
+            />
+
+            <View className="mt-6 flex-row gap-2">
+              <Button
+                variant="outline"
+                className="flex-1"
+                onPress={handleScheduleCancel}
+                disabled={!scheduleContext}
+              >
+                <Text>Cancel</Text>
+              </Button>
+              <Button
+                className="flex-1 bg-blue-500"
+                onPress={handleScheduleConfirm}
+                disabled={!scheduleContext}
+              >
+                <Text className="font-semibold text-white">Save</Text>
+              </Button>
+            </View>
+          </BottomSheetView>
+        </BottomSheetModal>
+      )}
+
+      {/* Edit Modal */}
+      {item && 'id' in item && (
+        <ContentEditModal
+          visible={showEditModal}
+          item={item as UserContentWithDetails}
+          onClose={() => setShowEditModal(false)}
+          onSuccess={() => setShowEditModal(false)}
         />
-      </View>
-    </BottomSheetModal>
+      )}
+    </>
   );
 }

@@ -18,8 +18,10 @@ import { useReopenContent } from '@/hooks/mutations/use-reopen-content';
 import { useSaveContent } from '@/hooks/mutations/use-save-content';
 import { useToggleContentPreference } from '@/hooks/mutations/use-toggle-content-preference';
 import { useToggleUserContentStatus } from '@/hooks/mutations/use-toggle-user-content-status';
+import { useUpdateContent } from '@/hooks/mutations/use-update-content';
 import { useUserContents } from '@/hooks/queries/use-user-contents';
 import { isContentLiked } from '@/utils/content-helpers';
+import type { PriorityValue } from '@/utils/priority';
 
 interface GroupedContent {
   date: string;
@@ -40,6 +42,7 @@ export function CompletedList() {
   const togglePreferenceMutation = useToggleContentPreference();
   const saveContentMutation = useSaveContent();
   const setPreferenceMutation = useSetContentPreference();
+  const updateContentMutation = useUpdateContent();
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -70,10 +73,23 @@ export function CompletedList() {
   }, [contents, modalVisible, selectedItem]);
 
   const handleReopen = useCallback(
-    (id: string) => {
-      reopenContentMutation.mutate(id);
+    async ({
+      userContentId,
+      scheduledFor,
+      priority,
+    }: {
+      userContentId: string;
+      scheduledFor: string;
+      priority: PriorityValue;
+    }) => {
+      await reopenContentMutation.mutateAsync(userContentId);
+      await updateContentMutation.mutateAsync({
+        userContentId,
+        scheduledFor,
+        priority,
+      });
     },
-    [reopenContentMutation],
+    [reopenContentMutation, updateContentMutation],
   );
 
   const handleDelete = useCallback(
@@ -94,8 +110,16 @@ export function CompletedList() {
   );
 
   const handleAddToQueue = useCallback(
-    (url: string, _contentId: string) => {
-      saveContentMutation.mutate(url);
+    ({
+      url,
+      scheduledFor,
+      priority,
+    }: {
+      url: string;
+      scheduledFor: string;
+      priority: PriorityValue;
+    }) => {
+      saveContentMutation.mutate({ url, scheduledFor, priority });
     },
     [saveContentMutation],
   );
@@ -286,6 +310,7 @@ export function CompletedList() {
           onLike={handleLike}
           onAddToQueue={handleAddToQueue}
           onNotInterested={handleNotInterested}
+          onReopen={handleReopen}
         />
       )}
     </View>

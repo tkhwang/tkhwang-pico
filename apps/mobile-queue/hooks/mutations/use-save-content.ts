@@ -6,11 +6,18 @@ import { Alert } from 'react-native';
 import { SAVE_CONTENT_DELAY_MS } from '@/consts/app-consts';
 import { queryKey } from '@/hooks/keys/query-key';
 import { saveContent } from '@/services/api/contents';
+import { DEFAULT_PRIORITY, type PriorityValue } from '@/utils/priority';
+
+interface SaveContentInput {
+  url: string;
+  scheduledFor?: string | null;
+  priority?: PriorityValue;
+}
 
 interface UseSaveContentOptions {
-  onMutate?: () => any;
+  onMutate?: () => unknown;
   onSuccess?: () => void;
-  onError?: (error: Error, variables: string, context: any) => void;
+  onError?: (error: Error, variables: SaveContentInput, context: unknown) => void;
 }
 
 export function useSaveContent(options?: UseSaveContentOptions) {
@@ -21,22 +28,36 @@ export function useSaveContent(options?: UseSaveContentOptions) {
   interface MutationContext {
     previousQueries?: [queryKey: unknown[], data: UserContentWithDetails[]][];
     optimisticId?: string;
-    userContext?: any;
+    userContext?: unknown;
+    variables: SaveContentInput;
   }
 
   type SaveContentResult = Awaited<ReturnType<typeof saveContent>>;
 
-  return useMutation<SaveContentResult, Error, string, MutationContext>({
-    mutationFn: async (url: string) => {
+  return useMutation<SaveContentResult, Error, SaveContentInput, MutationContext>({
+    mutationFn: async (input: SaveContentInput) => {
       const token = await getToken();
       if (!token) throw new Error('Authentication token not available');
-      return saveContent(url, token);
+      return saveContent(
+        {
+          url: input.url,
+          scheduledFor: input.scheduledFor ?? null,
+          priority: input.priority ?? DEFAULT_PRIORITY,
+        },
+        token,
+      );
     },
-    onMutate: async (url: string) => {
+    onMutate: async (input: SaveContentInput) => {
+      const url = input.url;
       // Call user's onMutate first if provided
       const userContext = options?.onMutate?.();
 
-      if (!user?.id) return { previousQueries: undefined, userContext };
+      if (!user?.id)
+        return {
+          previousQueries: undefined,
+          userContext,
+          variables: input,
+        };
 
       const key = queryKey.userContents.byUserId(user.id);
       await queryClient.cancelQueries({ queryKey: key });
@@ -57,7 +78,9 @@ export function useSaveContent(options?: UseSaveContentOptions) {
       let domain: string | null = null;
       try {
         domain = new URL(url).hostname;
-      } catch {}
+      } catch {
+        // Invalid URL, keep domain as null
+      }
 
       const savedAt = new Date().toISOString();
 
@@ -72,7 +95,7 @@ export function useSaveContent(options?: UseSaveContentOptions) {
         author: null,
         fetched_at: null,
         lang: null,
-        metadata: { optimistic: true, original_url: url } as any,
+        metadata: { optimistic: true, original_url: url },
         published_at: null,
         tags: null,
         token_count: null,
@@ -89,13 +112,15 @@ export function useSaveContent(options?: UseSaveContentOptions) {
         note: null,
         todo_status: 'pending',
         completed_at: null,
+        priority: input.priority ?? DEFAULT_PRIORITY,
+        scheduled_for: input.scheduledFor ?? null,
         contents: optimisticContent,
       };
 
       // Apply optimistic update to each query cache separately
       previousQueries.forEach(([specificQueryKey, data]) => {
         const existsIndex = data.findIndex((it) => {
-          const c = (it as any).content || it.contents;
+          const c = ('content' in it ? it.content : it.contents) as Content | undefined;
           return c?.canonical_url === url || c?.url === url;
         });
 
@@ -114,9 +139,9 @@ export function useSaveContent(options?: UseSaveContentOptions) {
         queryClient.setQueryData(specificQueryKey, nextItems);
       });
 
-      return { previousQueries, optimisticId, userContext };
+      return { previousQueries, optimisticId, userContext, variables: input };
     },
-    onError: (error: Error, url, context) => {
+    onError: (error: Error, input, context) => {
       console.error('Failed to save content:', error);
 
       // Rollback each query cache to its previous state
@@ -133,9 +158,9 @@ export function useSaveContent(options?: UseSaveContentOptions) {
       );
 
       // Call user's onError with userContext
-      options?.onError?.(error, url, context?.userContext);
+      options?.onError?.(error, input, context?.userContext);
     },
-    onSuccess: (data, _url, context) => {
+    onSuccess: (data, _input, context) => {
       if (user?.id) {
         const key = queryKey.userContents.byUserId(user.id);
 
@@ -150,7 +175,7 @@ export function useSaveContent(options?: UseSaveContentOptions) {
 
           const updatedItems = currentData.map((it) => {
             if (it.id === context?.optimisticId || it.content_id.startsWith('optimistic-')) {
-              const contents = (it as any).content || it.contents;
+              const contents = ('content' in it ? it.content : it.contents) as Content | undefined;
               const updatedContents: Content | undefined = contents
                 ? { ...contents, id: data.contentId, status: data.status }
                 : undefined;
@@ -158,6 +183,14 @@ export function useSaveContent(options?: UseSaveContentOptions) {
                 ...it,
                 content_id: data.contentId,
                 contents: updatedContents ?? it.contents,
+                scheduled_for:
+                  context?.variables?.scheduledFor !== undefined
+                    ? (context.variables.scheduledFor ?? null)
+                    : it.scheduled_for,
+                priority:
+                  context?.variables?.priority !== undefined
+                    ? (context.variables.priority ?? DEFAULT_PRIORITY)
+                    : (it.priority ?? DEFAULT_PRIORITY),
               } as UserContentWithDetails;
             }
             return it;

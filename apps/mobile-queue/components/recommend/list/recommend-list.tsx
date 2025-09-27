@@ -11,6 +11,7 @@ import { queryKey } from '@/hooks/keys/query-key';
 import { useSetContentPreference } from '@/hooks/mutations/use-content-preference';
 import { useSaveContent } from '@/hooks/mutations/use-save-content';
 import { useRecommendations } from '@/hooks/queries/use-recommendations';
+import type { PriorityValue } from '@/utils/priority';
 
 import { ContentDetail } from '../../content/detail/content-detail';
 import { SwipeableRecommendItem } from '../swipe/swipeable-recommend-item';
@@ -30,9 +31,6 @@ export function RecommendList() {
   const [refreshing, setRefreshing] = useState(false);
   const [selectedItem, setSelectedItem] = useState<Recommendation | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
-
-  // Store the content ID being added to queue
-  const [addingContentId, setAddingContentId] = useState<string | null>(null);
 
   const saveContentMutation = useSaveContent();
 
@@ -63,26 +61,34 @@ export function RecommendList() {
   }, []);
 
   const handleAddToQueue = useCallback(
-    (url: string, contentId: string) => {
-      setAddingContentId(contentId);
-      saveContentMutation.mutate(url, {
-        onSuccess: () => {
-          setAddingContentId(null);
-          // Evict after visual feedback completes
-          setTimeout(() => {
-            if (user?.id) {
-              const key = queryKey.recommendations.byUserId(user.id);
-              queryClient.setQueryData(key, (oldData: Recommendation[] | undefined) => {
-                if (!oldData) return oldData;
-                return oldData.filter((rec) => rec.content_id !== contentId);
-              });
-            }
-          }, SWIPE_ACTION_CARD_REMOVAL_DELAY_MS);
+    ({
+      url,
+      contentId,
+      scheduledFor,
+      priority,
+    }: {
+      url: string;
+      contentId: string;
+      scheduledFor: string;
+      priority: PriorityValue;
+    }) => {
+      saveContentMutation.mutate(
+        { url, scheduledFor, priority },
+        {
+          onSuccess: () => {
+            // Evict after visual feedback completes
+            setTimeout(() => {
+              if (user?.id) {
+                const key = queryKey.recommendations.byUserId(user.id);
+                queryClient.setQueryData<Recommendation[]>(key, (oldData) => {
+                  if (!oldData) return oldData;
+                  return oldData.filter((rec) => rec.content_id !== contentId);
+                });
+              }
+            }, SWIPE_ACTION_CARD_REMOVAL_DELAY_MS);
+          },
         },
-        onError: () => {
-          setAddingContentId(null);
-        },
-      });
+      );
     },
     [saveContentMutation, user?.id, queryClient],
   );
