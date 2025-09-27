@@ -162,17 +162,11 @@ export const bottomSheetReducer = (
         state.schedule.returnTo === 'detail' &&
         !(action.payload.reason === 'save' && state.schedule.closeDetailOnConfirm);
 
+      const initialSchedule = createInitialState().schedule;
       const nextState: BottomSheetState = {
-        detailVisible: shouldKeepDetail ? true : false,
+        detailVisible: shouldKeepDetail,
         active: shouldKeepDetail ? 'detail' : null,
-        schedule: {
-          visible: false,
-          context: null,
-          date: getDefaultSchedule(),
-          priority: DEFAULT_PRIORITY,
-          returnTo: 'detail',
-          closeDetailOnConfirm: false,
-        },
+        schedule: initialSchedule,
       };
       logTransition(state, action, nextState);
       return nextState;
