@@ -104,16 +104,16 @@ export function ContentEditModal({ visible, item, onClose, onSuccess }: ContentE
               <View className="rounded-t-3xl bg-white dark:bg-gray-900">
                 {/* Modal Header */}
                 <View className="flex-row items-center justify-between border-b border-gray-200 px-4 py-4 dark:border-gray-700">
-                  <TouchableOpacity onPress={onClose}>
-                    <Text className="text-blue-500 dark:text-blue-400">Cancel</Text>
-                  </TouchableOpacity>
-                  <View className="flex-row items-center gap-2">
+                  <View className="w-12" />
+                  <View className="flex-1 flex-row items-center justify-center gap-2">
                     <Icon as={Edit2} className="h-5 w-5 text-gray-700 dark:text-gray-300" />
                     <Text className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                       Edit Content
                     </Text>
                   </View>
-                  <View className="w-12" />
+                  <TouchableOpacity onPress={onClose}>
+                    <Text className="text-blue-500 dark:text-blue-400">Cancel</Text>
+                  </TouchableOpacity>
                 </View>
 
                 <View className="px-4 py-6">
