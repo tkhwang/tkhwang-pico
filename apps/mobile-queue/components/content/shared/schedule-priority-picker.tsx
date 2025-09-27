@@ -60,22 +60,12 @@ export function SchedulePriorityPicker({
   const thisWeek = React.useMemo(() => getEndOfCurrentWeek(today), [today]);
   const nextWeek = React.useMemo(() => getNextWeekPreset(today), [today]);
 
-  const todayDisplay = React.useMemo(
-    () => today.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-    [today],
-  );
-  const tomorrowDisplay = React.useMemo(
-    () => tomorrow.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-    [tomorrow],
-  );
-  const thisWeekDisplay = React.useMemo(
-    () => thisWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-    [thisWeek],
-  );
-  const nextWeekDisplay = React.useMemo(
-    () => nextWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-    [nextWeek],
-  );
+  const [todayDisplay, tomorrowDisplay, thisWeekDisplay, nextWeekDisplay] = React.useMemo(() => {
+    const options: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric' };
+    return [today, tomorrow, thisWeek, nextWeek].map((date) =>
+      date.toLocaleDateString('en-US', options),
+    );
+  }, [today, tomorrow, thisWeek, nextWeek]);
 
   const isTodaySelected = scheduledDate ? isSameDayPreset(scheduledDate, today) : false;
   const isTomorrowSelected = scheduledDate ? isSameDayPreset(scheduledDate, tomorrow) : false;
