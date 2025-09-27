@@ -73,15 +73,15 @@ export function BaseContentCard({
 
   const content = (
     <>
+      {/* Top left slot (e.g., match spectrum) */}
+      {topLeftSlot}
+
       {/* Metadata row at top */}
       {metadataProps && (
         <View className="mb-2">
           <ContentMetadata {...metadataProps} />
         </View>
       )}
-
-      {/* Top left slot (e.g., match spectrum) */}
-      {topLeftSlot}
 
       {/* Main content row */}
       <View className="flex-row items-start">
