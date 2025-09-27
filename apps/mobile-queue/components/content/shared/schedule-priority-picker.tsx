@@ -160,39 +160,6 @@ export function SchedulePriorityPicker({
     }
   }, [onScheduledDateChange, scheduledDate, today]);
 
-  const renderPresetButton = React.useCallback(
-    (label: string, dateLabel: string, onPress: () => void, selected: boolean) => (
-      <TouchableOpacity
-        key={label}
-        onPress={onPress}
-        className={cn(
-          'flex-1 items-start justify-center rounded-md border border-gray-300 px-3 py-3 dark:border-gray-600',
-          selected && 'border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-blue-500/10',
-        )}
-      >
-        <View className="flex-row items-baseline gap-1">
-          <Text
-            className={cn(
-              'text-sm font-semibold text-gray-700 dark:text-gray-300',
-              selected && 'text-blue-600 dark:text-blue-200',
-            )}
-          >
-            {label}:
-          </Text>
-          <Text
-            className={cn(
-              'text-sm text-gray-500 dark:text-gray-400',
-              selected && 'text-blue-500 dark:text-blue-300',
-            )}
-          >
-            {dateLabel}
-          </Text>
-        </View>
-      </TouchableOpacity>
-    ),
-    [],
-  );
-
   return (
     <View className={cn('gap-4', className)}>
       <SchedulePriorityPreview
@@ -208,27 +175,116 @@ export function SchedulePriorityPicker({
         </Text>
         <View className="gap-2">
           <View className="flex-row gap-2">
-            {renderPresetButton('Today', todayDisplay, handleSelectToday, isTodaySelected)}
-            {renderPresetButton(
-              'Tomorrow',
-              tomorrowDisplay,
-              handleSelectTomorrow,
-              isTomorrowSelected,
-            )}
+            <TouchableOpacity
+              onPress={handleSelectToday}
+              className={cn(
+                'flex-1 items-start justify-center rounded-md border border-gray-300 px-3 py-3 dark:border-gray-600',
+                isTodaySelected &&
+                  'border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-blue-500/10',
+              )}
+            >
+              <View className="flex-row items-baseline gap-1">
+                <Text
+                  className={cn(
+                    'text-sm font-semibold text-gray-700 dark:text-gray-300',
+                    isTodaySelected && 'text-blue-600 dark:text-blue-200',
+                  )}
+                >
+                  Today:
+                </Text>
+                <Text
+                  className={cn(
+                    'text-sm text-gray-500 dark:text-gray-400',
+                    isTodaySelected && 'text-blue-500 dark:text-blue-300',
+                  )}
+                >
+                  {todayDisplay}
+                </Text>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={handleSelectTomorrow}
+              className={cn(
+                'flex-1 items-start justify-center rounded-md border border-gray-300 px-3 py-3 dark:border-gray-600',
+                isTomorrowSelected &&
+                  'border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-blue-500/10',
+              )}
+            >
+              <View className="flex-row items-baseline gap-1">
+                <Text
+                  className={cn(
+                    'text-sm font-semibold text-gray-700 dark:text-gray-300',
+                    isTomorrowSelected && 'text-blue-600 dark:text-blue-200',
+                  )}
+                >
+                  Tomorrow:
+                </Text>
+                <Text
+                  className={cn(
+                    'text-sm text-gray-500 dark:text-gray-400',
+                    isTomorrowSelected && 'text-blue-500 dark:text-blue-300',
+                  )}
+                >
+                  {tomorrowDisplay}
+                </Text>
+              </View>
+            </TouchableOpacity>
           </View>
           <View className="flex-row gap-2">
-            {renderPresetButton(
-              'This Week',
-              thisWeekDisplay,
-              handleSelectThisWeek,
-              isThisWeekSelected,
-            )}
-            {renderPresetButton(
-              'Next Week',
-              nextWeekDisplay,
-              handleSelectNextWeek,
-              isNextWeekSelected,
-            )}
+            <TouchableOpacity
+              onPress={handleSelectThisWeek}
+              className={cn(
+                'flex-1 items-start justify-center rounded-md border border-gray-300 px-3 py-3 dark:border-gray-600',
+                isThisWeekSelected &&
+                  'border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-blue-500/10',
+              )}
+            >
+              <View className="flex-row items-baseline gap-1">
+                <Text
+                  className={cn(
+                    'text-sm font-semibold text-gray-700 dark:text-gray-300',
+                    isThisWeekSelected && 'text-blue-600 dark:text-blue-200',
+                  )}
+                >
+                  This Week:
+                </Text>
+                <Text
+                  className={cn(
+                    'text-sm text-gray-500 dark:text-gray-400',
+                    isThisWeekSelected && 'text-blue-500 dark:text-blue-300',
+                  )}
+                >
+                  {thisWeekDisplay}
+                </Text>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={handleSelectNextWeek}
+              className={cn(
+                'flex-1 items-start justify-center rounded-md border border-gray-300 px-3 py-3 dark:border-gray-600',
+                isNextWeekSelected &&
+                  'border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-blue-500/10',
+              )}
+            >
+              <View className="flex-row items-baseline gap-1">
+                <Text
+                  className={cn(
+                    'text-sm font-semibold text-gray-700 dark:text-gray-300',
+                    isNextWeekSelected && 'text-blue-600 dark:text-blue-200',
+                  )}
+                >
+                  Next Week:
+                </Text>
+                <Text
+                  className={cn(
+                    'text-sm text-gray-500 dark:text-gray-400',
+                    isNextWeekSelected && 'text-blue-500 dark:text-blue-300',
+                  )}
+                >
+                  {nextWeekDisplay}
+                </Text>
+              </View>
+            </TouchableOpacity>
           </View>
         </View>
         <View className="mt-2 flex-row gap-2">
