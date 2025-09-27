@@ -262,8 +262,8 @@ export function SchedulePriorityPicker({
         <View className="gap-2">
           {schedulePresetRows.map((row, rowIndex) => (
             <View key={rowIndex} className="flex-row gap-2">
-              {row.map((preset) => (
-                <SchedulePresetButton key={preset.key} {...preset} />
+              {row.map(({ key, ...presetProps }) => (
+                <SchedulePresetButton key={key} {...presetProps} />
               ))}
             </View>
           ))}
