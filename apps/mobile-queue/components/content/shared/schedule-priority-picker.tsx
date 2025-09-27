@@ -37,6 +37,47 @@ interface SchedulePriorityPickerProps {
 
 const PRIORITY_ORDER = [...PRIORITY_VALUES];
 
+interface SchedulePreset {
+  key: string;
+  label: string;
+  display: string;
+  selected: boolean;
+  onPress: () => void;
+}
+
+type SchedulePresetButtonProps = SchedulePreset;
+
+function SchedulePresetButton({ label, display, selected, onPress }: SchedulePresetButtonProps) {
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      className={cn(
+        'flex-1 items-start justify-center rounded-md border border-gray-300 px-3 py-3 dark:border-gray-600',
+        selected && 'border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-blue-500/10',
+      )}
+    >
+      <View className="flex-row items-baseline gap-1">
+        <Text
+          className={cn(
+            'text-sm font-semibold text-gray-700 dark:text-gray-300',
+            selected && 'text-blue-600 dark:text-blue-200',
+          )}
+        >
+          {label}:
+        </Text>
+        <Text
+          className={cn(
+            'text-sm text-gray-500 dark:text-gray-400',
+            selected && 'text-blue-500 dark:text-blue-300',
+          )}
+        >
+          {display}
+        </Text>
+      </View>
+    </TouchableOpacity>
+  );
+}
+
 export function SchedulePriorityPicker({
   scheduledDate,
   onScheduledDateChange,
@@ -59,6 +100,13 @@ export function SchedulePriorityPicker({
   const tomorrow = React.useMemo(() => getTomorrowPreset(today), [today]);
   const thisWeek = React.useMemo(() => getEndOfCurrentWeek(today), [today]);
   const nextWeek = React.useMemo(() => getNextWeekPreset(today), [today]);
+
+  const [todayDisplay, tomorrowDisplay, thisWeekDisplay, nextWeekDisplay] = React.useMemo(() => {
+    const options: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric' };
+    return [today, tomorrow, thisWeek, nextWeek].map((date) =>
+      date.toLocaleDateString('en-US', options),
+    );
+  }, [today, tomorrow, thisWeek, nextWeek]);
 
   const isTodaySelected = scheduledDate ? isSameDayPreset(scheduledDate, today) : false;
   const isTomorrowSelected = scheduledDate ? isSameDayPreset(scheduledDate, tomorrow) : false;
@@ -89,6 +137,61 @@ export function SchedulePriorityPicker({
     () => handleSelectDate(nextWeek),
     [handleSelectDate, nextWeek],
   );
+
+  const schedulePresets = React.useMemo<SchedulePreset[]>(
+    () => [
+      {
+        key: 'today',
+        label: 'Today',
+        display: todayDisplay,
+        selected: isTodaySelected,
+        onPress: handleSelectToday,
+      },
+      {
+        key: 'tomorrow',
+        label: 'Tomorrow',
+        display: tomorrowDisplay,
+        selected: isTomorrowSelected,
+        onPress: handleSelectTomorrow,
+      },
+      {
+        key: 'this-week',
+        label: 'This Week',
+        display: thisWeekDisplay,
+        selected: isThisWeekSelected,
+        onPress: handleSelectThisWeek,
+      },
+      {
+        key: 'next-week',
+        label: 'Next Week',
+        display: nextWeekDisplay,
+        selected: isNextWeekSelected,
+        onPress: handleSelectNextWeek,
+      },
+    ],
+    [
+      handleSelectNextWeek,
+      handleSelectThisWeek,
+      handleSelectToday,
+      handleSelectTomorrow,
+      isNextWeekSelected,
+      isThisWeekSelected,
+      isTodaySelected,
+      isTomorrowSelected,
+      nextWeekDisplay,
+      thisWeekDisplay,
+      todayDisplay,
+      tomorrowDisplay,
+    ],
+  );
+
+  const schedulePresetRows = React.useMemo(() => {
+    const rows: SchedulePreset[][] = [];
+    for (let index = 0; index < schedulePresets.length; index += 2) {
+      rows.push(schedulePresets.slice(index, index + 2));
+    }
+    return rows;
+  }, [schedulePresets]);
 
   const handleAndroidDateChange = React.useCallback(
     (event: DateTimePickerEvent, date?: Date) => {
@@ -156,107 +259,14 @@ export function SchedulePriorityPicker({
         <Text className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
           Reading Schedule
         </Text>
-        <View className="flex-row gap-2">
-          <TouchableOpacity
-            onPress={handleSelectToday}
-            className={cn(
-              'flex-1 items-center justify-center rounded-md border border-gray-300 px-2 py-3 dark:border-gray-600',
-              isTodaySelected &&
-                'border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-blue-500/10',
-            )}
-          >
-            <Text
-              className={cn(
-                'text-sm font-semibold text-gray-700 dark:text-gray-300',
-                isTodaySelected && 'text-blue-600 dark:text-blue-200',
-              )}
-            >
-              Today
-            </Text>
-            <Text
-              className={cn(
-                'text-xs text-gray-500 dark:text-gray-400',
-                isTodaySelected && 'text-blue-500 dark:text-blue-300',
-              )}
-            >
-              {today.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={handleSelectTomorrow}
-            className={cn(
-              'flex-1 items-center justify-center rounded-md border border-gray-300 px-2 py-3 dark:border-gray-600',
-              isTomorrowSelected &&
-                'border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-blue-500/10',
-            )}
-          >
-            <Text
-              className={cn(
-                'text-sm font-semibold text-gray-700 dark:text-gray-300',
-                isTomorrowSelected && 'text-blue-600 dark:text-blue-200',
-              )}
-            >
-              Tomorrow
-            </Text>
-            <Text
-              className={cn(
-                'text-xs text-gray-500 dark:text-gray-400',
-                isTomorrowSelected && 'text-blue-500 dark:text-blue-300',
-              )}
-            >
-              {tomorrow.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={handleSelectThisWeek}
-            className={cn(
-              'flex-1 items-center justify-center rounded-md border border-gray-300 px-2 py-3 dark:border-gray-600',
-              isThisWeekSelected &&
-                'border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-blue-500/10',
-            )}
-          >
-            <Text
-              className={cn(
-                'text-sm font-semibold text-gray-700 dark:text-gray-300',
-                isThisWeekSelected && 'text-blue-600 dark:text-blue-200',
-              )}
-            >
-              This Week
-            </Text>
-            <Text
-              className={cn(
-                'text-xs text-gray-500 dark:text-gray-400',
-                isThisWeekSelected && 'text-blue-500 dark:text-blue-300',
-              )}
-            >
-              {thisWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={handleSelectNextWeek}
-            className={cn(
-              'flex-1 items-center justify-center rounded-md border border-gray-300 px-2 py-3 dark:border-gray-600',
-              isNextWeekSelected &&
-                'border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-blue-500/10',
-            )}
-          >
-            <Text
-              className={cn(
-                'text-sm font-semibold text-gray-700 dark:text-gray-300',
-                isNextWeekSelected && 'text-blue-600 dark:text-blue-200',
-              )}
-            >
-              Next Week
-            </Text>
-            <Text
-              className={cn(
-                'text-xs text-gray-500 dark:text-gray-400',
-                isNextWeekSelected && 'text-blue-500 dark:text-blue-300',
-              )}
-            >
-              {nextWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-            </Text>
-          </TouchableOpacity>
+        <View className="gap-2">
+          {schedulePresetRows.map((row, rowIndex) => (
+            <View key={rowIndex} className="flex-row gap-2">
+              {row.map((preset) => (
+                <SchedulePresetButton key={preset.key} {...preset} />
+              ))}
+            </View>
+          ))}
         </View>
         <View className="mt-2 flex-row gap-2">
           <TouchableOpacity

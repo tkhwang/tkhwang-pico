@@ -55,24 +55,12 @@ export function ContentItemList({
   const completedDate = item.completed_at ? new ContentDate(item.completed_at) : null;
 
   const scheduleLabel = showCompletedTime
-    ? (completedDate?.toSimpleString() ?? '')
-    : (scheduledDate?.toSimpleString() ?? '');
+    ? (completedDate?.toSimpleString() ?? '—')
+    : (scheduledDate?.toSimpleString() ?? '—');
 
-  const scheduleIconClass = showCompletedTime
-    ? completedDate
-      ? 'text-emerald-500 dark:text-emerald-300'
-      : 'text-gray-400 dark:text-gray-500'
-    : scheduledDate
-      ? 'text-blue-500 dark:text-blue-300'
-      : 'text-gray-300 dark:text-gray-600';
+  const scheduleIconClass = 'text-gray-400 dark:text-gray-500';
 
-  const scheduleTextClass = showCompletedTime
-    ? completedDate
-      ? 'text-emerald-700 dark:text-emerald-300'
-      : 'text-gray-400 dark:text-gray-500'
-    : scheduledDate
-      ? 'text-gray-800 dark:text-gray-100'
-      : 'text-gray-400 dark:text-gray-500';
+  const scheduleTextClass = 'text-gray-400 dark:text-gray-500';
 
   const priorityBadge = (
     <View className={`flex-row items-center rounded-full px-1.5 py-0.5 ${priorityStyle.badge}`}>
@@ -122,7 +110,7 @@ export function ContentItemList({
                 as={showCompletedTime ? CheckCircle : CalendarDays}
                 className={`mr-1 h-3 w-3 ${scheduleIconClass}`}
               />
-              <Text className={`text-xs font-medium ${scheduleTextClass}`} numberOfLines={1}>
+              <Text className={`text-xs ${scheduleTextClass}`} numberOfLines={1}>
                 {scheduleLabel}
               </Text>
             </View>

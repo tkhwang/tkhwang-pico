@@ -111,7 +111,25 @@ export function ContentDetail({
   const [isScheduleSheetOpen, setScheduleSheetOpen] = React.useState(false);
 
   const snapPoints = React.useMemo(() => ['70%'], []);
-  const scheduleSnapPoints = React.useMemo(() => ['60%'], []);
+  const scheduleSnapPoints = React.useMemo(() => {
+    // Dynamic calculation based on content needs
+    // SchedulePriorityPicker has:
+    // - Header text (60px)
+    // - Preview component (80px)
+    // - Schedule section with 2 rows of buttons (160px)
+    // - Priority section (100px)
+    // - Action buttons (80px)
+    // - Padding and gaps (80px)
+    // Total minimum height: ~560px
+    // Add buffer for safe area and padding
+    const contentHeight = 560;
+    const safeAreaPadding = insets.bottom + 40; // bottom safe area + extra padding
+    const minHeight = contentHeight + safeAreaPadding;
+
+    // Use percentage for larger screens, fixed height for smaller screens
+    // This ensures content is always visible
+    return ['75%', `${minHeight}`];
+  }, [insets.bottom]);
   const readingRowSizes = React.useMemo(() => {
     if (readingRowWidth === null) {
       return null;
@@ -641,6 +659,10 @@ export function ContentDetail({
           onDismiss={handleScheduleSheetDismiss}
           backdropComponent={renderBackdrop}
           enablePanDownToClose
+          enableDynamicSizing={true}
+          keyboardBehavior="interactive"
+          keyboardBlurBehavior="restore"
+          android_keyboardInputMode="adjustResize"
         >
           <BottomSheetView className="flex-1 px-4 py-4">
             <Text className="mb-1 text-base font-semibold text-gray-900 dark:text-gray-100">

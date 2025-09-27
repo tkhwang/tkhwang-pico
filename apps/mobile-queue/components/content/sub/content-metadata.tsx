@@ -33,43 +33,31 @@ export function ContentMetadata({
   showMatchSpectrum = false,
   badgeElement,
 }: ContentMetadataProps) {
-  const metadataItems = [
-    domain && (
-      <View key="domain" className="flex-row items-center">
-        <SiteFavicon url={faviconUrl} size={12} className="mr-1" />
-        <Text className="text-xs text-gray-400 dark:text-gray-500">{domain}</Text>
-      </View>
-    ),
-    date && (
-      <Text key="date" className="text-xs text-gray-400 dark:text-gray-500">
-        {date}
-      </Text>
-    ),
-    readingTime && (
-      <Text key="readingTime" className="text-xs text-gray-400 dark:text-gray-500">
-        {readingTime}
-      </Text>
-    ),
-  ].filter(Boolean) as React.ReactNode[];
-
   return (
     <View className={`mb-1 ${className}`}>
       <View className="flex-row items-start justify-between">
         <View className="flex-1 pr-2">
           {showMatchSpectrum && <ContentMatchSpectrum score={score} />}
 
-          {metadataItems.length > 0 && (
-            <View className="flex-row flex-wrap items-center">
-              {metadataItems.map((item, index) => (
-                <View key={index} className="mr-2 flex-row items-center">
-                  {index > 0 && (
-                    <Text className="mr-2 text-xs text-gray-400 dark:text-gray-500">•</Text>
-                  )}
-                  {item}
-                </View>
-              ))}
+          <View className="flex-row items-center justify-between">
+            {/* Left side: Domain with favicon */}
+            {domain && (
+              <View className="flex-row items-center">
+                <SiteFavicon url={faviconUrl} size={12} className="mr-1" />
+                <Text className="text-xs text-gray-400 dark:text-gray-500">{domain}</Text>
+              </View>
+            )}
+
+            {/* Right side: Reading time (or date if reading time not available) */}
+            <View className="flex-row items-center">
+              {readingTime && (
+                <Text className="text-xs text-gray-400 dark:text-gray-500">{readingTime}</Text>
+              )}
+              {!readingTime && date && (
+                <Text className="text-xs text-gray-400 dark:text-gray-500">{date}</Text>
+              )}
             </View>
-          )}
+          </View>
         </View>
 
         {(badgeElement || rightElement) && (
