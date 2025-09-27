@@ -49,7 +49,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Dashboard',
+          title: 'Today',
           headerShown: false,
           tabBarIcon: ({ color, size, focused }) => (
             <Icon
@@ -100,7 +100,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="completed"
         options={{
-          title: 'Archive',
+          title: 'Done',
           headerShown: false,
           tabBarIcon: ({ color, size, focused }) => (
             <Icon
