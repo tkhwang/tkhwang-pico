@@ -230,13 +230,16 @@ export function ContentDetail({
     pendingSchedulePresentRef.current = false;
 
     if (shouldReopenDetail && visible && hasContent) {
-      allowAutoPresentRef.current = true;
       const detailSheet = sheetRef.current;
       if (detailSheet) {
         detailSheet.present();
         isPresentedRef.current = true;
       }
     }
+
+    // Always restore allowAutoPresentRef to true after schedule sheet dismisses
+    // This ensures the detail sheet can be opened again in the future
+    allowAutoPresentRef.current = true;
   }, [hasContent, visible]);
 
   const handleScheduleDateChange = React.useCallback((date: Date | null) => {
