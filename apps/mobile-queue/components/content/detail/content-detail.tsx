@@ -31,6 +31,13 @@ import { Text } from '@/components/ui/text';
 import { ContentDate } from '@/domains/value-object/content-date';
 import { useContentActions } from '@/hooks/use-content-actions';
 import { useHapticFeedback } from '@/hooks/use-haptic-feedback';
+import {
+  bottomSheetReducer,
+  createInitialState,
+  type ScheduleCloseReason,
+  type ScheduleContext,
+  type ScheduleOpenOptions,
+} from '@/reducers/bottom-sheet/bottom-sheet.reducer';
 import { formatReadingTimeWithSuffix, getThumbnailUrl } from '@/utils/content-formatters';
 import { formatDateForApi, getDefaultSchedule, normalizeToStartOfDay } from '@/utils/date';
 import { DEFAULT_PRIORITY, type PriorityValue } from '@/utils/priority';
@@ -40,14 +47,6 @@ import { ContentEditModal } from '../edit/content-edit-modal';
 import { ContentDetailBottomActions } from './content-detail-bottom-actions';
 
 const GRID_GAP = 8;
-
-type ScheduleContext =
-  | { type: 'add'; url: string; contentId: string }
-  | { type: 'reopen'; userContentId: string };
-
-interface ScheduleOpenOptions {
-  reopenDetailOnCancel: boolean;
-}
 
 interface ContentDetailProps {
   visible: boolean;
@@ -93,22 +92,26 @@ export function ContentDetail({
   const scrollContentPaddingBottom = 16;
   const scrollBottomInset = scrollContentPaddingBottom + sheetPaddingBottom;
   const { executeWithHapticFeedback } = useHapticFeedback();
+  const [sheetState, dispatch] = React.useReducer(
+    bottomSheetReducer,
+    undefined,
+    createInitialState,
+  );
+  const sheetStateRef = React.useRef(sheetState);
+  React.useEffect(() => {
+    sheetStateRef.current = sheetState;
+  }, [sheetState]);
+
   const sheetRef = React.useRef<BottomSheetModal>(null);
-  const isPresentedRef = React.useRef(false);
-  const skipOnCloseRef = React.useRef(false);
-  const allowAutoPresentRef = React.useRef(true);
-  const reopenDetailOnCancelRef = React.useRef(false);
-  const reopenDetailRequestedRef = React.useRef(false);
-  const pendingSchedulePresentRef = React.useRef(false);
+  const detailSheetPresentedRef = React.useRef(false);
+  const scheduleSheetRef = React.useRef<BottomSheetModal>(null);
+  const scheduleSheetPresentedRef = React.useRef(false);
+  const detailDismissedByUserRef = React.useRef(false);
+  const detailClosingProgrammaticallyRef = React.useRef(false);
+  const scheduleClosingReasonRef = React.useRef<ScheduleCloseReason | null>(null);
   const hasContent = Boolean(item && item.contents);
   const [showEditModal, setShowEditModal] = React.useState(false);
   const [readingRowWidth, setReadingRowWidth] = React.useState<number | null>(null);
-  const scheduleSheetRef = React.useRef<BottomSheetModal>(null);
-  const [scheduleDate, setScheduleDate] = React.useState<Date>(getDefaultSchedule());
-  const [schedulePriorityValue, setSchedulePriorityValue] =
-    React.useState<PriorityValue>(DEFAULT_PRIORITY);
-  const [scheduleContext, setScheduleContext] = React.useState<ScheduleContext | null>(null);
-  const [isScheduleSheetOpen, setScheduleSheetOpen] = React.useState(false);
 
   const snapPoints = React.useMemo(() => ['70%'], []);
   const scheduleSnapPoints = React.useMemo(() => {
@@ -146,6 +149,16 @@ export function ContentDetail({
     };
   }, [readingRowWidth]);
 
+  const detailVisible = sheetState.detailVisible;
+  const {
+    visible: scheduleVisible,
+    context: scheduleContext,
+    date: scheduleDate,
+    priority: schedulePriorityValue,
+    returnTo: scheduleReturnTarget,
+    closeDetailOnConfirm: closeDetailOnScheduleConfirm,
+  } = sheetState.schedule;
+
   const handleReadingRowLayout = React.useCallback((event: LayoutChangeEvent) => {
     const { width } = event.nativeEvent.layout;
     setReadingRowWidth((previous) => (previous === width ? previous : width));
@@ -173,37 +186,63 @@ export function ContentDetail({
     [],
   );
 
-  const handleDismiss = React.useCallback(() => {
-    isPresentedRef.current = false;
-    if (skipOnCloseRef.current) {
-      skipOnCloseRef.current = false;
-      if (pendingSchedulePresentRef.current) {
-        pendingSchedulePresentRef.current = false;
-        scheduleSheetRef.current?.present();
+  const handleDetailDismiss = React.useCallback(() => {
+    detailSheetPresentedRef.current = false;
+    const closingProgrammatically = detailClosingProgrammaticallyRef.current;
+    detailClosingProgrammaticallyRef.current = false;
+
+    const currentState = sheetStateRef.current;
+    if (!currentState.detailVisible && !currentState.schedule.visible) {
+      return;
+    }
+
+    if (!closingProgrammatically) {
+      detailDismissedByUserRef.current = true;
+      dispatch({ type: 'CLOSE_DETAIL' });
+      onClose();
+    }
+  }, [dispatch, onClose]);
+
+  React.useEffect(() => {
+    if (visible && hasContent) {
+      if (!detailVisible && !detailDismissedByUserRef.current) {
+        dispatch({ type: 'OPEN_DETAIL' });
       }
-      return;
+    } else {
+      if (detailVisible || scheduleVisible) {
+        detailClosingProgrammaticallyRef.current = true;
+        dispatch({ type: 'RESET' });
+      }
+      detailDismissedByUserRef.current = false;
+      scheduleClosingReasonRef.current = null;
     }
-    allowAutoPresentRef.current = true;
-    if (!visible) {
-      return;
-    }
-    onClose();
-  }, [onClose, visible]);
+  }, [dispatch, visible, hasContent, detailVisible, scheduleVisible]);
 
   React.useEffect(() => {
     const sheet = sheetRef.current;
     if (!sheet) return;
 
-    if (visible && hasContent && !isPresentedRef.current) {
-      if (!allowAutoPresentRef.current) {
-        return;
-      }
+    if (detailVisible && hasContent && !detailSheetPresentedRef.current) {
       sheet.present();
-      isPresentedRef.current = true;
-    } else if ((!visible || !hasContent) && isPresentedRef.current) {
+      detailSheetPresentedRef.current = true;
+    } else if ((!detailVisible || !hasContent) && detailSheetPresentedRef.current) {
+      detailSheetPresentedRef.current = false;
       sheet.dismiss();
     }
-  }, [visible, hasContent]);
+  }, [detailVisible, hasContent]);
+
+  React.useEffect(() => {
+    const scheduleSheet = scheduleSheetRef.current;
+    if (!scheduleSheet) return;
+
+    if (scheduleVisible && !scheduleSheetPresentedRef.current) {
+      scheduleSheet.present();
+      scheduleSheetPresentedRef.current = true;
+    } else if (!scheduleVisible && scheduleSheetPresentedRef.current) {
+      scheduleSheetPresentedRef.current = false;
+      scheduleSheet.dismiss();
+    }
+  }, [scheduleVisible]);
 
   const openScheduleSheet = React.useCallback(
     (
@@ -212,68 +251,74 @@ export function ContentDetail({
       initialPriority: PriorityValue,
       options: ScheduleOpenOptions,
     ) => {
-      setScheduleContext(context);
-      setScheduleDate(normalizeToStartOfDay(initialDate));
-      setSchedulePriorityValue(initialPriority);
-      setScheduleSheetOpen(true);
+      scheduleClosingReasonRef.current = null;
 
-      reopenDetailOnCancelRef.current = options.reopenDetailOnCancel;
-      reopenDetailRequestedRef.current = false;
-      allowAutoPresentRef.current = false;
-
-      const detailSheet = sheetRef.current;
-      if (detailSheet && isPresentedRef.current) {
-        pendingSchedulePresentRef.current = true;
-        skipOnCloseRef.current = true;
-        detailSheet.dismiss();
-        return;
-      }
-
-      pendingSchedulePresentRef.current = false;
-      scheduleSheetRef.current?.present();
+      dispatch({
+        type: 'OPEN_READING_SCHEDULE',
+        payload: {
+          context,
+          date: normalizeToStartOfDay(initialDate),
+          priority: initialPriority,
+          returnTo: options.returnTo,
+          closeDetailOnConfirm: options.closeDetailOnConfirm ?? false,
+        },
+      });
     },
-    [],
+    [dispatch],
   );
 
   const handleScheduleSheetDismiss = React.useCallback(() => {
-    setScheduleSheetOpen(false);
-    setScheduleContext(null);
-    setScheduleDate(getDefaultSchedule());
-    setSchedulePriorityValue(DEFAULT_PRIORITY);
+    scheduleSheetPresentedRef.current = false;
 
-    const shouldReopenDetail = reopenDetailRequestedRef.current && reopenDetailOnCancelRef.current;
-
-    reopenDetailRequestedRef.current = false;
-    reopenDetailOnCancelRef.current = false;
-    pendingSchedulePresentRef.current = false;
-
-    if (shouldReopenDetail && visible && hasContent) {
-      const detailSheet = sheetRef.current;
-      if (detailSheet) {
-        detailSheet.present();
-        isPresentedRef.current = true;
-      }
-    }
-
-    // Always restore allowAutoPresentRef to true after schedule sheet dismisses
-    // This ensures the detail sheet can be opened again in the future
-    allowAutoPresentRef.current = true;
-  }, [hasContent, visible]);
-
-  const handleScheduleDateChange = React.useCallback((date: Date | null) => {
-    if (!date) {
-      setScheduleDate(getDefaultSchedule());
+    const closingReason = scheduleClosingReasonRef.current;
+    if (closingReason) {
+      scheduleClosingReasonRef.current = null;
       return;
     }
-    setScheduleDate(normalizeToStartOfDay(date));
-  }, []);
+
+    const currentState = sheetStateRef.current;
+    if (!currentState.schedule.visible) {
+      return;
+    }
+
+    const shouldCloseDetail = currentState.schedule.returnTo === 'none';
+
+    dispatch({ type: 'CLOSE_READING_SCHEDULE', payload: { reason: 'dismiss' } });
+    if (shouldCloseDetail) {
+      detailDismissedByUserRef.current = true;
+      onClose();
+    }
+  }, [dispatch, onClose]);
+
+  const handleScheduleDateChange = React.useCallback(
+    (date: Date | null) => {
+      const normalizedDate = normalizeToStartOfDay(date ?? getDefaultSchedule());
+      dispatch({ type: 'UPDATE_SCHEDULE_DATE', payload: normalizedDate });
+    },
+    [dispatch],
+  );
+
+  const handleSchedulePriorityChange = React.useCallback(
+    (priority: PriorityValue) => {
+      dispatch({ type: 'UPDATE_SCHEDULE_PRIORITY', payload: priority });
+    },
+    [dispatch],
+  );
 
   const handleScheduleCancel = React.useCallback(() => {
-    reopenDetailRequestedRef.current = reopenDetailOnCancelRef.current;
-    allowAutoPresentRef.current = reopenDetailOnCancelRef.current;
-    pendingSchedulePresentRef.current = false;
-    scheduleSheetRef.current?.dismiss();
-  }, []);
+    if (!scheduleVisible) return;
+
+    scheduleClosingReasonRef.current = 'cancel';
+
+    if (scheduleReturnTarget === 'none') {
+      detailDismissedByUserRef.current = true;
+      detailClosingProgrammaticallyRef.current = true;
+    }
+
+    dispatch({ type: 'CLOSE_READING_SCHEDULE', payload: { reason: 'cancel' } });
+
+    if (scheduleReturnTarget === 'none') onClose();
+  }, [dispatch, onClose, scheduleReturnTarget, scheduleVisible]);
 
   const handleScheduleConfirm = React.useCallback(async () => {
     if (!scheduleContext) return;
@@ -306,18 +351,24 @@ export function ContentDetail({
           }
         }
 
-        reopenDetailOnCancelRef.current = false;
-        reopenDetailRequestedRef.current = false;
-        allowAutoPresentRef.current = false;
-        pendingSchedulePresentRef.current = false;
+        scheduleClosingReasonRef.current = 'save';
 
-        scheduleSheetRef.current?.dismiss();
-        onClose();
+        const shouldCloseDetail = scheduleReturnTarget === 'none' || closeDetailOnScheduleConfirm;
+
+        if (shouldCloseDetail) {
+          detailDismissedByUserRef.current = true;
+          detailClosingProgrammaticallyRef.current = true;
+        }
+
+        dispatch({ type: 'CLOSE_READING_SCHEDULE', payload: { reason: 'save' } });
+
+        if (shouldCloseDetail) onClose();
       } catch (error) {
         console.error('Failed to update reading schedule', error);
       }
     });
   }, [
+    closeDetailOnScheduleConfirm,
     executeWithHapticFeedback,
     onAddToQueue,
     onClose,
@@ -326,6 +377,7 @@ export function ContentDetail({
     scheduleContext,
     scheduleDate,
     schedulePriorityValue,
+    scheduleReturnTarget,
   ]);
 
   if (!hasContent || !item || !item.contents) {
@@ -385,7 +437,7 @@ export function ContentDetail({
         { type: 'reopen', userContentId: userContent.id },
         initialDate,
         initialPriority,
-        { reopenDetailOnCancel: true },
+        { returnTo: 'detail', closeDetailOnConfirm: true },
       );
     });
   };
@@ -418,7 +470,7 @@ export function ContentDetail({
         { type: 'add', url, contentId: item.content_id },
         defaultSchedule,
         DEFAULT_PRIORITY,
-        { reopenDetailOnCancel: true },
+        { returnTo: 'detail', closeDetailOnConfirm: true },
       );
     });
   };
@@ -449,12 +501,13 @@ export function ContentDetail({
         index={0}
         handleComponent={renderHandle}
         backdropComponent={renderBackdrop}
-        onDismiss={handleDismiss}
+        onDismiss={handleDetailDismiss}
         keyboardBehavior="interactive"
         keyboardBlurBehavior="restore"
         topInset={insets.top}
         backgroundStyle={{ backgroundColor: 'transparent' }}
         style={{ overflow: 'hidden' }}
+        stackBehavior="push"
         android_keyboardInputMode="adjustResize"
       >
         <View className="flex-1 rounded-t-2xl bg-white dark:bg-gray-800">
@@ -662,6 +715,7 @@ export function ContentDetail({
           enableDynamicSizing={true}
           keyboardBehavior="interactive"
           keyboardBlurBehavior="restore"
+          stackBehavior="push"
           android_keyboardInputMode="adjustResize"
         >
           <BottomSheetView className="flex-1 px-4 py-4">
@@ -675,11 +729,11 @@ export function ContentDetail({
             </Text>
 
             <SchedulePriorityPicker
-              visible={isScheduleSheetOpen}
+              visible={scheduleVisible}
               scheduledDate={scheduleDate}
               onScheduledDateChange={handleScheduleDateChange}
               priority={schedulePriorityValue}
-              onPriorityChange={setSchedulePriorityValue}
+              onPriorityChange={handleSchedulePriorityChange}
               previewTitle="Preview"
             />
 
