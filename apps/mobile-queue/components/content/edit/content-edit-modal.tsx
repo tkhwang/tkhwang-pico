@@ -136,7 +136,7 @@ export function ContentEditModal({ visible, item, onClose, onSuccess }: ContentE
                     onScheduledDateChange={setScheduledDate}
                     priority={priority}
                     onPriorityChange={setPriority}
-                    previewTitle="Current Settings"
+                    previewTitle="Reading Plan"
                   />
 
                   {/* Save Button */}

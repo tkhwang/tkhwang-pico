@@ -272,7 +272,7 @@ export function SwipeableRecommendItem({
             onScheduledDateChange={handleScheduleChange}
             priority={priority}
             onPriorityChange={setPriority}
-            previewTitle="Preview"
+            previewTitle="Reading Plan"
           />
 
           <View className="mt-6 flex-row gap-2">

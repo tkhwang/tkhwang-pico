@@ -21,7 +21,7 @@ import { Alert, type LayoutChangeEvent, Platform, TouchableOpacity, View } from 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { SchedulePriorityPicker } from '@/components/content/shared/schedule-priority-picker';
-import { SchedulePriorityPreview } from '@/components/content/shared/schedule-priority-preview';
+import { SchedulePriorityPlan } from '@/components/content/shared/schedule-priority-plan';
 import { ContentTags } from '@/components/content/sub/content-tags';
 import { ContentThumbnail } from '@/components/content/sub/content-thumbnail';
 import { Button } from '@/components/ui/button';
@@ -364,7 +364,7 @@ export function ContentDetail({
 
         if (shouldCloseDetail) onClose();
       } catch (error) {
-        console.error('Failed to update reading schedule', error);
+        console.error('Failed to update Reading Plan', error);
       }
     });
   }, [
@@ -615,10 +615,10 @@ export function ContentDetail({
                         : { flex: 1 }
                   }
                 >
-                  <SchedulePriorityPreview
+                  <SchedulePriorityPlan
                     scheduledDate={scheduledDatePreview}
                     priority={priorityValue}
-                    title="Reading Schedule"
+                    title="Reading Plan"
                   />
                 </View>
                 {!isCompleted && (
@@ -720,7 +720,7 @@ export function ContentDetail({
         >
           <BottomSheetView className="flex-1 px-4 py-4">
             <Text className="mb-1 text-base font-semibold text-gray-900 dark:text-gray-100">
-              {scheduleContext?.type === 'reopen' ? 'Reading Schedule' : 'Add to Queue'}
+              {scheduleContext?.type === 'reopen' ? 'Reading Plan' : 'Add to Queue'}
             </Text>
             <Text className="mb-4 text-xs text-gray-500 dark:text-gray-400">
               {scheduleContext?.type === 'reopen'
@@ -734,7 +734,7 @@ export function ContentDetail({
               onScheduledDateChange={handleScheduleDateChange}
               priority={schedulePriorityValue}
               onPriorityChange={handleSchedulePriorityChange}
-              previewTitle="Preview"
+              previewTitle="Reading Plan"
             />
 
             <View className="mt-6 flex-row gap-2">

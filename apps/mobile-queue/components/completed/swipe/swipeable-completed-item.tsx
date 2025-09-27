@@ -356,7 +356,7 @@ export function SwipeableCompletedItem({
               onScheduledDateChange={handleScheduleDateChange}
               priority={schedulePriorityValue}
               onPriorityChange={setSchedulePriorityValue}
-              previewTitle="Preview"
+              previewTitle="Reading Plan"
             />
 
             <View className="mt-6 flex-row gap-2">
