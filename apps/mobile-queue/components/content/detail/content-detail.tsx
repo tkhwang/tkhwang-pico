@@ -618,7 +618,7 @@ export function ContentDetail({
                   <SchedulePriorityPreview
                     scheduledDate={scheduledDatePreview}
                     priority={priorityValue}
-                    title="Reading Settings"
+                    title="Reading Schedule"
                   />
                 </View>
                 {!isCompleted && (

@@ -147,7 +147,7 @@ export function FabModal({ visible, onClose, onSuccess }: FabModalProps) {
                       onScheduledDateChange={setScheduledDate}
                       priority={priority}
                       onPriorityChange={setPriority}
-                      previewTitle="Reading Settings"
+                      previewTitle="Reading Schedule"
                     />
                   </View>
 

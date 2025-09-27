@@ -39,7 +39,7 @@ export function formatScheduleLabel(date: Date | null, referenceDate: Date = get
   if (isSameDay(date, tomorrow)) return 'Tomorrow';
 
   const thisWeekEnd = getEndOfCurrentWeek(today);
-  if (isSameDay(date, thisWeekEnd)) return 'This Week';
+  if (isSameDay(date, thisWeekEnd)) return 'This Weekend';
 
   const nextWeek = getNextWeekPreset(today);
   if (isSameDay(date, nextWeek)) return 'Next Week';

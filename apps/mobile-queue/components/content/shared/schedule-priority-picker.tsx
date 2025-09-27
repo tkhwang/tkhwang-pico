@@ -156,7 +156,7 @@ export function SchedulePriorityPicker({
       },
       {
         key: 'this-week',
-        label: 'This Week',
+        label: 'This Weekend',
         display: thisWeekDisplay,
         selected: isThisWeekSelected,
         onPress: handleSelectThisWeek,
