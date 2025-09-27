@@ -3,7 +3,7 @@ import DateTimePicker, {
   type DateTimePickerEvent,
 } from '@react-native-community/datetimepicker';
 import React from 'react';
-import { Platform, TouchableOpacity, View } from 'react-native';
+import { Platform, ScrollView, TouchableOpacity, View } from 'react-native';
 
 import { Text } from '@/components/ui/text';
 import { cn } from '@/lib/utils';
@@ -156,7 +156,7 @@ export function SchedulePriorityPicker({
       },
       {
         key: 'this-week',
-        label: 'This Week',
+        label: 'This Weekend',
         display: thisWeekDisplay,
         selected: isThisWeekSelected,
         onPress: handleSelectThisWeek,
@@ -246,7 +246,7 @@ export function SchedulePriorityPicker({
     }
   }, [onScheduledDateChange, scheduledDate, today]);
 
-  return (
+  const content = (
     <View className={cn('gap-4', className)}>
       <SchedulePriorityPreview
         scheduledDate={scheduledDate}
@@ -262,8 +262,8 @@ export function SchedulePriorityPicker({
         <View className="gap-2">
           {schedulePresetRows.map((row, rowIndex) => (
             <View key={rowIndex} className="flex-row gap-2">
-              {row.map((preset) => (
-                <SchedulePresetButton key={preset.key} {...preset} />
+              {row.map(({ key, ...presetProps }) => (
+                <SchedulePresetButton key={key} {...presetProps} />
               ))}
             </View>
           ))}
@@ -346,4 +346,18 @@ export function SchedulePriorityPicker({
       </View>
     </View>
   );
+
+  if (Platform.OS === 'ios') {
+    return (
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{ paddingBottom: 16 }}
+      >
+        {content}
+      </ScrollView>
+    );
+  }
+
+  return content;
 }
