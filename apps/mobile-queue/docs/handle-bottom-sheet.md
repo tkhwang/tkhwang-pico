@@ -60,14 +60,14 @@ dispatch({ type: 'CLOSE_READING_SCHEDULE', payload: { reason } });
 ### Add to queue 흐름
 
 1. 카드 탭 → detail bottom sheet가 열린다.
-2. `Add to queue` 선택 → reading schedule bottom sheet가 detail 위에 열린다. detail sheet는 스택에 남지만 비활성화된다.
-3. 읽기 일정 시트에서 `Save changes` → reducer가 `returnTo: 'none'`을 확인해 detail sheet를 함께 정리하고 idle 상태로 전환한다.
+2. `Add to queue` 선택 → reading schedule bottom sheet가 detail 위에 열린다. detail sheet는 비활성화된 상태로 스택에 유지된다.
+3. 읽기 일정 시트에서 `Save changes` → 읽기 일정 시트가 닫히고 이어서 detail sheet도 닫히며 idle 상태로 전환된다.
 
 ```ts
 dispatch({ type: 'OPEN_DETAIL', payload: { tab: 'discover', contentId } });
 dispatch({
   type: 'OPEN_READING_SCHEDULE',
-  payload: { tab: 'discover', contentId, returnTo: 'none' },
+  payload: { tab: 'discover', contentId, returnTo: 'detail', closeDetailOnConfirm: true },
 });
 dispatch({ type: 'CLOSE_READING_SCHEDULE', payload: { reason: 'save' } });
 ```
@@ -76,13 +76,13 @@ dispatch({ type: 'CLOSE_READING_SCHEDULE', payload: { reason: 'save' } });
 
 1. 카드 탭 → detail bottom sheet가 열린다.
 2. `Add to queue` → reading schedule bottom sheet가 detail 위에 열린다.
-3. 읽기 일정 시트에서 `Cancel` → reducer가 `returnTo: 'none'`을 확인해 두 시트를 모두 닫고 idle 상태로 전환한다.
+3. 읽기 일정 시트에서 `Cancel` → 읽기 일정 시트만 닫히고 detail sheet가 다시 활성화된다.
 
 ```ts
 dispatch({ type: 'OPEN_DETAIL', payload: { tab: 'discover', contentId } });
 dispatch({
   type: 'OPEN_READING_SCHEDULE',
-  payload: { tab: 'discover', contentId, returnTo: 'none' },
+  payload: { tab: 'discover', contentId, returnTo: 'detail', closeDetailOnConfirm: true },
 });
 dispatch({ type: 'CLOSE_READING_SCHEDULE', payload: { reason: 'cancel' } });
 ```
