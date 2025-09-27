@@ -60,6 +60,23 @@ export function SchedulePriorityPicker({
   const thisWeek = React.useMemo(() => getEndOfCurrentWeek(today), [today]);
   const nextWeek = React.useMemo(() => getNextWeekPreset(today), [today]);
 
+  const todayDisplay = React.useMemo(
+    () => today.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+    [today],
+  );
+  const tomorrowDisplay = React.useMemo(
+    () => tomorrow.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+    [tomorrow],
+  );
+  const thisWeekDisplay = React.useMemo(
+    () => thisWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+    [thisWeek],
+  );
+  const nextWeekDisplay = React.useMemo(
+    () => nextWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+    [nextWeek],
+  );
+
   const isTodaySelected = scheduledDate ? isSameDayPreset(scheduledDate, today) : false;
   const isTomorrowSelected = scheduledDate ? isSameDayPreset(scheduledDate, tomorrow) : false;
   const isThisWeekSelected = scheduledDate ? isSameDayPreset(scheduledDate, thisWeek) : false;
@@ -143,6 +160,39 @@ export function SchedulePriorityPicker({
     }
   }, [onScheduledDateChange, scheduledDate, today]);
 
+  const renderPresetButton = React.useCallback(
+    (label: string, dateLabel: string, onPress: () => void, selected: boolean) => (
+      <TouchableOpacity
+        key={label}
+        onPress={onPress}
+        className={cn(
+          'flex-1 items-start justify-center rounded-md border border-gray-300 px-3 py-3 dark:border-gray-600',
+          selected && 'border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-blue-500/10',
+        )}
+      >
+        <View className="flex-row items-baseline gap-1">
+          <Text
+            className={cn(
+              'text-sm font-semibold text-gray-700 dark:text-gray-300',
+              selected && 'text-blue-600 dark:text-blue-200',
+            )}
+          >
+            {label}:
+          </Text>
+          <Text
+            className={cn(
+              'text-sm text-gray-500 dark:text-gray-400',
+              selected && 'text-blue-500 dark:text-blue-300',
+            )}
+          >
+            {dateLabel}
+          </Text>
+        </View>
+      </TouchableOpacity>
+    ),
+    [],
+  );
+
   return (
     <View className={cn('gap-4', className)}>
       <SchedulePriorityPreview
@@ -156,107 +206,30 @@ export function SchedulePriorityPicker({
         <Text className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
           Reading Schedule
         </Text>
-        <View className="flex-row gap-2">
-          <TouchableOpacity
-            onPress={handleSelectToday}
-            className={cn(
-              'flex-1 items-center justify-center rounded-md border border-gray-300 px-2 py-3 dark:border-gray-600',
-              isTodaySelected &&
-                'border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-blue-500/10',
+        <View className="gap-2">
+          <View className="flex-row gap-2">
+            {renderPresetButton('Today', todayDisplay, handleSelectToday, isTodaySelected)}
+            {renderPresetButton(
+              'Tomorrow',
+              tomorrowDisplay,
+              handleSelectTomorrow,
+              isTomorrowSelected,
             )}
-          >
-            <Text
-              className={cn(
-                'text-sm font-semibold text-gray-700 dark:text-gray-300',
-                isTodaySelected && 'text-blue-600 dark:text-blue-200',
-              )}
-            >
-              Today
-            </Text>
-            <Text
-              className={cn(
-                'text-xs text-gray-500 dark:text-gray-400',
-                isTodaySelected && 'text-blue-500 dark:text-blue-300',
-              )}
-            >
-              {today.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={handleSelectTomorrow}
-            className={cn(
-              'flex-1 items-center justify-center rounded-md border border-gray-300 px-2 py-3 dark:border-gray-600',
-              isTomorrowSelected &&
-                'border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-blue-500/10',
+          </View>
+          <View className="flex-row gap-2">
+            {renderPresetButton(
+              'This Week',
+              thisWeekDisplay,
+              handleSelectThisWeek,
+              isThisWeekSelected,
             )}
-          >
-            <Text
-              className={cn(
-                'text-sm font-semibold text-gray-700 dark:text-gray-300',
-                isTomorrowSelected && 'text-blue-600 dark:text-blue-200',
-              )}
-            >
-              Tomorrow
-            </Text>
-            <Text
-              className={cn(
-                'text-xs text-gray-500 dark:text-gray-400',
-                isTomorrowSelected && 'text-blue-500 dark:text-blue-300',
-              )}
-            >
-              {tomorrow.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={handleSelectThisWeek}
-            className={cn(
-              'flex-1 items-center justify-center rounded-md border border-gray-300 px-2 py-3 dark:border-gray-600',
-              isThisWeekSelected &&
-                'border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-blue-500/10',
+            {renderPresetButton(
+              'Next Week',
+              nextWeekDisplay,
+              handleSelectNextWeek,
+              isNextWeekSelected,
             )}
-          >
-            <Text
-              className={cn(
-                'text-sm font-semibold text-gray-700 dark:text-gray-300',
-                isThisWeekSelected && 'text-blue-600 dark:text-blue-200',
-              )}
-            >
-              This Week
-            </Text>
-            <Text
-              className={cn(
-                'text-xs text-gray-500 dark:text-gray-400',
-                isThisWeekSelected && 'text-blue-500 dark:text-blue-300',
-              )}
-            >
-              {thisWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={handleSelectNextWeek}
-            className={cn(
-              'flex-1 items-center justify-center rounded-md border border-gray-300 px-2 py-3 dark:border-gray-600',
-              isNextWeekSelected &&
-                'border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-blue-500/10',
-            )}
-          >
-            <Text
-              className={cn(
-                'text-sm font-semibold text-gray-700 dark:text-gray-300',
-                isNextWeekSelected && 'text-blue-600 dark:text-blue-200',
-              )}
-            >
-              Next Week
-            </Text>
-            <Text
-              className={cn(
-                'text-xs text-gray-500 dark:text-gray-400',
-                isNextWeekSelected && 'text-blue-500 dark:text-blue-300',
-              )}
-            >
-              {nextWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-            </Text>
-          </TouchableOpacity>
+          </View>
         </View>
         <View className="mt-2 flex-row gap-2">
           <TouchableOpacity
