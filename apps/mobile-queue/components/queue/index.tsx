@@ -19,22 +19,24 @@ interface QueueStatusToggleProps {
 
 function QueueStatusToggle({ status, onStatusChange }: QueueStatusToggleProps) {
   return (
-    <View className="flex-row items-center rounded-lg bg-muted/60 p-1 dark:bg-muted/30">
+    <View className="flex-row items-center gap-1.5 rounded-lg bg-muted/80 p-1 dark:bg-muted/30">
       <TouchableOpacity
         onPress={() => onStatusChange('pending')}
         activeOpacity={0.7}
         className={`rounded-md px-3 py-1.5 ${
-          status === 'pending' ? 'bg-card shadow-sm shadow-black/5' : ''
+          status === 'pending'
+            ? 'bg-white shadow-sm shadow-black/5 dark:bg-gray-800'
+            : 'bg-transparent'
         }`}
       >
         <View className="flex-row items-center justify-center gap-2">
           <Icon
             as={Circle}
-            size={14}
+            size={18}
             className={status === 'pending' ? 'text-blue-500' : 'text-muted-foreground'}
           />
           <Text
-            className={`text-xs font-semibold ${
+            className={`text-sm font-semibold ${
               status === 'pending' ? 'text-blue-500' : 'text-muted-foreground'
             }`}
           >
@@ -46,17 +48,19 @@ function QueueStatusToggle({ status, onStatusChange }: QueueStatusToggleProps) {
         onPress={() => onStatusChange('completed')}
         activeOpacity={0.7}
         className={`rounded-md px-3 py-1.5 ${
-          status === 'completed' ? 'bg-card shadow-sm shadow-black/5' : ''
+          status === 'completed'
+            ? 'bg-white shadow-sm shadow-black/5 dark:bg-gray-800'
+            : 'bg-transparent'
         }`}
       >
         <View className="flex-row items-center justify-center gap-2">
           <Icon
             as={CheckCircle2}
-            size={14}
+            size={18}
             className={status === 'completed' ? 'text-green-500' : 'text-muted-foreground'}
           />
           <Text
-            className={`text-xs font-semibold ${
+            className={`text-sm font-semibold ${
               status === 'completed' ? 'text-green-500' : 'text-muted-foreground'
             }`}
           >

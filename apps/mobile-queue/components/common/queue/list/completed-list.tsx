@@ -303,10 +303,10 @@ export function CompletedList({ headerRight }: CompletedListProps) {
     <View className="flex-1 bg-gray-50 dark:bg-gray-900">
       <View className="mb-2 px-4 pt-3">
         <View className="flex-row items-center justify-between gap-3">
+          {headerRight ? <View className="shrink-0">{headerRight}</View> : null}
           <View className="shrink-0">
             <ViewModeToggle mode={viewMode} onModeChange={setViewMode} />
           </View>
-          {headerRight ? <View className="shrink-0">{headerRight}</View> : null}
         </View>
       </View>
 

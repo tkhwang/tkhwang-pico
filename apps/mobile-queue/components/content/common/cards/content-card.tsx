@@ -6,9 +6,11 @@ import { View } from 'react-native';
 import { BaseContentCard } from '@/components/content/common/cards/base-content-card';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
+import { PRIORITY_STYLES } from '@/consts/app-styles';
 import { ContentDate } from '@/domains/value-object/content-date';
 import { useContentActions } from '@/hooks/use-content-actions';
 import { formatReadingTime, getThumbnailUrl } from '@/utils/content-formatters';
+import { DEFAULT_PRIORITY, type PriorityValue } from '@/utils/priority';
 
 const getFaviconUrl = (metadata: unknown): string | null => {
   if (!metadata || typeof metadata !== 'object' || Array.isArray(metadata)) {
@@ -51,6 +53,10 @@ export function ContentCard({
 
   const thumbnailUrl = getThumbnailUrl(content);
   const faviconUrl = getFaviconUrl(content.metadata);
+  const priorityValue = (item.priority ?? DEFAULT_PRIORITY) as PriorityValue;
+  const priorityStyle = PRIORITY_STYLES[priorityValue] ?? PRIORITY_STYLES[DEFAULT_PRIORITY];
+  const accentClassName = priorityValue === 'high' ? priorityStyle.dot : undefined;
+
   const scheduledDate = item.scheduled_for ? new ContentDate(item.scheduled_for) : null;
   const completedDate = item.completed_at ? new ContentDate(item.completed_at) : null;
 
@@ -106,6 +112,7 @@ export function ContentCard({
         readingTime: content.word_count ? formatReadingTime(content.word_count) : undefined,
         rightElement: metadataRightElement,
       }}
+      sideAccentClassName={accentClassName}
     />
   );
 }

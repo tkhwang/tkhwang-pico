@@ -2,6 +2,7 @@ import React from 'react';
 import { TouchableOpacity, View } from 'react-native';
 
 import { Text } from '@/components/ui/text';
+import { cn } from '@/lib/utils';
 
 import { ContentMetadata } from '../sub/content-metadata';
 import { ContentTags } from '../sub/content-tags';
@@ -45,6 +46,10 @@ interface BaseContentCardProps {
   topLeftSlot?: React.ReactNode;
   // Slot for custom bottom content
   bottomSlot?: React.ReactNode;
+  // Optional thin accent bar at the top of the card
+  topAccentClassName?: string;
+  // Optional accent bar along the left edge
+  sideAccentClassName?: string;
 }
 
 /**
@@ -66,6 +71,8 @@ export function BaseContentCard({
   leftSlot,
   topLeftSlot,
   bottomSlot,
+  topAccentClassName,
+  sideAccentClassName,
 }: BaseContentCardProps) {
   const titleColorClass = isCompleted
     ? 'text-gray-500 dark:text-gray-500'
@@ -138,24 +145,39 @@ export function BaseContentCard({
     </>
   );
 
+  const composedContainerClass = cn(
+    'relative overflow-hidden rounded-lg border border-gray-100 bg-white p-3 dark:border-gray-700 dark:bg-gray-800',
+    containerClassName,
+  );
+
+  const topAccent = topAccentClassName ? (
+    <View className={cn('absolute left-0 right-0 top-0 h-1', topAccentClassName)} />
+  ) : null;
+
+  const sideAccent = sideAccentClassName ? (
+    <View className={cn('absolute bottom-0 left-0 top-0 w-1', sideAccentClassName)} />
+  ) : null;
+
   if (onPress || onLongPress) {
     return (
       <TouchableOpacity
-        className={`rounded-lg border border-gray-100 bg-white p-3 dark:border-gray-700 dark:bg-gray-800 ${containerClassName}`}
+        className={composedContainerClass}
         onPress={onPress}
         onLongPress={onLongPress}
         delayLongPress={500}
         activeOpacity={0.7}
       >
+        {topAccent}
+        {sideAccent}
         {content}
       </TouchableOpacity>
     );
   }
 
   return (
-    <View
-      className={`rounded-lg border border-gray-100 bg-white p-3 dark:border-gray-700 dark:bg-gray-800 ${containerClassName}`}
-    >
+    <View className={composedContainerClass}>
+      {topAccent}
+      {sideAccent}
       {content}
     </View>
   );
