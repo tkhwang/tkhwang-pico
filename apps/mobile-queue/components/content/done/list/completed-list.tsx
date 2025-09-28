@@ -4,9 +4,9 @@ import { Calendar } from 'lucide-react-native';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { RefreshControl, ScrollView, View } from 'react-native';
 
-import { ContentDetail } from '@/components/content/detail/content-detail';
 import { ContentCardList } from '@/components/content/common/cards/content-card-list';
 import { ContentCardSmall } from '@/components/content/common/cards/content-card-small';
+import { ContentDetail } from '@/components/content/detail/content-detail';
 import { CompletedListSkeleton } from '@/components/content/done/list/completed-list-skeleton';
 import { SwipeableCompletedItem } from '@/components/content/done/swipe/swipeable-completed-item';
 import { Icon } from '@/components/ui/icon';
@@ -23,12 +23,16 @@ import { useUserContents } from '@/hooks/queries/use-user-contents';
 import { isContentLiked } from '@/utils/content-helpers';
 import type { PriorityValue } from '@/utils/priority';
 
+interface CompletedListProps {
+  headerRight?: React.ReactNode;
+}
+
 interface GroupedContent {
   date: string;
   items: UserContentWithDetails[];
 }
 
-export function CompletedList() {
+export function CompletedList({ headerRight }: CompletedListProps) {
   const { data: contents = [], isLoading, error, refetch } = useUserContents('completed');
 
   const [refreshing, setRefreshing] = useState(false);
@@ -277,9 +281,14 @@ export function CompletedList() {
 
   return (
     <View className="flex-1 bg-gray-50 dark:bg-gray-900">
-      {/* View mode toggle */}
+      {/* View mode & status toggles */}
       <View className="mb-2 px-4 pt-3">
-        <ViewModeToggle mode={viewMode} onModeChange={setViewMode} />
+        <View className="flex-row items-center justify-between gap-3">
+          <View className="shrink-0">
+            <ViewModeToggle mode={viewMode} onModeChange={setViewMode} />
+          </View>
+          {headerRight ? <View className="shrink-0">{headerRight}</View> : null}
+        </View>
       </View>
 
       <FlashList

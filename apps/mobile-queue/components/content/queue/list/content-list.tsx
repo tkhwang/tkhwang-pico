@@ -3,9 +3,9 @@ import type { UserContentWithDetails } from '@tkhwang-pico/supabase';
 import React, { useCallback, useEffect, useState } from 'react';
 import { RefreshControl, ScrollView, TouchableOpacity, View } from 'react-native';
 
-import { ContentDetail } from '@/components/content/detail/content-detail';
 import { ContentCardList } from '@/components/content/common/cards/content-card-list';
 import { ContentCardSmall } from '@/components/content/common/cards/content-card-small';
+import { ContentDetail } from '@/components/content/detail/content-detail';
 import { ContentListSkeleton } from '@/components/content/queue/list/content-list-skeleton';
 import { SwipeableContentItem } from '@/components/content/queue/swipe/swipeable-content-item';
 import { Text } from '@/components/ui/text';
@@ -19,7 +19,11 @@ import { useUserContents } from '@/hooks/queries/use-user-contents';
 import { isContentLiked } from '@/utils/content-helpers';
 import type { PriorityValue } from '@/utils/priority';
 
-export function ContentList() {
+interface ContentListProps {
+  headerRight?: React.ReactNode;
+}
+
+export function ContentList({ headerRight }: ContentListProps) {
   const { data: userContents = [], isLoading, error, refetch } = useUserContents('pending');
 
   const [refreshing, setRefreshing] = useState(false);
@@ -193,9 +197,14 @@ export function ContentList() {
 
   return (
     <View className="flex-1">
-      {/* View mode toggle */}
+      {/* View mode & status toggles */}
       <View className="mb-2 px-4 pt-3">
-        <ViewModeToggle mode={viewMode} onModeChange={setViewMode} />
+        <View className="flex-row items-center justify-between gap-3">
+          <View className="shrink-0">
+            <ViewModeToggle mode={viewMode} onModeChange={setViewMode} />
+          </View>
+          {headerRight ? <View className="shrink-0">{headerRight}</View> : null}
+        </View>
       </View>
 
       <FlashList

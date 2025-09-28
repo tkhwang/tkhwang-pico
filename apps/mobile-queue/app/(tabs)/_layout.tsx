@@ -98,9 +98,9 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="completed"
+        name="store"
         options={{
-          title: 'Done',
+          title: 'Store',
           headerShown: false,
           tabBarIcon: ({ color, size, focused }) => (
             <Icon
