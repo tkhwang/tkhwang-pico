@@ -31,11 +31,11 @@ function QueueStatusToggle({ status, onStatusChange }: QueueStatusToggleProps) {
           <Icon
             as={Circle}
             size={14}
-            className={status === 'pending' ? 'text-primary' : 'text-muted-foreground'}
+            className={status === 'pending' ? 'text-blue-500' : 'text-muted-foreground'}
           />
           <Text
             className={`text-xs font-semibold ${
-              status === 'pending' ? 'text-primary' : 'text-muted-foreground'
+              status === 'pending' ? 'text-blue-500' : 'text-muted-foreground'
             }`}
           >
             Pending
@@ -53,11 +53,11 @@ function QueueStatusToggle({ status, onStatusChange }: QueueStatusToggleProps) {
           <Icon
             as={CheckCircle2}
             size={14}
-            className={status === 'completed' ? 'text-primary' : 'text-muted-foreground'}
+            className={status === 'completed' ? 'text-green-500' : 'text-muted-foreground'}
           />
           <Text
             className={`text-xs font-semibold ${
-              status === 'completed' ? 'text-primary' : 'text-muted-foreground'
+              status === 'completed' ? 'text-green-500' : 'text-muted-foreground'
             }`}
           >
             Completed
