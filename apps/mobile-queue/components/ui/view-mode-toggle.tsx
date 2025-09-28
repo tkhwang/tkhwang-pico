@@ -3,7 +3,6 @@ import React from 'react';
 import { TouchableOpacity, View } from 'react-native';
 
 import { Icon } from '@/components/ui/icon';
-import { Text } from '@/components/ui/text';
 
 export type ViewMode = 'bigCard' | 'smallCard' | 'list';
 
@@ -13,73 +12,33 @@ interface ViewModeToggleProps {
 }
 
 export function ViewModeToggle({ mode, onModeChange }: ViewModeToggleProps) {
+  const getSharedStyles = (isActive: boolean) => ({
+    button: `flex-1 items-center justify-center rounded-md px-3 py-1.5 ${
+      isActive ? 'bg-white dark:bg-gray-700' : ''
+    }`,
+    color: isActive ? 'text-blue-500' : 'text-gray-500 dark:text-gray-400',
+  });
+
   return (
     <View className="flex-row gap-2 rounded-lg bg-gray-100 p-1 dark:bg-gray-800">
-      <TouchableOpacity
-        onPress={() => onModeChange('bigCard')}
-        className={`flex-1 flex-row items-center justify-center gap-1 rounded-md px-2 py-1.5 ${
-          mode === 'bigCard' ? 'bg-white dark:bg-gray-700' : ''
-        }`}
-        activeOpacity={0.7}
-      >
-        <Icon
-          as={Square}
-          className={`h-5 w-5 ${
-            mode === 'bigCard' ? 'text-blue-500' : 'text-gray-500 dark:text-gray-400'
-          }`}
-        />
-        <Text
-          className={`text-[12px] ${
-            mode === 'bigCard' ? 'text-blue-500' : 'text-gray-500 dark:text-gray-400'
-          }`}
-        >
-          Card
-        </Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        onPress={() => onModeChange('smallCard')}
-        className={`flex-1 flex-row items-center justify-center gap-1 rounded-md px-2 py-1.5 ${
-          mode === 'smallCard' ? 'bg-white dark:bg-gray-700' : ''
-        }`}
-        activeOpacity={0.7}
-      >
-        <Icon
-          as={Grid2x2}
-          className={`h-5 w-5 ${
-            mode === 'smallCard' ? 'text-blue-500' : 'text-gray-500 dark:text-gray-400'
-          }`}
-        />
-        <Text
-          className={`text-[12px] ${
-            mode === 'smallCard' ? 'text-blue-500' : 'text-gray-500 dark:text-gray-400'
-          }`}
-        >
-          Grid
-        </Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        onPress={() => onModeChange('list')}
-        className={`flex-1 flex-row items-center justify-center gap-1 rounded-md px-2 py-1.5 ${
-          mode === 'list' ? 'bg-white dark:bg-gray-700' : ''
-        }`}
-        activeOpacity={0.7}
-      >
-        <Icon
-          as={List}
-          className={`h-5 w-5 ${
-            mode === 'list' ? 'text-blue-500' : 'text-gray-500 dark:text-gray-400'
-          }`}
-        />
-        <Text
-          className={`text-[12px] ${
-            mode === 'list' ? 'text-blue-500' : 'text-gray-500 dark:text-gray-400'
-          }`}
-        >
-          List
-        </Text>
-      </TouchableOpacity>
+      {[
+        { key: 'bigCard' as const, icon: Square },
+        { key: 'smallCard' as const, icon: Grid2x2 },
+        { key: 'list' as const, icon: List },
+      ].map(({ key, icon: IconComponent }) => {
+        const isActive = mode === key;
+        const styles = getSharedStyles(isActive);
+        return (
+          <TouchableOpacity
+            key={key}
+            onPress={() => onModeChange(key)}
+            className={styles.button}
+            activeOpacity={0.7}
+          >
+            <Icon as={IconComponent} className={`h-5 w-5 ${styles.color}`} />
+          </TouchableOpacity>
+        );
+      })}
     </View>
   );
 }
