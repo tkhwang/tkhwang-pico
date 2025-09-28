@@ -146,7 +146,7 @@ export function BaseContentCard({
   );
 
   const composedContainerClass = cn(
-    'relative overflow-hidden rounded-lg border border-gray-100 bg-white p-3 dark:border-gray-700 dark:bg-gray-800',
+    'relative overflow-hidden rounded-xl border border-gray-200 bg-white p-3 shadow-sm shadow-black/5 dark:border-gray-700 dark:bg-gray-800',
     containerClassName,
   );
 
