@@ -1,5 +1,4 @@
-import { useEffect, useRef } from 'react';
-import { Animated, ScrollView, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 
 import { ContentCardSkeleton } from '@/components/content/common/cards/content-card-skeleton';
 

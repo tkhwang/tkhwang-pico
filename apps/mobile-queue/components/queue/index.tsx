@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { TouchableOpacity, View } from 'react-native';
 
-import { CompletedList } from '@/components/content/done/list/completed-list';
-import { ContentList } from '@/components/content/queue/list/content-list';
+import { CompletedList } from '@/components/common/queue/list/completed-list';
+import { ContentList } from '@/components/common/queue/list/content-list';
 import { Text } from '@/components/ui/text';
 
 import { FAB } from '../fab';

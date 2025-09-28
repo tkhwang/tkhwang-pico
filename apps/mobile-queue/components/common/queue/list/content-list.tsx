@@ -3,11 +3,10 @@ import type { UserContentWithDetails } from '@tkhwang-pico/supabase';
 import React, { useCallback, useEffect, useState } from 'react';
 import { RefreshControl, ScrollView, TouchableOpacity, View } from 'react-native';
 
+import { SwipeableContentItem } from '@/components/common/queue/swipe/swipeable-content-item';
 import { ContentCardList } from '@/components/content/common/cards/content-card-list';
 import { ContentCardSmall } from '@/components/content/common/cards/content-card-small';
 import { ContentDetail } from '@/components/content/detail/content-detail';
-import { ContentListSkeleton } from '@/components/content/queue/list/content-list-skeleton';
-import { SwipeableContentItem } from '@/components/content/queue/swipe/swipeable-content-item';
 import { Text } from '@/components/ui/text';
 import { type ViewMode, ViewModeToggle } from '@/components/ui/view-mode-toggle';
 import { useSetContentPreference } from '@/hooks/mutations/use-content-preference';
@@ -18,6 +17,8 @@ import { useToggleUserContentStatus } from '@/hooks/mutations/use-toggle-user-co
 import { useUserContents } from '@/hooks/queries/use-user-contents';
 import { isContentLiked } from '@/utils/content-helpers';
 import type { PriorityValue } from '@/utils/priority';
+
+import { ContentListSkeleton } from './content-list-skeleton';
 
 interface ContentListProps {
   headerRight?: React.ReactNode;
@@ -105,7 +106,6 @@ export function ContentList({ headerRight }: ContentListProps) {
     setSelectedItem(null);
   }, []);
 
-  // Keep selectedItem in sync with latest cache while modal is open
   useEffect(() => {
     if (!modalVisible || !selectedItem) return;
     const updated = userContents.find((c) => c.content_id === selectedItem.content_id);
@@ -183,7 +183,6 @@ export function ContentList({ headerRight }: ContentListProps) {
       );
     }
 
-    // Default bigCard view with swipeable
     return (
       <SwipeableContentItem
         item={item}
@@ -197,7 +196,6 @@ export function ContentList({ headerRight }: ContentListProps) {
 
   return (
     <View className="flex-1">
-      {/* View mode & status toggles */}
       <View className="mb-2 px-4 pt-3">
         <View className="flex-row items-center justify-between gap-3">
           <View className="shrink-0">
@@ -211,7 +209,7 @@ export function ContentList({ headerRight }: ContentListProps) {
         data={userContents}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
-        key={viewMode} // Force re-render when switching modes
+        key={viewMode}
         estimatedItemSize={viewMode === 'list' ? 60 : viewMode === 'smallCard' ? 150 : 120}
         numColumns={viewMode === 'smallCard' ? 2 : 1}
         showsVerticalScrollIndicator={false}
@@ -233,7 +231,6 @@ export function ContentList({ headerRight }: ContentListProps) {
         }
       />
 
-      {/* Content Detail Modal */}
       <ContentDetail
         visible={modalVisible}
         item={selectedItem}

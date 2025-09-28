@@ -19,9 +19,6 @@ import { useSwipeActionFeedback } from '@/hooks/use-swipe-action-feedback';
 import { useSwipeableItem } from '@/hooks/use-swipeable-item';
 import { isContentLiked } from '@/utils/content-helpers';
 
-// Type assertion for React 19 compatibility
-const AnimatedViewTyped = Animated.View as any;
-
 interface SwipeableContentItemProps {
   item: UserContentWithDetails;
   onToggleComplete?: (id: string) => void;
@@ -60,12 +57,10 @@ export function SwipeableContentItem({
 
   const isLiked = isContentLiked(item);
 
-  // Dynamic colors and icons based on todo_status
   const isCompleted = item.todo_status === 'completed';
   const LeftIcon =
     actionCompleted === 'complete' ? CircleCheckBig : isCompleted ? RotateCcw : Check;
 
-  // Dynamic styles based on action state
   const likeStyles =
     actionCompleted === 'like'
       ? {
@@ -163,10 +158,16 @@ export function SwipeableContentItem({
     onPress?.(contentItem);
   };
 
+  const handleLayout = useCallback(
+    (event: LayoutChangeEvent) => {
+      itemHeight.value = event.nativeEvent.layout.height;
+    },
+    [itemHeight],
+  );
+
   return (
     <View className="relative mb-2">
-      {/* Left Background - Like + Complete (blue when reopening) - visible when swiping right */}
-      <AnimatedViewTyped
+      <Animated.View
         className="absolute left-0 top-0 flex-row overflow-hidden rounded-l-lg"
         style={[leftContainerStyle, { width: HOME_TAB_LEFT_ACTION_WIDTH }]}
       >
@@ -177,9 +178,9 @@ export function SwipeableContentItem({
           className={`items-center justify-center ${completionStyles.bg}`}
           style={{ width: SWIPE_ACTION_BUTTON_WIDTH }}
         >
-          <AnimatedViewTyped style={leftIconStyle}>
+          <Animated.View style={leftIconStyle}>
             <Icon as={LeftIcon} className={`h-6 w-6 ${completionStyles.icon}`} />
-          </AnimatedViewTyped>
+          </Animated.View>
           <Text className={`mt-1 text-xs font-semibold ${completionStyles.text}`}>
             {completionStyles.label}
           </Text>
@@ -191,55 +192,46 @@ export function SwipeableContentItem({
           className={`items-center justify-center ${likeStyles.bg}`}
           style={{ width: SWIPE_ACTION_BUTTON_WIDTH }}
         >
-          <AnimatedViewTyped style={leftIconStyle}>
+          <Animated.View style={leftIconStyle}>
             <Icon
               as={Heart}
               className={`h-6 w-6 ${likeStyles.icon}`}
               fill={isLiked ? 'currentColor' : 'none'}
             />
-          </AnimatedViewTyped>
+          </Animated.View>
           <Text className={`mt-1 text-xs font-semibold ${likeStyles.text}`}>
             {likeStyles.label}
           </Text>
         </TouchableOpacity>
-      </AnimatedViewTyped>
+      </Animated.View>
 
-      {/* Right Background - Delete - Only visible when swiping left */}
-      <AnimatedViewTyped
-        className="absolute right-0 top-0 overflow-hidden rounded-r-lg"
-        style={[
-          rightContainerStyle,
-          { width: HOME_TAB_RIGHT_ACTION_WIDTH, alignItems: 'center', justifyContent: 'center' },
-        ]}
+      <Animated.View
+        className={`absolute right-0 top-0 overflow-hidden rounded-r-lg ${deleteStyles.bg}`}
+        style={[rightContainerStyle, { width: HOME_TAB_RIGHT_ACTION_WIDTH }]}
       >
         <TouchableOpacity
           activeOpacity={0.8}
           onPress={handleDeletePress}
           disabled={isProcessing}
-          className={`h-full w-full items-center justify-center rounded-r-lg ${deleteStyles.bg}`}
+          className="items-center justify-center"
+          style={{ width: HOME_TAB_RIGHT_ACTION_WIDTH, height: '100%' }}
         >
-          <AnimatedViewTyped style={rightIconStyle}>
+          <Animated.View style={rightIconStyle}>
             <Icon
               as={actionCompleted === 'delete' ? X : Trash2}
               className={`h-6 w-6 ${deleteStyles.icon}`}
             />
-          </AnimatedViewTyped>
+          </Animated.View>
           <Text className={`mt-1 text-xs font-semibold ${deleteStyles.text}`}>
             {deleteStyles.label}
           </Text>
         </TouchableOpacity>
-      </AnimatedViewTyped>
+      </Animated.View>
 
-      {/* Swipeable Content */}
       <GestureDetector gesture={panGesture}>
-        <AnimatedViewTyped
-          style={animatedStyle}
-          onLayout={(event: LayoutChangeEvent) => {
-            itemHeight.value = event.nativeEvent.layout.height;
-          }}
-        >
+        <Animated.View className="bg-transparent" style={animatedStyle} onLayout={handleLayout}>
           <ContentCard item={item} onPress={handleContentPress} isLiked={isLiked} />
-        </AnimatedViewTyped>
+        </Animated.View>
       </GestureDetector>
     </View>
   );
