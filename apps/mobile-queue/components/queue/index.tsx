@@ -82,16 +82,14 @@ export function Queue() {
         <CompletedList headerRight={statusToggle} />
       )}
 
-      {isPendingView && (
-        <>
-          <FAB onPress={() => setIsModalVisible(true)} />
-          <FabModal
-            visible={isModalVisible}
-            onClose={() => setIsModalVisible(false)}
-            onSuccess={handleContentSaved}
-          />
-        </>
-      )}
+      <>
+        <FAB onPress={() => setIsModalVisible(true)} />
+        <FabModal
+          visible={isModalVisible}
+          onClose={() => setIsModalVisible(false)}
+          onSuccess={handleContentSaved}
+        />
+      </>
     </View>
   );
 }
