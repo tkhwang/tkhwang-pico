@@ -11,8 +11,8 @@ import { Alert, TouchableOpacity, View } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
 
-import { ContentItem } from '@/components/content/content-item';
-import { SchedulePriorityPicker } from '@/components/content/shared/schedule-priority-picker';
+import { ContentItem } from '@/components/content/common/items/content-item';
+import { SchedulePriorityPicker } from '@/components/content/common/schedule/schedule-priority-picker';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';

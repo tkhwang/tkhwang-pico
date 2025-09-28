@@ -4,10 +4,10 @@ import { Calendar } from 'lucide-react-native';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { RefreshControl, ScrollView, View } from 'react-native';
 
-import { CompletedListSkeleton } from '@/components/content/completed/list/completed-list-skeleton';
-import { SwipeableCompletedItem } from '@/components/content/completed/swipe/swipeable-completed-item';
-import { ContentItemList } from '@/components/content/content-item-list';
-import { ContentItemSmallCard } from '@/components/content/content-item-small-card';
+import { CompletedListSkeleton } from '@/components/content/done/list/completed-list-skeleton';
+import { SwipeableCompletedItem } from '@/components/content/done/swipe/swipeable-completed-item';
+import { ContentItemList } from '@/components/content/common/items/content-item-list';
+import { ContentItemSmallCard } from '@/components/content/common/items/content-item-small-card';
 import { ContentDetail } from '@/components/content/detail/content-detail';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';

@@ -5,7 +5,7 @@ import { Alert, type LayoutChangeEvent, TouchableOpacity, View } from 'react-nat
 import { GestureDetector } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
 
-import { ContentItem } from '@/components/content/content-item';
+import { ContentItem } from '@/components/content/common/items/content-item';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
 import {

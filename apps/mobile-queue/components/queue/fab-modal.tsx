@@ -13,7 +13,7 @@ import {
   View,
 } from 'react-native';
 
-import { SchedulePriorityPicker } from '@/components/content/shared/schedule-priority-picker';
+import { SchedulePriorityPicker } from '@/components/content/common/schedule/schedule-priority-picker';
 import { Text } from '@/components/ui/text';
 import { useSaveContent } from '@/hooks/mutations/use-save-content';
 import { formatDateForApi, getDefaultSchedule } from '@/utils/date';

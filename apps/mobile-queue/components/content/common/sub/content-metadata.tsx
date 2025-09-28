@@ -1,7 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
 
-import { ContentMatchSpectrum } from '@/components/content/sub/content-match-spectrum';
+import { ContentMatchSpectrum } from '@/components/content/common/sub/content-match-spectrum';
 import { SiteFavicon } from '@/components/ui/site-favicon';
 import { Text } from '@/components/ui/text';
 

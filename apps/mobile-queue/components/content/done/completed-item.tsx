@@ -3,7 +3,7 @@ import { Clock, ExternalLink, Heart } from 'lucide-react-native';
 import React from 'react';
 import { TouchableOpacity, View } from 'react-native';
 
-import { ContentThumbnail } from '@/components/content/sub/content-thumbnail';
+import { ContentThumbnail } from '@/components/content/common/sub/content-thumbnail';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
 import { useContentActions } from '@/hooks/use-content-actions';

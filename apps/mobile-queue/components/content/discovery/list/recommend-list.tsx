@@ -5,7 +5,7 @@ import type { Recommendation } from '@tkhwang-pico/supabase';
 import React, { useCallback, useMemo, useState } from 'react';
 import { RefreshControl, ScrollView, View } from 'react-native';
 
-import { SwipeableRecommendItem } from '@/components/content/recommend/swipe/swipeable-recommend-item';
+import { SwipeableRecommendItem } from '@/components/content/discovery/swipe/swipeable-recommend-item';
 import { Text } from '@/components/ui/text';
 import { SWIPE_ACTION_CARD_REMOVAL_DELAY_MS } from '@/consts/app-consts';
 import { queryKey } from '@/hooks/keys/query-key';

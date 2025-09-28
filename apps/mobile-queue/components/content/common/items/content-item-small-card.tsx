@@ -3,6 +3,7 @@ import { CalendarDays, Circle, CircleCheckBig, Heart } from 'lucide-react-native
 import React from 'react';
 import { TouchableOpacity, View } from 'react-native';
 
+import { ContentThumbnail } from '@/components/content/common/sub/content-thumbnail';
 import { Icon } from '@/components/ui/icon';
 import { SiteFavicon } from '@/components/ui/site-favicon';
 import { Text } from '@/components/ui/text';
@@ -12,8 +13,6 @@ import { useContentActions } from '@/hooks/use-content-actions';
 import { getThumbnailUrl } from '@/utils/content-formatters';
 import { DEFAULT_PRIORITY, PRIORITY_LABELS, type PriorityValue } from '@/utils/priority';
 import { getFaviconUrl } from '@/utils/url';
-
-import { ContentThumbnail } from './sub/content-thumbnail';
 
 interface ContentItemSmallCardProps {
   item: UserContentWithDetails;

@@ -20,10 +20,10 @@ import React from 'react';
 import { Alert, type LayoutChangeEvent, Platform, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { SchedulePriorityPicker } from '@/components/content/shared/schedule-priority-picker';
-import { SchedulePriorityPlan } from '@/components/content/shared/schedule-priority-plan';
-import { ContentTags } from '@/components/content/sub/content-tags';
-import { ContentThumbnail } from '@/components/content/sub/content-thumbnail';
+import { SchedulePriorityPicker } from '@/components/content/common/schedule/schedule-priority-picker';
+import { SchedulePriorityPlan } from '@/components/content/common/schedule/schedule-priority-plan';
+import { ContentTags } from '@/components/content/common/sub/content-tags';
+import { ContentThumbnail } from '@/components/content/common/sub/content-thumbnail';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import { SiteFavicon } from '@/components/ui/site-favicon';
