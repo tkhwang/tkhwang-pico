@@ -1,7 +1,6 @@
 import { addDays, endOfWeek, format, isSameDay, startOfDay } from 'date-fns';
 
 const API_DATE_FORMAT = 'yyyy-MM-dd';
-const SCHEDULE_DISPLAY_FORMAT = 'eee, MMMM d, yyyy';
 const DISPLAY_DATE_FORMAT = 'MMM d, yyyy';
 const DISPLAY_DATETIME_FORMAT = 'MMM d, yyyy h:mm a';
 
@@ -44,7 +43,7 @@ export function formatScheduleLabel(date: Date | null, referenceDate: Date = get
   const nextWeek = getNextWeekPreset(today);
   if (isSameDay(date, nextWeek)) return 'Next Week';
 
-  return format(date, SCHEDULE_DISPLAY_FORMAT);
+  return format(date, API_DATE_FORMAT);
 }
 
 export function isSameDayPreset(first: Date, second: Date) {
