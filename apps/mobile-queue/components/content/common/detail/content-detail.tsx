@@ -20,6 +20,8 @@ import React from 'react';
 import { Alert, type LayoutChangeEvent, Platform, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { ContentDetailBottomActions } from '@/components/content/common/detail/content-detail-bottom-actions';
+import { ContentEditModal } from '@/components/content/common/edit/content-edit-modal';
 import { SchedulePriorityPicker } from '@/components/content/common/schedule/schedule-priority-picker';
 import { SchedulePriorityPlan } from '@/components/content/common/schedule/schedule-priority-plan';
 import { ContentTags } from '@/components/content/common/sub/content-tags';
@@ -42,9 +44,6 @@ import { formatReadingTimeWithSuffix, getThumbnailUrl } from '@/utils/content-fo
 import { formatDateForApi, getDefaultSchedule, normalizeToStartOfDay } from '@/utils/date';
 import { DEFAULT_PRIORITY, type PriorityValue } from '@/utils/priority';
 import { getFaviconUrl } from '@/utils/url';
-
-import { ContentEditModal } from '../edit/content-edit-modal';
-import { ContentDetailBottomActions } from './content-detail-bottom-actions';
 
 const GRID_GAP = 8;
 

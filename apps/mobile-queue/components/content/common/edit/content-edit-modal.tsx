@@ -19,7 +19,7 @@ import { useUpdateContent } from '@/hooks/mutations/use-update-content';
 import { formatDateForApi, normalizeToStartOfDay } from '@/utils/date';
 import { DEFAULT_PRIORITY, type PriorityValue } from '@/utils/priority';
 
-import { Button } from '../../ui/button';
+import { Button } from '../../../ui/button';
 
 interface ContentEditModalProps {
   visible: boolean;

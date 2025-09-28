@@ -3,7 +3,11 @@ import type { UserContentWithDetails } from '@tkhwang-pico/supabase';
 import React, { useCallback, useEffect, useState } from 'react';
 import { RefreshControl, ScrollView, TouchableOpacity, View } from 'react-native';
 
+import { ContentDetail } from '@/components/content/common/detail/content-detail';
+import { ContentItemList } from '@/components/content/common/items/content-item-list';
+import { ContentItemSmallCard } from '@/components/content/common/items/content-item-small-card';
 import { ContentListSkeleton } from '@/components/content/queue/list/content-list-skeleton';
+import { SwipeableContentItem } from '@/components/content/queue/swipe/swipeable-content-item';
 import { Text } from '@/components/ui/text';
 import { type ViewMode, ViewModeToggle } from '@/components/ui/view-mode-toggle';
 import { useSetContentPreference } from '@/hooks/mutations/use-content-preference';
@@ -14,11 +18,6 @@ import { useToggleUserContentStatus } from '@/hooks/mutations/use-toggle-user-co
 import { useUserContents } from '@/hooks/queries/use-user-contents';
 import { isContentLiked } from '@/utils/content-helpers';
 import type { PriorityValue } from '@/utils/priority';
-
-import { ContentItemList } from '@/components/content/common/items/content-item-list';
-import { ContentItemSmallCard } from '@/components/content/common/items/content-item-small-card';
-import { ContentDetail } from '@/components/content/detail/content-detail';
-import { SwipeableContentItem } from '@/components/content/queue/swipe/swipeable-content-item';
 
 export function ContentList() {
   const { data: userContents = [], isLoading, error, refetch } = useUserContents('pending');

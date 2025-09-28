@@ -14,7 +14,7 @@ import { useSaveContent } from '@/hooks/mutations/use-save-content';
 import { useRecommendations } from '@/hooks/queries/use-recommendations';
 import type { PriorityValue } from '@/utils/priority';
 
-import { ContentDetail } from '../../detail/content-detail';
+import { ContentDetail } from '../../common/detail/content-detail';
 import { RecommendListSkeleton } from './recommend-list-skeleton';
 
 export function RecommendList() {
