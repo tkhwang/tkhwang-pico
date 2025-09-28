@@ -12,14 +12,13 @@ import {
   View,
 } from 'react-native';
 
-import { SchedulePriorityPicker } from '@/components/content/shared/schedule-priority-picker';
+import { SchedulePriorityPicker } from '@/components/content/common/schedule/schedule-priority-picker';
+import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
 import { useUpdateContent } from '@/hooks/mutations/use-update-content';
 import { formatDateForApi, normalizeToStartOfDay } from '@/utils/date';
 import { DEFAULT_PRIORITY, type PriorityValue } from '@/utils/priority';
-
-import { Button } from '../../ui/button';
 
 interface ContentEditModalProps {
   visible: boolean;
@@ -136,7 +135,7 @@ export function ContentEditModal({ visible, item, onClose, onSuccess }: ContentE
                     onScheduledDateChange={setScheduledDate}
                     priority={priority}
                     onPriorityChange={setPriority}
-                    previewTitle="Current Settings"
+                    previewTitle="Reading Plan"
                   />
 
                   {/* Save Button */}

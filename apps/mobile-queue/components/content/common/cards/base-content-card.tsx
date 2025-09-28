@@ -3,9 +3,9 @@ import { TouchableOpacity, View } from 'react-native';
 
 import { Text } from '@/components/ui/text';
 
-import { ContentMetadata } from './sub/content-metadata';
-import { ContentTags } from './sub/content-tags';
-import { ContentThumbnail } from './sub/content-thumbnail';
+import { ContentMetadata } from '../sub/content-metadata';
+import { ContentTags } from '../sub/content-tags';
+import { ContentThumbnail } from '../sub/content-thumbnail';
 
 interface BaseContentCardProps {
   // Required props
@@ -73,15 +73,15 @@ export function BaseContentCard({
 
   const content = (
     <>
+      {/* Top left slot (e.g., match spectrum) */}
+      {topLeftSlot}
+
       {/* Metadata row at top */}
       {metadataProps && (
         <View className="mb-2">
           <ContentMetadata {...metadataProps} />
         </View>
       )}
-
-      {/* Top left slot (e.g., match spectrum) */}
-      {topLeftSlot}
 
       {/* Main content row */}
       <View className="flex-row items-start">

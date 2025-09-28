@@ -11,7 +11,7 @@ import { Alert, type LayoutChangeEvent, TouchableOpacity, View } from 'react-nat
 import { GestureDetector } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
 
-import { SchedulePriorityPicker } from '@/components/content/shared/schedule-priority-picker';
+import { SchedulePriorityPicker } from '@/components/content/common/schedule/schedule-priority-picker';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
@@ -272,7 +272,7 @@ export function SwipeableRecommendItem({
             onScheduledDateChange={handleScheduleChange}
             priority={priority}
             onPriorityChange={setPriority}
-            previewTitle="Preview"
+            previewTitle="Reading Plan"
           />
 
           <View className="mt-6 flex-row gap-2">

@@ -8,19 +8,19 @@ import { PRIORITY_STYLES } from '@/consts/app-styles';
 import { formatScheduleLabel, getDefaultSchedule } from '@/utils/date';
 import { PRIORITY_LABELS, type PriorityValue } from '@/utils/priority';
 
-interface SchedulePriorityPreviewProps {
+interface SchedulePriorityPlanProps {
   scheduledDate: Date | null;
   priority: PriorityValue;
   title?: string;
   referenceDate?: Date;
 }
 
-export function SchedulePriorityPreview({
+export function SchedulePriorityPlan({
   scheduledDate,
   priority,
-  title = 'Current Settings',
+  title = 'Reading Plan',
   referenceDate,
-}: SchedulePriorityPreviewProps) {
+}: SchedulePriorityPlanProps) {
   const todayReference = React.useMemo(
     () => referenceDate ?? getDefaultSchedule(),
     [referenceDate],

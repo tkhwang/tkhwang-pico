@@ -18,19 +18,19 @@ import { useContentActions } from '@/hooks/use-content-actions';
 import { DEFAULT_PRIORITY, PRIORITY_LABELS, type PriorityValue } from '@/utils/priority';
 import { getFaviconUrl } from '@/utils/url';
 
-interface ContentItemListProps {
+interface ContentCardListProps {
   item: UserContentWithDetails;
   onPress?: (item: UserContentWithDetails) => void;
   isLiked?: boolean;
   showCompletedTime?: boolean;
 }
 
-export function ContentItemList({
+export function ContentCardList({
   item,
   onPress,
   isLiked = false,
   showCompletedTime = false,
-}: ContentItemListProps) {
+}: ContentCardListProps) {
   const { openURL } = useContentActions();
   const content = item.contents;
   const faviconUrl = getFaviconUrl(content?.metadata);

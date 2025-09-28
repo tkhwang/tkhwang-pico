@@ -5,7 +5,7 @@ import { Alert, type LayoutChangeEvent, TouchableOpacity, View } from 'react-nat
 import { GestureDetector } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
 
-import { ContentItem } from '@/components/content/content-item';
+import { ContentCard } from '@/components/content/common/cards/content-card';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
 import {
@@ -238,7 +238,7 @@ export function SwipeableContentItem({
             itemHeight.value = event.nativeEvent.layout.height;
           }}
         >
-          <ContentItem item={item} onPress={handleContentPress} isLiked={isLiked} />
+          <ContentCard item={item} onPress={handleContentPress} isLiked={isLiked} />
         </AnimatedViewTyped>
       </GestureDetector>
     </View>

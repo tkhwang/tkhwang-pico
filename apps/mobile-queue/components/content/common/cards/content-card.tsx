@@ -3,7 +3,7 @@ import { CalendarDays, CheckCircle, CircleCheckBig, Heart } from 'lucide-react-n
 import React from 'react';
 import { View } from 'react-native';
 
-import { BaseContentCard } from '@/components/content/base-content-card';
+import { BaseContentCard } from '@/components/content/common/cards/base-content-card';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
 import { PRIORITY_STYLES } from '@/consts/app-styles';
@@ -22,19 +22,19 @@ const getFaviconUrl = (metadata: unknown): string | null => {
   return typeof favicon_url === 'string' ? favicon_url : null;
 };
 
-interface ContentItemProps {
+interface ContentCardProps {
   item: UserContentWithDetails;
   onPress?: (item: UserContentWithDetails) => void;
   isLiked?: boolean;
   showCompletedTime?: boolean;
 }
 
-export function ContentItem({
+export function ContentCard({
   item,
   onPress,
   isLiked = false,
   showCompletedTime = false,
-}: ContentItemProps) {
+}: ContentCardProps) {
   const { openURL } = useContentActions();
   const content = item.contents;
 

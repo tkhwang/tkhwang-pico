@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View } from 'react-native';
 
-import { ContentList } from '../content/list/content-list';
+import { ContentList } from '../content/queue/list/content-list';
 import { FAB } from '../fab';
 import { FabModal } from './fab-modal';
 

@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { Animated, View } from 'react-native';
 
-export function ContentItemSkeleton() {
+export function ContentCardSkeleton() {
   const fadeAnim = useRef(new Animated.Value(0.5)).current;
 
   useEffect(() => {

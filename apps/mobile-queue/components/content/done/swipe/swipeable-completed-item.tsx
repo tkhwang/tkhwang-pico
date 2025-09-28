@@ -11,8 +11,8 @@ import { Alert, TouchableOpacity, View } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
 
-import { ContentItem } from '@/components/content/content-item';
-import { SchedulePriorityPicker } from '@/components/content/shared/schedule-priority-picker';
+import { ContentCard } from '@/components/content/common/cards/content-card';
+import { SchedulePriorityPicker } from '@/components/content/common/schedule/schedule-priority-picker';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
@@ -324,7 +324,7 @@ export function SwipeableCompletedItem({
               itemHeight.value = e.nativeEvent.layout.height;
             }}
           >
-            <ContentItem
+            <ContentCard
               item={item}
               onPress={handlePress}
               isLiked={isLiked}
@@ -356,7 +356,7 @@ export function SwipeableCompletedItem({
               onScheduledDateChange={handleScheduleDateChange}
               priority={schedulePriorityValue}
               onPriorityChange={setSchedulePriorityValue}
-              previewTitle="Preview"
+              previewTitle="Reading Plan"
             />
 
             <View className="mt-6 flex-row gap-2">

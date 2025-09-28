@@ -22,7 +22,7 @@ import {
   type PriorityValue,
 } from '@/utils/priority';
 
-import { SchedulePriorityPreview } from './schedule-priority-preview';
+import { SchedulePriorityPlan } from './schedule-priority-plan';
 
 interface SchedulePriorityPickerProps {
   scheduledDate: Date | null;
@@ -84,7 +84,7 @@ export function SchedulePriorityPicker({
   priority,
   onPriorityChange,
   visible = true,
-  previewTitle = 'Current Settings',
+  previewTitle = 'Reading Date',
   minDate,
   className,
 }: SchedulePriorityPickerProps) {
@@ -248,7 +248,7 @@ export function SchedulePriorityPicker({
 
   const content = (
     <View className={cn('gap-4', className)}>
-      <SchedulePriorityPreview
+      <SchedulePriorityPlan
         scheduledDate={scheduledDate}
         priority={priority}
         title={previewTitle}
@@ -257,7 +257,7 @@ export function SchedulePriorityPicker({
 
       <View>
         <Text className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-          Reading Schedule
+          Reading Date
         </Text>
         <View className="gap-2">
           {schedulePresetRows.map((row, rowIndex) => (
@@ -318,7 +318,9 @@ export function SchedulePriorityPicker({
       </View>
 
       <View>
-        <Text className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">Priority</Text>
+        <Text className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+          Reading Priority
+        </Text>
         <View className="flex-row gap-2">
           {PRIORITY_ORDER.map((value) => {
             const selected = priority === value;

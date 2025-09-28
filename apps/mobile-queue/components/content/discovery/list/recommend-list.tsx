@@ -5,6 +5,7 @@ import type { Recommendation } from '@tkhwang-pico/supabase';
 import React, { useCallback, useMemo, useState } from 'react';
 import { RefreshControl, ScrollView, View } from 'react-native';
 
+import { SwipeableRecommendItem } from '@/components/content/discovery/swipe/swipeable-recommend-item';
 import { Text } from '@/components/ui/text';
 import { SWIPE_ACTION_CARD_REMOVAL_DELAY_MS } from '@/consts/app-consts';
 import { queryKey } from '@/hooks/keys/query-key';
@@ -13,8 +14,7 @@ import { useSaveContent } from '@/hooks/mutations/use-save-content';
 import { useRecommendations } from '@/hooks/queries/use-recommendations';
 import type { PriorityValue } from '@/utils/priority';
 
-import { ContentDetail } from '../../content/detail/content-detail';
-import { SwipeableRecommendItem } from '../swipe/swipeable-recommend-item';
+import { ContentDetail } from '@/components/content/detail/content-detail';
 import { RecommendListSkeleton } from './recommend-list-skeleton';
 
 export function RecommendList() {

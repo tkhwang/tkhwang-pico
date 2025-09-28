@@ -3,7 +3,11 @@ import type { UserContentWithDetails } from '@tkhwang-pico/supabase';
 import React, { useCallback, useEffect, useState } from 'react';
 import { RefreshControl, ScrollView, TouchableOpacity, View } from 'react-native';
 
-import { ContentListSkeleton } from '@/components/content/list/content-list-skeleton';
+import { ContentDetail } from '@/components/content/detail/content-detail';
+import { ContentCardList } from '@/components/content/common/cards/content-card-list';
+import { ContentCardSmall } from '@/components/content/common/cards/content-card-small';
+import { ContentListSkeleton } from '@/components/content/queue/list/content-list-skeleton';
+import { SwipeableContentItem } from '@/components/content/queue/swipe/swipeable-content-item';
 import { Text } from '@/components/ui/text';
 import { type ViewMode, ViewModeToggle } from '@/components/ui/view-mode-toggle';
 import { useSetContentPreference } from '@/hooks/mutations/use-content-preference';
@@ -14,11 +18,6 @@ import { useToggleUserContentStatus } from '@/hooks/mutations/use-toggle-user-co
 import { useUserContents } from '@/hooks/queries/use-user-contents';
 import { isContentLiked } from '@/utils/content-helpers';
 import type { PriorityValue } from '@/utils/priority';
-
-import { ContentItemList } from '../content-item-list';
-import { ContentItemSmallCard } from '../content-item-small-card';
-import { ContentDetail } from '../detail/content-detail';
-import { SwipeableContentItem } from '../swipe/swipeable-content-item';
 
 export function ContentList() {
   const { data: userContents = [], isLoading, error, refetch } = useUserContents('pending');
@@ -167,7 +166,7 @@ export function ContentList() {
     if (viewMode === 'list') {
       return (
         <View className="mb-1">
-          <ContentItemList item={item} onPress={handleItemPress} isLiked={isLiked} />
+          <ContentCardList item={item} onPress={handleItemPress} isLiked={isLiked} />
         </View>
       );
     }
@@ -175,7 +174,7 @@ export function ContentList() {
     if (viewMode === 'smallCard') {
       return (
         <View className="flex-1 p-1">
-          <ContentItemSmallCard item={item} onPress={handleItemPress} isLiked={isLiked} />
+          <ContentCardSmall item={item} onPress={handleItemPress} isLiked={isLiked} />
         </View>
       );
     }

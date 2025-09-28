@@ -20,10 +20,12 @@ import React from 'react';
 import { Alert, type LayoutChangeEvent, Platform, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { SchedulePriorityPicker } from '@/components/content/shared/schedule-priority-picker';
-import { SchedulePriorityPreview } from '@/components/content/shared/schedule-priority-preview';
-import { ContentTags } from '@/components/content/sub/content-tags';
-import { ContentThumbnail } from '@/components/content/sub/content-thumbnail';
+import { ContentDetailBottomActions } from '@/components/content/detail/content-detail-bottom-actions';
+import { ContentEditModal } from '@/components/content/edit/content-edit-modal';
+import { SchedulePriorityPicker } from '@/components/content/common/schedule/schedule-priority-picker';
+import { SchedulePriorityPlan } from '@/components/content/common/schedule/schedule-priority-plan';
+import { ContentTags } from '@/components/content/common/sub/content-tags';
+import { ContentThumbnail } from '@/components/content/common/sub/content-thumbnail';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import { SiteFavicon } from '@/components/ui/site-favicon';
@@ -42,9 +44,6 @@ import { formatReadingTimeWithSuffix, getThumbnailUrl } from '@/utils/content-fo
 import { formatDateForApi, getDefaultSchedule, normalizeToStartOfDay } from '@/utils/date';
 import { DEFAULT_PRIORITY, type PriorityValue } from '@/utils/priority';
 import { getFaviconUrl } from '@/utils/url';
-
-import { ContentEditModal } from '../edit/content-edit-modal';
-import { ContentDetailBottomActions } from './content-detail-bottom-actions';
 
 const GRID_GAP = 8;
 
@@ -364,7 +363,7 @@ export function ContentDetail({
 
         if (shouldCloseDetail) onClose();
       } catch (error) {
-        console.error('Failed to update reading schedule', error);
+        console.error('Failed to update Reading Plan', error);
       }
     });
   }, [
@@ -615,10 +614,10 @@ export function ContentDetail({
                         : { flex: 1 }
                   }
                 >
-                  <SchedulePriorityPreview
+                  <SchedulePriorityPlan
                     scheduledDate={scheduledDatePreview}
                     priority={priorityValue}
-                    title="Reading Schedule"
+                    title="Reading Plan"
                   />
                 </View>
                 {!isCompleted && (
@@ -720,7 +719,7 @@ export function ContentDetail({
         >
           <BottomSheetView className="flex-1 px-4 py-4">
             <Text className="mb-1 text-base font-semibold text-gray-900 dark:text-gray-100">
-              {scheduleContext?.type === 'reopen' ? 'Reading Schedule' : 'Add to Queue'}
+              {scheduleContext?.type === 'reopen' ? 'Reading Plan' : 'Add to Queue'}
             </Text>
             <Text className="mb-4 text-xs text-gray-500 dark:text-gray-400">
               {scheduleContext?.type === 'reopen'
@@ -734,7 +733,7 @@ export function ContentDetail({
               onScheduledDateChange={handleScheduleDateChange}
               priority={schedulePriorityValue}
               onPriorityChange={handleSchedulePriorityChange}
-              previewTitle="Preview"
+              previewTitle="Reading Plan"
             />
 
             <View className="mt-6 flex-row gap-2">
