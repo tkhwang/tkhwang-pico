@@ -33,37 +33,35 @@ export function ContentMetadata({
   showMatchSpectrum = false,
   badgeElement,
 }: ContentMetadataProps) {
+  const rightContent = rightElement ? (
+    rightElement
+  ) : date ? (
+    <Text className="text-xs text-gray-400 dark:text-gray-500">{date}</Text>
+  ) : null;
+
   return (
     <View className={`mb-1 ${className}`}>
       <View className="flex-row items-start justify-between">
         <View className="flex-1 pr-2">
           {showMatchSpectrum && <ContentMatchSpectrum score={score} />}
 
-          <View className="flex-row items-center justify-between">
-            {/* Left side: Domain with favicon */}
+          <View className="flex-row items-center gap-2">
             {domain && (
               <View className="flex-row items-center">
                 <SiteFavicon url={faviconUrl} size={12} className="mr-1" />
                 <Text className="text-xs text-gray-400 dark:text-gray-500">{domain}</Text>
               </View>
             )}
-
-            {/* Right side: Reading time (or date if reading time not available) */}
-            <View className="flex-row items-center">
-              {readingTime && (
-                <Text className="text-xs text-gray-400 dark:text-gray-500">{readingTime}</Text>
-              )}
-              {!readingTime && date && (
-                <Text className="text-xs text-gray-400 dark:text-gray-500">{date}</Text>
-              )}
-            </View>
+            {readingTime && (
+              <Text className="text-xs text-gray-400 dark:text-gray-500">{readingTime}</Text>
+            )}
           </View>
         </View>
 
-        {(badgeElement || rightElement) && (
+        {(badgeElement || rightContent) && (
           <View className="ml-2 flex-shrink-0 items-end gap-1">
             {badgeElement}
-            {rightElement}
+            {rightContent}
           </View>
         )}
       </View>
