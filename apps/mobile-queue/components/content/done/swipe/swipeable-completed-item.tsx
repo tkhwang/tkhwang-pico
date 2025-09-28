@@ -11,7 +11,7 @@ import { Alert, TouchableOpacity, View } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
 
-import { ContentItem } from '@/components/content/common/items/content-item';
+import { ContentCard } from '@/components/content/common/cards/content-card';
 import { SchedulePriorityPicker } from '@/components/content/common/schedule/schedule-priority-picker';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
@@ -324,7 +324,7 @@ export function SwipeableCompletedItem({
               itemHeight.value = e.nativeEvent.layout.height;
             }}
           >
-            <ContentItem
+            <ContentCard
               item={item}
               onPress={handlePress}
               isLiked={isLiked}

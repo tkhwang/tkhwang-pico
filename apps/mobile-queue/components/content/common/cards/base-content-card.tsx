@@ -3,9 +3,9 @@ import { TouchableOpacity, View } from 'react-native';
 
 import { Text } from '@/components/ui/text';
 
-import { ContentMetadata } from './sub/content-metadata';
-import { ContentTags } from './sub/content-tags';
-import { ContentThumbnail } from './sub/content-thumbnail';
+import { ContentMetadata } from '../sub/content-metadata';
+import { ContentTags } from '../sub/content-tags';
+import { ContentThumbnail } from '../sub/content-thumbnail';
 
 interface BaseContentCardProps {
   // Required props

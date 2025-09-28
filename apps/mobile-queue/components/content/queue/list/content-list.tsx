@@ -3,9 +3,9 @@ import type { UserContentWithDetails } from '@tkhwang-pico/supabase';
 import React, { useCallback, useEffect, useState } from 'react';
 import { RefreshControl, ScrollView, TouchableOpacity, View } from 'react-native';
 
-import { ContentDetail } from '@/components/content/common/detail/content-detail';
-import { ContentItemList } from '@/components/content/common/items/content-item-list';
-import { ContentItemSmallCard } from '@/components/content/common/items/content-item-small-card';
+import { ContentDetail } from '@/components/content/detail/content-detail';
+import { ContentCardList } from '@/components/content/common/cards/content-card-list';
+import { ContentCardSmall } from '@/components/content/common/cards/content-card-small';
 import { ContentListSkeleton } from '@/components/content/queue/list/content-list-skeleton';
 import { SwipeableContentItem } from '@/components/content/queue/swipe/swipeable-content-item';
 import { Text } from '@/components/ui/text';
@@ -166,7 +166,7 @@ export function ContentList() {
     if (viewMode === 'list') {
       return (
         <View className="mb-1">
-          <ContentItemList item={item} onPress={handleItemPress} isLiked={isLiked} />
+          <ContentCardList item={item} onPress={handleItemPress} isLiked={isLiked} />
         </View>
       );
     }
@@ -174,7 +174,7 @@ export function ContentList() {
     if (viewMode === 'smallCard') {
       return (
         <View className="flex-1 p-1">
-          <ContentItemSmallCard item={item} onPress={handleItemPress} isLiked={isLiked} />
+          <ContentCardSmall item={item} onPress={handleItemPress} isLiked={isLiked} />
         </View>
       );
     }

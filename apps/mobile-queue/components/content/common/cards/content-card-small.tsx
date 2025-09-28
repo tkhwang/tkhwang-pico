@@ -14,18 +14,18 @@ import { getThumbnailUrl } from '@/utils/content-formatters';
 import { DEFAULT_PRIORITY, PRIORITY_LABELS, type PriorityValue } from '@/utils/priority';
 import { getFaviconUrl } from '@/utils/url';
 
-interface ContentItemSmallCardProps {
+interface ContentCardSmallProps {
   item: UserContentWithDetails;
   onPress?: (item: UserContentWithDetails) => void;
   isLiked?: boolean;
   showCompletedTime?: boolean;
 }
 
-export function ContentItemSmallCard({
+export function ContentCardSmall({
   item,
   onPress,
   isLiked = false,
-}: ContentItemSmallCardProps) {
+}: ContentCardSmallProps) {
   const { openURL } = useContentActions();
   const content = item.contents;
   const faviconUrl = getFaviconUrl(content?.metadata);

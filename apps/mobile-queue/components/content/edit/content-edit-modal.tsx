@@ -13,13 +13,12 @@ import {
 } from 'react-native';
 
 import { SchedulePriorityPicker } from '@/components/content/common/schedule/schedule-priority-picker';
+import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
 import { useUpdateContent } from '@/hooks/mutations/use-update-content';
 import { formatDateForApi, normalizeToStartOfDay } from '@/utils/date';
 import { DEFAULT_PRIORITY, type PriorityValue } from '@/utils/priority';
-
-import { Button } from '../../../ui/button';
 
 interface ContentEditModalProps {
   visible: boolean;
