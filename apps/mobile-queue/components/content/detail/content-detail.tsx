@@ -752,8 +752,10 @@ export function ContentDetail({
           keyboardBlurBehavior="restore"
           stackBehavior="push"
           android_keyboardInputMode="adjustResize"
+          backgroundStyle={{ backgroundColor: 'transparent' }}
+          handleComponent={renderHandle}
         >
-          <BottomSheetView className="flex-1 px-4 py-4">
+          <BottomSheetView className="flex-1 rounded-t-2xl bg-white px-4 py-4 dark:bg-gray-800">
             <Text className="mb-1 text-base font-semibold text-gray-900 dark:text-gray-100">
               {scheduleContext?.type === 'reopen' ? 'Reading Plan' : 'Add to Queue'}
             </Text>
