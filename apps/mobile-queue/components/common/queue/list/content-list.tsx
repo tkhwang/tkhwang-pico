@@ -196,7 +196,7 @@ export function ContentList({ headerRight }: ContentListProps) {
 
   return (
     <View className="flex-1">
-      <View className="mb-2 px-4 pt-3">
+      <View className="px-4 pb-1 pt-3">
         <View className="flex-row items-center justify-between gap-3">
           {headerRight ? <View className="shrink-0">{headerRight}</View> : null}
           <View className="shrink-0">
