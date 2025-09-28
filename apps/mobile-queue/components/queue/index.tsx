@@ -1,8 +1,10 @@
+import { CheckCircle2, Circle } from 'lucide-react-native';
 import React, { useEffect, useMemo, useState } from 'react';
 import { TouchableOpacity, View } from 'react-native';
 
 import { CompletedList } from '@/components/common/queue/list/completed-list';
 import { ContentList } from '@/components/common/queue/list/content-list';
+import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
 
 import { FAB } from '../fab';
@@ -25,13 +27,20 @@ function QueueStatusToggle({ status, onStatusChange }: QueueStatusToggleProps) {
           status === 'pending' ? 'bg-card shadow-sm shadow-black/5' : ''
         }`}
       >
-        <Text
-          className={`text-xs font-semibold ${
-            status === 'pending' ? 'text-primary' : 'text-muted-foreground'
-          }`}
-        >
-          Pending
-        </Text>
+        <View className="flex-row items-center justify-center gap-2">
+          <Icon
+            as={Circle}
+            size={14}
+            className={status === 'pending' ? 'text-primary' : 'text-muted-foreground'}
+          />
+          <Text
+            className={`text-xs font-semibold ${
+              status === 'pending' ? 'text-primary' : 'text-muted-foreground'
+            }`}
+          >
+            Pending
+          </Text>
+        </View>
       </TouchableOpacity>
       <TouchableOpacity
         onPress={() => onStatusChange('completed')}
@@ -40,13 +49,20 @@ function QueueStatusToggle({ status, onStatusChange }: QueueStatusToggleProps) {
           status === 'completed' ? 'bg-card shadow-sm shadow-black/5' : ''
         }`}
       >
-        <Text
-          className={`text-xs font-semibold ${
-            status === 'completed' ? 'text-primary' : 'text-muted-foreground'
-          }`}
-        >
-          Completed
-        </Text>
+        <View className="flex-row items-center justify-center gap-2">
+          <Icon
+            as={CheckCircle2}
+            size={14}
+            className={status === 'completed' ? 'text-primary' : 'text-muted-foreground'}
+          />
+          <Text
+            className={`text-xs font-semibold ${
+              status === 'completed' ? 'text-primary' : 'text-muted-foreground'
+            }`}
+          >
+            Completed
+          </Text>
+        </View>
       </TouchableOpacity>
     </View>
   );
