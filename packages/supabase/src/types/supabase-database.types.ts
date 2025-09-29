@@ -544,7 +544,7 @@ export interface Database {
       };
     };
     Enums: {
-      content_priority: 'low' | 'normal' | 'high';
+      content_priority: 'normal' | 'high';
       content_status: 'pending' | 'ready' | 'failed' | 'archived';
       content_todo_status: 'pending' | 'completed';
       embedding_scope: 'summary' | 'chunk' | 'title' | 'tags';
@@ -671,7 +671,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      content_priority: ['low', 'normal', 'high'],
+      content_priority: ['normal', 'high'],
       content_status: ['pending', 'ready', 'failed', 'archived'],
       content_todo_status: ['pending', 'completed'],
       embedding_scope: ['summary', 'chunk', 'title', 'tags'],

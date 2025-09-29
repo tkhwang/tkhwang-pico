@@ -17,15 +17,22 @@ import {
   Tag,
 } from 'lucide-react-native';
 import React from 'react';
-import { Alert, type LayoutChangeEvent, Platform, TouchableOpacity, View } from 'react-native';
+import {
+  Alert,
+  type LayoutChangeEvent,
+  Platform,
+  TouchableOpacity,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { ContentDetailBottomActions } from '@/components/content/detail/content-detail-bottom-actions';
-import { ContentEditModal } from '@/components/content/edit/content-edit-modal';
 import { SchedulePriorityPicker } from '@/components/content/common/schedule/schedule-priority-picker';
 import { SchedulePriorityPlan } from '@/components/content/common/schedule/schedule-priority-plan';
 import { ContentTags } from '@/components/content/common/sub/content-tags';
 import { ContentThumbnail } from '@/components/content/common/sub/content-thumbnail';
+import { ContentDetailBottomActions } from '@/components/content/detail/content-detail-bottom-actions';
+import { ContentEditModal } from '@/components/content/edit/content-edit-modal';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import { SiteFavicon } from '@/components/ui/site-favicon';
@@ -88,6 +95,11 @@ export function ContentDetail({
   const insets = useSafeAreaInsets();
   const isAndroid = Platform.OS === 'android';
   const sheetPaddingBottom = insets.bottom + (isAndroid ? 24 : 16);
+  const windowHeight = useWindowDimensions().height;
+  const [aboveSummaryHeight, setAboveSummaryHeight] = React.useState<number | null>(null);
+  const DETAIL_HEADER_HEIGHT = 64;
+  const ACTION_BAR_ESTIMATE = 120;
+  const SPACING_BUFFER = 32;
   const scrollContentPaddingBottom = 16;
   const scrollBottomInset = scrollContentPaddingBottom + sheetPaddingBottom;
   const { executeWithHapticFeedback } = useHapticFeedback();
@@ -112,7 +124,22 @@ export function ContentDetail({
   const [showEditModal, setShowEditModal] = React.useState(false);
   const [readingRowWidth, setReadingRowWidth] = React.useState<number | null>(null);
 
-  const snapPoints = React.useMemo(() => ['70%'], []);
+  const snapPoints = React.useMemo(() => {
+    if (!aboveSummaryHeight) {
+      return ['70%'];
+    }
+
+    const requiredHeight =
+      DETAIL_HEADER_HEIGHT +
+      aboveSummaryHeight +
+      ACTION_BAR_ESTIMATE +
+      sheetPaddingBottom +
+      SPACING_BUFFER;
+
+    const ratio = requiredHeight / windowHeight;
+    const clampedRatio = Math.min(0.95, Math.max(0.65, ratio));
+    return [`${Math.round(clampedRatio * 100)}%`];
+  }, [aboveSummaryHeight, windowHeight, sheetPaddingBottom]);
   const scheduleSnapPoints = React.useMemo(() => {
     // Dynamic calculation based on content needs
     // SchedulePriorityPicker has:
@@ -551,94 +578,103 @@ export function ContentDetail({
               paddingBottom: scrollBottomInset,
             }}
           >
-            {/* Title */}
-            <Text
-              className="mb-4 text-xl font-bold text-gray-900 dark:text-gray-100"
-              numberOfLines={3}
-              adjustsFontSizeToFit={false}
+            <View
+              onLayout={(event) => {
+                const measuredHeight = event.nativeEvent.layout.height;
+                setAboveSummaryHeight((prev) => (prev === measuredHeight ? prev : measuredHeight));
+              }}
             >
-              {content.title || 'Untitled'}
-            </Text>
+              {/* Title */}
+              <Text
+                className="mb-4 text-xl font-bold text-gray-900 dark:text-gray-100"
+                numberOfLines={3}
+                adjustsFontSizeToFit={false}
+              >
+                {content.title || 'Untitled'}
+              </Text>
 
-            {/* Metadata */}
-            <View className="mb-1 flex-row flex-wrap">
-              {content.domain && (
-                <View className="mb-2 mr-3 flex-row items-center">
-                  <SiteFavicon url={faviconUrl} size={14} className="mr-1" />
-                  <Text className="text-xs text-gray-600 dark:text-gray-400">{content.domain}</Text>
-                </View>
-              )}
-              {savedAtLabel && (
-                <View className="mb-2 mr-3 flex-row items-center">
-                  <Icon as={Calendar} className="mr-1 h-3.5 w-3.5 text-gray-400" />
-                  <Text className="text-xs text-gray-600 dark:text-gray-400">{savedAtLabel}</Text>
-                </View>
-              )}
-              {content.word_count !== null &&
-                content.word_count !== undefined &&
-                content.word_count > 0 && (
-                  <View className="mb-2 flex-row items-center">
-                    <Icon as={Clock} className="mr-1 h-3.5 w-3.5 text-gray-400" />
+              {/* Metadata */}
+              <View className="mb-1 flex-row flex-wrap">
+                {content.domain && (
+                  <View className="mb-2 mr-3 flex-row items-center">
+                    <SiteFavicon url={faviconUrl} size={14} className="mr-1" />
                     <Text className="text-xs text-gray-600 dark:text-gray-400">
-                      {formatReadingTimeWithSuffix(content.word_count)}
+                      {content.domain}
                     </Text>
                   </View>
                 )}
-            </View>
-
-            {/* Thumbnail */}
-            {thumbnailUrl && (
-              <View className="mb-4 items-center">
-                <ContentThumbnail imageUrl={thumbnailUrl} size="large" className="h-48 w-full" />
+                {savedAtLabel && (
+                  <View className="mb-2 mr-3 flex-row items-center">
+                    <Icon as={Calendar} className="mr-1 h-3.5 w-3.5 text-gray-400" />
+                    <Text className="text-xs text-gray-600 dark:text-gray-400">{savedAtLabel}</Text>
+                  </View>
+                )}
+                {content.word_count !== null &&
+                  content.word_count !== undefined &&
+                  content.word_count > 0 && (
+                    <View className="mb-2 flex-row items-center">
+                      <Icon as={Clock} className="mr-1 h-3.5 w-3.5 text-gray-400" />
+                      <Text className="text-xs text-gray-600 dark:text-gray-400">
+                        {formatReadingTimeWithSuffix(content.word_count)}
+                      </Text>
+                    </View>
+                  )}
               </View>
-            )}
 
-            {userContent && (
-              <View
-                className="mb-4 flex-row"
-                onLayout={!isCompleted ? handleReadingRowLayout : undefined}
-              >
+              {/* Thumbnail */}
+              {thumbnailUrl && (
+                <View className="mb-4 items-center">
+                  <ContentThumbnail imageUrl={thumbnailUrl} size="large" className="h-48 w-full" />
+                </View>
+              )}
+
+              {userContent && (
                 <View
-                  style={
-                    !isCompleted && readingRowSizes
-                      ? {
-                          width: readingRowSizes.cardWidth,
-                          marginRight: GRID_GAP,
-                        }
-                      : !isCompleted
+                  className="mb-4 flex-row"
+                  onLayout={!isCompleted ? handleReadingRowLayout : undefined}
+                >
+                  <View
+                    style={
+                      !isCompleted && readingRowSizes
                         ? {
-                            flexGrow: 3,
-                            flexShrink: 1,
+                            width: readingRowSizes.cardWidth,
                             marginRight: GRID_GAP,
                           }
-                        : { flex: 1 }
-                  }
-                >
-                  <SchedulePriorityPlan
-                    scheduledDate={scheduledDatePreview}
-                    priority={priorityValue}
-                    title="Reading Plan"
-                  />
-                </View>
-                {!isCompleted && (
-                  <TouchableOpacity
-                    onPress={() => setShowEditModal(true)}
-                    accessibilityRole="button"
-                    className="items-center justify-center rounded-lg bg-blue-50 px-2 py-3 dark:bg-blue-500/10"
-                    style={
-                      readingRowSizes
-                        ? { width: readingRowSizes.editWidth }
-                        : { flexGrow: 1, flexShrink: 1 }
+                        : !isCompleted
+                          ? {
+                              flexGrow: 3,
+                              flexShrink: 1,
+                              marginRight: GRID_GAP,
+                            }
+                          : { flex: 1 }
                     }
                   >
-                    <Icon as={Edit2} className="mb-1 h-5 w-5 text-blue-600 dark:text-blue-200" />
-                    <Text className="text-xs font-semibold text-blue-600 dark:text-blue-200">
-                      Edit
-                    </Text>
-                  </TouchableOpacity>
-                )}
-              </View>
-            )}
+                    <SchedulePriorityPlan
+                      scheduledDate={scheduledDatePreview}
+                      priority={priorityValue}
+                      title="Reading Plan"
+                    />
+                  </View>
+                  {!isCompleted && (
+                    <TouchableOpacity
+                      onPress={() => setShowEditModal(true)}
+                      accessibilityRole="button"
+                      className="items-center justify-center rounded-lg bg-blue-50 px-2 py-3 dark:bg-blue-500/10"
+                      style={
+                        readingRowSizes
+                          ? { width: readingRowSizes.editWidth }
+                          : { flexGrow: 1, flexShrink: 1 }
+                      }
+                    >
+                      <Icon as={Edit2} className="mb-1 h-5 w-5 text-blue-600 dark:text-blue-200" />
+                      <Text className="text-xs font-semibold text-blue-600 dark:text-blue-200">
+                        Edit
+                      </Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+              )}
+            </View>
 
             {/* Summary */}
             {content.summary && (
@@ -716,8 +752,10 @@ export function ContentDetail({
           keyboardBlurBehavior="restore"
           stackBehavior="push"
           android_keyboardInputMode="adjustResize"
+          backgroundStyle={{ backgroundColor: 'transparent' }}
+          handleComponent={renderHandle}
         >
-          <BottomSheetView className="flex-1 px-4 py-4">
+          <BottomSheetView className="flex-1 rounded-t-2xl bg-white px-4 py-4 dark:bg-gray-800">
             <Text className="mb-1 text-base font-semibold text-gray-900 dark:text-gray-100">
               {scheduleContext?.type === 'reopen' ? 'Reading Plan' : 'Add to Queue'}
             </Text>

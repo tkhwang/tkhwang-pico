@@ -4,11 +4,10 @@ import { Calendar } from 'lucide-react-native';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { RefreshControl, ScrollView, View } from 'react-native';
 
-import { ContentDetail } from '@/components/content/detail/content-detail';
+import { SwipeableCompletedItem } from '@/components/common/queue/swipe/swipeable-completed-item';
 import { ContentCardList } from '@/components/content/common/cards/content-card-list';
 import { ContentCardSmall } from '@/components/content/common/cards/content-card-small';
-import { CompletedListSkeleton } from '@/components/content/done/list/completed-list-skeleton';
-import { SwipeableCompletedItem } from '@/components/content/done/swipe/swipeable-completed-item';
+import { ContentDetail } from '@/components/content/detail/content-detail';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
 import { type ViewMode, ViewModeToggle } from '@/components/ui/view-mode-toggle';
@@ -23,12 +22,18 @@ import { useUserContents } from '@/hooks/queries/use-user-contents';
 import { isContentLiked } from '@/utils/content-helpers';
 import type { PriorityValue } from '@/utils/priority';
 
+import { CompletedListSkeleton } from './completed-list-skeleton';
+
+interface CompletedListProps {
+  headerRight?: React.ReactNode;
+}
+
 interface GroupedContent {
   date: string;
   items: UserContentWithDetails[];
 }
 
-export function CompletedList() {
+export function CompletedList({ headerRight }: CompletedListProps) {
   const { data: contents = [], isLoading, error, refetch } = useUserContents('completed');
 
   const [refreshing, setRefreshing] = useState(false);
@@ -137,12 +142,11 @@ export function CompletedList() {
   const handleToggleComplete = useCallback(
     (id: string) => {
       toggleContentMutation.mutate(id);
-      handleModalClose(); // Close modal after toggle
+      handleModalClose();
     },
     [toggleContentMutation, handleModalClose],
   );
 
-  // Group contents by date
   const groupedContents = useMemo((): GroupedContent[] => {
     const groups: Record<string, UserContentWithDetails[]> = {};
 
@@ -167,51 +171,6 @@ export function CompletedList() {
   }, [contents]);
 
   if (isLoading && !refreshing) return <CompletedListSkeleton />;
-
-  if (error) {
-    return (
-      <View className="flex-1 items-center justify-center bg-gray-50 px-4 dark:bg-gray-900">
-        <Text className="mb-4 text-4xl">⚠️</Text>
-        <Text className="mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100">
-          Failed to load archive
-        </Text>
-        <Text className="mb-4 text-center text-sm text-gray-500 dark:text-gray-400">
-          {error.message || 'An error occurred while loading your archive'}
-        </Text>
-      </View>
-    );
-  }
-
-  if (groupedContents.length === 0) {
-    return (
-      <ScrollView
-        className="flex-1 bg-gray-50 dark:bg-gray-900"
-        contentContainerStyle={{
-          flexGrow: 1,
-          justifyContent: 'center',
-          alignItems: 'center',
-          paddingHorizontal: 16,
-        }}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            tintColor="#3B82F6"
-            colors={['#3B82F6']}
-            progressBackgroundColor="#ffffff"
-          />
-        }
-      >
-        <Icon as={Calendar} size={48} className="mb-4 text-gray-400 dark:text-gray-600" />
-        <Text className="mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100">
-          No completed contents yet
-        </Text>
-        <Text className="text-center text-sm text-gray-500 dark:text-gray-400">
-          Complete some contents to see them in your archive
-        </Text>
-      </ScrollView>
-    );
-  }
 
   const renderItem = ({ item }: { item: GroupedContent }) => {
     return (
@@ -258,7 +217,6 @@ export function CompletedList() {
             })}
           </View>
         ) : (
-          // Default bigCard view with swipeable
           item.items.map((content, index) => (
             <View key={content.id} className={index > 0 ? 'mt-2' : ''}>
               <SwipeableCompletedItem
@@ -275,18 +233,56 @@ export function CompletedList() {
     );
   };
 
-  return (
-    <View className="flex-1 bg-gray-50 dark:bg-gray-900">
-      {/* View mode toggle */}
-      <View className="mb-2 px-4 pt-3">
-        <ViewModeToggle mode={viewMode} onModeChange={setViewMode} />
-      </View>
+  let content: React.ReactNode;
 
+  if (error) {
+    content = (
+      <View className="flex-1 items-center justify-center bg-gray-50 px-4 dark:bg-gray-900">
+        <Text className="mb-4 text-4xl">⚠️</Text>
+        <Text className="mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100">
+          Failed to load archive
+        </Text>
+        <Text className="mb-4 text-center text-sm text-gray-500 dark:text-gray-400">
+          {error.message || 'An error occurred while loading your archive'}
+        </Text>
+      </View>
+    );
+  } else if (groupedContents.length === 0) {
+    content = (
+      <ScrollView
+        className="flex-1 bg-gray-50 dark:bg-gray-900"
+        contentContainerStyle={{
+          flexGrow: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          paddingHorizontal: 16,
+        }}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#3B82F6"
+            colors={['#3B82F6']}
+            progressBackgroundColor="#ffffff"
+          />
+        }
+      >
+        <Icon as={Calendar} size={48} className="mb-4 text-gray-400 dark:text-gray-600" />
+        <Text className="mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100">
+          No completed contents yet
+        </Text>
+        <Text className="text-center text-sm text-gray-500 dark:text-gray-400">
+          Complete some contents to see them in your archive
+        </Text>
+      </ScrollView>
+    );
+  } else {
+    content = (
       <FlashList
         data={groupedContents}
         renderItem={renderItem}
         keyExtractor={(item) => item.date}
-        key={viewMode} // Force re-render when switching modes
+        key={viewMode}
         estimatedItemSize={viewMode === 'list' ? 150 : viewMode === 'smallCard' ? 300 : 200}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 8 }}
@@ -300,6 +296,21 @@ export function CompletedList() {
           />
         }
       />
+    );
+  }
+
+  return (
+    <View className="flex-1 bg-gray-50 dark:bg-gray-900">
+      <View className="px-4 pb-1 pt-3">
+        <View className="flex-row items-center justify-between gap-3">
+          {headerRight ? <View className="shrink-0">{headerRight}</View> : null}
+          <View className="shrink-0">
+            <ViewModeToggle mode={viewMode} onModeChange={setViewMode} />
+          </View>
+        </View>
+      </View>
+
+      <View className="flex-1">{content}</View>
       {selectedItem && (
         <ContentDetail
           visible={modalVisible}

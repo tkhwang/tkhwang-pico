@@ -3,11 +3,10 @@ import type { UserContentWithDetails } from '@tkhwang-pico/supabase';
 import React, { useCallback, useEffect, useState } from 'react';
 import { RefreshControl, ScrollView, TouchableOpacity, View } from 'react-native';
 
-import { ContentDetail } from '@/components/content/detail/content-detail';
+import { SwipeableContentItem } from '@/components/common/queue/swipe/swipeable-content-item';
 import { ContentCardList } from '@/components/content/common/cards/content-card-list';
 import { ContentCardSmall } from '@/components/content/common/cards/content-card-small';
-import { ContentListSkeleton } from '@/components/content/queue/list/content-list-skeleton';
-import { SwipeableContentItem } from '@/components/content/queue/swipe/swipeable-content-item';
+import { ContentDetail } from '@/components/content/detail/content-detail';
 import { Text } from '@/components/ui/text';
 import { type ViewMode, ViewModeToggle } from '@/components/ui/view-mode-toggle';
 import { useSetContentPreference } from '@/hooks/mutations/use-content-preference';
@@ -19,7 +18,13 @@ import { useUserContents } from '@/hooks/queries/use-user-contents';
 import { isContentLiked } from '@/utils/content-helpers';
 import type { PriorityValue } from '@/utils/priority';
 
-export function ContentList() {
+import { ContentListSkeleton } from './content-list-skeleton';
+
+interface ContentListProps {
+  headerRight?: React.ReactNode;
+}
+
+export function ContentList({ headerRight }: ContentListProps) {
   const { data: userContents = [], isLoading, error, refetch } = useUserContents('pending');
 
   const [refreshing, setRefreshing] = useState(false);
@@ -101,7 +106,6 @@ export function ContentList() {
     setSelectedItem(null);
   }, []);
 
-  // Keep selectedItem in sync with latest cache while modal is open
   useEffect(() => {
     if (!modalVisible || !selectedItem) return;
     const updated = userContents.find((c) => c.content_id === selectedItem.content_id);
@@ -179,7 +183,6 @@ export function ContentList() {
       );
     }
 
-    // Default bigCard view with swipeable
     return (
       <SwipeableContentItem
         item={item}
@@ -193,16 +196,20 @@ export function ContentList() {
 
   return (
     <View className="flex-1">
-      {/* View mode toggle */}
-      <View className="mb-2 px-4 pt-3">
-        <ViewModeToggle mode={viewMode} onModeChange={setViewMode} />
+      <View className="px-4 pb-1 pt-3">
+        <View className="flex-row items-center justify-between gap-3">
+          {headerRight ? <View className="shrink-0">{headerRight}</View> : null}
+          <View className="shrink-0">
+            <ViewModeToggle mode={viewMode} onModeChange={setViewMode} />
+          </View>
+        </View>
       </View>
 
       <FlashList
         data={userContents}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
-        key={viewMode} // Force re-render when switching modes
+        key={viewMode}
         estimatedItemSize={viewMode === 'list' ? 60 : viewMode === 'smallCard' ? 150 : 120}
         numColumns={viewMode === 'smallCard' ? 2 : 1}
         showsVerticalScrollIndicator={false}
@@ -224,7 +231,6 @@ export function ContentList() {
         }
       />
 
-      {/* Content Detail Modal */}
       <ContentDetail
         visible={modalVisible}
         item={selectedItem}

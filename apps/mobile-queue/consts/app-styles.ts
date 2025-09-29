@@ -259,11 +259,6 @@ type PriorityKey = Enums<'content_priority'>;
 const BASE_PRIORITY_STYLES: Partial<
   Record<PriorityValue, { badge: string; dot: string; text: string }>
 > = {
-  low: {
-    badge: 'bg-emerald-100 dark:bg-emerald-500/10',
-    dot: 'bg-emerald-500 dark:bg-emerald-300',
-    text: 'text-emerald-700 dark:text-emerald-200',
-  },
   normal: {
     badge: 'bg-blue-100 dark:bg-blue-500/10',
     dot: 'bg-blue-500 dark:bg-blue-300',

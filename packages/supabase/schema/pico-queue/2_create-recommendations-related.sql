@@ -19,7 +19,7 @@ do $$ begin
     create type content_todo_status as enum ('pending','completed');
   end if;
   if not exists (select 1 from pg_type where typname='content_priority') then
-    create type content_priority as enum ('low','normal','high');
+    create type content_priority as enum ('normal','high');
   end if;
 end $$;
 
