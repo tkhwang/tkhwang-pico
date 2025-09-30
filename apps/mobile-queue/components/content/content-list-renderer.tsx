@@ -1,6 +1,5 @@
-import { FlashList, type ListRenderItem } from '@shopify/flash-list';
+import { FlashList, type FlashListProps, type ListRenderItem } from '@shopify/flash-list';
 import type { ReactNode } from 'react';
-import type { RefreshControlProps } from 'react-native';
 import { RefreshControl, View } from 'react-native';
 
 import type { ViewMode } from '@/contexts/queue-context';
@@ -14,7 +13,7 @@ interface ContentListRendererProps<T> {
   refreshing?: boolean;
   onRefresh?: () => void;
   emptyComponent?: ReactNode;
-  contentContainerStyle?: Record<string, any>;
+  contentContainerStyle?: FlashListProps<T>['contentContainerStyle'];
 }
 
 export function ContentListRenderer<T>({
@@ -42,6 +41,12 @@ export function ContentListRenderer<T>({
     return <View className="flex-1">{emptyComponent}</View>;
   }
 
+  const defaultContentStyle = {
+    paddingHorizontal: viewMode === 'smallCard' ? 8 : 12,
+    paddingTop: 8,
+    paddingBottom: 12,
+  } as FlashListProps<T>['contentContainerStyle'];
+
   return (
     <FlashList
       data={data}
@@ -51,13 +56,7 @@ export function ContentListRenderer<T>({
       estimatedItemSize={estimatedItemSize}
       numColumns={viewMode === 'smallCard' ? 2 : 1}
       showsVerticalScrollIndicator={false}
-      contentContainerStyle={
-        contentContainerStyle ?? {
-          paddingHorizontal: viewMode === 'smallCard' ? 8 : 12,
-          paddingTop: 8,
-          paddingBottom: 12,
-        }
-      }
+      contentContainerStyle={contentContainerStyle ?? defaultContentStyle}
       removeClippedSubviews={true}
       drawDistance={200}
       refreshControl={refreshControl}
