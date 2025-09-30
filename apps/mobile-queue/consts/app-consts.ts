@@ -4,6 +4,11 @@ export const SWIPE_ACTION_FEEDBACK_DURATION_MS = 300; // Reduced from 500ms for 
 export const SWIPE_ACTION_CARD_REMOVAL_DELAY_MS = 400; // Delay before removing card after feedback animation
 export const DEFAULT_HAPTIC_DURATION_MS = 120;
 
+// storage keys
+export const LOCAL_STORAGE_KEYS = {
+  queueViewModes: 'queue:viewModes',
+} as const;
+
 // swipe action sizing
 export const SWIPE_ACTION_BUTTON_WIDTH = 80;
 export const SWIPE_MENU_DAMPING = 0.65;
