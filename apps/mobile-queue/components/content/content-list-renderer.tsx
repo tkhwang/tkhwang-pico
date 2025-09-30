@@ -1,5 +1,4 @@
 import { FlashList, type FlashListProps, type ListRenderItem } from '@shopify/flash-list';
-import type { ReactNode } from 'react';
 import { RefreshControl } from 'react-native';
 
 import type { ViewMode } from '@/contexts/queue-context';
@@ -12,7 +11,7 @@ interface ContentListRendererProps<T> {
   estimatedItemSize: number;
   refreshing?: boolean;
   onRefresh?: () => void;
-  emptyComponent?: ReactNode;
+  emptyComponent?: FlashListProps<T>['ListEmptyComponent'];
   contentContainerStyle?: FlashListProps<T>['contentContainerStyle'];
 }
 
