@@ -21,11 +21,7 @@ interface ContentCardSmallProps {
   showCompletedTime?: boolean;
 }
 
-export function ContentCardSmall({
-  item,
-  onPress,
-  isLiked = false,
-}: ContentCardSmallProps) {
+export function ContentCardSmall({ item, onPress, isLiked = false }: ContentCardSmallProps) {
   const { openURL } = useContentActions();
   const content = item.contents;
   const faviconUrl = getFaviconUrl(content?.metadata);
@@ -73,7 +69,7 @@ export function ContentCardSmall({
       onLongPress={handleLongPress}
       delayLongPress={500}
       activeOpacity={0.7}
-      className="flex-1 rounded-lg border border-gray-100 bg-white p-2.5 dark:border-gray-700 dark:bg-gray-800"
+      className="rounded-lg border border-gray-100 bg-white p-3 dark:border-gray-700 dark:bg-gray-800"
     >
       {/* Domain with favicon */}
       <View className="flex-row items-center">
@@ -88,10 +84,10 @@ export function ContentCardSmall({
         <ContentThumbnail
           imageUrl={thumbnailUrl}
           size="medium"
-          className="mb-2 h-24 w-full rounded-md"
+          className="mb-2 h-32 w-full rounded-md"
         />
       ) : (
-        <View className="mb-2 h-24 w-full rounded-md bg-gray-100 dark:bg-gray-700" />
+        <View className="mb-2 h-32 w-full rounded-md bg-gray-100 dark:bg-gray-700" />
       )}
 
       {/* Status Icons Row */}
