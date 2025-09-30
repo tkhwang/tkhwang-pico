@@ -4,7 +4,7 @@ import { View } from 'react-native';
 import { FAB } from '@/components/fab';
 import { useQueueState } from '@/contexts/queue-context';
 
-import { FabModal } from './fab-modal';
+import { FabModal } from '../../queue/fab-modal';
 import { QueueContent } from './queue-content';
 import { QueueHeader } from './queue-header';
 
