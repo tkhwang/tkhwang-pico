@@ -5,10 +5,9 @@ import { Header } from '@/components/header';
 
 interface MainLayoutProps {
   children: ReactNode;
-  showHeader?: boolean;
 }
 
-export function MainLayout({ children, showHeader = true }: MainLayoutProps) {
+export function MainLayout({ children }: MainLayoutProps) {
   return (
     <SafeAreaView
       className="flex-1 bg-white dark:bg-gray-900"
@@ -17,7 +16,7 @@ export function MainLayout({ children, showHeader = true }: MainLayoutProps) {
       }}
     >
       <View className="flex-1 bg-white dark:bg-gray-900">
-        {showHeader && <Header />}
+        <Header />
         <View className="flex-1">{children}</View>
       </View>
     </SafeAreaView>
