@@ -755,7 +755,10 @@ export function ContentDetail({
           backgroundStyle={{ backgroundColor: 'transparent' }}
           handleComponent={renderHandle}
         >
-          <BottomSheetView className="flex-1 rounded-t-2xl bg-white px-4 py-4 dark:bg-gray-800">
+          <BottomSheetView
+            className="flex-1 rounded-t-2xl bg-white px-4 dark:bg-gray-800"
+            style={{ paddingTop: 16, paddingBottom: insets.bottom + 16 }}
+          >
             <Text className="mb-1 text-base font-semibold text-gray-900 dark:text-gray-100">
               {scheduleContext?.type === 'reopen' ? 'Reading Plan' : 'Add to Queue'}
             </Text>

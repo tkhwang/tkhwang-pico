@@ -10,6 +10,7 @@ import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { Alert, type LayoutChangeEvent, TouchableOpacity, View } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ContentCard } from '@/components/content/common/cards/content-card';
 import { SchedulePriorityPicker } from '@/components/content/common/schedule/schedule-priority-picker';
@@ -52,6 +53,7 @@ export function SwipeableCompletedItem({
 }: SwipeableCompletedItemProps) {
   const isLiked = isContentLiked(item);
   const { isProcessing, actionCompleted, executeWithFeedback } = useSwipeActionFeedback();
+  const insets = useSafeAreaInsets();
 
   const {
     itemHeight,
@@ -79,7 +81,12 @@ export function SwipeableCompletedItem({
   const [pendingReopen, setPendingReopen] = useState<{ userContentId: string } | null>(null);
   const [isScheduleSheetOpen, setScheduleSheetOpen] = useState(false);
 
-  const sheetSnapPoints = useMemo(() => ['60%'], []);
+  const sheetSnapPoints = useMemo(() => {
+    const contentHeight = 560;
+    const safeAreaPadding = insets.bottom + 40;
+    const minHeight = contentHeight + safeAreaPadding;
+    return ['75%', `${minHeight}`];
+  }, [insets.bottom]);
 
   const renderBackdrop = useCallback(
     (backdropProps: BottomSheetBackdropProps) => (
@@ -340,8 +347,12 @@ export function SwipeableCompletedItem({
           onDismiss={handleScheduleSheetDismiss}
           backdropComponent={renderBackdrop}
           enablePanDownToClose={!isProcessing}
+          enableDynamicSizing={true}
         >
-          <BottomSheetView className="flex-1 px-4 py-4">
+          <BottomSheetView
+            className="flex-1 px-4"
+            style={{ paddingTop: 16, paddingBottom: insets.bottom + 16 }}
+          >
             <Text className="mb-1 text-base font-semibold text-gray-900 dark:text-gray-100">
               Add to Queue
             </Text>
