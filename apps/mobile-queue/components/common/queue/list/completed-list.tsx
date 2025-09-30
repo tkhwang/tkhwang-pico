@@ -1,16 +1,16 @@
-import { FlashList } from '@shopify/flash-list';
 import type { UserContentWithDetails } from '@tkhwang-pico/supabase';
 import { Calendar } from 'lucide-react-native';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { RefreshControl, ScrollView, View } from 'react-native';
 
 import { SwipeableCompletedItem } from '@/components/common/queue/swipe/swipeable-completed-item';
 import { ContentCardList } from '@/components/content/common/cards/content-card-list';
 import { ContentCardSmall } from '@/components/content/common/cards/content-card-small';
+import { ContentListRenderer } from '@/components/content/content-list-renderer';
 import { ContentDetail } from '@/components/content/detail/content-detail';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
-import { type ViewMode, ViewModeToggle } from '@/components/ui/view-mode-toggle';
+import { useQueueState } from '@/contexts/queue-context';
 import { useSetContentPreference } from '@/hooks/mutations/use-content-preference';
 import { useDeleteContent } from '@/hooks/mutations/use-delete-content';
 import { useReopenContent } from '@/hooks/mutations/use-reopen-content';
@@ -24,22 +24,13 @@ import type { PriorityValue } from '@/utils/priority';
 
 import { CompletedListSkeleton } from './completed-list-skeleton';
 
-interface CompletedListProps {
-  headerRight?: React.ReactNode;
-}
-
-interface GroupedContent {
-  date: string;
-  items: UserContentWithDetails[];
-}
-
-export function CompletedList({ headerRight }: CompletedListProps) {
+export function CompletedList() {
   const { data: contents = [], isLoading, error, refetch } = useUserContents('completed');
+  const { viewMode } = useQueueState();
 
   const [refreshing, setRefreshing] = useState(false);
   const [selectedItem, setSelectedItem] = useState<UserContentWithDetails | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const [viewMode, setViewMode] = useState<ViewMode>('bigCard');
 
   const deleteContentMutation = useDeleteContent();
   const reopenContentMutation = useReopenContent();
@@ -147,90 +138,46 @@ export function CompletedList({ headerRight }: CompletedListProps) {
     [toggleContentMutation, handleModalClose],
   );
 
-  const groupedContents = useMemo((): GroupedContent[] => {
-    const groups: Record<string, UserContentWithDetails[]> = {};
-
-    contents.forEach((content) => {
-      if (content.completed_at) {
-        const date = new Date(content.completed_at).toLocaleDateString('en-US', {
-          month: 'long',
-          day: 'numeric',
-          year: 'numeric',
-        });
-        if (!groups[date]) {
-          groups[date] = [];
-        }
-        groups[date].push(content);
-      }
-    });
-
-    return Object.entries(groups).map(([date, items]) => ({
-      date,
-      items,
-    }));
-  }, [contents]);
-
   if (isLoading && !refreshing) return <CompletedListSkeleton />;
 
-  const renderItem = ({ item }: { item: GroupedContent }) => {
-    return (
-      <View className="mb-6">
-        {/* Date section header */}
-        <View className="mb-3 flex-row items-center gap-2">
-          <Icon as={Calendar} size={18} className="text-gray-500 dark:text-gray-300" />
-          <Text className="text-sm font-semibold text-gray-700 dark:text-gray-200">
-            {item.date}
-          </Text>
-        </View>
+  const renderItem = ({ item, index }: { item: UserContentWithDetails; index: number }) => {
+    const isLiked = isContentLiked(item);
 
-        {/* Items for this date */}
-        {viewMode === 'list' ? (
-          <View>
-            {item.items.map((content) => {
-              const isLiked = isContentLiked(content);
-              return (
-                <View key={content.id} className="mb-1">
-                  <ContentCardList
-                    item={content}
-                    onPress={handleItemPress}
-                    isLiked={isLiked}
-                    showCompletedTime={true}
-                  />
-                </View>
-              );
-            })}
-          </View>
-        ) : viewMode === 'smallCard' ? (
-          <View className="-mx-1 flex-row flex-wrap">
-            {item.items.map((content) => {
-              const isLiked = isContentLiked(content);
-              return (
-                <View key={content.id} className="w-1/2 p-1">
-                  <ContentCardSmall
-                    item={content}
-                    onPress={handleItemPress}
-                    isLiked={isLiked}
-                    showCompletedTime={true}
-                  />
-                </View>
-              );
-            })}
-          </View>
-        ) : (
-          item.items.map((content, index) => (
-            <View key={content.id} className={index > 0 ? 'mt-2' : ''}>
-              <SwipeableCompletedItem
-                item={content}
-                onPress={handleItemPress}
-                onReopen={handleReopen}
-                onDelete={handleDelete}
-                onLike={handleLike}
-              />
-            </View>
-          ))
-        )}
-      </View>
-    );
+    if (viewMode === 'list') {
+      return (
+        <View className="mb-1">
+          <ContentCardList
+            item={item}
+            onPress={handleItemPress}
+            isLiked={isLiked}
+            showCompletedTime={true}
+          />
+        </View>
+      );
+    } else if (viewMode === 'smallCard') {
+      return (
+        <View className="flex-1 p-1">
+          <ContentCardSmall
+            item={item}
+            onPress={handleItemPress}
+            isLiked={isLiked}
+            showCompletedTime={true}
+          />
+        </View>
+      );
+    } else {
+      return (
+        <View className={index > 0 ? 'mt-2' : ''}>
+          <SwipeableCompletedItem
+            item={item}
+            onPress={handleItemPress}
+            onReopen={handleReopen}
+            onDelete={handleDelete}
+            onLike={handleLike}
+          />
+        </View>
+      );
+    }
   };
 
   let content: React.ReactNode;
@@ -247,7 +194,7 @@ export function CompletedList({ headerRight }: CompletedListProps) {
         </Text>
       </View>
     );
-  } else if (groupedContents.length === 0) {
+  } else if (contents.length === 0) {
     content = (
       <ScrollView
         className="flex-1 bg-gray-50 dark:bg-gray-900"
@@ -278,38 +225,21 @@ export function CompletedList({ headerRight }: CompletedListProps) {
     );
   } else {
     content = (
-      <FlashList
-        data={groupedContents}
+      <ContentListRenderer
+        data={contents}
         renderItem={renderItem}
-        keyExtractor={(item) => item.date}
-        key={viewMode}
-        estimatedItemSize={viewMode === 'list' ? 150 : viewMode === 'smallCard' ? 300 : 200}
-        showsVerticalScrollIndicator={false}
+        keyExtractor={(item) => item.id}
+        viewMode={viewMode}
+        estimatedItemSize={viewMode === 'list' ? 80 : viewMode === 'smallCard' ? 180 : 100}
+        refreshing={refreshing}
+        onRefresh={onRefresh}
         contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 8 }}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            tintColor="#3B82F6"
-            colors={['#3B82F6']}
-            progressBackgroundColor="#ffffff"
-          />
-        }
       />
     );
   }
 
   return (
     <View className="flex-1 bg-gray-50 dark:bg-gray-900">
-      <View className="px-4 pb-1 pt-3">
-        <View className="flex-row items-center justify-between gap-3">
-          {headerRight ? <View className="shrink-0">{headerRight}</View> : null}
-          <View className="shrink-0">
-            <ViewModeToggle mode={viewMode} onModeChange={setViewMode} />
-          </View>
-        </View>
-      </View>
-
       <View className="flex-1">{content}</View>
       {selectedItem && (
         <ContentDetail

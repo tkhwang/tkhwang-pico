@@ -1,4 +1,3 @@
-import { FlashList } from '@shopify/flash-list';
 import type { UserContentWithDetails } from '@tkhwang-pico/supabase';
 import React, { useCallback, useEffect, useState } from 'react';
 import { RefreshControl, ScrollView, TouchableOpacity, View } from 'react-native';
@@ -6,9 +5,10 @@ import { RefreshControl, ScrollView, TouchableOpacity, View } from 'react-native
 import { SwipeableContentItem } from '@/components/common/queue/swipe/swipeable-content-item';
 import { ContentCardList } from '@/components/content/common/cards/content-card-list';
 import { ContentCardSmall } from '@/components/content/common/cards/content-card-small';
+import { ContentListRenderer } from '@/components/content/content-list-renderer';
 import { ContentDetail } from '@/components/content/detail/content-detail';
 import { Text } from '@/components/ui/text';
-import { type ViewMode, ViewModeToggle } from '@/components/ui/view-mode-toggle';
+import { useQueueState } from '@/contexts/queue-context';
 import { useSetContentPreference } from '@/hooks/mutations/use-content-preference';
 import { useDeleteContent } from '@/hooks/mutations/use-delete-content';
 import { useSaveContent } from '@/hooks/mutations/use-save-content';
@@ -20,17 +20,13 @@ import type { PriorityValue } from '@/utils/priority';
 
 import { ContentListSkeleton } from './content-list-skeleton';
 
-interface ContentListProps {
-  headerRight?: React.ReactNode;
-}
-
-export function ContentList({ headerRight }: ContentListProps) {
+export function ContentList() {
   const { data: userContents = [], isLoading, error, refetch } = useUserContents('pending');
+  const { viewMode } = useQueueState();
 
   const [refreshing, setRefreshing] = useState(false);
   const [selectedItem, setSelectedItem] = useState<UserContentWithDetails | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const [viewMode, setViewMode] = useState<ViewMode>('bigCard');
 
   const toggleTodoMutation = useToggleUserContentStatus();
   const deleteContentMutation = useDeleteContent();
@@ -196,39 +192,14 @@ export function ContentList({ headerRight }: ContentListProps) {
 
   return (
     <View className="flex-1">
-      <View className="px-4 pb-1 pt-3">
-        <View className="flex-row items-center justify-between gap-3">
-          {headerRight ? <View className="shrink-0">{headerRight}</View> : null}
-          <View className="shrink-0">
-            <ViewModeToggle mode={viewMode} onModeChange={setViewMode} />
-          </View>
-        </View>
-      </View>
-
-      <FlashList
+      <ContentListRenderer
         data={userContents}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
-        key={viewMode}
+        viewMode={viewMode}
         estimatedItemSize={viewMode === 'list' ? 60 : viewMode === 'smallCard' ? 150 : 120}
-        numColumns={viewMode === 'smallCard' ? 2 : 1}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{
-          paddingHorizontal: viewMode === 'smallCard' ? 8 : 12,
-          paddingTop: 8,
-          paddingBottom: 12,
-        }}
-        removeClippedSubviews={true}
-        drawDistance={200}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            tintColor="#3B82F6"
-            colors={['#3B82F6']}
-            progressBackgroundColor="#ffffff"
-          />
-        }
+        refreshing={refreshing}
+        onRefresh={onRefresh}
       />
 
       <ContentDetail
