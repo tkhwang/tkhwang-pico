@@ -1,7 +1,7 @@
 import type { UserContentWithDetails } from '@tkhwang-pico/supabase';
 import { Calendar } from 'lucide-react-native';
 import React, { useCallback, useEffect, useState } from 'react';
-import { RefreshControl, ScrollView, View } from 'react-native';
+import { View } from 'react-native';
 
 import { SwipeableCompletedItem } from '@/components/common/queue/swipe/swipeable-completed-item';
 import { ContentCardList } from '@/components/content/common/cards/content-card-list';
@@ -180,67 +180,54 @@ export function CompletedList() {
     }
   };
 
-  let content: React.ReactNode;
+  const emptyComponent = error ? (
+    <View className="items-center px-4">
+      <Text className="mb-4 text-4xl">⚠️</Text>
+      <Text className="mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100">
+        Failed to load archive
+      </Text>
+      <Text className="mb-4 text-center text-sm text-gray-500 dark:text-gray-400">
+        {error?.message || 'An error occurred while loading your archive'}
+      </Text>
+    </View>
+  ) : (
+    <View className="items-center px-4">
+      <Icon as={Calendar} size={48} className="mb-4 text-gray-400 dark:text-gray-600" />
+      <Text className="mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100">
+        No completed contents yet
+      </Text>
+      <Text className="text-center text-sm text-gray-500 dark:text-gray-400">
+        Complete some contents to see them in your archive
+      </Text>
+    </View>
+  );
 
-  if (error) {
-    content = (
-      <View className="flex-1 items-center justify-center bg-gray-50 px-4 dark:bg-gray-900">
-        <Text className="mb-4 text-4xl">⚠️</Text>
-        <Text className="mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100">
-          Failed to load archive
-        </Text>
-        <Text className="mb-4 text-center text-sm text-gray-500 dark:text-gray-400">
-          {error.message || 'An error occurred while loading your archive'}
-        </Text>
-      </View>
-    );
-  } else if (contents.length === 0) {
-    content = (
-      <ScrollView
-        className="flex-1 bg-gray-50 dark:bg-gray-900"
-        contentContainerStyle={{
+  const contentContainerStyle =
+    contents.length === 0
+      ? {
+          paddingHorizontal: 16,
+          paddingVertical: 8,
           flexGrow: 1,
           justifyContent: 'center',
           alignItems: 'center',
-          paddingHorizontal: 16,
-        }}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            tintColor="#3B82F6"
-            colors={['#3B82F6']}
-            progressBackgroundColor="#ffffff"
-          />
         }
-      >
-        <Icon as={Calendar} size={48} className="mb-4 text-gray-400 dark:text-gray-600" />
-        <Text className="mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100">
-          No completed contents yet
-        </Text>
-        <Text className="text-center text-sm text-gray-500 dark:text-gray-400">
-          Complete some contents to see them in your archive
-        </Text>
-      </ScrollView>
-    );
-  } else {
-    content = (
-      <ContentListRenderer
-        data={contents}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-        viewMode={viewMode}
-        estimatedItemSize={viewMode === 'list' ? 80 : viewMode === 'smallCard' ? 180 : 100}
-        refreshing={refreshing}
-        onRefresh={onRefresh}
-        contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 8 }}
-      />
-    );
-  }
+      : { paddingHorizontal: 16, paddingVertical: 8 };
 
   return (
     <View className="flex-1 bg-gray-50 dark:bg-gray-900">
-      <View className="flex-1">{content}</View>
+      <View className="flex-1">
+        <ContentListRenderer
+          data={contents}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id}
+          viewMode={viewMode}
+          estimatedItemSize={viewMode === 'list' ? 80 : viewMode === 'smallCard' ? 180 : 100}
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          contentContainerStyle={contentContainerStyle}
+          emptyComponent={emptyComponent}
+        />
+      </View>
       {selectedItem && (
         <ContentDetail
           visible={modalVisible}

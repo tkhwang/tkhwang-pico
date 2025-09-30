@@ -1,6 +1,6 @@
 import type { UserContentWithDetails } from '@tkhwang-pico/supabase';
 import React, { useCallback, useEffect, useState } from 'react';
-import { RefreshControl, ScrollView, TouchableOpacity, View } from 'react-native';
+import { TouchableOpacity, View } from 'react-native';
 
 import { SwipeableContentItem } from '@/components/common/queue/swipe/swipeable-content-item';
 import { ContentCardList } from '@/components/content/common/cards/content-card-list';
@@ -129,36 +129,17 @@ export function ContentList() {
     );
   }
 
-  if (userContents.length === 0) {
-    return (
-      <ScrollView
-        className="flex-1"
-        contentContainerStyle={{
-          flexGrow: 1,
-          justifyContent: 'center',
-          alignItems: 'center',
-          paddingHorizontal: 16,
-        }}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            tintColor="#3B82F6"
-            colors={['#3B82F6']}
-            progressBackgroundColor="#ffffff"
-          />
-        }
-      >
-        <Text className="mb-4 text-4xl">📚</Text>
-        <Text className="mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100">
-          No saved contents yet
-        </Text>
-        <Text className="text-center text-sm text-gray-500 dark:text-gray-400">
-          Tap the + button to add your first content
-        </Text>
-      </ScrollView>
-    );
-  }
+  const emptyComponent = (
+    <View className="items-center px-4">
+      <Text className="mb-4 text-4xl">📚</Text>
+      <Text className="mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100">
+        No saved contents yet
+      </Text>
+      <Text className="text-center text-sm text-gray-500 dark:text-gray-400">
+        Tap the + button to add your first content
+      </Text>
+    </View>
+  );
 
   const renderItem = ({ item }: { item: (typeof userContents)[0] }) => {
     const isLiked = isContentLiked(item);
@@ -200,6 +181,7 @@ export function ContentList() {
         estimatedItemSize={viewMode === 'list' ? 60 : viewMode === 'smallCard' ? 150 : 120}
         refreshing={refreshing}
         onRefresh={onRefresh}
+        emptyComponent={emptyComponent}
       />
 
       <ContentDetail

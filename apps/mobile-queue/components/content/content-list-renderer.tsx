@@ -1,6 +1,6 @@
 import { FlashList, type FlashListProps, type ListRenderItem } from '@shopify/flash-list';
 import type { ReactNode } from 'react';
-import { RefreshControl, View } from 'react-native';
+import { RefreshControl } from 'react-native';
 
 import type { ViewMode } from '@/contexts/queue-context';
 
@@ -37,15 +37,24 @@ export function ContentListRenderer<T>({
     />
   ) : undefined;
 
-  if (data.length === 0 && emptyComponent) {
-    return <View className="flex-1">{emptyComponent}</View>;
-  }
-
   const defaultContentStyle = {
     paddingHorizontal: viewMode === 'smallCard' ? 8 : 12,
     paddingTop: 8,
     paddingBottom: 12,
   } as FlashListProps<T>['contentContainerStyle'];
+
+  const resolvedContentStyle = (() => {
+    if (contentContainerStyle) return contentContainerStyle;
+    if (data.length === 0) {
+      return {
+        ...defaultContentStyle,
+        flexGrow: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+      } as FlashListProps<T>['contentContainerStyle'];
+    }
+    return defaultContentStyle;
+  })();
 
   return (
     <FlashList
@@ -56,10 +65,11 @@ export function ContentListRenderer<T>({
       estimatedItemSize={estimatedItemSize}
       numColumns={viewMode === 'smallCard' ? 2 : 1}
       showsVerticalScrollIndicator={false}
-      contentContainerStyle={contentContainerStyle ?? defaultContentStyle}
+      contentContainerStyle={resolvedContentStyle}
       removeClippedSubviews={true}
       drawDistance={200}
       refreshControl={refreshControl}
+      ListEmptyComponent={emptyComponent}
     />
   );
 }
