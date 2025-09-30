@@ -17,10 +17,7 @@ export function QueueStatusFilter({ status, onStatusChange }: QueueStatusFilterP
         onPress={() => onStatusChange('pending')}
         activeOpacity={0.7}
         className={`rounded-md px-3 py-1.5 ${
-          status === 'pending'
-            ? // ? 'bg-white shadow-sm shadow-black/5 dark:bg-gray-800'
-              'bg-white dark:bg-gray-800'
-            : 'bg-transparent'
+          status === 'pending' ? 'bg-white dark:bg-gray-800' : 'bg-transparent'
         }`}
       >
         <View className="flex-row items-center justify-center gap-2">
@@ -42,10 +39,7 @@ export function QueueStatusFilter({ status, onStatusChange }: QueueStatusFilterP
         onPress={() => onStatusChange('completed')}
         activeOpacity={0.7}
         className={`rounded-md px-3 py-1.5 ${
-          status === 'completed'
-            ? // ? 'bg-white shadow-sm shadow-black/5 dark:bg-gray-800'
-              'bg-white dark:bg-gray-800'
-            : 'bg-transparent'
+          status === 'completed' ? 'bg-white dark:bg-gray-800' : 'bg-transparent'
         }`}
       >
         <View className="flex-row items-center justify-center gap-2">
