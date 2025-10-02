@@ -12,7 +12,7 @@ interface QueueStatusSelectorProps {
 
 export function QueueStatusSelector({ status, onStatusChange }: QueueStatusSelectorProps) {
   const tabs = [
-    { value: 'pending' as QueueStatus, label: 'Ing', icon: Circle },
+    { value: 'pending' as QueueStatus, label: 'Pending', icon: Circle },
     { value: 'completed' as QueueStatus, label: 'Done', icon: CheckCircle2 },
   ];
 
