@@ -18,7 +18,7 @@ export function QueueStatusFilter({ status, onStatusChange }: QueueStatusFilterP
 
   return (
     <Tabs value={status} onValueChange={onStatusChange as (value: string) => void}>
-      <TabsList className="gap-2 rounded-lg bg-gray-100 p-1 dark:bg-gray-800">
+      <TabsList className="gap-2 rounded-lg bg-gray-100 px-2 py-1 dark:bg-gray-800">
         {tabs.map(({ value, label, icon: IconComponent }) => {
           const isActive = status === value;
           const activeColor = 'text-blue-500';

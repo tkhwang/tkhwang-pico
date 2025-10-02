@@ -14,7 +14,7 @@ interface ViewModeToggleProps {
 export function ViewModeToggle({ mode, onModeChange }: ViewModeToggleProps) {
   return (
     <Tabs value={mode} onValueChange={(value) => onModeChange(value as ViewMode)}>
-      <TabsList className="gap-2 rounded-lg bg-gray-100 p-1 dark:bg-gray-800">
+      <TabsList className="gap-2 rounded-lg bg-gray-100 px-2 py-1 dark:bg-gray-800">
         {[
           { key: 'bigCard' as const, icon: Square },
           { key: 'smallCard' as const, icon: Grid2x2 },
