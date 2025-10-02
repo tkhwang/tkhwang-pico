@@ -28,7 +28,7 @@ export function QueueStatusFilter({ status, onStatusChange }: QueueStatusFilterP
 
   return (
     <Tabs value={status} onValueChange={onStatusChange as (value: string) => void}>
-      <TabsList className="gap-1.5 rounded-lg bg-muted/80 p-1 dark:bg-muted/30">
+      <TabsList className="gap-2 rounded-lg bg-muted/80 px-2 py-1 dark:bg-muted/30">
         {tabs.map(({ value, label, icon: IconComponent, activeColor }) => {
           const isActive = status === value;
           const iconColor = isActive ? activeColor : 'text-muted-foreground';
@@ -37,7 +37,7 @@ export function QueueStatusFilter({ status, onStatusChange }: QueueStatusFilterP
             <TabsTrigger
               key={value}
               value={value}
-              className={`flex-none flex-row items-center justify-center gap-1.5 rounded-md px-3 py-1.5 ${
+              className={`flex-1 flex-row items-center justify-center gap-1.5 rounded-md px-3 py-1.5 ${
                 isActive ? 'bg-white shadow-sm shadow-black/5 dark:bg-gray-800' : 'bg-transparent'
               }`}
             >
