@@ -1,5 +1,4 @@
 import { CheckCircle2, Circle } from 'lucide-react-native';
-import { View } from 'react-native';
 
 import { Icon } from '@/components/ui/icon';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -12,41 +11,45 @@ interface QueueStatusFilterProps {
 }
 
 export function QueueStatusFilter({ status, onStatusChange }: QueueStatusFilterProps) {
+  const tabs = [
+    {
+      value: 'pending' as QueueStatus,
+      label: 'Pending',
+      icon: Circle,
+      activeColor: 'text-blue-500',
+    },
+    {
+      value: 'completed' as QueueStatus,
+      label: 'Completed',
+      icon: CheckCircle2,
+      activeColor: 'text-green-500',
+    },
+  ];
+
   return (
     <Tabs value={status} onValueChange={onStatusChange as (value: string) => void}>
-      <TabsList className="w-full gap-2 bg-muted/80 dark:bg-muted/30">
-        <TabsTrigger value="pending" className="flex-1">
-          <View className="flex-row items-center justify-center gap-2">
-            <Icon
-              as={Circle}
-              size={18}
-              className={status === 'pending' ? 'text-blue-500' : 'text-muted-foreground'}
-            />
-            <Text
-              className={`text-sm font-semibold ${
-                status === 'pending' ? 'text-blue-500' : 'text-muted-foreground'
-              }`}
+      <TabsList className="gap-1.5 rounded-lg bg-muted/80 p-1 dark:bg-muted/30">
+        {tabs.map(({ value, label, icon: IconComponent, activeColor }) => {
+          const isActive = status === value;
+          const iconColor = isActive ? activeColor : 'text-muted-foreground';
+
+          return (
+            <TabsTrigger
+              key={value}
+              value={value}
+              className="flex-1 flex-row items-center justify-center gap-2 rounded-md px-3 py-1.5"
             >
-              Pending
-            </Text>
-          </View>
-        </TabsTrigger>
-        <TabsTrigger value="completed" className="flex-1">
-          <View className="flex-row items-center justify-center gap-2">
-            <Icon
-              as={CheckCircle2}
-              size={18}
-              className={status === 'completed' ? 'text-green-500' : 'text-muted-foreground'}
-            />
-            <Text
-              className={`text-sm font-semibold ${
-                status === 'completed' ? 'text-green-500' : 'text-muted-foreground'
-              }`}
-            >
-              Completed
-            </Text>
-          </View>
-        </TabsTrigger>
+              <Icon as={IconComponent} size={18} className={iconColor} />
+              <Text
+                className={`text-sm font-semibold ${
+                  isActive ? activeColor : 'text-muted-foreground'
+                }`}
+              >
+                {label}
+              </Text>
+            </TabsTrigger>
+          );
+        })}
       </TabsList>
     </Tabs>
   );
