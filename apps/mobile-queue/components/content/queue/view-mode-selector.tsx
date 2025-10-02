@@ -6,14 +6,14 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export type ViewMode = 'bigCard' | 'smallCard' | 'list';
 
-interface ViewModeToggleProps {
+interface ViewModeSelectorProps {
   mode: ViewMode;
   onModeChange: (mode: ViewMode) => void;
 }
 
-export function ViewModeToggle({ mode, onModeChange }: ViewModeToggleProps) {
+export function ViewModeSelector({ mode, onModeChange }: ViewModeSelectorProps) {
   return (
-    <Tabs value={mode} onValueChange={(value) => onModeChange(value as ViewMode)}>
+    <Tabs value={mode} onValueChange={(value: string) => onModeChange(value as ViewMode)}>
       <TabsList className="gap-2 rounded-lg bg-gray-100 px-2 py-1 dark:bg-gray-800">
         {[
           { key: 'bigCard' as const, icon: Square },

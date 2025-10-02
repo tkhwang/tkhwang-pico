@@ -5,12 +5,12 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Text } from '@/components/ui/text';
 import type { QueueStatus } from '@/contexts/queue-context';
 
-interface QueueStatusFilterProps {
+interface QueueStatusSelectorProps {
   status: QueueStatus;
   onStatusChange: (status: QueueStatus) => void;
 }
 
-export function QueueStatusFilter({ status, onStatusChange }: QueueStatusFilterProps) {
+export function QueueStatusSelector({ status, onStatusChange }: QueueStatusSelectorProps) {
   const tabs = [
     { value: 'pending' as QueueStatus, label: 'Ing', icon: Circle },
     { value: 'completed' as QueueStatus, label: 'Done', icon: CheckCircle2 },
