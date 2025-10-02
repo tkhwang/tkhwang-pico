@@ -1,21 +1,13 @@
 import type { UserContentWithDetails } from '@tkhwang-pico/supabase';
-import {
-  CalendarDays,
-  CheckCircle,
-  CircleCheckBig,
-  ExternalLink,
-  Heart,
-} from 'lucide-react-native';
-import React from 'react';
+import { CircleCheckBig, ExternalLink, Heart } from 'lucide-react-native';
 import { TouchableOpacity, View } from 'react-native';
 
 import { Icon } from '@/components/ui/icon';
 import { SiteFavicon } from '@/components/ui/site-favicon';
 import { Text } from '@/components/ui/text';
 import { PRIORITY_STYLES } from '@/consts/app-styles';
-import { ContentDate } from '@/domains/value-object/content-date';
 import { useContentActions } from '@/hooks/use-content-actions';
-import { DEFAULT_PRIORITY, PRIORITY_LABELS, type PriorityValue } from '@/utils/priority';
+import { DEFAULT_PRIORITY, type PriorityValue } from '@/utils/priority';
 import { getFaviconUrl } from '@/utils/url';
 
 interface ContentCardListProps {
@@ -29,15 +21,13 @@ export function ContentCardList({
   item,
   onPress,
   isLiked = false,
-  showCompletedTime = false,
+  showCompletedTime: _showCompletedTime = false,
 }: ContentCardListProps) {
   const { openURL } = useContentActions();
   const content = item.contents;
   const faviconUrl = getFaviconUrl(content?.metadata);
 
-  if (!item || !content) {
-    return null;
-  }
+  if (!item || !content) return null;
 
   const handlePress = () => {
     if (onPress) onPress(item);
@@ -51,25 +41,7 @@ export function ContentCardList({
   const isCompleted = item.todo_status === 'completed';
   const priorityValue = (item.priority ?? DEFAULT_PRIORITY) as PriorityValue;
   const priorityStyle = PRIORITY_STYLES[priorityValue];
-  const scheduledDate = item.scheduled_for ? new ContentDate(item.scheduled_for) : null;
-  const completedDate = item.completed_at ? new ContentDate(item.completed_at) : null;
-
-  const scheduleLabel = showCompletedTime
-    ? (completedDate?.toSimpleString() ?? '—')
-    : (scheduledDate?.toSimpleString() ?? '—');
-
-  const scheduleIconClass = 'text-gray-400 dark:text-gray-500';
-
-  const scheduleTextClass = 'text-gray-400 dark:text-gray-500';
-
-  const priorityBadge = (
-    <View className={`flex-row items-center rounded-full px-1.5 py-0.5 ${priorityStyle.badge}`}>
-      <View className={`mr-1 h-1.5 w-1.5 rounded-full ${priorityStyle.dot}`} />
-      <Text className={`text-[10px] font-semibold uppercase ${priorityStyle.text}`}>
-        {PRIORITY_LABELS[priorityValue]}
-      </Text>
-    </View>
-  );
+  const scheduleAccentClass = priorityValue === 'high' ? priorityStyle.dot : null;
 
   return (
     <TouchableOpacity
@@ -77,8 +49,12 @@ export function ContentCardList({
       onLongPress={handleLongPress}
       delayLongPress={500}
       activeOpacity={0.7}
-      className="flex-row items-center rounded-lg bg-white px-3 py-2.5 dark:bg-gray-800"
+      className="relative flex-row items-center overflow-hidden rounded-lg bg-white px-3 py-2.5 dark:bg-gray-800"
     >
+      {scheduleAccentClass ? (
+        <View className={`absolute bottom-0 left-0 top-0 w-1 ${scheduleAccentClass}`} />
+      ) : null}
+
       {/* Status Icon */}
       <View className="mr-2.5">
         {isCompleted ? (
@@ -102,18 +78,6 @@ export function ContentCardList({
             <Text className="flex-1 text-xs text-gray-500 dark:text-gray-400" numberOfLines={1}>
               {content.domain || 'CONTENT'}
             </Text>
-          </View>
-          <View className="shrink-0 flex-row items-center">
-            {priorityBadge}
-            <View className="ml-1.5 flex-row items-center">
-              <Icon
-                as={showCompletedTime ? CheckCircle : CalendarDays}
-                className={`mr-1 h-3 w-3 ${scheduleIconClass}`}
-              />
-              <Text className={`text-xs ${scheduleTextClass}`} numberOfLines={1}>
-                {scheduleLabel}
-              </Text>
-            </View>
           </View>
         </View>
       </View>
