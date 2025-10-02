@@ -11,10 +11,10 @@ export function QueueHeader() {
   return (
     <View className="bg-white px-4 py-3 dark:bg-gray-900">
       <View className="flex-row items-center gap-1">
-        <View className="min-w-0" style={{ flex: 6 }}>
+        <View className="w-3/5 min-w-0">
           <QueueStatusSelector status={status} onStatusChange={setStatus} />
         </View>
-        <View className="items-end" style={{ flex: 4 }}>
+        <View className="w-2/5 items-end">
           <ViewModeSelector mode={viewMode} onModeChange={setViewMode} />
         </View>
       </View>
