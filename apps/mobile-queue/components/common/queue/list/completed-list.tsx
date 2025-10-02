@@ -145,7 +145,7 @@ export function CompletedList() {
 
     if (viewMode === 'list') {
       return (
-        <View className="mb-1">
+        <View className="mb-2">
           <ContentCardList
             item={item}
             onPress={handleItemPress}
@@ -156,7 +156,7 @@ export function CompletedList() {
       );
     } else if (viewMode === 'smallCard') {
       return (
-        <View className="flex-1 p-1">
+        <View className="flex-1 px-1 pb-2">
           <ContentCardSmall
             item={item}
             onPress={handleItemPress}

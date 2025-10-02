@@ -69,7 +69,7 @@ export function ContentCardSmall({ item, onPress, isLiked = false }: ContentCard
       onLongPress={handleLongPress}
       delayLongPress={500}
       activeOpacity={0.7}
-      className="rounded-lg border border-gray-100 bg-white p-3 dark:border-gray-700 dark:bg-gray-800"
+      className="rounded-xl border border-gray-200 bg-white p-3 shadow-sm shadow-black/5 dark:border-gray-700 dark:bg-gray-800"
     >
       {/* Domain with favicon */}
       <View className="flex-row items-center">

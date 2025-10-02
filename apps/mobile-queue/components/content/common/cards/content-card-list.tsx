@@ -90,7 +90,6 @@ export function ContentCardList({
       onPress={handlePress}
       onLongPress={handleLongPress}
       sideAccentClassName={sideAccentClassName}
-      containerClassName="p-3"
     />
   );
 }

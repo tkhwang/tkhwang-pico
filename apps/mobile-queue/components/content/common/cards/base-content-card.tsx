@@ -102,14 +102,12 @@ export function BaseContentCard({
             {title}
           </Text>
 
-          {/* Summary */}
           {summary && (
             <Text className="mb-1 text-xs text-gray-600 dark:text-gray-400" numberOfLines={3}>
               {summary}
             </Text>
           )}
 
-          {/* Note */}
           {note && (
             <Text
               className="mb-1 text-xs italic text-gray-500 dark:text-gray-500"
@@ -119,7 +117,6 @@ export function BaseContentCard({
             </Text>
           )}
 
-          {/* Author */}
           {author && (
             <Text
               className="mb-1 text-xs italic text-gray-500 dark:text-gray-500"
@@ -129,10 +126,6 @@ export function BaseContentCard({
             </Text>
           )}
 
-          {/* Tags */}
-          {/* {tags && <ContentTags tags={tags} />} */}
-
-          {/* User labels */}
           {labels && <ContentTags tags={labels} variant="purple" />}
         </View>
 
