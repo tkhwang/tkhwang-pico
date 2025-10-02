@@ -141,7 +141,7 @@ export function ContentList() {
     </View>
   );
 
-  const renderItem = ({ item }: { item: (typeof userContents)[0] }) => {
+  const renderItem = ({ item, index }: { item: (typeof userContents)[0]; index: number }) => {
     const isLiked = isContentLiked(item);
 
     if (viewMode === 'list') {
@@ -153,8 +153,9 @@ export function ContentList() {
     }
 
     if (viewMode === 'smallCard') {
+      const columnPaddingClass = index % 2 === 0 ? 'pr-2' : 'pl-2';
       return (
-        <View className="flex-1 px-1 pb-2">
+        <View className={`flex-1 pb-3 ${columnPaddingClass}`}>
           <ContentCardSmall item={item} onPress={handleItemPress} isLiked={isLiked} />
         </View>
       );

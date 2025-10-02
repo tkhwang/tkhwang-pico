@@ -37,7 +37,7 @@ export function ContentListRenderer<T>({
   ) : undefined;
 
   const defaultContentStyle = {
-    paddingHorizontal: viewMode === 'smallCard' ? 8 : 12,
+    paddingHorizontal: 16,
     paddingTop: 8,
     paddingBottom: 12,
   } as FlashListProps<T>['contentContainerStyle'];

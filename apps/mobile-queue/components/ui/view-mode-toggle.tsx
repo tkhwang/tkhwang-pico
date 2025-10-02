@@ -27,7 +27,7 @@ export function ViewModeToggle({ mode, onModeChange }: ViewModeToggleProps) {
             <TabsTrigger
               key={key}
               value={key}
-              className="flex-none items-center justify-center rounded-md px-3 py-1.5"
+              className="flex-1 items-center justify-center rounded-md px-3 py-1.5"
             >
               <Icon as={IconComponent} className={`h-5 w-5 ${iconColor}`} />
             </TabsTrigger>
