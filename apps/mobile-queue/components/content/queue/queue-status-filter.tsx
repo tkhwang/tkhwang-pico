@@ -14,13 +14,13 @@ export function QueueStatusFilter({ status, onStatusChange }: QueueStatusFilterP
   const tabs = [
     {
       value: 'pending' as QueueStatus,
-      label: 'Pending',
+      label: 'Ing',
       icon: Circle,
       activeColor: 'text-blue-500',
     },
     {
       value: 'completed' as QueueStatus,
-      label: 'Completed',
+      label: 'Done',
       icon: CheckCircle2,
       activeColor: 'text-green-500',
     },
@@ -37,7 +37,9 @@ export function QueueStatusFilter({ status, onStatusChange }: QueueStatusFilterP
             <TabsTrigger
               key={value}
               value={value}
-              className="flex-1 flex-row items-center justify-center gap-2 rounded-md px-3 py-1.5"
+              className={`flex-none flex-row items-center justify-center gap-1.5 rounded-md px-3 py-1.5 ${
+                isActive ? 'bg-white shadow-sm shadow-black/5 dark:bg-gray-800' : 'bg-transparent'
+              }`}
             >
               <Icon as={IconComponent} size={18} className={iconColor} />
               <Text

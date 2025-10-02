@@ -10,11 +10,11 @@ export function QueueHeader() {
 
   return (
     <View className="bg-white px-4 py-3 dark:bg-gray-900">
-      <View className="flex-row items-center justify-between gap-3">
-        <View className="shrink-0">
+      <View className="flex-row items-center gap-3">
+        <View className="min-w-0 flex-1">
           <QueueStatusFilter status={status} onStatusChange={setStatus} />
         </View>
-        <View className="shrink-0">
+        <View className="ml-auto flex-none">
           <ViewModeToggle mode={viewMode} onModeChange={setViewMode} />
         </View>
       </View>

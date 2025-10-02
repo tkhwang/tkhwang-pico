@@ -24,7 +24,11 @@ export function ViewModeToggle({ mode, onModeChange }: ViewModeToggleProps) {
           const iconColor = isActive ? 'text-blue-500' : 'text-gray-500 dark:text-gray-400';
 
           return (
-            <TabsTrigger key={key} value={key} className="flex-1 rounded-md px-3 py-1.5">
+            <TabsTrigger
+              key={key}
+              value={key}
+              className="flex-none items-center justify-center rounded-md px-3 py-1.5"
+            >
               <Icon as={IconComponent} className={`h-5 w-5 ${iconColor}`} />
             </TabsTrigger>
           );
