@@ -145,7 +145,7 @@ export function CompletedList() {
 
     if (viewMode === 'list') {
       return (
-        <View className="mb-1">
+        <View className="mb-2">
           <ContentCardList
             item={item}
             onPress={handleItemPress}
@@ -155,8 +155,9 @@ export function CompletedList() {
         </View>
       );
     } else if (viewMode === 'smallCard') {
+      const columnPaddingClass = index % 2 === 0 ? 'pr-2' : 'pl-2';
       return (
-        <View className="flex-1 p-1">
+        <View className={`flex-1 pb-3 ${columnPaddingClass}`}>
           <ContentCardSmall
             item={item}
             onPress={handleItemPress}
@@ -181,7 +182,7 @@ export function CompletedList() {
   };
 
   const emptyComponent = error ? (
-    <View className="items-center px-4">
+    <View className="flex-1 items-center justify-center px-4">
       <Text className="mb-4 text-4xl">⚠️</Text>
       <Text className="mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100">
         Failed to load archive
@@ -191,7 +192,7 @@ export function CompletedList() {
       </Text>
     </View>
   ) : (
-    <View className="items-center px-4">
+    <View className="flex-1 items-center justify-center px-4">
       <Icon as={Calendar} size={48} className="mb-4 text-gray-400 dark:text-gray-600" />
       <Text className="mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100">
         No completed contents yet

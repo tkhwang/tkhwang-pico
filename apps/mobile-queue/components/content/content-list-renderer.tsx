@@ -1,5 +1,6 @@
 import { FlashList, type FlashListProps, type ListRenderItem } from '@shopify/flash-list';
-import { RefreshControl } from 'react-native';
+import React from 'react';
+import { RefreshControl, View } from 'react-native';
 
 import type { ViewMode } from '@/contexts/queue-context';
 
@@ -37,23 +38,31 @@ export function ContentListRenderer<T>({
   ) : undefined;
 
   const defaultContentStyle = {
-    paddingHorizontal: viewMode === 'smallCard' ? 8 : 12,
+    paddingHorizontal: 16,
     paddingTop: 8,
     paddingBottom: 12,
   } as FlashListProps<T>['contentContainerStyle'];
 
-  const resolvedContentStyle = (() => {
-    if (contentContainerStyle) return contentContainerStyle;
-    if (data.length === 0) {
-      return {
-        ...defaultContentStyle,
-        flexGrow: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-      } as FlashListProps<T>['contentContainerStyle'];
-    }
-    return defaultContentStyle;
-  })();
+  if (data.length === 0 && emptyComponent) {
+    const renderedEmpty =
+      typeof emptyComponent === 'function'
+        ? React.createElement(emptyComponent as React.ComponentType)
+        : emptyComponent;
+
+    return (
+      <View
+        style={[
+          { flex: 1, justifyContent: 'center', alignItems: 'center' },
+          defaultContentStyle,
+          contentContainerStyle,
+        ]}
+      >
+        {renderedEmpty}
+      </View>
+    );
+  }
+
+  const resolvedContentStyle = contentContainerStyle ?? defaultContentStyle;
 
   return (
     <FlashList

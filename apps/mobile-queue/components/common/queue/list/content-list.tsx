@@ -130,7 +130,7 @@ export function ContentList() {
   }
 
   const emptyComponent = (
-    <View className="items-center px-4">
+    <View className="flex-1 items-center justify-center px-4">
       <Text className="mb-4 text-4xl">📚</Text>
       <Text className="mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100">
         No saved contents yet
@@ -141,20 +141,21 @@ export function ContentList() {
     </View>
   );
 
-  const renderItem = ({ item }: { item: (typeof userContents)[0] }) => {
+  const renderItem = ({ item, index }: { item: (typeof userContents)[0]; index: number }) => {
     const isLiked = isContentLiked(item);
 
     if (viewMode === 'list') {
       return (
-        <View className="mb-1">
+        <View className="mb-2">
           <ContentCardList item={item} onPress={handleItemPress} isLiked={isLiked} />
         </View>
       );
     }
 
     if (viewMode === 'smallCard') {
+      const columnPaddingClass = index % 2 === 0 ? 'pr-2' : 'pl-2';
       return (
-        <View className="flex-1 p-1">
+        <View className={`flex-1 pb-3 ${columnPaddingClass}`}>
           <ContentCardSmall item={item} onPress={handleItemPress} isLiked={isLiked} />
         </View>
       );
