@@ -38,3 +38,14 @@ Exports:
 - `@tkhwang-pico/config-eslint-prettier/prettier/tailwind`
 
 Choose the preset that best matches the target (Tailwind includes `prettier-plugin-tailwindcss`).
+
+## Commitlint usage
+
+```js
+// commitlint.config.mjs
+import config from '@tkhwang-pico/config-eslint-prettier/commitlint';
+
+export default config;
+```
+
+Commit 메시지는 Conventional Commit 규칙(`type(scope?): summary`)을 따라야 합니다. 예) `feat(mobile/queue): support push notifications`.

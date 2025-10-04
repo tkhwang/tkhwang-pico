@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "files": [
+    "commitlint/index.mjs",
     "eslint/flat/base.mjs",
     "eslint/flat/react.mjs",
     "eslint/flat/next.mjs",
@@ -40,6 +41,7 @@
     "./eslint/expo": "./eslint/flat/expo.mjs",
     "./eslint/nest": "./eslint/flat/nest.mjs",
     "./eslint/node": "./eslint/flat/node.mjs",
+    "./commitlint": "./commitlint/index.mjs",
     "./prettier/base": "./prettier/prettier.base.cjs",
     "./prettier/tailwind": "./prettier/prettier.tailwind.cjs"
   }

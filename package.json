@@ -9,6 +9,7 @@
     "type-check": "yarn workspaces foreach run type-check",
     "lint": "yarn workspaces foreach run lint",
     "lint-staged": "lint-staged",
+    "commitlint": "commitlint",
     "postinstall": "yarn workspace @tkhwang-pico/supabase build"
   },
   "workspaces": [
@@ -20,6 +21,8 @@
     "react-dom": "19.0.0"
   },
   "devDependencies": {
+    "@commitlint/cli": "^19.5.0",
+    "@commitlint/config-conventional": "^19.5.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.1.6"
   }
